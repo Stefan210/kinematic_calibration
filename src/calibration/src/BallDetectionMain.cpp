@@ -40,6 +40,26 @@ int main(int argc, char **argv) {
 	return 0;
 }
 
+void msg_cb(const sensor_msgs::PointCloud2& input) {
+	ROS_INFO("Pointcloud Message Received.");
+	BallDetection bc;
+
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr initialCloud = pcl::PointCloud<pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudWithoutPlanes = pcl::PointCloud<pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudWithBallOnly = pcl::PointCloud<pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
+	pcl::fromROSMsg(input, *initialCloud);
+
+	bc.removePlanes(initialCloud, cloudWithoutPlanes);
+	bc.segmentBall(cloudWithoutPlanes, cloudWithBallOnly);
+
+	pcl::visualization::CloudViewer viewer("viewer");
+	viewer.showCloud(cloudWithBallOnly);
+	while (!viewer.wasStopped()) {
+
+	}
+
+}
+
 void msg_cb1(const sensor_msgs::PointCloud2& input) {
 	ROS_INFO("Pointcloud Message Received.");
 	BallDetection bc;
@@ -99,7 +119,7 @@ void msg_cb1(const sensor_msgs::PointCloud2& input) {
 	}
 }
 
-void msg_cb(const sensor_msgs::PointCloud2& input) {
+void msg_cb2(const sensor_msgs::PointCloud2& input) {
 	ROS_INFO("Pointcloud Message Received.");
 	BallDetection bc;
 
