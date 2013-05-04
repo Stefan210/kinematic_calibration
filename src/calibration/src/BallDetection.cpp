@@ -56,9 +56,9 @@ bool BallDetection::removePlanes(pcl::PointCloud<pcl::PointXYZRGB>::Ptr inCloud,
 	segPlane.setDistanceThreshold(0.03);
 	segPlane.setInputCloud(inCloud);
 	segPlane.setInputNormals(cloud_normals);
+
 	// Obtain the plane inliers and coefficients
 	segPlane.segment(*inliers_plane, *coefficients_plane);
-	std::cerr << "Plane coefficients: " << *coefficients_plane << std::endl;
 
 	// Extract the planar inliers from the input cloud
 	extract.setInputCloud(inCloud);
@@ -83,8 +83,6 @@ bool BallDetection::segmentBall(pcl::PointCloud<pcl::PointXYZRGB>::Ptr inCloud,
 	segSphere.setMaxIterations(100000);
 	segSphere.setInputCloud(inCloud);
 	segSphere.segment(*inliersSphere, coefficients);
-
-	ROS_INFO_STREAM("# Inliers points: " << inliersSphere->indices.size());
 
 	extract.setInputCloud(inCloud);
 	extract.setIndices(inliersSphere);
