@@ -15,19 +15,14 @@
 #include <pcl/sample_consensus/model_types.h>
 #include <pcl/segmentation/sac_segmentation.h>
 
-BallDetection::BallDetection() {
-
-}
-
-BallDetection::~BallDetection() {
-
-}
-
-pcl::PointXYZ BallDetection::getPosition(pcl::PointCloud<pcl::PointXYZRGB>::Ptr initialCloud) {
+pcl::PointXYZ BallDetection::getPosition(
+		pcl::PointCloud<pcl::PointXYZRGB>::Ptr initialCloud) {
 	pcl::PointXYZ ballPosition;
 
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudWithoutPlanes = pcl::PointCloud<pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudWithBallOnly = pcl::PointCloud<pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudWithoutPlanes = pcl::PointCloud<
+			pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudWithBallOnly = pcl::PointCloud<
+			pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
 
 	removePlanes(initialCloud, cloudWithoutPlanes);
 	segmentBall(cloudWithoutPlanes, cloudWithBallOnly, ballPosition);
@@ -108,7 +103,10 @@ bool BallDetection::segmentBall(pcl::PointCloud<pcl::PointXYZRGB>::Ptr inCloud,
 	extract.setNegative(false);
 	extract.filter(*outCloud);
 
-	//todo
+	if (coefficients.values[3] <= this->maxBallRadius
+			&& coefficients.values[3] >= this->minBallRadius) {
+		return true;
+	}
 	return false;
 }
 
@@ -118,4 +116,11 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr BallDetection::getCloudWithoutPlanes() {
 
 pcl::PointCloud<pcl::PointXYZRGB>::Ptr BallDetection::getCloudWithBallOnly() {
 	return this->cloudWithBallOnly;
+}
+
+void BallDetection::setMinBallRadius(float minBallRadius) {
+	this->minBallRadius = minBallRadius;
+}
+void BallDetection::setMaxBallRadius(float maxBallRadius) {
+	this->maxBallRadius = maxBallRadius;
 }

@@ -18,17 +18,23 @@
 #include <pcl/point_types.h>
 
 // Default parameter
-#define DEFAULT_MIN_BALL_RADIUS (0.05)
-#define DEFAULT_MAX_BALL_RADIUS (0.10)
+#define MIN_BALL_RADIUS (0.05)
+#define MAX_BALL_RADIUS (0.10)
 
 class BallDetection {
 
 public:
-	BallDetection();
-	~BallDetection();
-	pcl::PointXYZ getPosition(pcl::PointCloud<pcl::PointXYZRGB>::Ptr initialCloud);
+	BallDetection() :
+			minBallRadius(MIN_BALL_RADIUS), maxBallRadius(MAX_BALL_RADIUS) {
+	}
+	~BallDetection() {
+	}
+	pcl::PointXYZ getPosition(
+			pcl::PointCloud<pcl::PointXYZRGB>::Ptr initialCloud);
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr getCloudWithoutPlanes();
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr getCloudWithBallOnly();
+	void setMinBallRadius(float minBallRadius);
+	void setMaxBallRadius(float maxBallRadius);
 
 protected:
 	bool removePlanes(pcl::PointCloud<pcl::PointXYZRGB>::Ptr inCloud,
@@ -41,6 +47,8 @@ private:
 	pcl::PointXYZ ballPosition;
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudWithoutPlanes;
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudWithBallOnly;
+	float minBallRadius;
+	float maxBallRadius;
 
 };
 
