@@ -17,6 +17,10 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 
+// Default parameter
+#define DEFAULT_MIN_BALL_RADIUS (0.05)
+#define DEFAULT_MAX_BALL_RADIUS (0.10)
+
 class BallDetection {
 
 public:
