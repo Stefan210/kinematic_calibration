@@ -23,8 +23,18 @@ BallDetection::~BallDetection() {
 
 }
 
-pcl::PointXYZRGB BallDetection::getPosition() {
-	pcl::PointXYZRGB ballPosition;
+pcl::PointXYZ BallDetection::getPosition(pcl::PointCloud<pcl::PointXYZRGB>::Ptr initialCloud) {
+	pcl::PointXYZ ballPosition;
+
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudWithoutPlanes = pcl::PointCloud<pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudWithBallOnly = pcl::PointCloud<pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
+
+	removePlanes(initialCloud, cloudWithoutPlanes);
+	segmentBall(cloudWithoutPlanes, cloudWithBallOnly, ballPosition);
+
+	this->cloudWithoutPlanes = cloudWithoutPlanes;
+	this->cloudWithBallOnly = cloudWithBallOnly;
+	this->ballPosition = ballPosition;
 
 	return ballPosition;
 }
@@ -65,10 +75,14 @@ bool BallDetection::removePlanes(pcl::PointCloud<pcl::PointXYZRGB>::Ptr inCloud,
 	extract.setIndices(inliers_plane);
 	extract.setNegative(true);
 	extract.filter(*outCloud);
-	return false;
+
+	//todo
+	return true;
 }
+
 bool BallDetection::segmentBall(pcl::PointCloud<pcl::PointXYZRGB>::Ptr inCloud,
-		pcl::PointCloud<pcl::PointXYZRGB>::Ptr outCloud) {
+		pcl::PointCloud<pcl::PointXYZRGB>::Ptr outCloud,
+		pcl::PointXYZ& ballPosition) {
 	pcl::SACSegmentation<pcl::PointXYZRGB> segSphere;
 	pcl::ExtractIndices<pcl::PointXYZRGB> extract;
 	pcl::ModelCoefficients coefficients;
@@ -82,11 +96,26 @@ bool BallDetection::segmentBall(pcl::PointCloud<pcl::PointXYZRGB>::Ptr inCloud,
 	segSphere.setRadiusLimits(0.01, 0.30);
 	segSphere.setMaxIterations(100000);
 	segSphere.setInputCloud(inCloud);
-	segSphere.segment(*inliersSphere, coefficients);
+	segSphere.segment(*inliersSphere, coefficients); //x,y,z,R
+
+	ROS_INFO("Radius of ball: %f", coefficients.values[3]);
+	ballPosition.x = coefficients.values[0];
+	ballPosition.y = coefficients.values[1];
+	ballPosition.z = coefficients.values[2];
 
 	extract.setInputCloud(inCloud);
 	extract.setIndices(inliersSphere);
 	extract.setNegative(false);
 	extract.filter(*outCloud);
+
+	//todo
 	return false;
+}
+
+pcl::PointCloud<pcl::PointXYZRGB>::Ptr BallDetection::getCloudWithoutPlanes() {
+	return this->cloudWithoutPlanes;
+}
+
+pcl::PointCloud<pcl::PointXYZRGB>::Ptr BallDetection::getCloudWithBallOnly() {
+	return this->cloudWithBallOnly;
 }

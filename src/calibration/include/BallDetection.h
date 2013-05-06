@@ -22,12 +22,21 @@ class BallDetection {
 public:
 	BallDetection();
 	~BallDetection();
-	pcl::PointXYZRGB getPosition();
-	bool removePlanes(pcl::PointCloud<pcl::PointXYZRGB>::Ptr inCloud, pcl::PointCloud<pcl::PointXYZRGB>::Ptr outCloud);
-	bool segmentBall(pcl::PointCloud<pcl::PointXYZRGB>::Ptr inCloud, pcl::PointCloud<pcl::PointXYZRGB>::Ptr outCloud);
+	pcl::PointXYZ getPosition(pcl::PointCloud<pcl::PointXYZRGB>::Ptr initialCloud);
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr getCloudWithoutPlanes();
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr getCloudWithBallOnly();
 
+protected:
+	bool removePlanes(pcl::PointCloud<pcl::PointXYZRGB>::Ptr inCloud,
+			pcl::PointCloud<pcl::PointXYZRGB>::Ptr outCloud);
+	bool segmentBall(pcl::PointCloud<pcl::PointXYZRGB>::Ptr inCloud,
+			pcl::PointCloud<pcl::PointXYZRGB>::Ptr outCloud,
+			pcl::PointXYZ& ballPosition);
 
-
+private:
+	pcl::PointXYZ ballPosition;
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudWithoutPlanes;
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudWithBallOnly;
 
 };
 
