@@ -4,7 +4,7 @@ project(calibration)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs pcl pcl_ros)
+find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs visualization_msgs pcl pcl_ros)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -116,16 +116,6 @@ include_directories(include
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
 
-#############
-## Testing ##
-#############
-
-## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_calibration.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
-
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
@@ -134,3 +124,13 @@ target_link_libraries(BallDetection ${catkin_LIBRARIES})
 
 add_executable(BallDetectionMain src/BallDetectionMain.cpp)
 target_link_libraries(BallDetectionMain BallDetection)
+
+#############
+## Testing ##
+#############
+
+## Add gtest based cpp test target and link libraries
+catkin_add_gtest(BallDetectionTest test/BallDetectionTest.cpp)
+if(TARGET BallDetectionTest)
+  target_link_libraries(BallDetectionTest BallDetection)
+endif()
