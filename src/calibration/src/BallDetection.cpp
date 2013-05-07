@@ -1,15 +1,14 @@
 /*
  * BallDetection.cpp
  *
- *  Created on: 02.05.2013
- *      Author: stefan
+ *  Created on: 01.05.2013
+ *      Author: Stefan Wrobel
  */
 
 #include "../include/BallDetection.h"
 
 #include <pcl/ModelCoefficients.h>
 #include <pcl/filters/extract_indices.h>
-#include <pcl/filters/passthrough.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/sample_consensus/method_types.h>
 #include <pcl/sample_consensus/model_types.h>

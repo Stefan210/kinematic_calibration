@@ -1,7 +1,7 @@
 /*
  * BallDetectionMain.cpp
  *
- *  Created on: 02.05.2013
+ *  Created on: 01.05.2013
  *      Author: stefan
  */
 
@@ -15,17 +15,6 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/visualization/cloud_viewer.h>
-
-#include <pcl/filters/radius_outlier_removal.h>
-#include <pcl/filters/conditional_removal.h>
-
-#include <pcl/ModelCoefficients.h>
-#include <pcl/filters/extract_indices.h>
-#include <pcl/filters/passthrough.h>
-#include <pcl/features/normal_3d.h>
-#include <pcl/sample_consensus/method_types.h>
-#include <pcl/sample_consensus/model_types.h>
-#include <pcl/segmentation/sac_segmentation.h>
 
 #include "../include/BallDetection.h"
 

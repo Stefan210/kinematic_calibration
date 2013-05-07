@@ -1,11 +1,17 @@
-//
+/*
+ * BallDetectionTest.cpp
+ *
+ *  Created on: 01.05.2013
+ *      Author: Stefan Wrobel
+ */
+
 #include "../include/BallDetection.h"
 
-// pcl
+// PCL specific includes
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 
-// gtest
+// gtest specific includes
 #include <gtest/gtest.h>
 
 // Declare a test
@@ -49,6 +55,8 @@ TEST(BallDetectionTest, simpleTest)
 		}
 	}
 
+	// the center of the sphere that is found by the segmentation
+	// should be at the previously defined position
 	ASSERT_TRUE(std::abs(ballPosition.x - x_center) < 0.01);
 	ASSERT_TRUE(std::abs(ballPosition.y - y_center) < 0.01);
 	ASSERT_TRUE(std::abs(ballPosition.z - z_center) < 0.01);
