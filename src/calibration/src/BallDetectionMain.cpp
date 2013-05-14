@@ -38,7 +38,8 @@ void msg_cb(const sensor_msgs::PointCloud2& input) {
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr initialCloud = pcl::PointCloud<
 			pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
 	pcl::fromROSMsg(input, *initialCloud);
-	pcl::PointXYZ ballPosition = bc.getPosition(initialCloud);
+	BallDetection::BallData bd = bc.getPosition(initialCloud);
+	pcl::PointXYZ ballPosition = bd.position;
 
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudWithoutPlanes =
 			bc.getCloudWithoutPlanes();
@@ -47,14 +48,15 @@ void msg_cb(const sensor_msgs::PointCloud2& input) {
 
 	ros::Time stamp = input.header.stamp;
 	sendMarker(ballPosition, stamp);
-	ROS_INFO("Ball position is (x,y,z) (%f, %f, %f).", ballPosition.x, ballPosition.y, ballPosition.z);
+	ROS_INFO(
+			"Ball position is (x,y,z) (%f, %f, %f) with radius %f.", ballPosition.x, ballPosition.y, ballPosition.z, bd.radius);
 
 	pcl::visualization::CloudViewer viewer("viewer");
 
 	/*viewer.showCloud(cloudWithBallOnly);
-	while (!viewer.wasStopped()) {
+	 while (!viewer.wasStopped()) {
 
-	}*/
+	 }*/
 
 }
 

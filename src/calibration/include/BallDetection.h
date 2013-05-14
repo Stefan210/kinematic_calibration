@@ -27,6 +27,11 @@
 class BallDetection {
 
 public:
+	struct BallData {
+		pcl::PointXYZ position;
+		float radius;
+	};
+
 	/// Constructor
 	BallDetection() :
 			minBallRadius(MIN_BALL_RADIUS), maxBallRadius(MAX_BALL_RADIUS) {
@@ -42,8 +47,10 @@ public:
 	 * @param initialCloud The point cloud containing the ball.
 	 * @return The position of the detected ball.
 	 */
-	pcl::PointXYZ getPosition(
+	BallData getPosition(
 			pcl::PointCloud<pcl::PointXYZRGB>::Ptr initialCloud);
+
+	BallData getAvgPosition(std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> clouds);
 
 	/**
 	 * Returns the cloud after extracting the planes.
@@ -90,7 +97,7 @@ protected:
 	 */
 	bool segmentBall(pcl::PointCloud<pcl::PointXYZRGB>::Ptr inCloud,
 			pcl::PointCloud<pcl::PointXYZRGB>::Ptr outCloud,
-			pcl::PointXYZ& ballPosition);
+			BallDetection::BallData& ballData);
 
 private:
 	/**

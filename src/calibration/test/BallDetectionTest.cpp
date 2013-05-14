@@ -17,9 +17,7 @@
 // Declare a test
 /* Note: This is just a very simple test for verifying that the ball detection basically works.
  * Passing this test does not imply that it also works with "real" data.
- */
-TEST(BallDetectionTest, simpleTest)
-{
+ */TEST(BallDetectionTest, simpleTest) {
 	float x_center = 0.48;
 	float y_center = 0.24;
 	float z_center = 0.02;
@@ -30,22 +28,22 @@ TEST(BallDetectionTest, simpleTest)
 	BallDetection bc;
 
 	// add sphere
-	for(int lat = 0; lat < 360; lat++) {
-		for(int lon = 0; lon < 180; lon++) {
+	for (int lat = 0; lat < 360; lat++) {
+		for (int lon = 0; lon < 180; lon++) {
 			float lon_rad = lon * M_PI / 180;
 			float lat_rad = lat * M_PI / 180;
 			pcl::PointXYZRGB point;
-			point.x = r*std::cos(lon_rad)*std::sin(lat_rad) + x_center;
-			point.y = r*std::sin(lon_rad)*std::sin(lat_rad) + y_center;
-			point.z = r*std::cos(lat_rad) + z_center;
+			point.x = r * std::cos(lon_rad) * std::sin(lat_rad) + x_center;
+			point.y = r * std::sin(lon_rad) * std::sin(lat_rad) + y_center;
+			point.z = r * std::cos(lat_rad) + z_center;
 			point.rgb = 255 + (255 << 8) + (255 << 16);
 			(*cloudPtr).push_back(point);
 		}
 	}
 
 	// add plane
-	for(float x = 0; x < 1; x += 0.05) {
-		for(float y = 0;  y < 5; y += 0.05) {
+	for (float x = 0; x < 1; x += 0.05) {
+		for (float y = 0; y < 5; y += 0.05) {
 			pcl::PointXYZRGB point;
 			point.x = x;
 			point.y = y;
@@ -55,6 +53,8 @@ TEST(BallDetectionTest, simpleTest)
 		}
 	}
 
+	pcl::PointXYZ ballPosition = bc.getPosition(cloudPtr).position;
+
 	// the center of the sphere that is found by the segmentation
 	// should be at the previously defined position
 	ASSERT_TRUE(std::abs(ballPosition.x - x_center) < 0.01);
@@ -62,15 +62,60 @@ TEST(BallDetectionTest, simpleTest)
 	ASSERT_TRUE(std::abs(ballPosition.z - z_center) < 0.01);
 }
 
-// Run all the tests that were declared with TEST()
-int main(int argc, char **argv){
-testing::InitGoogleTest(&argc, argv);
-return RUN_ALL_TESTS();
+TEST(BallDetectionTest, avgTest) {
+	float x_center = 0.48;
+	float y_center = 0.24;
+	float z_center = 0.02;
+	int r = 1.10;
+	std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> clouds;
+	BallDetection bc;
+
+	for (int numOfClouds = -2; numOfClouds < 3; numOfClouds++) {
+		pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudPtr = pcl::PointCloud<
+				pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
+
+		// add sphere
+		for (int lat = 0; lat < 360; lat++) {
+			for (int lon = 0; lon < 180; lon++) {
+				float lon_rad = lon * M_PI / 180;
+				float lat_rad = lat * M_PI / 180;
+				pcl::PointXYZRGB point;
+				point.x = r * std::cos(lon_rad) * std::sin(lat_rad) + x_center + numOfClouds;
+				point.y = r * std::sin(lon_rad) * std::sin(lat_rad) + y_center + numOfClouds;
+				point.z = r * std::cos(lat_rad) + z_center + numOfClouds;
+				point.rgb = 255 + (255 << 8) + (255 << 16);
+				(*cloudPtr).push_back(point);
+			}
+		}
+
+		// add plane
+		for (float x = 0; x < 1; x += 0.05) {
+			for (float y = 0; y < 5; y += 0.05) {
+				pcl::PointXYZRGB point;
+				point.x = x;
+				point.y = y;
+				point.z = 0;
+				point.rgb = 255;
+				(*cloudPtr).push_back(point);
+			}
+		}
+
+		clouds.push_back(cloudPtr);
+	}
+
+	BallDetection::BallData bd = bc.getAvgPosition(clouds);
+	pcl::PointXYZ ballPosition = bd.position;
+
+	// the center of the sphere that is found by the segmentation
+	// should be at the previously defined position
+	ASSERT_TRUE(std::abs(bd.position.x - x_center) < 0.01);
+	ASSERT_TRUE(std::abs(bd.position.y - y_center) < 0.01);
+	ASSERT_TRUE(std::abs(bd.position.z - z_center) < 0.01);
 }
 
-
-
-
-
-
+// Run all the tests that were declared with TEST()
+int main(int argc, char **argv) {
+	testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
+}
 
