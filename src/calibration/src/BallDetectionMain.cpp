@@ -28,12 +28,15 @@ int main(int argc, char **argv) {
 			1, msg_cb);
 
 	ros::spin();
+
 	return 0;
 }
 
 void msg_cb(const sensor_msgs::PointCloud2& input) {
 	ROS_INFO("Pointcloud Message Received.");
 	BallDetection bc;
+	//bc.setMinBallRadius(0.074);
+	//bc.setMaxBallRadius(0.076);
 
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr initialCloud = pcl::PointCloud<
 			pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
@@ -47,16 +50,16 @@ void msg_cb(const sensor_msgs::PointCloud2& input) {
 			bc.getCloudWithBallOnly();
 
 	ros::Time stamp = input.header.stamp;
-	sendMarker(ballPosition, stamp);
+
 	ROS_INFO(
 			"Ball position is (x,y,z) (%f, %f, %f) with radius %f.", ballPosition.x, ballPosition.y, ballPosition.z, bd.radius);
-
+	sendMarker(ballPosition, stamp);
 	pcl::visualization::CloudViewer viewer("viewer");
 
-	/*viewer.showCloud(cloudWithBallOnly);
-	 while (!viewer.wasStopped()) {
+	viewer.showCloud(cloudWithBallOnly);
+	while (!viewer.wasStopped()) {
 
-	 }*/
+	}
 
 }
 

@@ -112,9 +112,9 @@ bool BallDetection::segmentBall(pcl::PointCloud<pcl::PointXYZRGB>::Ptr inCloud,
 	segSphere.setOptimizeCoefficients(false);
 	segSphere.setModelType(pcl::SACMODEL_SPHERE); //detecting SPHERE
 	segSphere.setMethodType(pcl::SAC_RANSAC);
-	segSphere.setDistanceThreshold(0.01);
+	segSphere.setDistanceThreshold(0.0001);
 	segSphere.setRadiusLimits(this->minBallRadius, this->maxBallRadius); //0.01, 0.30
-	segSphere.setMaxIterations(100000);
+	segSphere.setMaxIterations(100000); //100000
 	segSphere.setInputCloud(inCloud);
 	segSphere.segment(*inliersSphere, coefficients); //x,y,z,R
 
