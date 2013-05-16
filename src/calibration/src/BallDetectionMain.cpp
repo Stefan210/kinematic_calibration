@@ -21,6 +21,8 @@
 void msg_cb(const sensor_msgs::PointCloud2& input);
 void sendMarker(pcl::PointXYZ, ros::Time stamp);
 
+std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> clouds;
+
 int main(int argc, char **argv) {
 	ros::init(argc, argv, "BallDetectionMain");
 	ros::NodeHandle nh;
@@ -41,7 +43,14 @@ void msg_cb(const sensor_msgs::PointCloud2& input) {
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr initialCloud = pcl::PointCloud<
 			pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
 	pcl::fromROSMsg(input, *initialCloud);
-	BallDetection::BallData bd = bc.getPosition(initialCloud);
+
+	clouds.push_back(initialCloud);
+
+	//BallDetection::BallData bd = bc.getPosition(initialCloud);
+
+	if(clouds.size() < 10) return;
+
+	BallDetection::BallData bd = bc.getAvgPosition(clouds);
 	pcl::PointXYZ ballPosition = bd.position;
 
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudWithoutPlanes =
