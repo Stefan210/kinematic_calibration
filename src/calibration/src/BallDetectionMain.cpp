@@ -9,6 +9,8 @@
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <visualization_msgs/Marker.h>
+#include <tf/transform_listener.h>
+#include <geometry_msgs/PointStamped.h>
 
 // PCL specific includes
 #include <pcl/ros/conversions.h>
@@ -18,16 +20,23 @@
 
 #include "../include/BallDetection.h"
 
+#define FIXED_FRAME "r_sole"
+#define CAMERA_FRAME "xtion_depth_optical_frame"
+
 void msg_cb(const sensor_msgs::PointCloud2& input);
-void sendMarker(pcl::PointXYZ, ros::Time stamp);
+void sendMarker(geometry_msgs::PointStamped);
+void transformPosition(tf::TransformListener& tl, geometry_msgs::PointStamped, geometry_msgs::PointStamped& transformedPosition);
 
 std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> clouds;
+tf::TransformListener* ptf;
 
 int main(int argc, char **argv) {
 	ros::init(argc, argv, "BallDetectionMain");
 	ros::NodeHandle nh;
 	ros::Subscriber subscriber = nh.subscribe("/xtion/depth_registered/points",
 			1, msg_cb);
+	tf::TransformListener tf;
+	ptf = &tf;
 
 	ros::spin();
 
@@ -48,7 +57,7 @@ void msg_cb(const sensor_msgs::PointCloud2& input) {
 
 	//BallDetection::BallData bd = bc.getPosition(initialCloud);
 
-	if(clouds.size() < 10) return;
+	if(clouds.size() < 1) return;
 
 	BallDetection::BallData bd = bc.getAvgPosition(clouds);
 	pcl::PointXYZ ballPosition = bd.position;
@@ -62,7 +71,20 @@ void msg_cb(const sensor_msgs::PointCloud2& input) {
 
 	ROS_INFO(
 			"Ball position is (x,y,z) (%f, %f, %f) with radius %f.", ballPosition.x, ballPosition.y, ballPosition.z, bd.radius);
-	sendMarker(ballPosition, stamp);
+
+	// create stamped geometry_msgs for original and transformed point
+	geometry_msgs::PointStamped camera_point;
+	geometry_msgs::PointStamped transformed_point;
+
+	camera_point.point.x = ballPosition.x;
+	camera_point.point.y = ballPosition.y;
+	camera_point.point.z = ballPosition.z;
+	camera_point.header.stamp = stamp;
+	camera_point.header.frame_id = CAMERA_FRAME;
+
+	//todo: use of non-global transform listener!
+	transformPosition(*ptf, camera_point, transformed_point);
+	sendMarker(transformed_point);
 	pcl::visualization::CloudViewer viewer("viewer");
 
 	viewer.showCloud(cloudWithBallOnly);
@@ -72,20 +94,29 @@ void msg_cb(const sensor_msgs::PointCloud2& input) {
 
 }
 
-void sendMarker(pcl::PointXYZ position, ros::Time stamp) {
+void transformPosition(tf::TransformListener& tl, geometry_msgs::PointStamped originalPosition, geometry_msgs::PointStamped& transformedPosition) {
+	tl.transformPoint(FIXED_FRAME, originalPosition, transformedPosition);
+
+	ROS_INFO("originalPosition: (%.2f, %.2f. %.2f) -----> transformedPosition: (%.2f, %.2f, %.2f) at time %.2f",
+			originalPosition.point.x, originalPosition.point.y, originalPosition.point.z,
+			transformedPosition.point.x, transformedPosition.point.y, transformedPosition.point.z, transformedPosition.header.stamp.toSec());
+}
+
+void sendMarker(geometry_msgs::PointStamped position) {
 	ros::NodeHandle n;
 	ros::Publisher marker_pub = n.advertise<visualization_msgs::Marker>(
 			"visualization_marker", 1);
 	visualization_msgs::Marker marker;
-	marker.header.frame_id = "xtion_depth_optical_frame";
-	marker.header.stamp = stamp;
+
+	marker.header.frame_id = position.header.frame_id;
+	marker.header.stamp = position.header.stamp;
 	marker.ns = "my_namespace";
 	marker.id = 0;
 	marker.type = visualization_msgs::Marker::SPHERE;
 	marker.action = visualization_msgs::Marker::ADD;
-	marker.pose.position.x = position.x;
-	marker.pose.position.y = position.y;
-	marker.pose.position.z = position.z;
+	marker.pose.position.x = position.point.x;
+	marker.pose.position.y = position.point.y;
+	marker.pose.position.z = position.point.z;
 	marker.pose.orientation.x = 0.0;
 	marker.pose.orientation.y = 0.0;
 	marker.pose.orientation.z = 0.0;
