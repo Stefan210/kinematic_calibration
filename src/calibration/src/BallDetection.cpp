@@ -13,17 +13,23 @@
 #include <pcl/sample_consensus/method_types.h>
 #include <pcl/sample_consensus/model_types.h>
 #include <pcl/segmentation/sac_segmentation.h>
+#include <pcl/filters/passthrough.h>
+
+#include <boost/math/special_functions/fpclassify.hpp>
 
 BallDetection::BallData BallDetection::getPosition(
 		pcl::PointCloud<pcl::PointXYZRGB>::Ptr initialCloud) {
 	BallDetection::BallData bd;
 
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudDistanceFiltered = pcl::PointCloud<
+			pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudWithoutPlanes = pcl::PointCloud<
 			pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudWithBallOnly = pcl::PointCloud<
 			pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
 
-	removePlanes(initialCloud, cloudWithoutPlanes);
+	filterRange(initialCloud, cloudDistanceFiltered);
+	removePlanes(cloudDistanceFiltered, cloudWithoutPlanes);
 	segmentBall(cloudWithoutPlanes, cloudWithBallOnly, bd);
 
 	this->cloudWithoutPlanes = cloudWithoutPlanes;
@@ -40,23 +46,58 @@ BallDetection::BallData BallDetection::getAvgPosition(
 	float ySum = 0;
 	float zSum = 0;
 	BallDetection::BallData bd;
+	int positionsFound = 0;
 
-	for(int numOfCloud = 0; numOfCloud < clouds.size(); numOfCloud++) {
+	for (int numOfCloud = 0; numOfCloud < clouds.size(); numOfCloud++) {
+		ROS_INFO(
+				"Processing pointcloud #%i/%i", numOfCloud+1, (int)clouds.size());
 		BallDetection::BallData current = this->getPosition(clouds[numOfCloud]);
-		xSum += current.position.x;
-		ySum += current.position.y;
-		zSum += current.position.z;
-		radiusSum += current.radius;
+		if (!isnan(current.position.x)) {
+			xSum += current.position.x;
+			ySum += current.position.y;
+			zSum += current.position.z;
+			radiusSum += current.radius;
+			positionsFound++;
+			ROS_INFO(
+					"(x,y,z,r), %f, %f, %f, %f", current.position.x, current.position.y, current.position.z, current.radius);
+		}
 	}
 
-	bd.position.x = xSum / (float)clouds.size();
-	bd.position.y = ySum / (float)clouds.size();
-	bd.position.z = zSum / (float)clouds.size();
-	bd.radius = radiusSum / (float)clouds.size();
+	bd.position.x = xSum / (float) positionsFound;
+	bd.position.y = ySum / (float) positionsFound;
+	bd.position.z = zSum / (float) positionsFound;
+	bd.radius = radiusSum / (float) positionsFound;
 
 	this->ballPosition = bd.position;
 
 	return bd;
+}
+
+void BallDetection::filterRange(pcl::PointCloud<pcl::PointXYZRGB>::Ptr inCloud,
+		pcl::PointCloud<pcl::PointXYZRGB>::Ptr outCloud) {
+	// Create the filtering object
+	pcl::PassThrough<pcl::PointXYZRGB> pass;
+
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr filteredX = pcl::PointCloud<
+			pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr filteredXY = pcl::PointCloud<
+			pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
+
+
+	pass.setInputCloud(inCloud);
+	pass.setFilterFieldName("x");
+	pass.setFilterLimits(-1.0, 1.0);
+	pass.filter(*filteredX);
+
+	pass.setInputCloud(filteredX);
+	pass.setFilterFieldName("y");
+	pass.setFilterLimits(-1.0, 1.0);
+	pass.filter(*filteredXY);
+
+	pass.setInputCloud(filteredXY);
+	pass.setFilterFieldName("z");
+	pass.setFilterLimits(-1.0, 1.0);
+	pass.filter(*outCloud);
 }
 
 bool BallDetection::removePlanes(pcl::PointCloud<pcl::PointXYZRGB>::Ptr inCloud,
@@ -112,7 +153,7 @@ bool BallDetection::segmentBall(pcl::PointCloud<pcl::PointXYZRGB>::Ptr inCloud,
 	segSphere.setOptimizeCoefficients(false);
 	segSphere.setModelType(pcl::SACMODEL_SPHERE); //detecting SPHERE
 	segSphere.setMethodType(pcl::SAC_RANSAC);
-	segSphere.setDistanceThreshold(0.0001);
+	segSphere.setDistanceThreshold(0.0001); //0.0001
 	segSphere.setRadiusLimits(this->minBallRadius, this->maxBallRadius); //0.01, 0.30
 	segSphere.setMaxIterations(100000); //100000
 	segSphere.setInputCloud(inCloud);

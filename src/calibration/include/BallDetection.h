@@ -79,6 +79,9 @@ public:
 	void setMaxBallRadius(float maxBallRadius);
 
 protected:
+	void filterRange(pcl::PointCloud<pcl::PointXYZRGB>::Ptr inCloud,
+			pcl::PointCloud<pcl::PointXYZRGB>::Ptr outCloud);
+
 	/**
 	 * Extracts planes (e.g. floor) contained in the point cloud.
 	 * @param inCloud Point cloud which contains planes.
