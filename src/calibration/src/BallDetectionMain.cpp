@@ -21,11 +21,13 @@
 #include "../include/BallDetection.h"
 
 #define FIXED_FRAME "r_sole"
-#define CAMERA_FRAME "xtion_depth_optical_frame"
+#define CAMERA_FRAME "xtion_rgb_optical_frame"
 
 struct BallDetectionMainOptions {
 	int numOfPcls;
 	std::string filename;
+	float minRadius;
+	float maxRadius;
 };
 
 void msg_cb(const sensor_msgs::PointCloud2& input);
@@ -44,11 +46,18 @@ int main(int argc, char **argv) {
 			1, msg_cb);
 	tf::TransformListener tf;
 	ptf = &tf;
+	options.numOfPcls = 1;
+	options.minRadius = 0.74;
+	options.maxRadius = 0.76;
 
 	// parse command line arguments
 	for (int i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "-n") == 0) {
 			options.numOfPcls = atoi(argv[i + 1]);
+		} else 	if (strcmp(argv[i], "-minr") == 0) {
+			options.minRadius = atof(argv[i + 1]);
+		} else 	if (strcmp(argv[i], "-maxr") == 0) {
+			options.maxRadius = atof(argv[i + 1]);
 		}
 	}
 
@@ -92,32 +101,75 @@ void msg_cb(const sensor_msgs::PointCloud2& input) {
 	camera_point.point.y = ballPosition.y;
 	camera_point.point.z = ballPosition.z;
 	camera_point.header.stamp = stamp;
-	camera_point.header.frame_id = CAMERA_FRAME;
+	camera_point.header.frame_id = input.header.frame_id;
 
-	//todo: use of non-global transform listener!
 	transformPosition(*ptf, camera_point, transformed_point);
 
 	// output results to console
 	ROS_INFO("Radius, camera_frame.x, camera_frame.y, camera_frame.z, fixed_frame.x, fixed_frame.y, fixed_frame.z");
 	ROS_INFO(
 			"%f, %f, %f, %f, %f, %f, %f", bd.radius, ballPosition.x, ballPosition.y, ballPosition.z, transformed_point.point.x, transformed_point.point.y, transformed_point.point.z);
-	/*sendMarker(transformed_point);
-	pcl::visualization::CloudViewer viewer("viewer");
+	//sendMarker(camera_point);
+	sendMarker(transformed_point);
+
+	/*pcl::visualization::CloudViewer viewer("viewer");
 
 	viewer.showCloud(cloudWithBallOnly);
 	while (!viewer.wasStopped()) {
 
 	}*/
 
+	clouds.clear();
 }
 
 void transformPosition(tf::TransformListener& tl,
 		geometry_msgs::PointStamped originalPosition,
 		geometry_msgs::PointStamped& transformedPosition) {
-	tl.transformPoint(FIXED_FRAME, originalPosition, transformedPosition);
+	//tl.transformPoint(FIXED_FRAME, originalPosition, transformedPosition);
 
-	//ROS_INFO(
-	//		"originalPosition: (%.2f, %.2f. %.2f) -----> transformedPosition: (%.2f, %.2f, %.2f) at time %.2f", originalPosition.point.x, originalPosition.point.y, originalPosition.point.z, transformedPosition.point.x, transformedPosition.point.y, transformedPosition.point.z, transformedPosition.header.stamp.toSec());
+	// temp start
+	tf::StampedTransform opticalToCamera;
+	tf::StampedTransform cameraToHead;
+	tf::StampedTransform headToFixed;
+	std::string optical = originalPosition.header.frame_id;
+	std::string camera = "xtion_platform";
+	std::string head = "HeadPitch_link";
+	std::string fixed = "r_sole";
+	ros::Time time = originalPosition.header.stamp;
+	tl.lookupTransform(camera, optical, time, opticalToCamera);
+	tl.lookupTransform(head, camera, time, cameraToHead);
+	tl.lookupTransform(fixed, head, time, headToFixed);
+
+	//v1
+	//tf::Transform opticalToFixed = opticalToCamera * cameraToHead * headToFixed;
+	tf::Vector3 originalVector(originalPosition.point.x, originalPosition.point.y, originalPosition.point.z);
+	//tf::Vector3 transformedVetor = opticalToFixed * originalVector;
+	tf::Vector3 transformedVetor = (headToFixed * (cameraToHead * (opticalToCamera * originalVector)));
+	transformedPosition.point.x = transformedVetor.getX();
+	transformedPosition.point.y = transformedVetor.getY();
+	transformedPosition.point.z = transformedVetor.getZ();
+	transformedPosition.header.stamp = originalPosition.header.stamp;
+	transformedPosition.header.frame_id = "r_sole";
+	ROS_INFO(
+			"originalPosition: (%.2f, %.2f. %.2f) -----> transformedPosition: (%.2f, %.2f, %.2f) at time %.2f", originalPosition.point.x, originalPosition.point.y, originalPosition.point.z, transformedPosition.point.x, transformedPosition.point.y, transformedPosition.point.z, transformedPosition.header.stamp.toSec());
+
+	//v2
+	tf::StampedTransform opticalToFixedStamped;
+	tl.lookupTransform(FIXED_FRAME, originalPosition.header.frame_id, time, opticalToFixedStamped);
+	transformedVetor = opticalToFixedStamped * originalVector;
+	transformedPosition.point.x = transformedVetor.getX();
+	transformedPosition.point.y = transformedVetor.getY();
+	transformedPosition.point.z = transformedVetor.getZ();
+	transformedPosition.header.stamp = originalPosition.header.stamp;
+	transformedPosition.header.frame_id = "r_sole";
+	ROS_INFO(
+			"originalPosition: (%.2f, %.2f. %.2f) -----> transformedPosition: (%.2f, %.2f, %.2f) at time %.2f", originalPosition.point.x, originalPosition.point.y, originalPosition.point.z, transformedPosition.point.x, transformedPosition.point.y, transformedPosition.point.z, transformedPosition.header.stamp.toSec());
+
+	// temp end
+
+	tl.transformPoint(FIXED_FRAME, originalPosition, transformedPosition);
+	ROS_INFO(
+			"originalPosition: (%.2f, %.2f. %.2f) -----> transformedPosition: (%.2f, %.2f, %.2f) at time %.2f", originalPosition.point.x, originalPosition.point.y, originalPosition.point.z, transformedPosition.point.x, transformedPosition.point.y, transformedPosition.point.z, transformedPosition.header.stamp.toSec());
 }
 
 void sendMarker(geometry_msgs::PointStamped position) {
