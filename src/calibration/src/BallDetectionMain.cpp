@@ -2,7 +2,7 @@
  * BallDetectionMain.cpp
  *
  *  Created on: 01.05.2013
- *      Author: stefan
+ *      Author: Stefan Wrobel
  */
 
 // ROS specific includes
@@ -125,9 +125,8 @@ void msg_cb(const sensor_msgs::PointCloud2& input) {
 void transformPosition(tf::TransformListener& tl,
 		geometry_msgs::PointStamped originalPosition,
 		geometry_msgs::PointStamped& transformedPosition) {
-	//tl.transformPoint(FIXED_FRAME, originalPosition, transformedPosition);
 
-	// temp start
+	// 1) transformation using three single transformations and chaining
 	tf::StampedTransform opticalToCamera;
 	tf::StampedTransform cameraToHead;
 	tf::StampedTransform headToFixed;
@@ -140,10 +139,9 @@ void transformPosition(tf::TransformListener& tl,
 	tl.lookupTransform(head, camera, time, cameraToHead);
 	tl.lookupTransform(fixed, head, time, headToFixed);
 
-	//v1
-	//tf::Transform opticalToFixed = opticalToCamera * cameraToHead * headToFixed;
+
+	//tf::Transform opticalToFixed = headToFixed * cameraToHead * opticalToCamera;
 	tf::Vector3 originalVector(originalPosition.point.x, originalPosition.point.y, originalPosition.point.z);
-	//tf::Vector3 transformedVetor = opticalToFixed * originalVector;
 	tf::Vector3 transformedVetor = (headToFixed * (cameraToHead * (opticalToCamera * originalVector)));
 	transformedPosition.point.x = transformedVetor.getX();
 	transformedPosition.point.y = transformedVetor.getY();
@@ -153,20 +151,7 @@ void transformPosition(tf::TransformListener& tl,
 	ROS_INFO(
 			"originalPosition: (%.2f, %.2f. %.2f) -----> transformedPosition: (%.2f, %.2f, %.2f) at time %.2f", originalPosition.point.x, originalPosition.point.y, originalPosition.point.z, transformedPosition.point.x, transformedPosition.point.y, transformedPosition.point.z, transformedPosition.header.stamp.toSec());
 
-	//v2
-	tf::StampedTransform opticalToFixedStamped;
-	tl.lookupTransform(FIXED_FRAME, originalPosition.header.frame_id, time, opticalToFixedStamped);
-	transformedVetor = opticalToFixedStamped * originalVector;
-	transformedPosition.point.x = transformedVetor.getX();
-	transformedPosition.point.y = transformedVetor.getY();
-	transformedPosition.point.z = transformedVetor.getZ();
-	transformedPosition.header.stamp = originalPosition.header.stamp;
-	transformedPosition.header.frame_id = "r_sole";
-	ROS_INFO(
-			"originalPosition: (%.2f, %.2f. %.2f) -----> transformedPosition: (%.2f, %.2f, %.2f) at time %.2f", originalPosition.point.x, originalPosition.point.y, originalPosition.point.z, transformedPosition.point.x, transformedPosition.point.y, transformedPosition.point.z, transformedPosition.header.stamp.toSec());
-
-	// temp end
-
+	// tranfroamtion within one step
 	tl.transformPoint(FIXED_FRAME, originalPosition, transformedPosition);
 	ROS_INFO(
 			"originalPosition: (%.2f, %.2f. %.2f) -----> transformedPosition: (%.2f, %.2f, %.2f) at time %.2f", originalPosition.point.x, originalPosition.point.y, originalPosition.point.z, transformedPosition.point.x, transformedPosition.point.y, transformedPosition.point.z, transformedPosition.header.stamp.toSec());
