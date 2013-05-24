@@ -8,6 +8,8 @@
 #ifndef TRANSFORMOPTIMIZATION_H_
 #define TRANSFORMOPTIMIZATION_H_
 
+#include <tf/tf.h>
+
 struct MeasurePointStruct {
 	tf::Vector3 measuredPosition; 	// measured point within the measure frame
 	tf::Transform MeasureToFrameA; // e.g. measure frame first frame of the camera system
@@ -23,7 +25,7 @@ class TransformOptimization {
 public:
 	TransformOptimization();
 	virtual ~TransformOptimization();
-	void addMeasurePoint(MeasurePoint& newPoint);
+	void addMeasurePoint(MeasurePoint newPoint);
 	void clearMeasurePoints();
 	void optimizeTransform(tf::Transform& FrameAToFrameB);
 
@@ -31,7 +33,7 @@ protected:
 	void calculateError(tf::Transform& FrameAToFrameB, float& error);
 
 private:
-	std::vector<MeasurePoint&> measurePoints;
+	std::vector<MeasurePoint> measurePoints;
 };
 
 #endif /* TRANSFORMOPTIMIZATION_H_ */

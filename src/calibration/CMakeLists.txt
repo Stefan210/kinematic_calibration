@@ -125,6 +125,9 @@ target_link_libraries(BallDetection ${catkin_LIBRARIES})
 add_executable(BallDetectionMain src/BallDetectionMain.cpp)
 target_link_libraries(BallDetectionMain BallDetection)
 
+add_executable(CameraCalibration src/CameraCalibration.cpp src/BallDetection.cpp src/TransformOptimization.cpp)
+target_link_libraries(CameraCalibration ${catkin_LIBRARIES})
+
 #############
 ## Testing ##
 #############

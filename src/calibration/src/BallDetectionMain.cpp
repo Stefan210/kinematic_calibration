@@ -151,7 +151,7 @@ void transformPosition(tf::TransformListener& tl,
 	ROS_INFO(
 			"originalPosition: (%.2f, %.2f. %.2f) -----> transformedPosition: (%.2f, %.2f, %.2f) at time %.2f", originalPosition.point.x, originalPosition.point.y, originalPosition.point.z, transformedPosition.point.x, transformedPosition.point.y, transformedPosition.point.z, transformedPosition.header.stamp.toSec());
 
-	// tranfroamtion within one step
+	// 2) tranfroamtion within one step
 	tl.transformPoint(FIXED_FRAME, originalPosition, transformedPosition);
 	ROS_INFO(
 			"originalPosition: (%.2f, %.2f. %.2f) -----> transformedPosition: (%.2f, %.2f, %.2f) at time %.2f", originalPosition.point.x, originalPosition.point.y, originalPosition.point.z, transformedPosition.point.x, transformedPosition.point.y, transformedPosition.point.z, transformedPosition.header.stamp.toSec());

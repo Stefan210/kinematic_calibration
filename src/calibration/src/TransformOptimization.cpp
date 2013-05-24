@@ -16,7 +16,7 @@ TransformOptimization::~TransformOptimization() {
 	// TODO Auto-generated destructor stub
 }
 
-void TransformOptimization::addMeasurePoint(MeasurePoint& newPoint) {
+void TransformOptimization::addMeasurePoint(MeasurePoint newPoint) {
 	this->measurePoints.push_back(newPoint);
 }
 
