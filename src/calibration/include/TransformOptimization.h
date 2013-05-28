@@ -12,8 +12,8 @@
 
 struct MeasurePointStruct {
 	tf::Vector3 measuredPosition; // measured point within the measure frame
-	tf::Transform MeasureToFrameA; // e.g. measure frame to first frame of the camera system
-	tf::Transform FrameBToFrameC; // e.g. first frame of body (HeadPitch) to last frame of body (r_sole)
+	tf::Transform measureToFrameA; // e.g. measure frame to first frame of the camera system
+	tf::Transform frameBToFrameC; // e.g. first frame of body (HeadPitch) to last frame of body (r_sole)
 };
 
 typedef struct MeasurePointStruct MeasurePoint;
@@ -28,12 +28,16 @@ public:
 	void addMeasurePoint(MeasurePoint newPoint);
 	void clearMeasurePoints();
 	void optimizeTransform(tf::Transform& FrameAToFrameB);
+	void setInitialTransformAB(tf::Transform FrameAToFrameB);
 
 protected:
 	void calculateError(tf::Transform& FrameAToFrameB, float& error);
+	bool canStop();
 
 private:
 	std::vector<MeasurePoint> measurePoints;
+	tf::Transform initialTransformAB;
+	int numOfIterations;
 };
 
 #endif /* TRANSFORMOPTIMIZATION_H_ */

@@ -7,7 +7,7 @@
 
 #include "../include/CameraCalibration.h"
 
-CameraCalibration::CameraCalibration() {
+CameraCalibration::CameraCalibration() : transformListener(ros::Duration(180,0)) {
 	// TODO
 	this->pointCloudTopic = DEFAULT_POINTCLOUD_MSG;
 	this->cameraFrame = DEFAULT_CAMERA_FRAME;
@@ -17,7 +17,7 @@ CameraCalibration::CameraCalibration() {
 			&CameraCalibration::pointcloudMsgCb, this);
 	this->ballDetection.setMinBallRadius(0.074); //todo: parameterize
 	this->ballDetection.setMaxBallRadius(0.076); //todo: parameterize
-	this->minNumOfMeasurements = 10; //todo: parameterize
+	this->minNumOfMeasurements = 3; //todo: parameterize
 }
 
 CameraCalibration::~CameraCalibration() {
@@ -55,6 +55,21 @@ void CameraCalibration::pointcloudMsgCb(const sensor_msgs::PointCloud2& input) {
 			this->measurementSeries.push_back(newMeasurePoint);
 			ROS_INFO(
 					"Last measurement (average position): %f, %f, %f.", newMeasurePoint.measuredPosition.getX(), newMeasurePoint.measuredPosition.getY(), newMeasurePoint.measuredPosition.getZ());
+			// TODO: extract method / refactor
+			if(this->measurementSeries.size() == 3) {
+				ROS_INFO("optimizing...");
+				// initialize TransformOptization
+				tf::StampedTransform frameAToFrameB;
+				this->transformListener.lookupTransform(headFrame, cameraFrame, input.header.stamp, frameAToFrameB);
+				this->transformOptimization.setInitialTransformAB(frameAToFrameB);
+				for(int j = 0; j < this->measurementSeries.size(); j++) {
+					this->transformOptimization.addMeasurePoint(this->measurementSeries[j]);
+				}
+
+				// optimize!
+				tf::Transform optimizedTransform;
+				this->transformOptimization.optimizeTransform(optimizedTransform);
+			}
 		}
 		currentMeasurement.clear();
 	} else { // pointcloud belongs to current measurement
@@ -83,8 +98,8 @@ void CameraCalibration::createMeasurePoint(
 	transformListener.lookupTransform(cameraFrame, opticalFrame, time,
 			opticalToCamera);
 	transformListener.lookupTransform(fixedFrame, headFrame, time, headToFixed);
-	newMeasurePoint.MeasureToFrameA = opticalToCamera;
-	newMeasurePoint.FrameBToFrameC = headToFixed;
+	newMeasurePoint.measureToFrameA = opticalToCamera;
+	newMeasurePoint.frameBToFrameC = headToFixed;
 
 	// determine average position
 	float x = 0, y = 0, z = 0;
