@@ -38,6 +38,8 @@ private:
 	std::vector<MeasurePoint> measurePoints;
 	tf::Transform initialTransformAB;
 	int numOfIterations;
+	tf::Transform svdSelfImpl(std::vector<tf::Vector3> pointcloudX,
+			std::vector<tf::Vector3> pointcloudP);
 };
 
 #endif /* TRANSFORMOPTIMIZATION_H_ */
