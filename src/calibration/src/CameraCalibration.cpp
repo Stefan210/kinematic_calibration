@@ -56,7 +56,7 @@ void CameraCalibration::pointcloudMsgCb(const sensor_msgs::PointCloud2& input) {
 			ROS_INFO(
 					"Last measurement (average position): %f, %f, %f.", newMeasurePoint.measuredPosition.getX(), newMeasurePoint.measuredPosition.getY(), newMeasurePoint.measuredPosition.getZ());
 			// TODO: extract method / refactor
-			if(this->measurementSeries.size() == 3) {
+			if(this->measurementSeries.size() == 15) {
 				ROS_INFO("optimizing...");
 				// initialize TransformOptization
 				tf::StampedTransform frameAToFrameB;

@@ -11,7 +11,7 @@
 #include <tf/tf.h>
 
 struct MeasurePointStruct {
-	tf::Vector3 measuredPosition; // measured point within the measure frame
+	tf::Vector3 measuredPosition; // measured point within the optical frame
 	tf::Transform measureToFrameA; // e.g. measure frame to first frame of the camera system
 	tf::Transform frameBToFrameC; // e.g. first frame of body (HeadPitch) to last frame of body (r_sole)
 };
@@ -40,6 +40,9 @@ private:
 	int numOfIterations;
 	tf::Transform svdSelfImpl(std::vector<tf::Vector3> pointcloudX,
 			std::vector<tf::Vector3> pointcloudP);
+	tf::Transform svdPCL(std::vector<tf::Vector3> pointcloudX,
+			std::vector<tf::Vector3> pointcloudP);
+	void validate(tf::Transform transformAToB);
 };
 
 #endif /* TRANSFORMOPTIMIZATION_H_ */

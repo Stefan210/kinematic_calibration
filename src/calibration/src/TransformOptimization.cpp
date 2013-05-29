@@ -8,6 +8,8 @@
 #include "../include/TransformOptimization.h"
 
 #include <Eigen/SVD>
+#include <pcl/registration/transformation_estimation.h>
+#include <pcl/registration/transformation_estimation_svd.h>
 
 using namespace std;
 
@@ -29,7 +31,7 @@ void TransformOptimization::clearMeasurePoints() {
 	this->measurePoints.clear();
 }
 
-void TransformOptimization::optimizeTransform(tf::Transform& FrameAToFrameB) {
+void TransformOptimization::optimizeTransform(tf::Transform& frameAToFrameB) {
 	tf::Transform currentAB = initialTransformAB;
 
 	std::cout << "initial origin " << currentAB.getOrigin().getX() << ","
@@ -76,13 +78,25 @@ void TransformOptimization::optimizeTransform(tf::Transform& FrameAToFrameB) {
 		std::vector<tf::Vector3> pointcloudP;
 		for (int i = 0; i < numOfPoints; i++) {
 			MeasurePoint currentMeasure = measurePoints[i];
-			tf::Vector3 currentPointB = currentMeasure.frameBToFrameC.inverse()
+			tf::Vector3 currentPointB = (currentMeasure.frameBToFrameC.inverse())
 					* centerPointC;
 			pointcloudP.push_back(currentPointB);
 		}
 
 		// 3) Use pointcloud from 2) and measured points and apply SVD to calculate the new transformation A to B (Camera to HeadPitch)
-		tf::Transform newTransform = svdSelfImpl(pointcloudX, pointcloudP);
+
+		/*tf::Transform newTransform = svdSelfImpl(pointcloudX, pointcloudP);
+		 currentAB = newTransform;
+
+		 std::cout << "origin " << currentAB.getOrigin().getX() << ","
+		 << currentAB.getOrigin().getY() << ","
+		 << currentAB.getOrigin().getZ() << ";";
+
+		 std::cout << "rotation " << currentAB.getRotation().getX() << ","
+		 << currentAB.getRotation().getY() << ","
+		 << currentAB.getRotation().getZ() << ";" << endl;*/
+
+		tf::Transform newTransform = svdPCL(pointcloudX, pointcloudP);
 
 		// 4) Update, outputs, statistical...
 		currentAB = newTransform;
@@ -93,9 +107,11 @@ void TransformOptimization::optimizeTransform(tf::Transform& FrameAToFrameB) {
 
 		std::cout << "rotation " << currentAB.getRotation().getX() << ","
 				<< currentAB.getRotation().getY() << ","
-				<< currentAB.getRotation().getZ() << ";" << endl;
+				<< currentAB.getRotation().getZ() << ";" << endl << endl;
 
 	}
+	validate(currentAB);
+	frameAToFrameB = currentAB;
 }
 
 tf::Transform TransformOptimization::svdSelfImpl(
@@ -152,6 +168,36 @@ tf::Transform TransformOptimization::svdSelfImpl(
 	return newTransform;
 }
 
+tf::Transform TransformOptimization::svdPCL(
+		std::vector<tf::Vector3> pointcloudX,
+		std::vector<tf::Vector3> pointcloudP) {
+	pcl::registration::TransformationEstimationSVD<pcl::PointXYZ, pcl::PointXYZ> svd;
+	pcl::PointCloud<pcl::PointXYZ> pclX, pclP;
+	pcl::Correspondences correspondences;
+	for (int i = 0; i < pointcloudX.size(); i++) {
+		pcl::PointXYZ pointX;
+		pointX.x = pointcloudX[i].getX();
+		pointX.y = pointcloudX[i].getY();
+		pointX.z = pointcloudX[i].getZ();
+		pclX.push_back(pointX);
+
+		pcl::PointXYZ pointP;
+		pointP.x = pointcloudP[i].getX();
+		pointP.y = pointcloudP[i].getY();
+		pointP.z = pointcloudP[i].getZ();
+		pclP.push_back(pointP);
+
+		correspondences.push_back(pcl::Correspondence(i,i,0));
+	}
+	Eigen::Matrix4f tm;
+	svd.estimateRigidTransformation(pclX, pclP, correspondences, tm);
+	tf::Matrix3x3 Rtf(tm(0, 0), tm(0, 1), tm(0, 2), tm(1, 0), tm(1, 1),
+			tm(1, 2), tm(2, 0), tm(2, 1), tm(2, 2));
+	tf::Vector3 ttf(tm(0, 3), tm(1, 3), tm(2, 3));
+	tf::Transform newTransform(Rtf, ttf);
+	return newTransform;
+}
+
 void TransformOptimization::calculateError(tf::Transform& FrameAToFrameB,
 		float& error) {
 	// TODO: Throw exception.
@@ -177,12 +223,70 @@ void TransformOptimization::calculateError(tf::Transform& FrameAToFrameB,
 }
 
 void TransformOptimization::setInitialTransformAB(
-		tf::Transform FrameAToFrameB) {
-	this->initialTransformAB = FrameAToFrameB;
+		tf::Transform frameAToFrameB) {
+	this->initialTransformAB = frameAToFrameB;
 }
 
 bool TransformOptimization::canStop() {
 	// todo...
-	return numOfIterations++ > 100;
+	return numOfIterations++ > 1000;
+}
+
+void TransformOptimization::validate(tf::Transform transformAToB) {
+
+	// transform each point to fixed frame
+	float x = 0, y = 0, z = 0;
+	for (int i = 0; i < this->measurePoints.size(); i++) {
+		MeasurePoint currentMeasure = measurePoints[i];
+		tf::Vector3 currentPointMeasure = currentMeasure.measuredPosition;
+		tf::Vector3 currentPointC =
+				currentMeasure.frameBToFrameC
+						* (transformAToB
+								* (currentMeasure.measureToFrameA
+										* currentPointMeasure));
+		std::cout << "position " << currentPointC.getX() << ","
+				<< currentPointC.getY() << "," << currentPointC.getZ() << ";" << endl;
+	}
+
+	// compare error between the optimized pointclouds
+	int numOfPoints = measurePoints.size();
+	std::vector<tf::Vector3> pointcloudX;
+	for (int i = 0; i < numOfPoints; i++) {
+		MeasurePoint currentMeasure = measurePoints[i];
+		tf::Vector3 currentPointB = transformAToB * (currentMeasure.measureToFrameA
+				* currentMeasure.measuredPosition);
+		pointcloudX.push_back(currentPointB);
+	}
+
+	float centerX = 0, centerY = 0, centerZ = 0;
+	for (int i = 0; i < numOfPoints; i++) {
+		MeasurePoint currentMeasure = measurePoints[i];
+		tf::Vector3 currentPointMeasure = currentMeasure.measuredPosition;
+		tf::Vector3 currentPointC = currentMeasure.frameBToFrameC
+				* (transformAToB
+						* (currentMeasure.measureToFrameA
+								* currentPointMeasure));
+		centerX += currentPointC.getX();
+		centerY += currentPointC.getY();
+		centerZ += currentPointC.getZ();
+	}
+	tf::Vector3 centerPointC(centerX / numOfPoints, centerY / numOfPoints,
+			centerZ / numOfPoints);
+	std::cout << "position " << centerPointC.getX() << ","
+			<< centerPointC.getY() << "," << centerPointC.getZ() << ";";
+
+	// 2) Transform point from 1) to B (HeadPitch) using transformations from measurements.
+	std::vector<tf::Vector3> pointcloudP;
+	for (int i = 0; i < numOfPoints; i++) {
+		MeasurePoint currentMeasure = measurePoints[i];
+		tf::Vector3 currentPointB = (currentMeasure.frameBToFrameC.inverse())
+				* centerPointC;
+		pointcloudP.push_back(currentPointB);
+	}
+
+	for (int i = 0; i < numOfPoints; i++) {
+		std::cout << "X_x: " << pointcloudX[i].getX() << "X_y: " << pointcloudX[i].getY() << "X_z: " << pointcloudX[i].getZ() << std::endl;
+		std::cout << "P_x: " << pointcloudP[i].getX() << "P_y: " << pointcloudP[i].getY() << "P_z: " << pointcloudP[i].getZ() << std::endl << std::endl;
+	}
 }
 
