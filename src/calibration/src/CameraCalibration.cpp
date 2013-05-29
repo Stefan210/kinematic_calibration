@@ -18,10 +18,11 @@ CameraCalibration::CameraCalibration() : transformListener(ros::Duration(180,0))
 	this->ballDetection.setMinBallRadius(0.074); //todo: parameterize
 	this->ballDetection.setMaxBallRadius(0.076); //todo: parameterize
 	this->minNumOfMeasurements = 3; //todo: parameterize
+	this->transformOptimization = new SvdTransformOptimization(); //todo: injection
 }
 
 CameraCalibration::~CameraCalibration() {
-	// TODO Auto-generated destructor stub
+	delete this->transformOptimization;
 }
 
 int main(int argc, char** argv) {
@@ -61,14 +62,14 @@ void CameraCalibration::pointcloudMsgCb(const sensor_msgs::PointCloud2& input) {
 				// initialize TransformOptization
 				tf::StampedTransform frameAToFrameB;
 				this->transformListener.lookupTransform(headFrame, cameraFrame, input.header.stamp, frameAToFrameB);
-				this->transformOptimization.setInitialTransformAB(frameAToFrameB);
+				this->transformOptimization->setInitialTransformAB(frameAToFrameB);
 				for(int j = 0; j < this->measurementSeries.size(); j++) {
-					this->transformOptimization.addMeasurePoint(this->measurementSeries[j]);
+					this->transformOptimization->addMeasurePoint(this->measurementSeries[j]);
 				}
 
 				// optimize!
 				tf::Transform optimizedTransform;
-				this->transformOptimization.optimizeTransform(optimizedTransform);
+				this->transformOptimization->optimizeTransform(optimizedTransform);
 			}
 		}
 		currentMeasurement.clear();

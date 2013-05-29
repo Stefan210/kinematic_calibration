@@ -25,24 +25,20 @@ class TransformOptimization {
 public:
 	TransformOptimization();
 	virtual ~TransformOptimization();
+	virtual void optimizeTransform(tf::Transform& FrameAToFrameB) = 0;
 	void addMeasurePoint(MeasurePoint newPoint);
 	void clearMeasurePoints();
-	void optimizeTransform(tf::Transform& FrameAToFrameB);
 	void setInitialTransformAB(tf::Transform FrameAToFrameB);
 
 protected:
+	void validate(tf::Transform transformAToB);
 	void calculateError(tf::Transform& FrameAToFrameB, float& error);
-	bool canStop();
-
-private:
+	virtual bool canStop();
+	int numOfIterations;
 	std::vector<MeasurePoint> measurePoints;
 	tf::Transform initialTransformAB;
-	int numOfIterations;
-	tf::Transform svdSelfImpl(std::vector<tf::Vector3> pointcloudX,
-			std::vector<tf::Vector3> pointcloudP);
-	tf::Transform svdPCL(std::vector<tf::Vector3> pointcloudX,
-			std::vector<tf::Vector3> pointcloudP);
-	void validate(tf::Transform transformAToB);
+
+
 };
 
 #endif /* TRANSFORMOPTIMIZATION_H_ */

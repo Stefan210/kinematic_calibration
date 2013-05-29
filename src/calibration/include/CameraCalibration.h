@@ -11,6 +11,7 @@
 // Project specific includes
 #include "../include/BallDetection.h"
 #include "../include/TransformOptimization.h"
+#include "../include/SvdTransformOptimization.h"
 
 // ROS specific includes
 #include <ros/ros.h>
@@ -79,7 +80,7 @@ protected:
 
 private:
 	BallDetection ballDetection;
-	TransformOptimization transformOptimization;
+	TransformOptimization* transformOptimization;
 	ros::NodeHandle nodeHandle;
 	ros::Subscriber subscriber;
 	tf::TransformListener transformListener;
