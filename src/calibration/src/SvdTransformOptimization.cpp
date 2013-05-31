@@ -37,7 +37,7 @@ void SvdTransformOptimization::optimizeTransform(tf::Transform& frameAToFrameB) 
 	std::vector<tf::Vector3> pointcloudX;
 	for (int i = 0; i < numOfPoints; i++) {
 		MeasurePoint currentMeasure = measurePoints[i];
-		tf::Vector3 currentPointA = currentMeasure.measureToFrameA
+		tf::Vector3 currentPointA = currentMeasure.opticalToCamera
 				* currentMeasure.measuredPosition;
 		pointcloudX.push_back(currentPointA);
 	}
@@ -50,9 +50,9 @@ void SvdTransformOptimization::optimizeTransform(tf::Transform& frameAToFrameB) 
 		for (int i = 0; i < numOfPoints; i++) {
 			MeasurePoint currentMeasure = measurePoints[i];
 			tf::Vector3 currentPointMeasure = currentMeasure.measuredPosition;
-			tf::Vector3 currentPointC = currentMeasure.frameBToFrameC
+			tf::Vector3 currentPointC = currentMeasure.headToFixed
 					* (currentAB
-							* (currentMeasure.measureToFrameA
+							* (currentMeasure.opticalToCamera
 									* currentPointMeasure));
 			centerX += currentPointC.getX();
 			centerY += currentPointC.getY();
@@ -67,7 +67,7 @@ void SvdTransformOptimization::optimizeTransform(tf::Transform& frameAToFrameB) 
 		std::vector<tf::Vector3> pointcloudP;
 		for (int i = 0; i < numOfPoints; i++) {
 			MeasurePoint currentMeasure = measurePoints[i];
-			tf::Vector3 currentPointB = (currentMeasure.frameBToFrameC.inverse())
+			tf::Vector3 currentPointB = (currentMeasure.headToFixed.inverse())
 					* centerPointC;
 			pointcloudP.push_back(currentPointB);
 		}

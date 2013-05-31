@@ -40,8 +40,8 @@ void TransformOptimization::calculateError(tf::Transform& FrameAToFrameB,
 
 	for (int i = 0; i < this->measurePoints.size(); i++) {
 		MeasurePoint& current = this->measurePoints[i];
-		tf::Vector3 transformedPoint = current.frameBToFrameC * FrameAToFrameB
-				* current.measureToFrameA * current.measuredPosition;
+		tf::Vector3 transformedPoint = current.headToFixed * FrameAToFrameB
+				* current.opticalToCamera * current.measuredPosition;
 		error += (referencePoint.x() - transformedPoint.x())
 				* (referencePoint.x() - transformedPoint.x());
 		error += (referencePoint.y() - transformedPoint.y())
@@ -69,9 +69,9 @@ void TransformOptimization::validate(tf::Transform transformAToB) {
 		MeasurePoint currentMeasure = measurePoints[i];
 		tf::Vector3 currentPointMeasure = currentMeasure.measuredPosition;
 		tf::Vector3 currentPointC =
-				currentMeasure.frameBToFrameC
+				currentMeasure.headToFixed
 						* (transformAToB
-								* (currentMeasure.measureToFrameA
+								* (currentMeasure.opticalToCamera
 										* currentPointMeasure));
 		std::cout << "position " << currentPointC.getX() << ","
 				<< currentPointC.getY() << "," << currentPointC.getZ() << ";" << endl;
@@ -82,7 +82,7 @@ void TransformOptimization::validate(tf::Transform transformAToB) {
 	std::vector<tf::Vector3> pointcloudX;
 	for (int i = 0; i < numOfPoints; i++) {
 		MeasurePoint currentMeasure = measurePoints[i];
-		tf::Vector3 currentPointB = transformAToB * (currentMeasure.measureToFrameA
+		tf::Vector3 currentPointB = transformAToB * (currentMeasure.opticalToCamera
 				* currentMeasure.measuredPosition);
 		pointcloudX.push_back(currentPointB);
 	}
@@ -91,9 +91,9 @@ void TransformOptimization::validate(tf::Transform transformAToB) {
 	for (int i = 0; i < numOfPoints; i++) {
 		MeasurePoint currentMeasure = measurePoints[i];
 		tf::Vector3 currentPointMeasure = currentMeasure.measuredPosition;
-		tf::Vector3 currentPointC = currentMeasure.frameBToFrameC
+		tf::Vector3 currentPointC = currentMeasure.headToFixed
 				* (transformAToB
-						* (currentMeasure.measureToFrameA
+						* (currentMeasure.opticalToCamera
 								* currentPointMeasure));
 		centerX += currentPointC.getX();
 		centerY += currentPointC.getY();
@@ -108,7 +108,7 @@ void TransformOptimization::validate(tf::Transform transformAToB) {
 	std::vector<tf::Vector3> pointcloudP;
 	for (int i = 0; i < numOfPoints; i++) {
 		MeasurePoint currentMeasure = measurePoints[i];
-		tf::Vector3 currentPointB = (currentMeasure.frameBToFrameC.inverse())
+		tf::Vector3 currentPointB = (currentMeasure.headToFixed.inverse())
 				* centerPointC;
 		pointcloudP.push_back(currentPointB);
 	}

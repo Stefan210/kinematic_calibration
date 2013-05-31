@@ -12,6 +12,7 @@
 #include "../include/BallDetection.h"
 #include "../include/TransformOptimization.h"
 #include "../include/SvdTransformOptimization.h"
+#include "../include/LocalTransformOptimization.h"
 
 // ROS specific includes
 #include <ros/ros.h>
