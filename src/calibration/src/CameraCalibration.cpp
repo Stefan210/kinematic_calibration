@@ -20,7 +20,9 @@ CameraCalibration::CameraCalibration() :
 	this->ballDetection.setMaxBallRadius(0.076); //todo: parameterize
 	this->minNumOfMeasurements = 3; //todo: parameterize
 	this->transformOptimization = new SvdTransformOptimization(); //todo: injection
-	//this->transformOptimization = new HillClimbingTransformOptimization();
+	this->transformOptimization->setMaxIterations(100000);
+	this->transformOptimization->setMinError(0.000001);
+	this->transformOptimization->setErrorImprovement(0.000000001);
 }
 
 CameraCalibration::~CameraCalibration() {

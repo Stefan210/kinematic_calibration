@@ -27,8 +27,8 @@ HillClimbingTransformOptimization::~HillClimbingTransformOptimization() {
 void HillClimbingTransformOptimization::optimizeTransform(
 		tf::Transform& FrameAToFrameB) {
 	LtoState currentState, bestState;
-	currentState.frameAToFrameB = this->initialTransformAB;
-	currentState.error = calculateError(this->initialTransformAB);
+	currentState.frameAToFrameB = this->initialTransformCameraToHead;
+	currentState.error = calculateError(this->initialTransformCameraToHead);
 	bestState.error = INFINITY;
 	bool canImprove = true;
 	int numOfIterations = 0;

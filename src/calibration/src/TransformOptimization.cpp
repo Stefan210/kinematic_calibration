@@ -27,84 +27,81 @@ void TransformOptimization::clearMeasurePoints() {
 	this->measurePoints.clear();
 }
 
-void TransformOptimization::calculateError(tf::Transform& FrameAToFrameB,
-		float& error) {
+void TransformOptimization::calculateSqrtDistFromMarker(
+		tf::Transform& CameraToHead, tf::Vector3 markerPoint, float& error) {
 	// TODO: Throw exception.
 	if (this->measurePoints.empty()) {
 		return;
 	}
 
-	// TODO: Make use of the strategy pattern to decide how to get the reference point.
-	tf::Vector3 referencePoint = this->measurePoints.front().measuredPosition;
 	error = 0;
 
 	for (int i = 0; i < this->measurePoints.size(); i++) {
 		MeasurePoint& current = this->measurePoints[i];
-		tf::Vector3 transformedPoint = current.headToFixed * FrameAToFrameB
+		tf::Vector3 transformedPoint = current.headToFixed * CameraToHead
 				* current.opticalToCamera * current.measuredPosition;
-		error += (referencePoint.x() - transformedPoint.x())
-				* (referencePoint.x() - transformedPoint.x());
-		error += (referencePoint.y() - transformedPoint.y())
-				* (referencePoint.y() - transformedPoint.y());
-		error += (referencePoint.z() - transformedPoint.z())
-				* (referencePoint.z() - transformedPoint.z());
+		error += (markerPoint.x() - transformedPoint.x())
+				* (markerPoint.x() - transformedPoint.x());
+		error += (markerPoint.y() - transformedPoint.y())
+				* (markerPoint.y() - transformedPoint.y());
+		error += (markerPoint.z() - transformedPoint.z())
+				* (markerPoint.z() - transformedPoint.z());
 	}
 }
 
 void TransformOptimization::setInitialTransformCameraToHead(
 		tf::Transform frameAToFrameB) {
-	this->initialTransformAB = frameAToFrameB;
+	this->initialTransformCameraToHead = frameAToFrameB;
 }
 
 bool TransformOptimization::canStop() {
-	// todo...
-	return numOfIterations++ > 1000;
+	if(numOfIterations++ > maxIterations)
+		return true;
+
+	if(error < minError)
+		return true;
+
+	if(std::abs(lastError - error) < errorImprovement)
+		return true;
+
+	return  false;
 }
 
-void TransformOptimization::validate(tf::Transform transformAToB) {
+void TransformOptimization::calculateSqrtDistCameraHead(
+		tf::Transform& cameraToHead, float& error) {
+	error = 0;
 
-	// transform each point to fixed frame
-	float x = 0, y = 0, z = 0;
-	for (int i = 0; i < this->measurePoints.size(); i++) {
-		MeasurePoint currentMeasure = measurePoints[i];
-		tf::Vector3 currentPointMeasure = currentMeasure.measuredPosition;
-		tf::Vector3 currentPointC =
-				currentMeasure.headToFixed
-						* (transformAToB
-								* (currentMeasure.opticalToCamera
-										* currentPointMeasure));
-		std::cout << "position " << currentPointC.getX() << ","
-				<< currentPointC.getY() << "," << currentPointC.getZ() << ";" << endl;
-	}
-
-	// compare error between the optimized pointclouds
+	// Transform points from optical frame to camera frame --> X.
 	int numOfPoints = measurePoints.size();
 	std::vector<tf::Vector3> pointcloudX;
 	for (int i = 0; i < numOfPoints; i++) {
 		MeasurePoint currentMeasure = measurePoints[i];
-		tf::Vector3 currentPointB = transformAToB * (currentMeasure.opticalToCamera
-				* currentMeasure.measuredPosition);
+		tf::Vector3 currentPointB = cameraToHead
+				* (currentMeasure.opticalToCamera
+						* currentMeasure.measuredPosition);
 		pointcloudX.push_back(currentPointB);
 	}
 
+	// Transform each point to fixed frame and determine the centroid.
 	float centerX = 0, centerY = 0, centerZ = 0;
 	for (int i = 0; i < numOfPoints; i++) {
 		MeasurePoint currentMeasure = measurePoints[i];
 		tf::Vector3 currentPointMeasure = currentMeasure.measuredPosition;
-		tf::Vector3 currentPointC = currentMeasure.headToFixed
-				* (transformAToB
-						* (currentMeasure.opticalToCamera
-								* currentPointMeasure));
+		tf::Vector3 currentPointC =
+				currentMeasure.headToFixed
+						* (cameraToHead
+								* (currentMeasure.opticalToCamera
+										* currentPointMeasure));
 		centerX += currentPointC.getX();
 		centerY += currentPointC.getY();
 		centerZ += currentPointC.getZ();
 	}
 	tf::Vector3 centerPointC(centerX / numOfPoints, centerY / numOfPoints,
 			centerZ / numOfPoints);
-	std::cout << "position " << centerPointC.getX() << ","
-			<< centerPointC.getY() << "," << centerPointC.getZ() << ";";
+	//std::cout << "position " << centerPointC.getX() << ","
+	//		<< centerPointC.getY() << "," << centerPointC.getZ() << ";";
 
-	// 2) Transform point from 1) to B (HeadPitch) using transformations from measurements.
+	// Transform point from above to HeadPitch using transformations from measurements --> P.
 	std::vector<tf::Vector3> pointcloudP;
 	for (int i = 0; i < numOfPoints; i++) {
 		MeasurePoint currentMeasure = measurePoints[i];
@@ -113,9 +110,17 @@ void TransformOptimization::validate(tf::Transform transformAToB) {
 		pointcloudP.push_back(currentPointB);
 	}
 
+	// Calculate the sum of the squared distances between both pointclouds (X and P).
 	for (int i = 0; i < numOfPoints; i++) {
-		std::cout << "X_x: " << pointcloudX[i].getX() << "X_y: " << pointcloudX[i].getY() << "X_z: " << pointcloudX[i].getZ() << std::endl;
-		std::cout << "P_x: " << pointcloudP[i].getX() << "P_y: " << pointcloudP[i].getY() << "P_z: " << pointcloudP[i].getZ() << std::endl << std::endl;
+		/*std::cout << "X(x,y,z): " << pointcloudX[i].getX() << ","
+				<< pointcloudX[i].getY() << "," << pointcloudX[i].getZ()
+				<< "\t";
+		std::cout << "P(x,y,z):" << pointcloudP[i].getX() << ","
+				<< pointcloudP[i].getY() << "," << pointcloudP[i].getZ()
+				<< std::endl << std::endl;*/
+		error += std::pow(pointcloudX[i].getX() - pointcloudP[i].getX(), 2)
+				+ std::pow(pointcloudX[i].getY() - pointcloudP[i].getY(), 2)
+				+ std::pow(pointcloudX[i].getZ() - pointcloudP[i].getZ(), 2);
 	}
 }
 

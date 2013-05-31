@@ -26,18 +26,48 @@ class TransformOptimization {
 public:
 	TransformOptimization();
 	virtual ~TransformOptimization();
-	virtual void optimizeTransform(tf::Transform& FrameAToFrameB) = 0;
+	virtual void optimizeTransform(tf::Transform& CameraToHead) = 0;
 	void addMeasurePoint(MeasurePoint newPoint);
 	void clearMeasurePoints();
-	void setInitialTransformCameraToHead(tf::Transform FrameAToFrameB);
+	void setInitialTransformCameraToHead(tf::Transform CameraToHead);
+	virtual void calculateSqrtDistFromMarker(tf::Transform& CameraToHead, tf::Vector3 markerPoint, float& error);
+	virtual void calculateSqrtDistCameraHead(tf::Transform& CameraToHead, float& error);
+
+	float getMaxIterations() const {
+		return maxIterations;
+	}
+
+	void setMaxIterations(float maxIterations) {
+		this->maxIterations = maxIterations;
+	}
+
+	float getMinError() const {
+		return minError;
+	}
+
+	void setMinError(float minError) {
+		this->minError = minError;
+	}
+
+	float getErrorImprovement() const {
+		return errorImprovement;
+	}
+
+	void setErrorImprovement(float errorImprovement) {
+		this->errorImprovement = errorImprovement;
+	}
 
 protected:
 	void validate(tf::Transform transformAToB);
-	void calculateError(tf::Transform& FrameAToFrameB, float& error);
 	virtual bool canStop();
 	int numOfIterations;
 	std::vector<MeasurePoint> measurePoints;
-	tf::Transform initialTransformAB;
+	tf::Transform initialTransformCameraToHead;
+	float error;
+	float lastError;
+	float errorImprovement;
+	float minError;
+	float maxIterations;
 
 
 };
