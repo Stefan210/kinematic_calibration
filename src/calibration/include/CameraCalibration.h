@@ -96,8 +96,7 @@ private:
 	int minNumOfMeasurements;
 	bool distanceTooBig(pcl::PointXYZ first, pcl::PointXYZ second);
 	void createMeasurePoint(std::vector<BallDetection::BallData> measurement,
-			pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud,
-			MeasurePoint& newMeasurePoint);
+			ros::Time time, MeasurePoint& newMeasurePoint);
 };
 
 #endif /* CAMERACALIBRATION_H_ */

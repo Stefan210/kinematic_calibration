@@ -14,6 +14,7 @@ struct MeasurePointStruct {
 	tf::Vector3 measuredPosition; // measured point within the optical frame
 	tf::Transform opticalToCamera; // e.g. measure frame to first frame of the camera system
 	tf::Transform headToFixed; // e.g. first frame of body (HeadPitch) to last frame of body (r_sole)
+	ros::Time stamp;
 };
 
 typedef struct MeasurePointStruct MeasurePoint;
@@ -28,7 +29,7 @@ public:
 	virtual void optimizeTransform(tf::Transform& FrameAToFrameB) = 0;
 	void addMeasurePoint(MeasurePoint newPoint);
 	void clearMeasurePoints();
-	void setInitialTransformAB(tf::Transform FrameAToFrameB);
+	void setInitialTransformCameraToHead(tf::Transform FrameAToFrameB);
 
 protected:
 	void validate(tf::Transform transformAToB);

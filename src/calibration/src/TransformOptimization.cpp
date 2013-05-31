@@ -51,7 +51,7 @@ void TransformOptimization::calculateError(tf::Transform& FrameAToFrameB,
 	}
 }
 
-void TransformOptimization::setInitialTransformAB(
+void TransformOptimization::setInitialTransformCameraToHead(
 		tf::Transform frameAToFrameB) {
 	this->initialTransformAB = frameAToFrameB;
 }
