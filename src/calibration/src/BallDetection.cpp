@@ -86,17 +86,17 @@ void BallDetection::filterRange(pcl::PointCloud<pcl::PointXYZRGB>::Ptr inCloud,
 
 	pass.setInputCloud(inCloud);
 	pass.setFilterFieldName("x");
-	pass.setFilterLimits(-1.0, 1.0);
+	pass.setFilterLimits(-1.5, 1.5); //-1.0, 1.0
 	pass.filter(*filteredX);
 
 	pass.setInputCloud(filteredX);
 	pass.setFilterFieldName("y");
-	pass.setFilterLimits(-1.0, 1.0);
+	pass.setFilterLimits(-1.5, 1.5); //-1.0, 1.0
 	pass.filter(*filteredXY);
 
 	pass.setInputCloud(filteredXY);
 	pass.setFilterFieldName("z");
-	pass.setFilterLimits(-1.0, 1.0);
+	pass.setFilterLimits(-1.5, 1.5); //-1.0, 1.0
 	pass.filter(*outCloud);
 }
 

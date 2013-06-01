@@ -27,7 +27,7 @@ HillClimbingTransformOptimization::~HillClimbingTransformOptimization() {
 void HillClimbingTransformOptimization::optimizeTransform(
 		tf::Transform& FrameAToFrameB) {
 	LtoState currentState, bestState;
-	currentState.frameAToFrameB = this->initialTransformCameraToHead;
+	currentState.cameraToHead = this->initialTransformCameraToHead;
 	currentState.error = calculateError(this->initialTransformCameraToHead);
 	bestState.error = INFINITY;
 	bool canImprove = true;
@@ -60,7 +60,7 @@ void HillClimbingTransformOptimization::optimizeTransform(
 		}
 	}
 
-	FrameAToFrameB = *(new tf::Transform(currentState.frameAToFrameB));
+	FrameAToFrameB = *(new tf::Transform(currentState.cameraToHead));
 }
 
 bool HillClimbingTransformOptimization::decreaseStepwidth() {
@@ -73,8 +73,7 @@ bool HillClimbingTransformOptimization::decreaseStepwidth() {
 }
 
 double HillClimbingTransformOptimization::calculateError(
-		tf::Transform& FrameAToFrameB) {
-	tf::Vector3 centerPoint = this->measurePoints.front().measuredPosition;
+		tf::Transform& cameraToHead) {
 	double error = 0;
 	int numOfPoints = this->measurePoints.size();
 
@@ -82,19 +81,19 @@ double HillClimbingTransformOptimization::calculateError(
 	double centerX = 0, centerY = 0, centerZ = 0;
 	for (int i = 0; i < numOfPoints; i++) {
 		MeasurePoint& current = this->measurePoints[i];
-		tf::Vector3 transformedPoint = (current.headToFixed * (FrameAToFrameB
+		tf::Vector3 transformedPoint = (current.headToFixed * (cameraToHead
 				* (current.opticalToCamera * current.measuredPosition)));
 		centerX += transformedPoint.getX();
 		centerY += transformedPoint.getY();
 		centerZ += transformedPoint.getZ();
 	}
-	tf::Vector3 centerPointC(centerX / numOfPoints, centerY / numOfPoints,
+	tf::Vector3 centerPoint(centerX / numOfPoints, centerY / numOfPoints,
 			centerZ / numOfPoints);
 
 	// calculate squared error
 	for (int i = 0; i < numOfPoints; i++) {
 		MeasurePoint& current = this->measurePoints[i];
-		tf::Vector3 transformedPoint = (current.headToFixed * (FrameAToFrameB
+		tf::Vector3 transformedPoint = (current.headToFixed * (cameraToHead
 				* (current.opticalToCamera * current.measuredPosition)));
 		error += (centerPoint.x() - transformedPoint.x())
 				* (centerPoint.x() - transformedPoint.x());
@@ -112,7 +111,7 @@ std::vector<LtoState> HillClimbingTransformOptimization::getNeighbors(
 	std::vector<LtoState> neighbours;
 	std::vector<tf::Transform> transforms;
 
-	tf::Transform currentTransform = current.frameAToFrameB;
+	tf::Transform currentTransform = current.cameraToHead;
 
 	// get rotation
 	double roll, pitch, yaw;
@@ -145,7 +144,7 @@ std::vector<LtoState> HillClimbingTransformOptimization::getNeighbors(
 		double error = calculateError(transforms[i]);
 		LtoState newState;
 		newState.error = error;
-		newState.frameAToFrameB = transforms[i];
+		newState.cameraToHead = transforms[i];
 		neighbours.push_back(newState);
 	}
 
@@ -154,7 +153,7 @@ std::vector<LtoState> HillClimbingTransformOptimization::getNeighbors(
 
 std::ostream& operator<< (std::ostream &out, LtoState &state)
 {
-	tf::Transform currentTransform = state.frameAToFrameB;
+	tf::Transform currentTransform = state.cameraToHead;
 
 	// get rotation
 	double roll, pitch, yaw;

@@ -91,12 +91,13 @@ private:
 	std::string headFrame;
 	std::string fixedFrame;
 	std::vector<BallDetection::BallData> currentMeasurement;
-	ros::Time currentMeasurementTime;
+	//ros::Time currentMeasurementTime;
 	std::vector<MeasurePoint> measurementSeries;
+	std::vector<ros::Time> currentTimestamps;
 	int minNumOfMeasurements;
 	bool distanceTooBig(pcl::PointXYZ first, pcl::PointXYZ second);
 	void createMeasurePoint(std::vector<BallDetection::BallData> measurement,
-			ros::Time time, MeasurePoint& newMeasurePoint);
+			std::vector<ros::Time> timestamps, MeasurePoint& newMeasurePoint);
 };
 
 #endif /* CAMERACALIBRATION_H_ */

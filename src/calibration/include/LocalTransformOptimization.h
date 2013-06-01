@@ -12,7 +12,7 @@
 
 class LtoState {
 public:
-	tf::Transform frameAToFrameB;
+	tf::Transform cameraToHead;
 	double error;
 	bool isBetterThan(const LtoState other) {
 		return error < other.error;
