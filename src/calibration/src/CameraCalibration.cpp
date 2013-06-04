@@ -94,7 +94,7 @@ void CameraCalibration::pointcloudMsgCb(const sensor_msgs::PointCloud2& input) {
 				ROS_INFO("optimizing...");
 				// initialize TransformOptization
 				this->transformOptimization->setInitialTransformCameraToHead(
-						cameraToHead);
+						this->initialTransformFactory->getTransform());
 				for (int j = 0; j < this->measurementSeries.size(); j++) {
 					this->transformOptimization->addMeasurePoint(
 							this->measurementSeries[j]);
