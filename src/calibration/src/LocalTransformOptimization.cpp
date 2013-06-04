@@ -72,13 +72,13 @@ bool HillClimbingTransformOptimization::decreaseStepwidth() {
 	return true;
 }
 
-double HillClimbingTransformOptimization::calculateError(
+float HillClimbingTransformOptimization::calculateError(
 		tf::Transform& cameraToHead) {
-	double error = 0;
+	float error = 0;
 	int numOfPoints = this->measurePoints.size();
 
 	// calculate centroid
-	double centerX = 0, centerY = 0, centerZ = 0;
+	float centerX = 0, centerY = 0, centerZ = 0;
 	for (int i = 0; i < numOfPoints; i++) {
 		MeasurePoint& current = this->measurePoints[i];
 		tf::Vector3 transformedPoint = (current.headToFixed * (cameraToHead
@@ -91,7 +91,7 @@ double HillClimbingTransformOptimization::calculateError(
 			centerZ / numOfPoints);
 
 	// calculate squared error
-	for (int i = 0; i < numOfPoints; i++) {
+	/*for (int i = 0; i < numOfPoints; i++) {
 		MeasurePoint& current = this->measurePoints[i];
 		tf::Vector3 transformedPoint = (current.headToFixed * (cameraToHead
 				* (current.opticalToCamera * current.measuredPosition)));
@@ -101,7 +101,8 @@ double HillClimbingTransformOptimization::calculateError(
 				* (centerPoint.y() - transformedPoint.y());
 		error += (centerPoint.z() - transformedPoint.z())
 				* (centerPoint.z() - transformedPoint.z());
-	}
+	}*/
+	this->calculateSqrtDistFromMarker(cameraToHead, centerPoint, error);
 
 	return error;
 }

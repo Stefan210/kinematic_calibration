@@ -39,7 +39,7 @@ public:
 protected:
 	float stepwidth;
 	bool decreaseStepwidth();
-	double calculateError(tf::Transform& FrameAToFrameB);
+	float calculateError(tf::Transform& FrameAToFrameB);
 	std::vector<LtoState> getNeighbors(LtoState& current);
 };
 #endif /* LOCALTRANSFORMOPTIMIZATION_H_ */
