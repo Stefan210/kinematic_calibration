@@ -24,6 +24,7 @@ CameraCalibration::CameraCalibration() :
 	this->transformOptimization->setMaxIterations(100000);
 	this->transformOptimization->setMinError(0.000001);
 	this->transformOptimization->setErrorImprovement(0.000000001);
+	this->initialTransformFactory = new TfTransformFactory(headFrame, cameraFrame);
 }
 
 CameraCalibration::~CameraCalibration() {
@@ -120,6 +121,15 @@ bool CameraCalibration::distanceTooBig(pcl::PointXYZ first,
 			std::pow(first.x - second.x, 2) + std::pow(first.y - second.y, 2)
 					+ std::pow(first.z - second.z, 2));
 	return (distance > 0.01);
+}
+
+void CameraCalibration::setInitialCameraToHeadTransform(float tx, float ty,
+		float tz, float roll, float pitch, float yaw) {
+	if(this->initialTransformFactory) {
+		delete this->initialTransformFactory;
+	}
+
+	this->initialTransformFactory = new ManualTransformFactory(tx, ty, tz, roll, pitch, yaw);
 }
 
 void CameraCalibration::createMeasurePoint(

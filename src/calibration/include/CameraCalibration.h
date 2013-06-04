@@ -13,6 +13,7 @@
 #include "../include/TransformOptimization.h"
 #include "../include/SvdTransformOptimization.h"
 #include "../include/LocalTransformOptimization.h"
+#include "../include/TransformFactory.h"
 
 // ROS specific includes
 #include <ros/ros.h>
@@ -35,6 +36,8 @@ class CameraCalibration {
 public:
 	CameraCalibration();
 	virtual ~CameraCalibration();
+	void setInitialCameraToHeadTransform(float tx, float ty, float tz,
+			float roll, float pitch, float yaw);
 
 	std::string getCameraFrame() const {
 		return cameraFrame;
@@ -82,6 +85,7 @@ protected:
 private:
 	BallDetection ballDetection;
 	TransformOptimization* transformOptimization;
+	TransformFactory* initialTransformFactory;
 	ros::NodeHandle nodeHandle;
 	ros::Subscriber subscriber;
 	tf::TransformListener transformListener;
