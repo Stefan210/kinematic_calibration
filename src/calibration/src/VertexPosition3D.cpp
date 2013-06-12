@@ -12,7 +12,7 @@ VertexPosition3D::VertexPosition3D() {
 }
 
 VertexPosition3D::~VertexPosition3D() {
-	// TODO Auto-generated destructor stub
+
 }
 
 bool VertexPosition3D::read(std::istream& in) {
@@ -24,6 +24,9 @@ bool VertexPosition3D::write(std::ostream& out) const {
 }
 
 void VertexPosition3D::oplusImpl(const double* delta) {
+	this->_estimate[0] += delta[0];
+	this->_estimate[1] += delta[1];
+	this->_estimate[2] += delta[2];
 }
 
 void VertexPosition3D::setToOriginImpl() {

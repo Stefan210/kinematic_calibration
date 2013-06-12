@@ -23,6 +23,7 @@ class EdgeRobotMarkerMeasurement : public BaseBinaryEdge<3, Eigen::Vector3d, Ver
 public:
 	EdgeRobotMarkerMeasurement(MeasurePoint& measurePoint);
 	virtual ~EdgeRobotMarkerMeasurement();
+	virtual void computeError();
 
 protected:
 	MeasurePoint& measurePoint;
