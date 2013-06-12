@@ -16,8 +16,10 @@ TransformFactory::~TransformFactory() {
 	// TODO Auto-generated destructor stub
 }
 
-TfTransformFactory::TfTransformFactory(std::string tragetFrame,
+TfTransformFactory::TfTransformFactory(std::string targetFrame,
 		std::string sourceFrame) {
+	this->targetFrame = targetFrame;
+	this->sourceFrame = sourceFrame;
 }
 
 TfTransformFactory::~TfTransformFactory() {

@@ -7,34 +7,68 @@
 
 #include "../include/CameraCalibration.h"
 
-CameraCalibration::CameraCalibration() :
+CameraCalibration::CameraCalibration(CameraCalibrationOptions options) :
 		transformListener(ros::Duration(180, 0)) {
-	// TODO
-	this->pointCloudTopic = DEFAULT_POINTCLOUD_MSG;
-	this->cameraFrame = DEFAULT_CAMERA_FRAME;
-	this->fixedFrame = DEFAULT_FIXED_FRAME;
-	this->headFrame = DEFAULT_HEAD_FRAME;
+	this->pointCloudTopic = options.getPointCloudTopic();
+	this->cameraFrame = options.getCameraFrame();
+	this->fixedFrame = options.getFixedFrame();
+	this->headFrame = options.getHeadFrame();
 	this->subscriber = nodeHandle.subscribe(this->pointCloudTopic, 100,
 			&CameraCalibration::pointcloudMsgCb, this);
-	this->ballDetection.setMinBallRadius(0.074); //todo: parameterize
-	this->ballDetection.setMaxBallRadius(0.076); //todo: parameterize
-	this->minNumOfMeasurements = 3; //todo: parameterize
-	//this->transformOptimization = new SvdTransformOptimization(); //todo: injection
-	this->transformOptimization = new HillClimbingTransformOptimization(); //todo: injection
-	this->transformOptimization->setMaxIterations(100000);
-	this->transformOptimization->setMinError(0.000001);
-	this->transformOptimization->setErrorImprovement(0.000000001);
-	this->initialTransformFactory = new TfTransformFactory(headFrame, cameraFrame);
+	this->ballDetection.setMinBallRadius(options.getMinBallRadius());
+	this->ballDetection.setMaxBallRadius(options.getMaxBallRadius());
+	this->minNumOfMeasurements = options.getMinNumOfMeasurements();
+	this->transformOptimization = options.getTransformOptimization();
+	this->initialTransformFactory = options.getInitialTransformFactory();
 }
 
 CameraCalibration::~CameraCalibration() {
-	delete this->transformOptimization;
+
 }
 
 int main(int argc, char** argv) {
-	ros::init(argc, argv, "CameraCalibration");
+	std::string nodeName = "CameraCalibration";
 
-	CameraCalibration cameraCalibration;
+	// parse command line arguments
+	for (int i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "-n") == 0
+				|| strcmp(argv[i], "--name") == 0) {
+			nodeName = argv[i+1];
+		}
+	}
+
+	ros::init(argc, argv, nodeName);
+
+	// Set all options.
+	CameraCalibrationOptions options;
+	options.setCameraFrame(DEFAULT_CAMERA_FRAME);
+	options.setFixedFrame(DEFAULT_FIXED_FRAME);
+	options.setHeadFrame(DEFAULT_HEAD_FRAME);
+	TransformFactory* transformFactory = new TfTransformFactory(DEFAULT_HEAD_FRAME,
+			DEFAULT_CAMERA_FRAME);
+	options.setInitialTransformFactory(transformFactory);
+	options.setMaxBallRadius(0.076);
+	options.setMinBallRadius(0.074);
+	options.setMinNumOfMeasurements(3);
+	options.setPointCloudTopic(DEFAULT_POINTCLOUD_MSG);
+	TransformOptimization* transformOptimization = new SvdTransformOptimization();
+	transformOptimization->setMaxIterations(100000);
+	transformOptimization->setMinError(0.000001);
+	transformOptimization->setErrorImprovement(0.000000001);
+	options.setTransformOptimization(transformOptimization);
+
+	// parse command line arguments
+	for (int i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "-ig") == 0
+				|| strcmp(argv[i], "--initial-guess") == 0) {
+			TransformFactory* mtf = new ManualTransformFactory(atof(argv[i + 1]), atof(argv[i + 2]),
+					atof(argv[i + 3]), atof(argv[i + 4]), atof(argv[i + 5]),
+					atof(argv[i + 6]));
+			options.setInitialTransformFactory(mtf);
+		}
+	}
+
+	CameraCalibration cameraCalibration(options);
 	ros::spin();
 
 	return 0;
@@ -48,13 +82,12 @@ void CameraCalibration::pointcloudMsgCb(const sensor_msgs::PointCloud2& input) {
 			pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
 	pcl::fromROSMsg(input, *initialCloud);
 
-	if(initialCloud->empty())
+	if (initialCloud->empty())
 		return;
 
 	BallDetection::BallData bd;
 	try {
-		bd = this->ballDetection.getPosition(
-				initialCloud);
+		bd = this->ballDetection.getPosition(initialCloud);
 	} catch (...) {
 		//todo
 	}
@@ -94,12 +127,12 @@ void CameraCalibration::pointcloudMsgCb(const sensor_msgs::PointCloud2& input) {
 				ROS_INFO("optimizing...");
 				// initialize TransformOptization
 				this->transformOptimization->setInitialTransformCameraToHead(
-						this->initialTransformFactory->getTransform());
+						this->initialTransformFactory->getTransform()); std::cout << "foo" << std::endl;
 				for (int j = 0; j < this->measurementSeries.size(); j++) {
 					this->transformOptimization->addMeasurePoint(
 							this->measurementSeries[j]);
 				}
-
+				 std::cout << "bar" << std::endl;
 				// optimize!
 				tf::Transform optimizedTransform;
 				this->transformOptimization->optimizeTransform(
@@ -125,11 +158,12 @@ bool CameraCalibration::distanceTooBig(pcl::PointXYZ first,
 
 void CameraCalibration::setInitialCameraToHeadTransform(float tx, float ty,
 		float tz, float roll, float pitch, float yaw) {
-	if(this->initialTransformFactory) {
+	if (this->initialTransformFactory) {
 		delete this->initialTransformFactory;
 	}
 
-	this->initialTransformFactory = new ManualTransformFactory(tx, ty, tz, roll, pitch, yaw);
+	this->initialTransformFactory = new ManualTransformFactory(tx, ty, tz, roll,
+			pitch, yaw);
 }
 
 void CameraCalibration::createMeasurePoint(
@@ -166,5 +200,88 @@ void CameraCalibration::createMeasurePoint(
 		z += position.z;
 	}
 	newMeasurePoint.measuredPosition.setValue(x / size, y / size, z / size);
+}
+
+std::string CameraCalibrationOptions::getCameraFrame() const {
+	return cameraFrame;
+}
+
+void CameraCalibrationOptions::setCameraFrame(std::string cameraFrame) {
+	this->cameraFrame = cameraFrame;
+}
+
+std::string CameraCalibrationOptions::getFixedFrame() const {
+	return fixedFrame;
+}
+
+void CameraCalibrationOptions::setFixedFrame(std::string fixedFrame) {
+	this->fixedFrame = fixedFrame;
+}
+
+std::string CameraCalibrationOptions::getHeadFrame() const {
+	return headFrame;
+}
+
+void CameraCalibrationOptions::setHeadFrame(std::string headFrame) {
+	this->headFrame = headFrame;
+}
+
+TransformFactory* CameraCalibrationOptions::getInitialTransformFactory() const {
+	return initialTransformFactory;
+}
+
+void CameraCalibrationOptions::setInitialTransformFactory(
+		TransformFactory* initialTransformFactory) {
+	this->initialTransformFactory = initialTransformFactory;
+}
+
+int CameraCalibrationOptions::getMinNumOfMeasurements() const {
+	return minNumOfMeasurements;
+}
+
+void CameraCalibrationOptions::setMinNumOfMeasurements(
+		int minNumOfMeasurements) {
+	this->minNumOfMeasurements = minNumOfMeasurements;
+}
+
+std::string CameraCalibrationOptions::getOpticalFrame() const {
+	return opticalFrame;
+}
+
+void CameraCalibrationOptions::setOpticalFrame(std::string opticalFrame) {
+	this->opticalFrame = opticalFrame;
+}
+
+std::string CameraCalibrationOptions::getPointCloudTopic() const {
+	return pointCloudTopic;
+}
+
+void CameraCalibrationOptions::setPointCloudTopic(std::string pointCloudTopic) {
+	this->pointCloudTopic = pointCloudTopic;
+}
+
+TransformOptimization* CameraCalibrationOptions::getTransformOptimization() const {
+	return transformOptimization;
+}
+
+void CameraCalibrationOptions::setTransformOptimization(
+		TransformOptimization* transformOptimization) {
+	this->transformOptimization = transformOptimization;
+}
+
+float CameraCalibrationOptions::getMaxBallRadius() const {
+	return maxBallRadius;
+}
+
+void CameraCalibrationOptions::setMaxBallRadius(float maxBallRadius) {
+	this->maxBallRadius = maxBallRadius;
+}
+
+float CameraCalibrationOptions::getMinBallRadius() const {
+	return minBallRadius;
+}
+
+void CameraCalibrationOptions::setMinBallRadius(float minBallRadius) {
+	this->minBallRadius = minBallRadius;
 }
 

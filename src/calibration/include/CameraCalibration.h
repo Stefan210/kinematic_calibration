@@ -29,55 +29,51 @@
 #define DEFAULT_HEAD_FRAME "HeadPitch_link"
 #define DEFAULT_FIXED_FRAME "r_sole"
 
+class CameraCalibrationOptions {
+	public:
+	std::string getCameraFrame() const;
+	void setCameraFrame(std::string cameraFrame);
+	std::string getFixedFrame() const;
+	void setFixedFrame(std::string fixedFrame);
+	std::string getHeadFrame() const;
+	void setHeadFrame(std::string headFrame);
+	TransformFactory* getInitialTransformFactory() const;
+	void setInitialTransformFactory(TransformFactory* initialTransformFactory);
+	int getMinNumOfMeasurements() const;
+	void setMinNumOfMeasurements(int minNumOfMeasurements);
+	std::string getOpticalFrame() const;
+	void setOpticalFrame(std::string opticalFrame);
+	std::string getPointCloudTopic() const;
+	void setPointCloudTopic(std::string pointCloudTopic);
+	TransformOptimization* getTransformOptimization() const;
+	void setTransformOptimization(TransformOptimization* transformOptimization);
+	float getMaxBallRadius() const;
+	void setMaxBallRadius(float maxBallRadius);
+	float getMinBallRadius() const;
+	void setMinBallRadius(float minBallRadius);
+
+protected:
+	std::string pointCloudTopic;
+	std::string opticalFrame;
+	std::string cameraFrame;
+	std::string headFrame;
+	std::string fixedFrame;
+	TransformOptimization* transformOptimization;
+	TransformFactory* initialTransformFactory;
+	int minNumOfMeasurements;
+	float minBallRadius;
+	float maxBallRadius;
+};
+
 /*
  *
  */
 class CameraCalibration {
 public:
-	CameraCalibration();
+	CameraCalibration(CameraCalibrationOptions options);
 	virtual ~CameraCalibration();
 	void setInitialCameraToHeadTransform(float tx, float ty, float tz,
 			float roll, float pitch, float yaw);
-
-	std::string getCameraFrame() const {
-		return cameraFrame;
-	}
-
-	void setCameraFrame(std::string cameraFrame) {
-		this->cameraFrame = cameraFrame;
-	}
-
-	std::string getFixedFrame() const {
-		return fixedFrame;
-	}
-
-	void setFixedFrame(std::string fixedFrame) {
-		this->fixedFrame = fixedFrame;
-	}
-
-	std::string getHeadFrame() const {
-		return headFrame;
-	}
-
-	void setHeadFrame(std::string headFrame) {
-		this->headFrame = headFrame;
-	}
-
-	std::string getOpticalFrame() const {
-		return opticalFrame;
-	}
-
-	void setOpticalFrame(std::string opticalFrame) {
-		this->opticalFrame = opticalFrame;
-	}
-
-	std::string getPointCloudTopic() const {
-		return pointCloudTopic;
-	}
-
-	void setPointCloudTopic(std::string pointCloudTopic) {
-		this->pointCloudTopic = pointCloudTopic;
-	}
 
 protected:
 	void pointcloudMsgCb(const sensor_msgs::PointCloud2& input);
