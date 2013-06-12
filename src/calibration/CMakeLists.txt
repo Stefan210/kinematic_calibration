@@ -138,7 +138,14 @@ add_library(G2oOptimization
 	
 target_link_libraries(G2oOptimization ${})
 
-add_executable(CameraCalibration src/CameraCalibration.cpp src/BallDetection.cpp src/TransformOptimization.cpp src/SvdTransformOptimization.cpp src/LocalTransformOptimization.cpp src/TransformFactory.cpp)
+add_executable(CameraCalibration 
+	src/CameraCalibration.cpp 
+	src/BallDetection.cpp 
+	src/TransformOptimization.cpp 
+	src/SvdTransformOptimization.cpp 
+	src/LocalTransformOptimization.cpp 
+	src/G2oTransformOptimization.cpp 
+	src/TransformFactory.cpp)
 target_link_libraries(CameraCalibration ${catkin_LIBRARIES})
 
 #############
