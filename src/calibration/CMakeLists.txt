@@ -9,6 +9,11 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs visualization_msgs
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
+# g2o is required
+#find_package(G2O REQUIRED)
+#include_directories(${G2O_INCLUDE_DIR})
+#link_directories(${G2O_LIBRARY_DIR})
+
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -124,6 +129,14 @@ target_link_libraries(BallDetection ${catkin_LIBRARIES})
 
 add_executable(BallDetectionMain src/BallDetectionMain.cpp)
 target_link_libraries(BallDetectionMain BallDetection)
+
+add_library(G2oOptimization 
+	src/EdgeRobotMarkerMeasurement.cpp
+	src/VertexPosition3D.cpp
+	src/VertexTransformation3D.cpp
+	)
+	
+target_link_libraries(G2oOptimization ${})
 
 add_executable(CameraCalibration src/CameraCalibration.cpp src/BallDetection.cpp src/TransformOptimization.cpp src/SvdTransformOptimization.cpp src/LocalTransformOptimization.cpp src/TransformFactory.cpp)
 target_link_libraries(CameraCalibration ${catkin_LIBRARIES})
