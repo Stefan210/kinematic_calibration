@@ -13,6 +13,7 @@
 #include "../include/TransformOptimization.h"
 #include "../include/SvdTransformOptimization.h"
 #include "../include/LocalTransformOptimization.h"
+#include "../include/G2oTransformOptimization.h"
 #include "../include/TransformFactory.h"
 
 // ROS specific includes

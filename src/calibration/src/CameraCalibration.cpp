@@ -31,9 +31,8 @@ int main(int argc, char** argv) {
 
 	// parse command line arguments
 	for (int i = 1; i < argc; i++) {
-		if (strcmp(argv[i], "-n") == 0
-				|| strcmp(argv[i], "--name") == 0) {
-			nodeName = argv[i+1];
+		if (strcmp(argv[i], "-n") == 0 || strcmp(argv[i], "--name") == 0) {
+			nodeName = argv[i + 1];
 		}
 	}
 
@@ -44,26 +43,31 @@ int main(int argc, char** argv) {
 	options.setCameraFrame(DEFAULT_CAMERA_FRAME);
 	options.setFixedFrame(DEFAULT_FIXED_FRAME);
 	options.setHeadFrame(DEFAULT_HEAD_FRAME);
-	TransformFactory* transformFactory = new TfTransformFactory(DEFAULT_HEAD_FRAME,
-			DEFAULT_CAMERA_FRAME);
+	TransformFactory* transformFactory = new TfTransformFactory(
+			DEFAULT_HEAD_FRAME, DEFAULT_CAMERA_FRAME);
 	options.setInitialTransformFactory(transformFactory);
 	options.setMaxBallRadius(0.076);
 	options.setMinBallRadius(0.074);
 	options.setMinNumOfMeasurements(3);
 	options.setPointCloudTopic(DEFAULT_POINTCLOUD_MSG);
-	TransformOptimization* transformOptimization = new SvdTransformOptimization();
-	transformOptimization->setMaxIterations(100000);
-	transformOptimization->setMinError(0.000001);
-	transformOptimization->setErrorImprovement(0.000000001);
-	options.setTransformOptimization(transformOptimization);
+	TransformOptimization* svdTransformOptimization =
+			new SvdTransformOptimization();
+	svdTransformOptimization->setMaxIterations(100000);
+	svdTransformOptimization->setMinError(0.000001);
+	svdTransformOptimization->setErrorImprovement(0.000000001);
+	TransformOptimization* g2oTransformOptimization = new G2oTransformOptimization();
+	CompositeTransformOptimization* compositeTransformOptimization = new CompositeTransformOptimization();
+	compositeTransformOptimization->addTransformOptimization("svd", svdTransformOptimization);
+	compositeTransformOptimization->addTransformOptimization("g2o", g2oTransformOptimization);
+	options.setTransformOptimization(compositeTransformOptimization);
 
 	// parse command line arguments
 	for (int i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "-ig") == 0
 				|| strcmp(argv[i], "--initial-guess") == 0) {
-			TransformFactory* mtf = new ManualTransformFactory(atof(argv[i + 1]), atof(argv[i + 2]),
-					atof(argv[i + 3]), atof(argv[i + 4]), atof(argv[i + 5]),
-					atof(argv[i + 6]));
+			TransformFactory* mtf = new ManualTransformFactory(
+					atof(argv[i + 1]), atof(argv[i + 2]), atof(argv[i + 3]),
+					atof(argv[i + 4]), atof(argv[i + 5]), atof(argv[i + 6]));
 			options.setInitialTransformFactory(mtf);
 		}
 	}
@@ -126,17 +130,19 @@ void CameraCalibration::pointcloudMsgCb(const sensor_msgs::PointCloud2& input) {
 			if (this->measurementSeries.size() == 15) {
 				ROS_INFO("optimizing...");
 				// initialize TransformOptization
+				tf::Transform initialTransform;
+				this->initialTransformFactory->getTransform(initialTransform);
 				this->transformOptimization->setInitialTransformCameraToHead(
-						this->initialTransformFactory->getTransform()); std::cout << "foo" << std::endl;
+						initialTransform);
 				for (int j = 0; j < this->measurementSeries.size(); j++) {
 					this->transformOptimization->addMeasurePoint(
 							this->measurementSeries[j]);
 				}
-				 std::cout << "bar" << std::endl;
 				// optimize!
 				tf::Transform optimizedTransform;
 				this->transformOptimization->optimizeTransform(
 						optimizedTransform);
+//				std::cout << "initial: " << initialTransform.getOrigin()[0] << " " << initialTransform.getOrigin()[1] << " " << initialTransform.getOrigin()[2] << "\n";
 			}
 		}
 		currentMeasurement.clear();

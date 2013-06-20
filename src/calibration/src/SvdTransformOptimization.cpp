@@ -24,13 +24,13 @@ void SvdTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 	tf::Transform currentCameraToHead = initialTransformCameraToHead;
 	this->lastError = INFINITY;
 
-	std::cout << "initial origin " << currentCameraToHead.getOrigin().getX() << ","
+/*	std::cout << "initial origin " << currentCameraToHead.getOrigin().getX() << ","
 			<< currentCameraToHead.getOrigin().getY() << ","
 			<< currentCameraToHead.getOrigin().getZ() << ";";
 
 	std::cout << "initial rotation " << currentCameraToHead.getRotation().getX() << ","
 			<< currentCameraToHead.getRotation().getY() << ","
-			<< currentCameraToHead.getRotation().getZ() << ";" << endl;
+			<< currentCameraToHead.getRotation().getZ() << ";" << endl;*/
 
 	int numOfPoints = measurePoints.size();
 
@@ -79,7 +79,7 @@ void SvdTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 		this->lastError = error;
 		calculateSqrtDistCameraHead(currentCameraToHead, error);
 
-		std::cout << "[optimization]";
+/*		std::cout << "[optimization]";
 
 		std::cout << "iteration " << numOfIterations << ";";
 
@@ -96,9 +96,9 @@ void SvdTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 
 		std::cout << "error " << error << ";";
 
-		std::cout << std::endl;
+		std::cout << std::endl;*/
 	}
-	cameraToHead = currentCameraToHead;
+	cameraToHead = tf::Transform(currentCameraToHead);
 }
 
 

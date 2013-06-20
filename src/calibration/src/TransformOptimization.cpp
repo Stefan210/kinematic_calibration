@@ -28,30 +28,73 @@ void TransformOptimization::clearMeasurePoints() {
 }
 
 void TransformOptimization::calculateSqrtDistFromMarker(
-		tf::Transform& CameraToHead, tf::Vector3 markerPoint, float& error) {
-	// TODO: Throw exception.
-	if (this->measurePoints.empty()) {
-		return;
-	}
-
+		tf::Transform& cameraToHead, tf::Vector3 markerPoint, float& error) {
 	error = 0;
 
 	for (int i = 0; i < this->measurePoints.size(); i++) {
+		float currentError = 0;
 		MeasurePoint& current = this->measurePoints[i];
-		tf::Vector3 transformedPoint = current.headToFixed * CameraToHead
+		tf::Vector3 transformedPoint = current.headToFixed * cameraToHead
 				* current.opticalToCamera * current.measuredPosition;
-		error += (markerPoint.x() - transformedPoint.x())
-				* (markerPoint.x() - transformedPoint.x());
-		error += (markerPoint.y() - transformedPoint.y())
-				* (markerPoint.y() - transformedPoint.y());
-		error += (markerPoint.z() - transformedPoint.z())
-				* (markerPoint.z() - transformedPoint.z());
+		currentError += pow(markerPoint.x() - transformedPoint.x(), 2);
+		currentError += pow(markerPoint.y() - transformedPoint.y(), 2);
+		currentError += pow(markerPoint.z() - transformedPoint.z(), 2);
+		error  += sqrt(currentError);
 	}
+
+	error /= this->measurePoints.size();
 }
 
 void TransformOptimization::setInitialTransformCameraToHead(
 		tf::Transform frameAToFrameB) {
 	this->initialTransformCameraToHead = frameAToFrameB;
+}
+
+void TransformOptimization::getMarkerEstimate(
+		const tf::Transform& cameraToHead, tf::Vector3& position) {
+	int numOfPoints = measurePoints.size();
+	float centerX = 0, centerY = 0, centerZ = 0;
+	for (int i = 0; i < numOfPoints; i++) {
+		MeasurePoint currentMeasure = measurePoints[i];
+		tf::Vector3 pointFixed = currentMeasure.headToFixed
+				* (cameraToHead
+						* (currentMeasure.opticalToCamera
+								* currentMeasure.measuredPosition));
+		centerX += pointFixed.getX();
+		centerY += pointFixed.getY();
+		centerZ += pointFixed.getZ();
+/*
+		std::cout << "Tt_headToFixed: " << currentMeasure.headToFixed.getOrigin()[0] << " " << currentMeasure.headToFixed.getOrigin()[1] << " " << currentMeasure.headToFixed.getOrigin()[2] << "\n";
+		std::cout << "Tt_cameraToHead: " << cameraToHead.getOrigin()[0] << " " << cameraToHead.getOrigin()[1] << " " << cameraToHead.getOrigin()[2] << "\n";
+		std::cout << "Tt_opticalToCamera: " << currentMeasure.opticalToCamera.getOrigin()[0] << " " << currentMeasure.opticalToCamera.getOrigin()[1] << " " << currentMeasure.opticalToCamera.getOrigin()[2] << "\n";
+		std::cout << "P_optical: x,y,z " << currentMeasure.measuredPosition.getX() << ","  << currentMeasure.measuredPosition.getY() << ","  << currentMeasure.measuredPosition.getZ() << "\n";
+		std::cout << "P_fixed: x,y,z " << pointFixed.getX() << ","  << pointFixed.getY() << ","  << pointFixed.getZ() << "\n";
+	*/
+	}
+
+	position[0] = (centerX / (float)numOfPoints);
+	position[1] = (centerY / (float)numOfPoints);
+	position[2] = (centerZ / (float)numOfPoints);
+}
+
+void TransformOptimization::printResult(std::string pre,
+		tf::Transform& cameraToHead, tf::Vector3 markerPosition) {
+	float error;
+	calculateSqrtDistFromMarker(cameraToHead, markerPosition, error);
+	std::cout << pre << ";";
+	std::cout << "position (x,y,z):" << markerPosition[0] << ","
+			<< markerPosition[1] << ","
+			<< markerPosition[2] << ";";
+	std::cout << "translation (x,y,z):" << cameraToHead.getOrigin()[0]
+			<< "," << cameraToHead.getOrigin()[1] << ","
+			<< cameraToHead.getOrigin()[2] << ";";
+	std::cout << "rotation (q0,q1,q2,q3):"
+			<< cameraToHead.getRotation()[0] << ","
+			<< cameraToHead.getRotation()[1] << ","
+			<< cameraToHead.getRotation()[2] << ","
+			<< cameraToHead.getRotation()[3] << ";";
+	std::cout << "error: " << error;
+	std::cout << "\n";
 }
 
 bool TransformOptimization::canStop() {
@@ -83,6 +126,7 @@ void TransformOptimization::calculateSqrtDistCameraHead(
 	}
 
 	// Transform each point to fixed frame and determine the centroid.
+	// todo: replace with call to helper function
 	float centerX = 0, centerY = 0, centerZ = 0;
 	for (int i = 0; i < numOfPoints; i++) {
 		MeasurePoint currentMeasure = measurePoints[i];
@@ -123,4 +167,57 @@ void TransformOptimization::calculateSqrtDistCameraHead(
 				+ std::pow(pointcloudX[i].getZ() - pointcloudP[i].getZ(), 2);
 	}
 }
+
+void CompositeTransformOptimization::addTransformOptimization(
+		std::string name, TransformOptimization* to) {
+	this->optimizer.insert(make_pair(name, to));
+}
+
+void CompositeTransformOptimization::optimizeTransform(
+		tf::Transform& cameraToHead) {
+	float smallestError = INFINITY;
+	float currentError = 0;
+
+	// return the transform with the smallest error
+	for(map<string, TransformOptimization*>::const_iterator it = this->optimizer.begin();
+	    it != this->optimizer.end(); ++it) {
+		tf::Transform transform;
+		tf::Vector3 markerPosition;
+		it->second->optimizeTransform(transform);
+		it->second->getMarkerEstimate(transform, markerPosition);
+		this->calculateSqrtDistFromMarker(transform, markerPosition, currentError);
+		if(currentError < smallestError) {
+			smallestError = currentError;
+			cameraToHead = tf::Transform(transform);
+		}
+		printResult(it->first, transform, markerPosition);
+	}
+}
+
+void CompositeTransformOptimization::addMeasurePoint(MeasurePoint newPoint) {
+	for(map<string, TransformOptimization*>::const_iterator it = this->optimizer.begin();
+	    it != this->optimizer.end(); ++it) {
+		it->second->addMeasurePoint(newPoint);
+	}
+	this->TransformOptimization::addMeasurePoint(newPoint);
+}
+
+void CompositeTransformOptimization::clearMeasurePoints() {
+	for(map<string, TransformOptimization*>::const_iterator it = this->optimizer.begin();
+	    it != this->optimizer.end(); ++it) {
+		it->second->clearMeasurePoints();
+	}
+	this->TransformOptimization::clearMeasurePoints();
+}
+
+void CompositeTransformOptimization::setInitialTransformCameraToHead(
+		tf::Transform cameraToHead) {
+	for(map<string, TransformOptimization*>::const_iterator it = this->optimizer.begin();
+	    it != this->optimizer.end(); ++it) {
+		it->second->setInitialTransformCameraToHead(cameraToHead);
+	}
+	this->TransformOptimization::setInitialTransformCameraToHead(cameraToHead);
+}
+
+
 

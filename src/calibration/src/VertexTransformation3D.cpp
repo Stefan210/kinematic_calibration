@@ -23,7 +23,6 @@ bool VertexTransformation3D::write(std::ostream& out) const {
 	return false;
 }
 
-// TODO: write unit tests!
 void VertexTransformation3D::oplusImpl(const double* delta) {
 	double tx_delta = delta[0];
 	double ty_delta = delta[1];
@@ -39,16 +38,17 @@ void VertexTransformation3D::oplusImpl(const double* delta) {
 	tf::Vector3 t_new(tx_old + tx_delta, ty_old + ty_delta, tz_old + tz_delta);
 
 	tf::Quaternion quat_old = this->_estimate.getRotation();
-	tf::Quaternion quat_delta;quat_delta.setRPY(roll_delta, pitch_delta, yaw_delta);
-	tf::Quaternion quat_new = quat_old + quat_delta;
+
+	double roll_old, pitch_old, yaw_old;
+	tf::Matrix3x3(quat_old).getRPY(roll_old, pitch_old, yaw_old);
+	tf::Quaternion quat_new;
+	quat_new.setRPY(roll_old + roll_delta, pitch_old + pitch_delta, yaw_old + yaw_delta);
 
 	tf::Transform newTransform(quat_new, t_new);
 	this->setEstimate(newTransform);
 }
 
-
 void VertexTransformation3D::setToOriginImpl() {
 	this->_estimate = tf::Transform();
 }
-
 

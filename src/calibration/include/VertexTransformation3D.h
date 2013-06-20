@@ -24,8 +24,8 @@ public:
 	VertexTransformation3D();
 	virtual ~VertexTransformation3D();
 
-	virtual bool read(std::istream&);
-	virtual bool write(std::ostream&) const;
+	virtual bool read(std::istream& in);
+	virtual bool write(std::ostream& out) const;
 	virtual void oplusImpl(const double*);
 	virtual void setToOriginImpl();
 

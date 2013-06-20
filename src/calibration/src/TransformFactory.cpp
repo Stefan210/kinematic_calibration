@@ -25,13 +25,11 @@ TfTransformFactory::TfTransformFactory(std::string targetFrame,
 TfTransformFactory::~TfTransformFactory() {
 }
 
-tf::Transform TfTransformFactory::getTransform() {
+void TfTransformFactory::getTransform(tf::Transform& transform) {
 	tf::StampedTransform stampedTransform;
-	tf::Transform transform;
 	transformListener.lookupTransform(this->targetFrame, this->sourceFrame, ros::Time(0), stampedTransform);
 	transform.setOrigin(stampedTransform.getOrigin());
 	transform.setRotation(stampedTransform.getRotation());
-	return transform;
 }
 
 ManualTransformFactory::ManualTransformFactory(float tx, float ty, float tz,
@@ -47,8 +45,9 @@ ManualTransformFactory::ManualTransformFactory(float tx, float ty, float tz,
 ManualTransformFactory::~ManualTransformFactory() {
 }
 
-tf::Transform ManualTransformFactory::getTransform() {
- return tf::Transform(tf::createQuaternionFromRPY(roll, pitch, yaw), tf::Vector3(tx, ty, tz));
+void ManualTransformFactory::getTransform(tf::Transform& transform) {
+	transform.setOrigin(tf::Vector3(tx, ty, tz));
+	transform.setRotation(tf::createQuaternionFromRPY(roll, pitch, yaw));
 }
 
 

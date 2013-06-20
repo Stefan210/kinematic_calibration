@@ -17,7 +17,8 @@
 // Declare a test
 /* Note: This is just a very simple test for verifying that the ball detection basically works.
  * Passing this test does not imply that it also works with "real" data.
- */TEST(BallDetectionTest, simpleTest) {
+ */
+TEST(BallDetectionTest, simpleTest) {
 	float x_center = 0.48;
 	float y_center = 0.24;
 	float z_center = 0.02;
@@ -42,8 +43,8 @@
 	}
 
 	// add plane
-	for (float x = 0; x < 1; x += 0.05) {
-		for (float y = 0; y < 5; y += 0.05) {
+	for (float x = 0; x < 1; x += 0.005) {
+		for (float y = 0; y < 3; y += 0.005) {
 			pcl::PointXYZRGB point;
 			point.x = x;
 			point.y = y;
@@ -80,17 +81,17 @@ TEST(BallDetectionTest, avgTest) {
 				float lon_rad = lon * M_PI / 180;
 				float lat_rad = lat * M_PI / 180;
 				pcl::PointXYZRGB point;
-				point.x = r * std::cos(lon_rad) * std::sin(lat_rad) + x_center + numOfClouds;
-				point.y = r * std::sin(lon_rad) * std::sin(lat_rad) + y_center + numOfClouds;
-				point.z = r * std::cos(lat_rad) + z_center + numOfClouds;
+				point.x = r * std::cos(lon_rad) * std::sin(lat_rad) + x_center + numOfClouds/5;
+				point.y = r * std::sin(lon_rad) * std::sin(lat_rad) + y_center + numOfClouds/5;
+				point.z = r * std::cos(lat_rad) + z_center + numOfClouds/5;
 				point.rgb = 255 + (255 << 8) + (255 << 16);
 				(*cloudPtr).push_back(point);
 			}
 		}
 
 		// add plane
-		for (float x = 0; x < 1; x += 0.05) {
-			for (float y = 0; y < 5; y += 0.05) {
+		for (float x = 0; x < 1; x += 0.005) {
+			for (float y = 0; y < 3; y += 0.005) {
 				pcl::PointXYZRGB point;
 				point.x = x;
 				point.y = y;

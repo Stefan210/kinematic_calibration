@@ -1,18 +1,13 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(calibration)
+project(learning_tf)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs visualization_msgs pcl pcl_ros)
+find_package(catkin REQUIRED COMPONENTS roscpp rospy tf turtlesim)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-
-# g2o is required
-#find_package(G2O REQUIRED)
-#include_directories(${G2O_INCLUDE_DIR})
-#link_directories(${G2O_LIBRARY_DIR})
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -41,7 +36,7 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs visualization_msgs
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
 #   DEPENDENCIES
-#   std_msgs
+#   std_msgs  # Or other packages containing msgs
 # )
 
 ###################################
@@ -54,8 +49,8 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs visualization_msgs
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
    INCLUDE_DIRS include
-#  LIBRARIES calibration
-  CATKIN_DEPENDS roscpp rospy std_msgs sensor_msgs
+#  LIBRARIES learning_tf
+#  CATKIN_DEPENDS roscpp rospy tf turtlesim
 #  DEPENDS system_lib
 )
 
@@ -70,19 +65,19 @@ include_directories(include
 )
 
 ## Declare a cpp library
-# add_library(calibration
-#   src/${PROJECT_NAME}/calibration.cpp
+# add_library(learning_tf
+#   src/${PROJECT_NAME}/learning_tf.cpp
 # )
 
 ## Declare a cpp executable
-# add_executable(calibration_node src/calibration_node.cpp)
+# add_executable(learning_tf_node src/learning_tf_node.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(calibration_node calibration_generate_messages_cpp)
+# add_dependencies(learning_tf_node learning_tf_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(calibration_node
+# target_link_libraries(learning_tf_node
 #   ${catkin_LIBRARIES}
 # )
 
@@ -101,7 +96,7 @@ include_directories(include
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS calibration calibration_node
+# install(TARGETS learning_tf learning_tf_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -121,56 +116,24 @@ include_directories(include
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
 
-## Add folders to be run by python nosetests
-# catkin_add_nosetests(test)
-
-add_library(BallDetection src/BallDetection.cpp)
-target_link_libraries(BallDetection ${catkin_LIBRARIES})
-
-add_executable(BallDetectionMain src/BallDetectionMain.cpp)
-target_link_libraries(BallDetectionMain BallDetection)
-
-add_library(G2oOptimization 
-	src/EdgeMarkerMeasurement.cpp
-	src/VertexPosition3D.cpp
-	src/VertexTransformation3D.cpp
-	)
-	
-target_link_libraries(G2oOptimization 
-  ${catkin_LIBRARIES}
-  g2o_core core
-  csparse 
-  g2o_solver_csparse solver_csparse
-  g2o_csparse_extension csparse_extension
-  g2o_stuff stuff
-  solver_cholmod
-  )
-
-add_executable(CameraCalibration 
-	src/CameraCalibration.cpp 
-	src/BallDetection.cpp 
-	src/TransformOptimization.cpp 
-	src/SvdTransformOptimization.cpp 
-	src/LocalTransformOptimization.cpp 
-	src/G2oTransformOptimization.cpp 
-	src/TransformFactory.cpp)
-target_link_libraries(CameraCalibration 
-  ${catkin_LIBRARIES} 
-  G2oOptimization
-)
-
 #############
 ## Testing ##
 #############
 
 ## Add gtest based cpp test target and link libraries
-catkin_add_gtest(BallDetectionTest test/BallDetectionTest.cpp)
-if(TARGET BallDetectionTest)
-  target_link_libraries(BallDetectionTest BallDetection)
-endif()
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_learning_tf.cpp)
+# if(TARGET ${PROJECT_NAME}-test)
+#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
+# endif()
 
-catkin_add_gtest(VertexTransformation3DTest test/VertexTransformation3DTest.cpp)
-target_link_libraries(VertexTransformation3DTest G2oOptimization)
+## Add folders to be run by python nosetests
+# catkin_add_nosetests(test)
 
-catkin_add_gtest(VertexPosition3DTest test/VertexPosition3DTest.cpp)
-target_link_libraries(VertexPosition3DTest G2oOptimization)
+add_executable(turtle_tf_broadcaster src/turtle_tf_broadcaster.cpp)
+target_link_libraries(turtle_tf_broadcaster ${catkin_LIBRARIES})
+
+add_executable(turtle_tf_listener src/turtle_tf_listener.cpp)
+target_link_libraries(turtle_tf_listener ${catkin_LIBRARIES})
+
+add_executable(frame_tf_broadcaster src/frame_tf_broadcaster.cpp)
+target_link_libraries(frame_tf_broadcaster ${catkin_LIBRARIES})

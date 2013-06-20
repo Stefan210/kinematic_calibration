@@ -19,14 +19,14 @@ class TransformFactory {
 public:
 	TransformFactory();
 	virtual ~TransformFactory();
-	virtual tf::Transform getTransform() = 0;
+	virtual void getTransform(tf::Transform& transform) = 0;
 };
 
 class TfTransformFactory : public TransformFactory {
 public:
 	TfTransformFactory(std::string targetFrame, std::string sourceFrame);
 	virtual ~TfTransformFactory();
-	virtual tf::Transform getTransform();
+	virtual void getTransform(tf::Transform& transform);
 
 protected:
 	std::string targetFrame;
@@ -38,7 +38,7 @@ class ManualTransformFactory : public TransformFactory {
 public:
 	ManualTransformFactory(float tx, float ty, float tz, float roll, float pitch, float yaw);
 	virtual ~ManualTransformFactory();
-	virtual tf::Transform getTransform();
+	virtual void getTransform(tf::Transform& transform);
 
 protected:
 	float tx;

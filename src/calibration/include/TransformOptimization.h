@@ -26,12 +26,17 @@ class TransformOptimization {
 public:
 	TransformOptimization();
 	virtual ~TransformOptimization();
-	virtual void optimizeTransform(tf::Transform& CameraToHead) = 0;
-	void addMeasurePoint(MeasurePoint newPoint);
-	void clearMeasurePoints();
-	void setInitialTransformCameraToHead(tf::Transform CameraToHead);
-	virtual void calculateSqrtDistFromMarker(tf::Transform& CameraToHead, tf::Vector3 markerPoint, float& error);
-	virtual void calculateSqrtDistCameraHead(tf::Transform& CameraToHead, float& error);
+	virtual void optimizeTransform(tf::Transform& cameraToHead) = 0;
+	virtual void addMeasurePoint(MeasurePoint newPoint);
+	virtual void clearMeasurePoints();
+	virtual void setInitialTransformCameraToHead(tf::Transform cameraToHead);
+	virtual void calculateSqrtDistFromMarker(tf::Transform& cameraToHead,
+			tf::Vector3 markerPoint, float& error);
+	virtual void calculateSqrtDistCameraHead(tf::Transform& cameraToHead,
+			float& error);
+	virtual void getMarkerEstimate(const tf::Transform& cameraToHead,
+			tf::Vector3& position);
+	void printResult(std::string pre, tf::Transform& cameraToHead, tf::Vector3 markerPosition);
 
 	float getMaxIterations() const {
 		return maxIterations;
@@ -58,7 +63,6 @@ public:
 	}
 
 protected:
-	void validate(tf::Transform transformAToB);
 	virtual bool canStop();
 	int numOfIterations;
 	std::vector<MeasurePoint> measurePoints;
@@ -69,7 +73,18 @@ protected:
 	float minError;
 	float maxIterations;
 
+};
 
+class CompositeTransformOptimization : public TransformOptimization {
+public:
+	void addTransformOptimization(std::string name, TransformOptimization* to);
+	virtual void optimizeTransform(tf::Transform& cameraToHead);
+	virtual void addMeasurePoint(MeasurePoint newPoint);
+	virtual void clearMeasurePoints();
+	virtual void setInitialTransformCameraToHead(tf::Transform cameraToHead);
+
+private:
+	std::map<std::string, TransformOptimization*> optimizer;
 };
 
 #endif /* TRANSFORMOPTIMIZATION_H_ */
