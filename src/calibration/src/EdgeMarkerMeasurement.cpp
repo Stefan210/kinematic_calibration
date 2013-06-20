@@ -34,10 +34,8 @@ void EdgeMarkerMeasurement::computeError() {
 					* (measurePoint.opticalToCamera
 							* measurePoint.measuredPosition)));
 
-	newError += pow(transformedMeasurement.getX() - markerPosition[0], 2);
-	newError += pow(transformedMeasurement.getY() - markerPosition[1], 2);
-	newError += pow(transformedMeasurement.getZ() - markerPosition[2], 2);
-
-	this->_error[0] = newError;
+	_error[0] = transformedMeasurement.getX() - markerPosition[0];
+	_error[1] = transformedMeasurement.getY() - markerPosition[1];
+	_error[2] = transformedMeasurement.getZ() - markerPosition[2];
 }
 

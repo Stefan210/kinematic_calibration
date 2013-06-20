@@ -68,7 +68,7 @@ void G2oTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 		EdgeMarkerMeasurement* edge = new EdgeMarkerMeasurement(
 				this->measurePoints[i]);
 		edge->setId(i);
-		edge->setInformation(Eigen::Matrix<double, 1, 1>::Identity());
+		edge->setInformation(Eigen::Matrix<double, 3, 3>::Identity());
 		edge->vertices()[0] = positionVertex;
 		edge->vertices()[1] = transformationVertex;
 		optimizer.addEdge(edge);
