@@ -80,6 +80,8 @@ void TransformOptimization::getMarkerEstimate(
 void TransformOptimization::printResult(std::string pre,
 		tf::Transform& cameraToHead, tf::Vector3 markerPosition) {
 	float error;
+	double r, p, y;
+	tf::Matrix3x3(cameraToHead.getRotation()).getRPY(r, p, y);
 	calculateSqrtDistFromMarker(cameraToHead, markerPosition, error);
 	std::cout << pre << ";";
 	std::cout << "position (x,y,z):" << markerPosition[0] << ","
@@ -93,6 +95,10 @@ void TransformOptimization::printResult(std::string pre,
 			<< cameraToHead.getRotation()[1] << ","
 			<< cameraToHead.getRotation()[2] << ","
 			<< cameraToHead.getRotation()[3] << ";";
+	std::cout << "rotation (r,p,y):"
+			<< r << ","
+			<< p << ","
+			<< y << ";";
 	std::cout << "error: " << error;
 	std::cout << "\n";
 }

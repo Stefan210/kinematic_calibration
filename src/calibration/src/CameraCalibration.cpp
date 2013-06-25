@@ -126,6 +126,7 @@ void CameraCalibration::pointcloudMsgCb(const sensor_msgs::PointCloud2& input) {
 			ROS_INFO(
 					"Last measurement (average position, fixed frame): %f, %f, %f.", pointFixed.getX(), pointFixed.getY(), pointFixed.getZ());
 			// TODO: extract method / refactor
+			// TODO: don't use a hard coded criterium for starting the optimization!
 			// if there are enough measurement series, start the optimization
 			if (this->measurementSeries.size() == 15) {
 				ROS_INFO("optimizing...");
