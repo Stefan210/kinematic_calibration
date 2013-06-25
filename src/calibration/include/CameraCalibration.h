@@ -31,7 +31,7 @@
 #define DEFAULT_FIXED_FRAME "r_sole"
 
 class CameraCalibrationOptions {
-	public:
+public:
 	std::string getCameraFrame() const;
 	void setCameraFrame(std::string cameraFrame);
 	std::string getFixedFrame() const;
@@ -99,6 +99,8 @@ private:
 	bool distanceTooBig(pcl::PointXYZ first, pcl::PointXYZ second);
 	void createMeasurePoint(std::vector<BallDetection::BallData> measurement,
 			std::vector<ros::Time> timestamps, MeasurePoint& newMeasurePoint);
+	void startOptimization();
+	void outputMeasurePoint(const MeasurePoint& newMeasurePoint);
 };
 
 #endif /* CAMERACALIBRATION_H_ */

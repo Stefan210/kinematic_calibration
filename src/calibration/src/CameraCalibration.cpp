@@ -55,10 +55,14 @@ int main(int argc, char** argv) {
 	svdTransformOptimization->setMaxIterations(100000);
 	svdTransformOptimization->setMinError(0.000001);
 	svdTransformOptimization->setErrorImprovement(0.000000001);
-	TransformOptimization* g2oTransformOptimization = new G2oTransformOptimization();
-	CompositeTransformOptimization* compositeTransformOptimization = new CompositeTransformOptimization();
-	compositeTransformOptimization->addTransformOptimization("svd", svdTransformOptimization);
-	compositeTransformOptimization->addTransformOptimization("g2o", g2oTransformOptimization);
+	TransformOptimization* g2oTransformOptimization =
+			new G2oTransformOptimization();
+	CompositeTransformOptimization* compositeTransformOptimization =
+			new CompositeTransformOptimization();
+	compositeTransformOptimization->addTransformOptimization("svd",
+			svdTransformOptimization);
+	compositeTransformOptimization->addTransformOptimization("g2o",
+			g2oTransformOptimization);
 	options.setTransformOptimization(compositeTransformOptimization);
 
 	// parse command line arguments
@@ -93,7 +97,7 @@ void CameraCalibration::pointcloudMsgCb(const sensor_msgs::PointCloud2& input) {
 	try {
 		bd = this->ballDetection.getPosition(initialCloud);
 	} catch (...) {
-		//todo
+		return;
 	}
 	this->opticalFrame = input.header.frame_id;
 
@@ -109,41 +113,12 @@ void CameraCalibration::pointcloudMsgCb(const sensor_msgs::PointCloud2& input) {
 			createMeasurePoint(currentMeasurement, currentTimestamps,
 					newMeasurePoint);
 			this->measurementSeries.push_back(newMeasurePoint);
-			tf::StampedTransform cameraToHead;
+			outputMeasurePoint(newMeasurePoint);
 
-			// get the transform between headFrame and cameraFrame and transform the current point to fixed frame
-			this->transformListener.lookupTransform(headFrame, cameraFrame,
-					currentTimestamps[currentTimestamps.size() - 1],
-					cameraToHead);
-			tf::Vector3 pointFixed = newMeasurePoint.headToFixed
-					* (cameraToHead
-							* (newMeasurePoint.opticalToCamera
-									* newMeasurePoint.measuredPosition));
-
-			// output ball position in optical and fixed frame
-			ROS_INFO(
-					"Last measurement (average position, optical frame): %f, %f, %f.", newMeasurePoint.measuredPosition.getX(), newMeasurePoint.measuredPosition.getY(), newMeasurePoint.measuredPosition.getZ());
-			ROS_INFO(
-					"Last measurement (average position, fixed frame): %f, %f, %f.", pointFixed.getX(), pointFixed.getY(), pointFixed.getZ());
-			// TODO: extract method / refactor
 			// TODO: don't use a hard coded criterium for starting the optimization!
 			// if there are enough measurement series, start the optimization
 			if (this->measurementSeries.size() == 15) {
-				ROS_INFO("optimizing...");
-				// initialize TransformOptization
-				tf::Transform initialTransform;
-				this->initialTransformFactory->getTransform(initialTransform);
-				this->transformOptimization->setInitialTransformCameraToHead(
-						initialTransform);
-				for (int j = 0; j < this->measurementSeries.size(); j++) {
-					this->transformOptimization->addMeasurePoint(
-							this->measurementSeries[j]);
-				}
-				// optimize!
-				tf::Transform optimizedTransform;
-				this->transformOptimization->optimizeTransform(
-						optimizedTransform);
-//				std::cout << "initial: " << initialTransform.getOrigin()[0] << " " << initialTransform.getOrigin()[1] << " " << initialTransform.getOrigin()[2] << "\n";
+				startOptimization();
 			}
 		}
 		currentMeasurement.clear();
@@ -153,6 +128,43 @@ void CameraCalibration::pointcloudMsgCb(const sensor_msgs::PointCloud2& input) {
 	this->currentMeasurement.push_back(bd);
 	this->currentTimestamps.push_back(input.header.stamp);
 
+}
+
+void CameraCalibration::startOptimization() {
+	ROS_INFO("optimizing...");
+	// initialize TransformOptization
+	tf::Transform initialTransform;
+	this->initialTransformFactory->getTransform(initialTransform);
+	this->transformOptimization->setInitialTransformCameraToHead(
+			initialTransform);
+	// TODO: Add method to pass the list, not a single point!
+	for (int j = 0; j < this->measurementSeries.size(); j++) {
+		this->transformOptimization->addMeasurePoint(
+				this->measurementSeries[j]);
+	}
+	// optimize!
+	tf::Transform optimizedTransform;
+	this->transformOptimization->optimizeTransform(optimizedTransform);
+	// TODO: Do something with the optimized transform...
+}
+
+void CameraCalibration::outputMeasurePoint(
+		const MeasurePoint& newMeasurePoint) {
+	tf::StampedTransform cameraToHead;
+
+	// get the transform between headFrame and cameraFrame and transform the current point to fixed frame
+	this->transformListener.lookupTransform(headFrame, cameraFrame,
+			currentTimestamps[currentTimestamps.size() - 1], cameraToHead);
+	tf::Vector3 pointFixed = newMeasurePoint.headToFixed
+			* (cameraToHead
+					* (newMeasurePoint.opticalToCamera
+							* newMeasurePoint.measuredPosition));
+
+	// output ball position in optical and fixed frame
+	ROS_INFO(
+			"Last measurement (average position, optical frame): %f, %f, %f.", newMeasurePoint.measuredPosition.getX(), newMeasurePoint.measuredPosition.getY(), newMeasurePoint.measuredPosition.getZ());
+	ROS_INFO(
+			"Last measurement (average position, fixed frame): %f, %f, %f.", pointFixed.getX(), pointFixed.getY(), pointFixed.getZ());
 }
 
 bool CameraCalibration::distanceTooBig(pcl::PointXYZ first,
