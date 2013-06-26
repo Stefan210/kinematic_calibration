@@ -3,3 +3,4 @@ devel
 build
 *.pcd
 install
+*EXTERNAL*

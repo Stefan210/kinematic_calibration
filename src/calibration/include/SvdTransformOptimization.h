@@ -8,12 +8,12 @@
 #ifndef SVDTRANSFORMOPTIMIZATION_H_
 #define SVDTRANSFORMOPTIMIZATION_H_
 
-#include "TransformOptimization.h"
+#include "CameraTransformOptimization.h"
 
 /*
- *
+ * Class for calibrating the transformation between robot and camera using SVD/ICP.
  */
-class SvdTransformOptimization : public TransformOptimization {
+class SvdTransformOptimization : public CameraTransformOptimization {
 public:
 	SvdTransformOptimization();
 	virtual ~SvdTransformOptimization();

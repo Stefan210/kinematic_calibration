@@ -13,7 +13,7 @@
 using namespace g2o;
 
 /*
- *
+ * Vertex that represents a 3D point.
  */
 class VertexPosition3D : public BaseVertex<3, Eigen::Vector3d> {
 public:

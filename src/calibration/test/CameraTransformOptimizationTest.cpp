@@ -5,5 +5,5 @@
  *      Author: Stefan Wrobel
  */
 
-#include "../include/TransformOptimization.h"
+#include "../include/CameraTransformOptimization.h"
 

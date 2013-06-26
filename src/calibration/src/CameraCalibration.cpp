@@ -7,6 +7,14 @@
 
 #include "../include/CameraCalibration.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <termios.h>
+
 CameraCalibration::CameraCalibration(CameraCalibrationOptions options) :
 		transformListener(ros::Duration(180, 0)) {
 	this->pointCloudTopic = options.getPointCloudTopic();
@@ -50,12 +58,12 @@ int main(int argc, char** argv) {
 	options.setMinBallRadius(0.074);
 	options.setMinNumOfMeasurements(3);
 	options.setPointCloudTopic(DEFAULT_POINTCLOUD_MSG);
-	TransformOptimization* svdTransformOptimization =
+	CameraTransformOptimization* svdTransformOptimization =
 			new SvdTransformOptimization();
 	svdTransformOptimization->setMaxIterations(100000);
 	svdTransformOptimization->setMinError(0.000001);
 	svdTransformOptimization->setErrorImprovement(0.000000001);
-	TransformOptimization* g2oTransformOptimization =
+	CameraTransformOptimization* g2oTransformOptimization =
 			new G2oTransformOptimization();
 	CompositeTransformOptimization* compositeTransformOptimization =
 			new CompositeTransformOptimization();
@@ -77,7 +85,27 @@ int main(int argc, char** argv) {
 	}
 
 	CameraCalibration cameraCalibration(options);
-	ros::spin();
+	//ros::spin();
+
+	while(ros::ok()) {
+        fd_set set;
+        struct timeval tv;
+
+        tv.tv_sec = 0;
+        tv.tv_usec = 10;
+
+        FD_ZERO( &set );
+        FD_SET( fileno( stdin ), &set );
+
+        int res = select( fileno( stdin )+1, &set, NULL, NULL, &tv );
+
+        if( res > 0 )
+        {
+        	cameraCalibration.startOptimization();
+        	break;
+        }
+		ros::spinOnce();
+	}
 
 	return 0;
 }
@@ -117,7 +145,7 @@ void CameraCalibration::pointcloudMsgCb(const sensor_msgs::PointCloud2& input) {
 
 			// TODO: don't use a hard coded criterium for starting the optimization!
 			// if there are enough measurement series, start the optimization
-			if (this->measurementSeries.size() == 15) {
+			if (this->measurementSeries.size() == 15 && false) {
 				startOptimization();
 			}
 		}
@@ -279,12 +307,12 @@ void CameraCalibrationOptions::setPointCloudTopic(std::string pointCloudTopic) {
 	this->pointCloudTopic = pointCloudTopic;
 }
 
-TransformOptimization* CameraCalibrationOptions::getTransformOptimization() const {
+CameraTransformOptimization* CameraCalibrationOptions::getTransformOptimization() const {
 	return transformOptimization;
 }
 
 void CameraCalibrationOptions::setTransformOptimization(
-		TransformOptimization* transformOptimization) {
+		CameraTransformOptimization* transformOptimization) {
 	this->transformOptimization = transformOptimization;
 }
 

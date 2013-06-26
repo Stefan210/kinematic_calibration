@@ -102,7 +102,7 @@ void G2oTransformOptimization::getMarkerEstimate(
 	if (this->markerPositionOptimized == true) {
 		position = this->markerPosition;
 	} else {
-		this->TransformOptimization::getMarkerEstimate(cameraToHead, position);
+		this->CameraTransformOptimization::getMarkerEstimate(cameraToHead, position);
 	}
 }
 

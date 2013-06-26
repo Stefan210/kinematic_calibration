@@ -10,14 +10,14 @@
 
 #include "../include/VertexPosition3D.h"
 #include "../include/VertexTransformation3D.h"
-#include "../include/TransformOptimization.h"
+#include "../include/CameraTransformOptimization.h"
 
 #include <g2o/core/base_binary_edge.h>
 
 using namespace g2o;
 
 /*
- *
+ * Represents an edge for a measurement.
  */
 class EdgeMarkerMeasurement : public BaseBinaryEdge<3, MeasurePoint, VertexPosition3D, VertexTransformation3D> {
 public:

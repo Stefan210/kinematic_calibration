@@ -8,12 +8,12 @@
 #ifndef G2OTRANSFORMOPTIMIZATION_H_
 #define G2OTRANSFORMOPTIMIZATION_H_
 
-#include <TransformOptimization.h>
+#include "CameraTransformOptimization.h"
 
 /*
- *
+ * Class for calibrating the transformation between robot and camera using g2o.
  */
-class G2oTransformOptimization: public TransformOptimization {
+class G2oTransformOptimization: public CameraTransformOptimization {
 public:
 	G2oTransformOptimization();
 	virtual ~G2oTransformOptimization();

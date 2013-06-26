@@ -8,7 +8,7 @@
 #ifndef LOCALTRANSFORMOPTIMIZATION_H_
 #define LOCALTRANSFORMOPTIMIZATION_H_
 
-#include "TransformOptimization.h"
+#include "CameraTransformOptimization.h"
 
 class LtoState {
 public:
@@ -21,9 +21,9 @@ public:
 };
 
 /*
- *
+ * Class for calibrating the transformation between robot and camera using local optimization.
  */
-class LocalTransformOptimization : public TransformOptimization {
+class LocalTransformOptimization : public CameraTransformOptimization {
 public:
 	LocalTransformOptimization();
 	virtual ~LocalTransformOptimization();

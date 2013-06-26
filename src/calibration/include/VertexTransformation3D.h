@@ -17,7 +17,7 @@
 using namespace g2o;
 
 /*
- *
+ * Vertex that represents a 3D transformation.
  */
 class VertexTransformation3D :  public BaseVertex<6, tf::Transform> {
 public:

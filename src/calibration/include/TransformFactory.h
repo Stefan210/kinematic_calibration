@@ -12,8 +12,8 @@
 #include <tf/tf.h>
 #include <tf/transform_listener.h>
 
-/*
- *
+/**
+ * Class for getting a transform.
  */
 class TransformFactory {
 public:
@@ -22,6 +22,9 @@ public:
 	virtual void getTransform(tf::Transform& transform) = 0;
 };
 
+/**
+ * Gets the transform from TF.
+ */
 class TfTransformFactory : public TransformFactory {
 public:
 	TfTransformFactory(std::string targetFrame, std::string sourceFrame);
@@ -34,6 +37,9 @@ protected:
 	tf::TransformListener transformListener;
 };
 
+/**
+ * Gets the transform from input.
+ */
 class ManualTransformFactory : public TransformFactory {
 public:
 	ManualTransformFactory(float tx, float ty, float tz, float roll, float pitch, float yaw);

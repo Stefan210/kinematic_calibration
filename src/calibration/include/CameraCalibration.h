@@ -10,7 +10,7 @@
 
 // Project specific includes
 #include "../include/BallDetection.h"
-#include "../include/TransformOptimization.h"
+#include "../include/CameraTransformOptimization.h"
 #include "../include/SvdTransformOptimization.h"
 #include "../include/LocalTransformOptimization.h"
 #include "../include/G2oTransformOptimization.h"
@@ -46,8 +46,8 @@ public:
 	void setOpticalFrame(std::string opticalFrame);
 	std::string getPointCloudTopic() const;
 	void setPointCloudTopic(std::string pointCloudTopic);
-	TransformOptimization* getTransformOptimization() const;
-	void setTransformOptimization(TransformOptimization* transformOptimization);
+	CameraTransformOptimization* getTransformOptimization() const;
+	void setTransformOptimization(CameraTransformOptimization* transformOptimization);
 	float getMaxBallRadius() const;
 	void setMaxBallRadius(float maxBallRadius);
 	float getMinBallRadius() const;
@@ -59,7 +59,7 @@ protected:
 	std::string cameraFrame;
 	std::string headFrame;
 	std::string fixedFrame;
-	TransformOptimization* transformOptimization;
+	CameraTransformOptimization* transformOptimization;
 	TransformFactory* initialTransformFactory;
 	int minNumOfMeasurements;
 	float minBallRadius;
@@ -75,13 +75,14 @@ public:
 	virtual ~CameraCalibration();
 	void setInitialCameraToHeadTransform(float tx, float ty, float tz,
 			float roll, float pitch, float yaw);
+	void startOptimization();
 
 protected:
 	void pointcloudMsgCb(const sensor_msgs::PointCloud2& input);
 
 private:
 	BallDetection ballDetection;
-	TransformOptimization* transformOptimization;
+	CameraTransformOptimization* transformOptimization;
 	TransformFactory* initialTransformFactory;
 	ros::NodeHandle nodeHandle;
 	ros::Subscriber subscriber;
@@ -99,7 +100,6 @@ private:
 	bool distanceTooBig(pcl::PointXYZ first, pcl::PointXYZ second);
 	void createMeasurePoint(std::vector<BallDetection::BallData> measurement,
 			std::vector<ros::Time> timestamps, MeasurePoint& newMeasurePoint);
-	void startOptimization();
 	void outputMeasurePoint(const MeasurePoint& newMeasurePoint);
 };
 

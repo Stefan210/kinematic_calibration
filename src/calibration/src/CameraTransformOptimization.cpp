@@ -5,29 +5,29 @@
  *      Author: Stefan Wrobel
  */
 
-#include "../include/TransformOptimization.h"
+#include "../include/CameraTransformOptimization.h"
 
 using namespace std;
 
-TransformOptimization::TransformOptimization() :
+CameraTransformOptimization::CameraTransformOptimization() :
 		numOfIterations(0) {
 	// TODO Auto-generated constructor stub
 
 }
 
-TransformOptimization::~TransformOptimization() {
+CameraTransformOptimization::~CameraTransformOptimization() {
 	// TODO Auto-generated destructor stub
 }
 
-void TransformOptimization::addMeasurePoint(MeasurePoint newPoint) {
+void CameraTransformOptimization::addMeasurePoint(MeasurePoint newPoint) {
 	this->measurePoints.push_back(newPoint);
 }
 
-void TransformOptimization::clearMeasurePoints() {
+void CameraTransformOptimization::clearMeasurePoints() {
 	this->measurePoints.clear();
 }
 
-void TransformOptimization::calculateSqrtDistFromMarker(
+void CameraTransformOptimization::calculateSqrtDistFromMarker(
 		tf::Transform& cameraToHead, tf::Vector3 markerPoint, float& error) {
 	error = 0;
 
@@ -45,12 +45,12 @@ void TransformOptimization::calculateSqrtDistFromMarker(
 	error /= this->measurePoints.size();
 }
 
-void TransformOptimization::setInitialTransformCameraToHead(
+void CameraTransformOptimization::setInitialTransformCameraToHead(
 		tf::Transform frameAToFrameB) {
 	this->initialTransformCameraToHead = frameAToFrameB;
 }
 
-void TransformOptimization::getMarkerEstimate(
+void CameraTransformOptimization::getMarkerEstimate(
 		const tf::Transform& cameraToHead, tf::Vector3& position) {
 	int numOfPoints = measurePoints.size();
 	float centerX = 0, centerY = 0, centerZ = 0;
@@ -77,11 +77,11 @@ void TransformOptimization::getMarkerEstimate(
 	position[2] = (centerZ / (float)numOfPoints);
 }
 
-void TransformOptimization::printResult(std::string pre,
+void CameraTransformOptimization::printResult(std::string pre,
 		tf::Transform& cameraToHead, tf::Vector3 markerPosition) {
 	float error;
 	double r, p, y;
-	tf::Matrix3x3(cameraToHead.getRotation()).getRPY(r, p, y);
+
 	calculateSqrtDistFromMarker(cameraToHead, markerPosition, error);
 	std::cout << pre << ";";
 	std::cout << "position (x,y,z):" << markerPosition[0] << ","
@@ -95,7 +95,13 @@ void TransformOptimization::printResult(std::string pre,
 			<< cameraToHead.getRotation()[1] << ","
 			<< cameraToHead.getRotation()[2] << ","
 			<< cameraToHead.getRotation()[3] << ";";
-	std::cout << "rotation (r,p,y):"
+	tf::Matrix3x3(cameraToHead.getRotation()).getRPY(r, p, y, 1);
+	std::cout << "rotation1 (r,p,y):"
+			<< r << ","
+			<< p << ","
+			<< y << ";";
+	tf::Matrix3x3(cameraToHead.getRotation()).getRPY(r, p, y, 2);
+	std::cout << "rotation2 (r,p,y):"
 			<< r << ","
 			<< p << ","
 			<< y << ";";
@@ -103,7 +109,7 @@ void TransformOptimization::printResult(std::string pre,
 	std::cout << "\n";
 }
 
-bool TransformOptimization::canStop() {
+bool CameraTransformOptimization::canStop() {
 	if(numOfIterations++ > maxIterations)
 		return true;
 
@@ -116,7 +122,7 @@ bool TransformOptimization::canStop() {
 	return  false;
 }
 
-void TransformOptimization::calculateSqrtDistCameraHead(
+void CameraTransformOptimization::calculateSqrtDistCameraHead(
 		tf::Transform& cameraToHead, float& error) {
 	error = 0;
 
@@ -175,7 +181,7 @@ void TransformOptimization::calculateSqrtDistCameraHead(
 }
 
 void CompositeTransformOptimization::addTransformOptimization(
-		std::string name, TransformOptimization* to) {
+		std::string name, CameraTransformOptimization* to) {
 	this->optimizer.insert(make_pair(name, to));
 }
 
@@ -185,7 +191,7 @@ void CompositeTransformOptimization::optimizeTransform(
 	float currentError = 0;
 
 	// return the transform with the smallest error
-	for(map<string, TransformOptimization*>::const_iterator it = this->optimizer.begin();
+	for(map<string, CameraTransformOptimization*>::const_iterator it = this->optimizer.begin();
 	    it != this->optimizer.end(); ++it) {
 		tf::Transform transform;
 		tf::Vector3 markerPosition;
@@ -201,28 +207,28 @@ void CompositeTransformOptimization::optimizeTransform(
 }
 
 void CompositeTransformOptimization::addMeasurePoint(MeasurePoint newPoint) {
-	for(map<string, TransformOptimization*>::const_iterator it = this->optimizer.begin();
+	for(map<string, CameraTransformOptimization*>::const_iterator it = this->optimizer.begin();
 	    it != this->optimizer.end(); ++it) {
 		it->second->addMeasurePoint(newPoint);
 	}
-	this->TransformOptimization::addMeasurePoint(newPoint);
+	this->CameraTransformOptimization::addMeasurePoint(newPoint);
 }
 
 void CompositeTransformOptimization::clearMeasurePoints() {
-	for(map<string, TransformOptimization*>::const_iterator it = this->optimizer.begin();
+	for(map<string, CameraTransformOptimization*>::const_iterator it = this->optimizer.begin();
 	    it != this->optimizer.end(); ++it) {
 		it->second->clearMeasurePoints();
 	}
-	this->TransformOptimization::clearMeasurePoints();
+	this->CameraTransformOptimization::clearMeasurePoints();
 }
 
 void CompositeTransformOptimization::setInitialTransformCameraToHead(
 		tf::Transform cameraToHead) {
-	for(map<string, TransformOptimization*>::const_iterator it = this->optimizer.begin();
+	for(map<string, CameraTransformOptimization*>::const_iterator it = this->optimizer.begin();
 	    it != this->optimizer.end(); ++it) {
 		it->second->setInitialTransformCameraToHead(cameraToHead);
 	}
-	this->TransformOptimization::setInitialTransformCameraToHead(cameraToHead);
+	this->CameraTransformOptimization::setInitialTransformCameraToHead(cameraToHead);
 }
 
 
