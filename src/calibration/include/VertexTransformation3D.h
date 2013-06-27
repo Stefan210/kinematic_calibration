@@ -14,12 +14,25 @@
 // tf specific includes
 #include <tf/tf.h>
 
+// todo: use strategy pattern instead of hard coded!
+#define ANGLEAXIS
+//#define RPY
+//#define QUATERNION
+
 using namespace g2o;
 
 /*
  * Vertex that represents a 3D transformation.
  */
-class VertexTransformation3D :  public BaseVertex<6, tf::Transform> {
+class VertexTransformation3D :
+#ifdef ANGLEAXIS
+	public BaseVertex<7, tf::Transform>
+#elif QUATERNION
+	public BaseVertex<7, tf::Transform>
+#elif RPY
+	public BaseVertex<6, tf::Transform>
+#endif
+	{
 public:
 	VertexTransformation3D();
 	virtual ~VertexTransformation3D();
