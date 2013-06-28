@@ -4,3 +4,4 @@ build
 *.pcd
 install
 *EXTERNAL*
+src/g2o*

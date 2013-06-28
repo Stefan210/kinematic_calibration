@@ -26,7 +26,8 @@
 
 // Default defines
 #define DEFAULT_POINTCLOUD_MSG "/xtion/depth_registered/points"
-#define DEFAULT_CAMERA_FRAME "xtion_platform"
+//#define DEFAULT_CAMERA_FRAME "xtion_platform"
+#define DEFAULT_CAMERA_FRAME "xtion_rgb_optical_frame"
 #define DEFAULT_HEAD_FRAME "HeadPitch_link"
 #define DEFAULT_FIXED_FRAME "r_sole"
 

@@ -15,8 +15,8 @@
 #include <tf/tf.h>
 
 // todo: use strategy pattern instead of hard coded!
-#define ANGLEAXIS
-//#define RPY
+//#define ANGLEAXIS
+#define RPY
 //#define QUATERNION
 
 using namespace g2o;
@@ -27,9 +27,11 @@ using namespace g2o;
 class VertexTransformation3D :
 #ifdef ANGLEAXIS
 	public BaseVertex<7, tf::Transform>
-#elif QUATERNION
+#endif
+#ifdef QUATERNION
 	public BaseVertex<7, tf::Transform>
-#elif RPY
+#endif
+#ifdef RPY
 	public BaseVertex<6, tf::Transform>
 #endif
 	{

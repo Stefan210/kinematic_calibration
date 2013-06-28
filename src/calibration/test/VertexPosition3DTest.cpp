@@ -31,9 +31,9 @@ TEST(VertexPosition3DTest, oplusImplTest) {
 	testee.setEstimate(position);
 	testee.oplusImpl(delta);
 	newPosition = testee.estimate();
-	ASSERT_DOUBLE_EQ(newPosition[0], 1);
-	ASSERT_DOUBLE_EQ(newPosition[1], 2);
-	ASSERT_DOUBLE_EQ(newPosition[2], 3);
+	ASSERT_TRUE(fabs(newPosition[0] - 1)  < 1e-6);
+	ASSERT_TRUE(fabs(newPosition[1] - 2) < 1e-6);
+	ASSERT_TRUE(fabs(newPosition[2] - 3) < 1e-6);
 }
 
 // Run all the tests that were declared with TEST()

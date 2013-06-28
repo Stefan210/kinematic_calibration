@@ -10,6 +10,8 @@
 // gtest specific includes
 #include <gtest/gtest.h>
 
+#ifdef RPY
+
 TEST(VertexTransformationTest, oplusImplTestNoChange) {
 	VertexTransformation3D testee;
 	tf::Quaternion rotation; rotation.setRPY(0, 0, 0);
@@ -22,7 +24,9 @@ TEST(VertexTransformationTest, oplusImplTestNoChange) {
 	testee.setEstimate(initialTransform);
 	testee.oplusImpl(delta);
 	currentTransform = testee.estimate();
-	ASSERT_EQ(initialTransform, currentTransform);
+
+	ASSERT_TRUE(initialTransform.getBasis() == currentTransform.getBasis());
+	ASSERT_TRUE(initialTransform.getRotation() == currentTransform.getRotation());
 }
 
 TEST(VertexTransformationTest, oplusImplTestTranslation) {
@@ -37,9 +41,9 @@ TEST(VertexTransformationTest, oplusImplTestTranslation) {
 	testee.setEstimate(initialTransform);
 	testee.oplusImpl(delta);
 	currentTransform = testee.estimate();
-	ASSERT_EQ(currentTransform.getOrigin()[0], 1);
-	ASSERT_EQ(currentTransform.getOrigin()[1], 2);
-	ASSERT_EQ(currentTransform.getOrigin()[2], 3);
+	ASSERT_TRUE(fabs(currentTransform.getOrigin()[0] - 1) < 1e-6);
+	ASSERT_TRUE(fabs(currentTransform.getOrigin()[1] - 2) < 1e-6);
+	ASSERT_TRUE(fabs(currentTransform.getOrigin()[2] - 3) < 1e-6);
 }
 
 TEST(VertexTransformationTest, oplusImplTestRotation) {
@@ -57,9 +61,9 @@ TEST(VertexTransformationTest, oplusImplTestRotation) {
 	currentTransform = testee.estimate();
 	tf::Matrix3x3(currentTransform.getRotation()).getRPY(roll, pitch, yaw);
 
-	ASSERT_DOUBLE_EQ(roll, 0.1);
-	ASSERT_DOUBLE_EQ(pitch, 0.2);
-	ASSERT_DOUBLE_EQ(yaw, 0.3);
+	ASSERT_TRUE(fabs(roll - 0.1) < 1e-6);
+	ASSERT_TRUE(fabs(pitch - 0.2) < 1e-6);
+	ASSERT_TRUE(fabs(yaw - 0.3) < 1e-6);
 }
 
 // Run all the tests that were declared with TEST()
@@ -67,3 +71,5 @@ int main(int argc, char **argv) {
 	testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();
 }
+
+#endif

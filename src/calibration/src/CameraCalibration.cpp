@@ -21,7 +21,7 @@ CameraCalibration::CameraCalibration(CameraCalibrationOptions options) :
 	this->cameraFrame = options.getCameraFrame();
 	this->fixedFrame = options.getFixedFrame();
 	this->headFrame = options.getHeadFrame();
-	this->subscriber = nodeHandle.subscribe(this->pointCloudTopic, 100,
+	this->subscriber = nodeHandle.subscribe(this->pointCloudTopic, 1000,
 			&CameraCalibration::pointcloudMsgCb, this);
 	this->ballDetection.setMinBallRadius(options.getMinBallRadius());
 	this->ballDetection.setMaxBallRadius(options.getMaxBallRadius());
@@ -217,6 +217,7 @@ void CameraCalibration::createMeasurePoint(
 		std::vector<BallDetection::BallData> measurement,
 		std::vector<ros::Time> timestamps, MeasurePoint& newMeasurePoint) {
 	bool transformationFound = false;
+	cameraFrame = opticalFrame; //todo: hack!
 
 	// get transforms
 	tf::StampedTransform opticalToCamera;
