@@ -21,6 +21,7 @@ CameraCalibration::CameraCalibration(CameraCalibrationOptions options) :
 	this->cameraFrame = options.getCameraFrame();
 	this->fixedFrame = options.getFixedFrame();
 	this->headFrame = options.getHeadFrame();
+	this->footprintFrame = options.getFootprintFrame();
 	this->subscriber = nodeHandle.subscribe(this->pointCloudTopic, 1000,
 			&CameraCalibration::pointcloudMsgCb, this);
 	this->ballDetection.setMinBallRadius(options.getMinBallRadius());
@@ -51,6 +52,7 @@ int main(int argc, char** argv) {
 	options.setCameraFrame(DEFAULT_CAMERA_FRAME);
 	options.setFixedFrame(DEFAULT_FIXED_FRAME);
 	options.setHeadFrame(DEFAULT_HEAD_FRAME);
+	options.setFootprintFrame(DEFAULT_FOOTPRINT_FRAME);
 	TransformFactory* transformFactory = new TfTransformFactory(
 			DEFAULT_HEAD_FRAME, DEFAULT_CAMERA_FRAME);
 	options.setInitialTransformFactory(transformFactory);
@@ -122,23 +124,25 @@ void CameraCalibration::pointcloudMsgCb(const sensor_msgs::PointCloud2& input) {
 		return;
 
 	BallDetection::BallData bd;
+	GroundData gd;
 	try {
 		bd = this->ballDetection.getPosition(initialCloud);
+		gd = this->groundDetection.getGroundData(initialCloud);
 	} catch (...) {
 		return;
 	}
 	this->opticalFrame = input.header.frame_id;
 
 	// current pointcloud belongs to a new measurement
-	if (!this->currentMeasurement.empty()
+	if (!this->currentBallMeasurements.empty()
 			&& distanceTooBig(bd.position,
-					(currentMeasurement[currentMeasurement.size() - 1]).position)) {
+					(currentBallMeasurements[currentBallMeasurements.size() - 1]).position)) {
 		ROS_INFO("Beginning new measurement.");
-		if (currentMeasurement.size() > minNumOfMeasurements) {
+		if (currentBallMeasurements.size() > minNumOfMeasurements) {
 			// if the current measurement has enough single measurements,
 			// take the average point and save the transformations
 			MeasurePoint newMeasurePoint;
-			createMeasurePoint(currentMeasurement, currentTimestamps,
+			createMeasurePoint(currentBallMeasurements, currentGroundMeasurements, currentTimestamps,
 					newMeasurePoint);
 			this->measurementSeries.push_back(newMeasurePoint);
 			outputMeasurePoint(newMeasurePoint);
@@ -149,11 +153,13 @@ void CameraCalibration::pointcloudMsgCb(const sensor_msgs::PointCloud2& input) {
 				startOptimization();
 			}
 		}
-		currentMeasurement.clear();
+		currentBallMeasurements.clear();
+		currentGroundMeasurements.clear();
 		currentTimestamps.clear();
 	}
 	// add point to current measurement
-	this->currentMeasurement.push_back(bd);
+	this->currentBallMeasurements.push_back(bd);
+	this->currentGroundMeasurements.push_back(gd);
 	this->currentTimestamps.push_back(input.header.stamp);
 
 }
@@ -214,14 +220,16 @@ void CameraCalibration::setInitialCameraToHeadTransform(float tx, float ty,
 }
 
 void CameraCalibration::createMeasurePoint(
-		std::vector<BallDetection::BallData> measurement,
+		std::vector<BallDetection::BallData> ballMeasurements,
+		std::vector<GroundData> groundMeasurements,
 		std::vector<ros::Time> timestamps, MeasurePoint& newMeasurePoint) {
 	bool transformationFound = false;
-	cameraFrame = opticalFrame; //todo: hack!
+	//cameraFrame = opticalFrame; //todo: hack!
 
 	// get transforms
 	tf::StampedTransform opticalToCamera;
 	tf::StampedTransform headToFixed;
+	tf::StampedTransform fixedToFootprint;
 
 	ros::Time time;
 	for (int i = timestamps.size() / 2; i < timestamps.size(); i++) {
@@ -235,19 +243,37 @@ void CameraCalibration::createMeasurePoint(
 	transformListener.lookupTransform(cameraFrame, opticalFrame, time,
 			opticalToCamera);
 	transformListener.lookupTransform(fixedFrame, headFrame, time, headToFixed);
+	transformListener.lookupTransform(footprintFrame, fixedFrame, time, fixedToFootprint);
 	newMeasurePoint.opticalToCamera = opticalToCamera;
 	newMeasurePoint.headToFixed = headToFixed;
+	newMeasurePoint.fixedToFootprint = fixedToFootprint;
 
 	// determine average position
 	float x = 0, y = 0, z = 0;
-	int size = measurement.size();
+	int size = ballMeasurements.size();
 	for (int i = 0; i < size; i++) {
-		pcl::PointXYZ position = measurement[i].position;
+		pcl::PointXYZ position = ballMeasurements[i].position;
 		x += position.x;
 		y += position.y;
 		z += position.z;
 	}
 	newMeasurePoint.measuredPosition.setValue(x / size, y / size, z / size);
+
+	GroundData gdAvg;
+	size = groundMeasurements.size();
+	for (int i = 0; i < size; i++) {
+		float a = 0, b = 0, c = 0, d = 0;
+		GroundData gd = groundMeasurements[i];
+		gdAvg.a += gd.a;
+		gdAvg.b += gd.b;
+		gdAvg.c += gd.c;
+		gdAvg.d += gd.d;
+	}
+	gdAvg.a /= size;
+	gdAvg.b /= size;
+	gdAvg.c /= size;
+	gdAvg.d /= size;
+	newMeasurePoint.groundPose = gdAvg.getPose();
 }
 
 std::string CameraCalibrationOptions::getCameraFrame() const {
@@ -272,6 +298,14 @@ std::string CameraCalibrationOptions::getHeadFrame() const {
 
 void CameraCalibrationOptions::setHeadFrame(std::string headFrame) {
 	this->headFrame = headFrame;
+}
+
+std::string CameraCalibrationOptions::getFootprintFrame() const {
+	return footprintFrame;
+}
+
+void CameraCalibrationOptions::setFootprintFrame(std::string footprintFrame) {
+	this->footprintFrame = footprintFrame;
 }
 
 TransformFactory* CameraCalibrationOptions::getInitialTransformFactory() const {

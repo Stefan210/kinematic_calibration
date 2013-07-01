@@ -10,6 +10,7 @@
 
 // Project specific includes
 #include "../include/BallDetection.h"
+#include "../include/GroundDetection.h"
 #include "../include/CameraTransformOptimization.h"
 #include "../include/SvdTransformOptimization.h"
 #include "../include/LocalTransformOptimization.h"
@@ -30,6 +31,7 @@
 #define DEFAULT_CAMERA_FRAME "xtion_rgb_optical_frame"
 #define DEFAULT_HEAD_FRAME "HeadPitch_link"
 #define DEFAULT_FIXED_FRAME "r_sole"
+#define DEFAULT_FOOTPRINT_FRAME "base_footprint"
 
 class CameraCalibrationOptions {
 public:
@@ -45,6 +47,8 @@ public:
 	void setMinNumOfMeasurements(int minNumOfMeasurements);
 	std::string getOpticalFrame() const;
 	void setOpticalFrame(std::string opticalFrame);
+	std::string getFootprintFrame() const;
+	void setFootprintFrame(std::string footprintFrame);
 	std::string getPointCloudTopic() const;
 	void setPointCloudTopic(std::string pointCloudTopic);
 	CameraTransformOptimization* getTransformOptimization() const;
@@ -60,6 +64,7 @@ protected:
 	std::string cameraFrame;
 	std::string headFrame;
 	std::string fixedFrame;
+	std::string footprintFrame;
 	CameraTransformOptimization* transformOptimization;
 	TransformFactory* initialTransformFactory;
 	int minNumOfMeasurements;
@@ -83,6 +88,7 @@ protected:
 
 private:
 	BallDetection ballDetection;
+	GroundDetection groundDetection;
 	CameraTransformOptimization* transformOptimization;
 	TransformFactory* initialTransformFactory;
 	ros::NodeHandle nodeHandle;
@@ -93,13 +99,16 @@ private:
 	std::string cameraFrame;
 	std::string headFrame;
 	std::string fixedFrame;
-	std::vector<BallDetection::BallData> currentMeasurement;
+	std::string footprintFrame;
+	std::vector<BallDetection::BallData> currentBallMeasurements;
+	std::vector<GroundData> currentGroundMeasurements;
 	//ros::Time currentMeasurementTime;
 	std::vector<MeasurePoint> measurementSeries;
 	std::vector<ros::Time> currentTimestamps;
 	int minNumOfMeasurements;
 	bool distanceTooBig(pcl::PointXYZ first, pcl::PointXYZ second);
-	void createMeasurePoint(std::vector<BallDetection::BallData> measurement,
+	void createMeasurePoint(std::vector<BallDetection::BallData> ballMeasurements,
+			std::vector<GroundData> groundMeasurements,
 			std::vector<ros::Time> timestamps, MeasurePoint& newMeasurePoint);
 	void outputMeasurePoint(const MeasurePoint& newMeasurePoint);
 };
