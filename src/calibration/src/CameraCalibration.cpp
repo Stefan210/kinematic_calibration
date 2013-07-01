@@ -143,7 +143,7 @@ void CameraCalibration::pointcloudMsgCb(const sensor_msgs::PointCloud2& input) {
 			this->measurementSeries.push_back(newMeasurePoint);
 			outputMeasurePoint(newMeasurePoint);
 
-			// TODO: don't use a hard coded criterium for starting the optimization!
+			// TODO: don't use a hard coded criteria for starting the optimization!
 			// if there are enough measurement series, start the optimization
 			if (this->measurementSeries.size() == 15 && false) {
 				startOptimization();

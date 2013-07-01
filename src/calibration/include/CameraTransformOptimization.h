@@ -9,15 +9,10 @@
 #define TRANSFORMOPTIMIZATION_H_
 
 #include <tf/tf.h>
+#include "../include/CameraMeasurePoint.h"
 
-struct MeasurePointStruct {
-	tf::Vector3 measuredPosition; // measured point within the optical frame
-	tf::Transform opticalToCamera; // e.g. measure frame to first frame of the camera system
-	tf::Transform headToFixed; // e.g. first frame of body (HeadPitch) to last frame of body (r_sole)
-	ros::Time stamp;
-};
 
-typedef struct MeasurePointStruct MeasurePoint;
+
 
 /*
  * Class for calibrating the transformation between robot and camera.
