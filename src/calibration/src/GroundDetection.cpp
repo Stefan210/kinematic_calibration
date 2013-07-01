@@ -102,3 +102,31 @@ void GroundDetection::segmentPlane(
 	gd.d = coefficients_plane->values[3];
 }
 
+const tf::Pose GroundData::getPose() const {
+	float roll, pitch, yaw;
+	getRPY(roll, pitch, yaw);
+	tf::Quaternion q; q.setRPY(roll, pitch, yaw);
+	tf::Pose pose(q, tf::Vector3(0, 0, 0));
+	return pose;
+}
+
+void GroundData::getRPY(float& roll, float& pitch, float& yaw) const {
+	// normal vector to the X-Y plane
+	tf::Vector3 vectorXY(0, b, c);
+
+	// normal vector to the X-Z plane
+	tf::Vector3 vectorXZ(a, 0, c);
+
+	// normal vector to the Y-Z plane
+	tf::Vector3 vectorYZ(a, b, 0);
+
+	// normal of the detected plane
+	tf::Vector3 vectorGround(a, b, c);
+
+	roll = vectorXY.angle(vectorGround);
+	pitch = vectorXZ.angle(vectorGround);
+	yaw = vectorYZ.angle(vectorGround);
+}
+
+
+

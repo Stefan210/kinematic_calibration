@@ -41,6 +41,58 @@ TEST(GroundDetectionTest, simpleTest) {
 	ASSERT_DOUBLE_EQ(0.0, groundData.d);
 }
 
+TEST(GroundDataTest, getRpyTest1) {
+	GroundData gd;
+	gd.a = 0;
+	gd.b = 0;
+	gd.c = 1;
+	gd.d = 0;
+	float r, p, y;
+	gd.getRPY(r, p, y);
+	ASSERT_DOUBLE_EQ(0, r);
+	ASSERT_DOUBLE_EQ(0, p);
+
+	gd.d = 5;
+	gd.getRPY(r, p, y);
+	ASSERT_DOUBLE_EQ(0, r);
+	ASSERT_DOUBLE_EQ(0, p);
+}
+
+TEST(GroundDataTest, getRpyTest2) {
+	GroundData gd;
+	gd.a = 0;
+	gd.b = 1;
+	gd.c = 0;
+	gd.d = 0;
+	float r, p, y;
+	gd.getRPY(r, p, y);
+	ASSERT_DOUBLE_EQ(0, r);
+	ASSERT_DOUBLE_EQ(0, y);
+
+	gd.d = 5;
+	gd.getRPY(r, p, y);
+	ASSERT_DOUBLE_EQ(0, r);
+	ASSERT_DOUBLE_EQ(0, y);
+}
+
+TEST(GroundDataTest, getRpyTest3) {
+	GroundData gd;
+	gd.a = 1;
+	gd.b = 0;
+	gd.c = 0;
+	gd.d = 0;
+	float r, p, y;
+	gd.getRPY(r, p, y);
+	ASSERT_DOUBLE_EQ(0, p);
+	ASSERT_DOUBLE_EQ(0, y);
+
+	gd.d = 5;
+	gd.getRPY(r, p, y);
+	ASSERT_DOUBLE_EQ(0, p);
+	ASSERT_DOUBLE_EQ(0, y);
+}
+
+
 
 
 // Run all the tests that were declared with TEST()
