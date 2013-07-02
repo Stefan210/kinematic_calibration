@@ -111,21 +111,12 @@ const tf::Pose GroundData::getPose() const {
 }
 
 void GroundData::getRPY(float& roll, float& pitch, float& yaw) const {
-	// normal vector to the X-Y plane
-	tf::Vector3 vectorXY(0, b, c);
+	tf::Vector3 normalXY(0,0,1);
+	roll = normalXY.angle(tf::Vector3(0,b,c));
+	pitch = normalXY.angle(tf::Vector3(a,0,c));
 
-	// normal vector to the X-Z plane
-	tf::Vector3 vectorXZ(a, 0, c);
-
-	// normal vector to the Y-Z plane
-	tf::Vector3 vectorYZ(a, b, 0);
-
-	// normal of the detected plane
-	tf::Vector3 vectorGround(a, b, c);
-
-	roll = vectorXY.angle(vectorGround);
-	pitch = vectorXZ.angle(vectorGround);
-	yaw = vectorYZ.angle(vectorGround);
+	tf::Vector3 normalXZ(0,1,0);
+	yaw = normalXZ.angle(tf::Vector3(a,b,0));
 }
 
 

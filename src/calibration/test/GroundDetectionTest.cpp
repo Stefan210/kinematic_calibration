@@ -49,13 +49,13 @@ TEST(GroundDataTest, getRpyTest1) {
 	gd.d = 0;
 	float r, p, y;
 	gd.getRPY(r, p, y);
-	ASSERT_DOUBLE_EQ(0, r);
-	ASSERT_DOUBLE_EQ(0, p);
+	ASSERT_NEAR(0, r, 1e-6);
+	ASSERT_NEAR(0, p, 1e-6);
 
 	gd.d = 5;
 	gd.getRPY(r, p, y);
-	ASSERT_DOUBLE_EQ(0, r);
-	ASSERT_DOUBLE_EQ(0, p);
+	ASSERT_NEAR(0, r, 1e-6);
+	ASSERT_NEAR(0, p, 1e-6);
 }
 
 TEST(GroundDataTest, getRpyTest2) {
@@ -66,13 +66,13 @@ TEST(GroundDataTest, getRpyTest2) {
 	gd.d = 0;
 	float r, p, y;
 	gd.getRPY(r, p, y);
-	ASSERT_DOUBLE_EQ(0, r);
-	ASSERT_DOUBLE_EQ(0, y);
+	ASSERT_NEAR(M_PI_2, r, 1e-6);
+	ASSERT_NEAR(0, y, 1e-6);
 
 	gd.d = 5;
 	gd.getRPY(r, p, y);
-	ASSERT_DOUBLE_EQ(0, r);
-	ASSERT_DOUBLE_EQ(0, y);
+	ASSERT_NEAR(M_PI_2, r, 1e-6);
+	ASSERT_NEAR(0, y, 1e-6);
 }
 
 TEST(GroundDataTest, getRpyTest3) {
@@ -83,13 +83,13 @@ TEST(GroundDataTest, getRpyTest3) {
 	gd.d = 0;
 	float r, p, y;
 	gd.getRPY(r, p, y);
-	ASSERT_DOUBLE_EQ(0, p);
-	ASSERT_DOUBLE_EQ(0, y);
+	ASSERT_NEAR(M_PI_2, p, 1e-6);
+	ASSERT_NEAR(M_PI_2, y, 1e-6);
 
 	gd.d = 5;
 	gd.getRPY(r, p, y);
-	ASSERT_DOUBLE_EQ(0, p);
-	ASSERT_DOUBLE_EQ(0, y);
+	ASSERT_NEAR(M_PI_2, p, 1e-6);
+	ASSERT_NEAR(M_PI_2, y, 1e-6);
 }
 
 
