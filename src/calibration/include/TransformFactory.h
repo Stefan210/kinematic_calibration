@@ -43,16 +43,12 @@ protected:
 class ManualTransformFactory : public TransformFactory {
 public:
 	ManualTransformFactory(float tx, float ty, float tz, float roll, float pitch, float yaw);
+	ManualTransformFactory(tf::Transform t);
 	virtual ~ManualTransformFactory();
 	virtual void getTransform(tf::Transform& transform);
 
 protected:
-	float tx;
-	float ty;
-	float tz;
-	float roll;
-	float pitch;
-	float yaw;
+	tf::Transform transform;
 };
 
 #endif /* TRANSFORMFACTORY_H_ */

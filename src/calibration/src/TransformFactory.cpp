@@ -34,20 +34,20 @@ void TfTransformFactory::getTransform(tf::Transform& transform) {
 
 ManualTransformFactory::ManualTransformFactory(float tx, float ty, float tz,
 		float roll, float pitch, float yaw) {
-	this->tx = tx;
-	this->ty = ty;
-	this->tz = tz;
-	this->roll = roll;
-	this->pitch = pitch;
-	this->yaw = yaw;
+	transform.setOrigin(tf::Vector3(tx, ty, tz));
+	transform.setRotation(tf::createQuaternionFromRPY(roll, pitch, yaw));
+}
+
+ManualTransformFactory::ManualTransformFactory(tf::Transform t) {
+	transform.setOrigin(t.getOrigin());
+	transform.setRotation(t.getRotation());
 }
 
 ManualTransformFactory::~ManualTransformFactory() {
 }
 
 void ManualTransformFactory::getTransform(tf::Transform& transform) {
-	transform.setOrigin(tf::Vector3(tx, ty, tz));
-	transform.setRotation(tf::createQuaternionFromRPY(roll, pitch, yaw));
+	transform = this->transform;
 }
 
 
