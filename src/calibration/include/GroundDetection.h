@@ -8,6 +8,8 @@
 #ifndef GROUNDDETECTION_H_
 #define GROUNDDETECTION_H_
 
+#include <iostream>
+
 // TF specific includes
 #include <tf/tf.h>
 
@@ -20,11 +22,23 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 
+using namespace std;
+
 class GroundData {
 public:
 	float a, b, c, d;
 	tf::Pose getPose() const;
 	void getRPY(float& roll, float& pitch, float& yaw) const;
+
+	friend ostream &operator<<(ostream &output, const GroundData &gd) {
+		output << " " << gd.a << " " << gd.b << " " << gd.c << " " << gd.d;
+		return output;
+	}
+
+	friend istream &operator>>(istream &input, GroundData &gd) {
+		input >> gd.a >> gd.b >> gd.c >> gd.d;
+		return input;
+	}
 };
 
 /*
@@ -34,14 +48,14 @@ class GroundDetection {
 public:
 	GroundDetection();
 	virtual ~GroundDetection();
-	GroundData getGroundData(pcl::PointCloud<pcl::PointXYZRGB>::Ptr initialCloud);
+	GroundData getGroundData(
+			pcl::PointCloud<pcl::PointXYZRGB>::Ptr initialCloud);
 
 protected:
 	void filterRange(pcl::PointCloud<pcl::PointXYZRGB>::Ptr inCloud,
 			pcl::PointCloud<pcl::PointXYZRGB>::Ptr outCloud);
 
-	void segmentPlane(
-			pcl::PointCloud<pcl::PointXYZRGB>::Ptr inCloud,
+	void segmentPlane(pcl::PointCloud<pcl::PointXYZRGB>::Ptr inCloud,
 			GroundData& gd);
 };
 
