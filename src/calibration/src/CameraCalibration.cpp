@@ -273,7 +273,7 @@ void CameraCalibration::createMeasurePoint(
 	gdAvg.b /= size;
 	gdAvg.c /= size;
 	gdAvg.d /= size;
-	newMeasurePoint.groundPose = gdAvg.getPose();
+	newMeasurePoint.groundData = gdAvg;
 }
 
 std::string CameraCalibrationOptions::getCameraFrame() const {

@@ -19,7 +19,7 @@ using namespace g2o;
 /*
  * Represents an edge for a measurement.
  */
-class EdgeMarkerMeasurement : public BaseBinaryEdge<3, MeasurePoint, VertexPosition3D, VertexTransformation3D> {
+class EdgeMarkerMeasurement : public BaseBinaryEdge<5, MeasurePoint, VertexPosition3D, VertexTransformation3D> {
 public:
 	EdgeMarkerMeasurement(MeasurePoint& measurePoint);
 	virtual ~EdgeMarkerMeasurement();
