@@ -22,13 +22,16 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 
+// GTEST specific includes
+#include <gtest/gtest_prod.h>
+
 using namespace std;
 
 class GroundData {
 public:
 	float a, b, c, d;
 	tf::Pose getPose() const;
-	void getRPY(float& roll, float& pitch, float& yaw) const;
+	void getRPY(double& roll, double& pitch, double& yaw) const;
 
 	friend ostream &operator<<(ostream &output, const GroundData &gd) {
 		output << " " << gd.a << " " << gd.b << " " << gd.c << " " << gd.d;
@@ -39,6 +42,12 @@ public:
 		input >> gd.a >> gd.b >> gd.c >> gd.d;
 		return input;
 	}
+
+private:
+	// returns an angle between [-PI_2, PI_2]
+	double normalize(double angle) const;
+
+	FRIEND_TEST(GroundDataTest, normalizeTest);
 };
 
 /*

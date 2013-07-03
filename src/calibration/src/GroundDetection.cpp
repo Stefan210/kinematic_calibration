@@ -103,20 +103,32 @@ void GroundDetection::segmentPlane(
 }
 
 tf::Pose GroundData::getPose() const {
-	float roll, pitch, yaw;
+	double roll, pitch, yaw;
 	getRPY(roll, pitch, yaw);
-	tf::Quaternion q; q.setRPY(roll, pitch, yaw);
+	tf::Quaternion q;
+	q.setRPY(roll, pitch, yaw);
 	tf::Pose pose(q, tf::Vector3(0, 0, 0));
 	return pose;
 }
 
-void GroundData::getRPY(float& roll, float& pitch, float& yaw) const {
-	tf::Vector3 normalXY(0,0,1);
-	roll = normalXY.angle(tf::Vector3(0,b,c));
-	pitch = normalXY.angle(tf::Vector3(a,0,c));
+void GroundData::getRPY(double& roll, double& pitch, double& yaw) const {
+	tf::Vector3 normalXY(0, 0, 1);
+	roll = normalize(normalXY.angle(tf::Vector3(0, b, c)));
+	pitch = normalize(normalXY.angle(tf::Vector3(a, 0, c)));
 
-	tf::Vector3 normalXZ(0,1,0);
-	yaw = normalXZ.angle(tf::Vector3(a,b,0));
+	tf::Vector3 normalXZ(0, 1, 0);
+	yaw = normalize(normalXZ.angle(tf::Vector3(a, b, 0)));
 }
 
+double GroundData::normalize(double angle) const {
+	while (angle < -M_PI_2) {
+		angle += M_PI;
+	}
+
+	while (angle > M_PI_2) {
+		angle -= M_PI;
+	}
+
+	return angle;
+}
 

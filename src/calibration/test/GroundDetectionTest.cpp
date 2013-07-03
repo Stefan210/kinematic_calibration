@@ -47,7 +47,7 @@ TEST(GroundDataTest, getRpyTest1) {
 	gd.b = 0;
 	gd.c = 1;
 	gd.d = 0;
-	float r, p, y;
+	double r, p, y;
 	gd.getRPY(r, p, y);
 	ASSERT_NEAR(0, r, 1e-6);
 	ASSERT_NEAR(0, p, 1e-6);
@@ -64,7 +64,7 @@ TEST(GroundDataTest, getRpyTest2) {
 	gd.b = 1;
 	gd.c = 0;
 	gd.d = 0;
-	float r, p, y;
+	double r, p, y;
 	gd.getRPY(r, p, y);
 	ASSERT_NEAR(M_PI_2, r, 1e-6);
 	ASSERT_NEAR(0, y, 1e-6);
@@ -81,7 +81,7 @@ TEST(GroundDataTest, getRpyTest3) {
 	gd.b = 0;
 	gd.c = 0;
 	gd.d = 0;
-	float r, p, y;
+	double r, p, y;
 	gd.getRPY(r, p, y);
 	ASSERT_NEAR(M_PI_2, p, 1e-6);
 	ASSERT_NEAR(M_PI_2, y, 1e-6);
@@ -90,6 +90,16 @@ TEST(GroundDataTest, getRpyTest3) {
 	gd.getRPY(r, p, y);
 	ASSERT_NEAR(M_PI_2, p, 1e-6);
 	ASSERT_NEAR(M_PI_2, y, 1e-6);
+}
+
+TEST(GroundDataTest, normalizeTest) {
+	GroundData gd;
+
+	ASSERT_NEAR(gd.normalize(0.0), 0.0, 1e-6);
+	ASSERT_NEAR(gd.normalize(M_PI_2), M_PI_2, 1e-6);
+	ASSERT_NEAR(gd.normalize(-M_PI_2), -M_PI_2, 1e-6);
+	ASSERT_NEAR(gd.normalize(M_PI_2 + 1.0), - M_PI_2 + 1.0, 1e-6);
+	ASSERT_NEAR(gd.normalize(-M_PI_2 - 1.0), M_PI_2 -1.0, 1e-6);
 }
 
 

@@ -24,7 +24,7 @@ public:
 	tf::Transform fixedToFootprint;
 	ros::Time stamp;
 
-	inline const tf::Transform headToFootprint() const {return headToFixed * fixedToFootprint;}
+	inline const tf::Transform headToFootprint() const {return fixedToFootprint * headToFixed;}
 	inline const tf::Pose groundPose() const {return groundData.getPose();}
 
 	friend ostream &operator<<(ostream &output, const CameraMeasurePoint &cmp) {

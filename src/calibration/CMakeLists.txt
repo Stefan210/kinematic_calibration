@@ -182,8 +182,8 @@ endif()
 catkin_add_gtest(GroundDetectionTest test/GroundDetectionTest.cpp src/GroundDetection.cpp src/CameraMeasurePoint.cpp)
 target_link_libraries(GroundDetectionTest ${catkin_LIBRARIES})
 
-catkin_add_gtest(VertexTransformation3DTest test/VertexTransformation3DTest.cpp src/CameraMeasurePoint.cpp)
+catkin_add_gtest(VertexTransformation3DTest test/VertexTransformation3DTest.cpp src/CameraMeasurePoint.cpp src/GroundDetection.cpp)
 target_link_libraries(VertexTransformation3DTest G2oOptimization)
 
-catkin_add_gtest(VertexPosition3DTest test/VertexPosition3DTest.cpp src/CameraMeasurePoint.cpp)
+catkin_add_gtest(VertexPosition3DTest test/VertexPosition3DTest.cpp src/CameraMeasurePoint.cpp src/GroundDetection.cpp)
 target_link_libraries(VertexPosition3DTest G2oOptimization)

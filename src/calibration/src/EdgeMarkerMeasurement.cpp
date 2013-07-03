@@ -59,7 +59,9 @@ void EdgeMarkerMeasurement::computeError() {
 	transformedGroundData.c = transformedGroundNormal[2];
 	transformedGroundData.d = 0;
 	tf::Matrix3x3(transformedGroundData.getPose().getRotation()).getRPY(roll, pitch, yaw);
-	std::cout << "ground (2: via normal transformation)(roll, pitch, yaw) " <<  roll << " " << pitch << " " << yaw << std::endl;
+	std::cout << "ground (2a: via normal transformation)(roll, pitch, yaw) " <<  roll << " " << pitch << " " << yaw << std::endl;
+	transformedGroundData.getRPY(roll, pitch, yaw);
+	std::cout << "ground (2b: via normal transformation)(roll, pitch, yaw) " <<  roll << " " << pitch << " " << yaw << std::endl;
 
 	_error[3] = roll*1;
 	_error[4] = pitch*1;
