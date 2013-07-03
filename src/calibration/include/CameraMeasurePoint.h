@@ -25,6 +25,16 @@ public:
 
 	inline const tf::Transform headToFootprint() const {return headToFixed * fixedToFootprint;}
 	inline const tf::Pose groundPose() const {return groundData.getPose();}
+/*
+	friend ostream &operator<<(ostream &output, const CameraMeasurePoint &gd) {
+		output << " " << gd.a << " " << gd.b << " " << gd.c << " " << gd.d;
+		return output;
+	}
+
+	friend istream &operator>>(istream &input, CameraMeasurePoint &gd) {
+		input >> gd.a >> gd.b >> gd.c >> gd.d;
+		return input;
+	}*/
 };
 
 typedef CameraMeasurePoint MeasurePoint;
