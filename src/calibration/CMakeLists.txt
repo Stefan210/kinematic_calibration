@@ -155,6 +155,7 @@ add_executable(CameraCalibration
 	src/GroundDetection.cpp
 	src/CameraMeasurePoint.cpp
 	src/Utils.cpp
+	src/CalibrationDataSerialization.cpp
 	src/CameraTransformOptimization.cpp 
 	src/SvdTransformOptimization.cpp 
 	src/LocalTransformOptimization.cpp 

@@ -15,6 +15,8 @@
 #include <fcntl.h>
 #include <termios.h>
 
+using namespace std;
+
 CameraCalibration::CameraCalibration(CameraCalibrationOptions options) :
 		transformListener(ros::Duration(180, 0)) {
 	this->pointCloudTopic = options.getPointCloudTopic();
@@ -83,10 +85,25 @@ int main(int argc, char** argv) {
 					atof(argv[i + 1]), atof(argv[i + 2]), atof(argv[i + 3]),
 					atof(argv[i + 4]), atof(argv[i + 5]), atof(argv[i + 6]));
 			options.setInitialTransformFactory(mtf);
+		} else if(strcmp(argv[i], "--data-to-file") == 0) {
+			string fileName = argv[i+1];
+			CalibrationDataSerialization* calibrationDataSerialization = new CalibrationDataSerialization(fileName);
+			options.setTransformOptimization(calibrationDataSerialization);
 		}
 	}
 
 	CameraCalibration cameraCalibration(options);
+
+	// parse command line arguments
+	for (int i = 1; i < argc; i++) {
+		if(strcmp(argv[i], "--data-from-file") == 0) {
+			string fileName = argv[i+1];
+			CalibrationDataSerialization data(fileName);
+			cameraCalibration.setData(data.getMeasurementSeries(), data.getInitialTransform());
+			cameraCalibration.startOptimization();
+			return 0;
+		}
+	}
 	//ros::spin();
 
 	while(ros::ok()) {
@@ -180,6 +197,12 @@ void CameraCalibration::startOptimization() {
 	tf::Transform optimizedTransform;
 	this->transformOptimization->optimizeTransform(optimizedTransform);
 	// TODO: Do something with the optimized transform...
+}
+
+void CameraCalibration::setData(std::vector<MeasurePoint> measurementSeries,
+		tf::Transform initialTransform) {
+	this->measurementSeries = measurementSeries;
+	this->initialTransformFactory = new ManualTransformFactory(initialTransform);
 }
 
 void CameraCalibration::outputMeasurePoint(

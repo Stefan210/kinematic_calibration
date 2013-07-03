@@ -16,6 +16,7 @@
 #include "../include/LocalTransformOptimization.h"
 #include "../include/G2oTransformOptimization.h"
 #include "../include/TransformFactory.h"
+#include "../include/CalibrationDataSerialization.h"
 
 // ROS specific includes
 #include <ros/ros.h>
@@ -82,6 +83,7 @@ public:
 	void setInitialCameraToHeadTransform(float tx, float ty, float tz,
 			float roll, float pitch, float yaw);
 	void startOptimization();
+	void setData(std::vector<MeasurePoint> measurementSeries, tf::Transform initialTransform);
 
 protected:
 	void pointcloudMsgCb(const sensor_msgs::PointCloud2& input);
