@@ -130,6 +130,9 @@ target_link_libraries(BallDetection ${catkin_LIBRARIES})
 add_executable(BallDetectionMain src/BallDetectionMain.cpp)
 target_link_libraries(BallDetectionMain BallDetection)
 
+add_executable(GroundDetectionMain src/GroundDetectionMain.cpp src/GroundDetection.cpp)
+target_link_libraries(GroundDetectionMain ${catkin_LIBRARIES})
+
 add_library(G2oOptimization 
 	src/EdgeMarkerMeasurement.cpp
 	src/VertexPosition3D.cpp
@@ -156,10 +159,13 @@ add_executable(CameraCalibration
 	src/LocalTransformOptimization.cpp 
 	src/G2oTransformOptimization.cpp 
 	src/TransformFactory.cpp)
+	
 target_link_libraries(CameraCalibration 
   ${catkin_LIBRARIES} 
   G2oOptimization
 )
+
+
 
 #############
 ## Testing ##

@@ -23,7 +23,7 @@
 class GroundData {
 public:
 	float a, b, c, d;
-	const tf::Pose getPose() const;
+	tf::Pose getPose() const;
 	void getRPY(float& roll, float& pitch, float& yaw) const;
 };
 
