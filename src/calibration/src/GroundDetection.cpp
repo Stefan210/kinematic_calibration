@@ -89,7 +89,7 @@ void GroundDetection::segmentPlane(
 	segPlane.setNormalDistanceWeight(0.1);
 	segPlane.setMethodType(pcl::SAC_RANSAC);
 	segPlane.setMaxIterations(100);
-	segPlane.setDistanceThreshold(0.03);
+	segPlane.setDistanceThreshold(0.001);
 	segPlane.setInputCloud(inCloud);
 	segPlane.setInputNormals(cloud_normals);
 
@@ -112,15 +112,30 @@ tf::Pose GroundData::getPose() const {
 }
 
 void GroundData::getRPY(double& roll, double& pitch, double& yaw) const {
+	// normal vector to the XY-plane
 	tf::Vector3 normalXY(0, 0, 1);
-	roll = normalize(normalXY.angle(tf::Vector3(0, b, c)));
-	pitch = normalize(normalXY.angle(tf::Vector3(a, 0, c)));
 
+	// roll is the angle between the normal vector projected into the YZ-plane
+	roll = normalize(normalXY.angle(tf::Vector3(0, b, c)));
+
+	// pitch is the angle between the normal vector projected into the XZ-plane
+	pitch = normalize(normalXY.angle(tf::Vector3(a, 0, c)));
+	std::cout << "(roll, pitch)(1): " << roll << " " << pitch << std::endl;
+
+	// NOTE: same as above, just without normals...
+	/*
+	roll = normalize(M_PI_2 - tf::Vector3(0, 1, 0).angle(tf::Vector3(0, b, c)));
+	pitch = normalize(
+			M_PI_2 - tf::Vector3(1, 0, 0).angle(tf::Vector3(a, 0, c)));
+	std::cout << "(roll, pitch)(2): " << roll << " " << pitch << std::endl;
+	*/
+
+	// yaw is the angle between the normal to the XZ-plane and the normal of the plane projected into the XZ-Plane
 	tf::Vector3 normalXZ(0, 1, 0);
 	yaw = normalize(normalXZ.angle(tf::Vector3(a, b, 0)));
 }
 
-double GroundData::normalize(double angle) const {
+double GroundData::normalize(double angle) {
 	while (angle < -M_PI_2) {
 		angle += M_PI;
 	}

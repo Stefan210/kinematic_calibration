@@ -43,10 +43,10 @@ public:
 		return input;
 	}
 
-private:
 	// returns an angle between [-PI_2, PI_2]
-	double normalize(double angle) const;
+	static double normalize(double angle);
 
+private:
 	FRIEND_TEST(GroundDataTest, normalizeTest);
 };
 
