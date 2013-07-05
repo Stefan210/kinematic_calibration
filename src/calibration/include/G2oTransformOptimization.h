@@ -22,9 +22,20 @@ public:
 	virtual void getMarkerEstimate(const tf::Transform& cameraToHead,
 			tf::Vector3& position);
 
+    Eigen::Matrix<double,5,5> getCorrelationMatrix() const
+    {
+        return correlationMatrix;
+    }
+
+    void setCorrelationMatrix(Eigen::Matrix<double,5,5> correlationMatrix)
+    {
+        this->correlationMatrix = correlationMatrix;
+    }
+
 private:
-	tf::Vector3 markerPosition;
-	bool markerPositionOptimized;
+    tf::Vector3 markerPosition;
+    bool markerPositionOptimized;
+    Eigen::Matrix<double,5,5> correlationMatrix;
 };
 
 #endif /* G2OTRANSFORMOPTIMIZATION_H_ */

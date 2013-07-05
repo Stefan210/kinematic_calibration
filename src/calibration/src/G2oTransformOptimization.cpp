@@ -22,6 +22,11 @@
 
 G2oTransformOptimization::G2oTransformOptimization() {
 	this->markerPositionOptimized = false;
+	this->correlationMatrix.setConstant(0,0,1.0);
+	this->correlationMatrix.setConstant(1,1,1.0);
+	this->correlationMatrix.setConstant(2,2,1.0);
+	this->correlationMatrix.setConstant(3,3,1.0);
+	this->correlationMatrix.setConstant(4,4,1.0);
 }
 
 G2oTransformOptimization::~G2oTransformOptimization() {
@@ -68,7 +73,7 @@ void G2oTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 		EdgeMarkerMeasurement* edge = new EdgeMarkerMeasurement(
 				this->measurePoints[i]);
 		edge->setId(i);
-		edge->setInformation(Eigen::Matrix<double, 5, 5>::Identity());
+		edge->setInformation(this->correlationMatrix);
 		edge->vertices()[0] = positionVertex;
 		edge->vertices()[1] = transformationVertex;
 		optimizer.addEdge(edge);
