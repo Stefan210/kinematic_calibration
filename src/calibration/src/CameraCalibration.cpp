@@ -77,11 +77,11 @@ int main(int argc, char** argv) {
 	G2oTransformOptimization* g2oTransformOptimization1 =
 			new G2oTransformOptimization();
 	Eigen::Matrix<double,5,5> correlationMatrix1 = Eigen::Matrix<double,5,5>::Identity();
-	correlationMatrix1.setConstant(0,0,1.0);
-	correlationMatrix1.setConstant(1,1,1.0);
-	correlationMatrix1.setConstant(2,2,1.0);
-	correlationMatrix1.setConstant(3,3,1.0);
-	correlationMatrix1.setConstant(4,4,1.0);
+	correlationMatrix1(0,0) = 1.0;
+	correlationMatrix1(1,1) = 1.0;
+	correlationMatrix1(2,2) = 1.0;
+	correlationMatrix1(3,3) = 1.0;
+	correlationMatrix1(4,4) = 1.0;
 	g2oTransformOptimization1->setCorrelationMatrix(correlationMatrix1);
 	compositeTransformOptimization->addTransformOptimization("g2o(1,1,1,1,1)",
 			g2oTransformOptimization1);
@@ -90,11 +90,11 @@ int main(int argc, char** argv) {
 	G2oTransformOptimization* g2oTransformOptimization2 =
 			new G2oTransformOptimization();
 	Eigen::Matrix<double,5,5> correlationMatrix2 = Eigen::Matrix<double,5,5>::Identity();
-	correlationMatrix2.setConstant(0,0,1.0);
-	correlationMatrix2.setConstant(1,1,1.0);
-	correlationMatrix2.setConstant(2,2,1.0);
-	correlationMatrix2.setConstant(3,3,0.0);
-	correlationMatrix2.setConstant(4,4,0.0);
+	correlationMatrix2(0,0) = 1.0;
+	correlationMatrix2(1,1) = 1.0;
+	correlationMatrix2(2,2) = 1.0;
+	correlationMatrix2(3,3) = 0.0;
+	correlationMatrix2(4,4) = 0.0;
 	g2oTransformOptimization2->setCorrelationMatrix(correlationMatrix2);
 	compositeTransformOptimization->addTransformOptimization("g2o(1,1,1,0,0)",
 			g2oTransformOptimization2);
@@ -103,11 +103,11 @@ int main(int argc, char** argv) {
 	G2oTransformOptimization* g2oTransformOptimization3 =
 			new G2oTransformOptimization();
 	Eigen::Matrix<double,5,5> correlationMatrix3 = Eigen::Matrix<double,5,5>::Identity();
-	correlationMatrix3.setConstant(0,0,0.0);
-	correlationMatrix3.setConstant(1,1,0.0);
-	correlationMatrix3.setConstant(2,2,0.0);
-	correlationMatrix3.setConstant(3,3,1.0);
-	correlationMatrix3.setConstant(4,4,1.0);
+	correlationMatrix3(0,0) = 0.0;
+	correlationMatrix3(1,1) = 0.0;
+	correlationMatrix3(2,2) = 0.0;
+	correlationMatrix3(3,3) = 1.0;
+	correlationMatrix3(4,4) = 1.0;
 	g2oTransformOptimization3->setCorrelationMatrix(correlationMatrix3);
 	compositeTransformOptimization->addTransformOptimization("g2o(0,0,0,1,1)",
 			g2oTransformOptimization3);
@@ -116,11 +116,11 @@ int main(int argc, char** argv) {
 	G2oTransformOptimization* g2oTransformOptimization4 =
 			new G2oTransformOptimization();
 	Eigen::Matrix<double,5,5> correlationMatrix4 = Eigen::Matrix<double,5,5>::Identity();
-	correlationMatrix4.setConstant(0,0,1.0);
-	correlationMatrix4.setConstant(1,1,1.0);
-	correlationMatrix4.setConstant(2,2,1.0);
-	correlationMatrix4.setConstant(3,3,10.0);
-	correlationMatrix4.setConstant(4,4,10.0);
+	correlationMatrix4(0,0) = 1.0;
+	correlationMatrix4(1,1) = 1.0;
+	correlationMatrix4(2,2) = 1.0;
+	correlationMatrix4(3,3) = 10.0;
+	correlationMatrix4(4,4) = 10.0;
 	g2oTransformOptimization4->setCorrelationMatrix(correlationMatrix4);
 	compositeTransformOptimization->addTransformOptimization("g2o(1,1,1,10,10)",
 			g2oTransformOptimization4);
@@ -129,11 +129,11 @@ int main(int argc, char** argv) {
 	G2oTransformOptimization* g2oTransformOptimization5 =
 			new G2oTransformOptimization();
 	Eigen::Matrix<double,5,5> correlationMatrix5 = Eigen::Matrix<double,5,5>::Identity();
-	correlationMatrix5.setConstant(0,0,1.0);
-	correlationMatrix5.setConstant(1,1,1.0);
-	correlationMatrix5.setConstant(2,2,1.0);
-	correlationMatrix5.setConstant(3,3,0.1);
-	correlationMatrix5.setConstant(4,4,0.1);
+	correlationMatrix5(0,0) = 1.0;
+	correlationMatrix5(1,1) = 1.0;
+	correlationMatrix5(2,2) = 1.0;
+	correlationMatrix5(3,3) = 0.1;
+	correlationMatrix5(4,4) = 0.1;
 	g2oTransformOptimization5->setCorrelationMatrix(correlationMatrix5);
 	compositeTransformOptimization->addTransformOptimization("g2o(1,1,1,0.1,0.1)",
 			g2oTransformOptimization5);
