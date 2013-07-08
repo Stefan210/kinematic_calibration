@@ -39,7 +39,7 @@ void CameraTransformOptimization::calculateSqrtDistFromMarker(
 		currentError += pow(markerPoint.x() - transformedPoint.x(), 2);
 		currentError += pow(markerPoint.y() - transformedPoint.y(), 2);
 		currentError += pow(markerPoint.z() - transformedPoint.z(), 2);
-		error  += sqrt(currentError);
+		error += sqrt(currentError);
 	}
 
 	error /= this->measurePoints.size();
@@ -63,18 +63,18 @@ void CameraTransformOptimization::getMarkerEstimate(
 		centerX += pointFixed.getX();
 		centerY += pointFixed.getY();
 		centerZ += pointFixed.getZ();
-/*
-		std::cout << "Tt_headToFixed: " << currentMeasure.headToFixed.getOrigin()[0] << " " << currentMeasure.headToFixed.getOrigin()[1] << " " << currentMeasure.headToFixed.getOrigin()[2] << "\n";
-		std::cout << "Tt_cameraToHead: " << cameraToHead.getOrigin()[0] << " " << cameraToHead.getOrigin()[1] << " " << cameraToHead.getOrigin()[2] << "\n";
-		std::cout << "Tt_opticalToCamera: " << currentMeasure.opticalToCamera.getOrigin()[0] << " " << currentMeasure.opticalToCamera.getOrigin()[1] << " " << currentMeasure.opticalToCamera.getOrigin()[2] << "\n";
-		std::cout << "P_optical: x,y,z " << currentMeasure.measuredPosition.getX() << ","  << currentMeasure.measuredPosition.getY() << ","  << currentMeasure.measuredPosition.getZ() << "\n";
-		std::cout << "P_fixed: x,y,z " << pointFixed.getX() << ","  << pointFixed.getY() << ","  << pointFixed.getZ() << "\n";
-	*/
+		/*
+		 std::cout << "Tt_headToFixed: " << currentMeasure.headToFixed.getOrigin()[0] << " " << currentMeasure.headToFixed.getOrigin()[1] << " " << currentMeasure.headToFixed.getOrigin()[2] << "\n";
+		 std::cout << "Tt_cameraToHead: " << cameraToHead.getOrigin()[0] << " " << cameraToHead.getOrigin()[1] << " " << cameraToHead.getOrigin()[2] << "\n";
+		 std::cout << "Tt_opticalToCamera: " << currentMeasure.opticalToCamera.getOrigin()[0] << " " << currentMeasure.opticalToCamera.getOrigin()[1] << " " << currentMeasure.opticalToCamera.getOrigin()[2] << "\n";
+		 std::cout << "P_optical: x,y,z " << currentMeasure.measuredPosition.getX() << ","  << currentMeasure.measuredPosition.getY() << ","  << currentMeasure.measuredPosition.getZ() << "\n";
+		 std::cout << "P_fixed: x,y,z " << pointFixed.getX() << ","  << pointFixed.getY() << ","  << pointFixed.getZ() << "\n";
+		 */
 	}
 
-	position[0] = (centerX / (float)numOfPoints);
-	position[1] = (centerY / (float)numOfPoints);
-	position[2] = (centerZ / (float)numOfPoints);
+	position[0] = (centerX / (float) numOfPoints);
+	position[1] = (centerY / (float) numOfPoints);
+	position[2] = (centerZ / (float) numOfPoints);
 }
 
 void CameraTransformOptimization::printResult(std::string pre,
@@ -83,43 +83,66 @@ void CameraTransformOptimization::printResult(std::string pre,
 	double r, p, y;
 
 	calculateSqrtDistFromMarker(cameraToHead, markerPosition, error);
+	getAvgRP(cameraToHead, r, p);
 	std::cout << pre << ";";
 	std::cout << "position (x,y,z):" << markerPosition[0] << ","
-			<< markerPosition[1] << ","
-			<< markerPosition[2] << ";";
-	std::cout << "translation (x,y,z):" << cameraToHead.getOrigin()[0]
-			<< "," << cameraToHead.getOrigin()[1] << ","
-			<< cameraToHead.getOrigin()[2] << ";";
-	std::cout << "rotation (q0,q1,q2,q3):"
-			<< cameraToHead.getRotation()[0] << ","
-			<< cameraToHead.getRotation()[1] << ","
+			<< markerPosition[1] << "," << markerPosition[2] << ";";
+	std::cout << "ground (r,p):" << r << "," << p << ";";
+	std::cout << "translation (x,y,z):" << cameraToHead.getOrigin()[0] << ","
+			<< cameraToHead.getOrigin()[1] << "," << cameraToHead.getOrigin()[2]
+			<< ";";
+	std::cout << "rotation (q0,q1,q2,q3):" << cameraToHead.getRotation()[0]
+			<< "," << cameraToHead.getRotation()[1] << ","
 			<< cameraToHead.getRotation()[2] << ","
 			<< cameraToHead.getRotation()[3] << ";";
 	tf::Matrix3x3(cameraToHead.getRotation()).getRPY(r, p, y, 1);
-	std::cout << "rotation1 (r,p,y):"
-			<< r << ","
-			<< p << ","
-			<< y << ";";
+	std::cout << "rotation1 (r,p,y):" << r << "," << p << "," << y << ";";
 	tf::Matrix3x3(cameraToHead.getRotation()).getRPY(r, p, y, 2);
-	std::cout << "rotation2 (r,p,y):"
-			<< r << ","
-			<< p << ","
-			<< y << ";";
+	std::cout << "rotation2 (r,p,y):" << r << "," << p << "," << y << ";";
 	std::cout << "error: " << error;
-	std::cout << "\n";
+	std::cout << "\n\n";
+}
+
+void CameraTransformOptimization::getAvgRP(const tf::Transform&  cameraToHead, double& r,
+		double& p) {
+	r = 0;
+	p = 0;
+	double roll, pitch, yaw;
+	int size = this->measurePoints.size();
+	for (int i = 0; i < size; i++) {
+		CameraMeasurePoint measurePoint = this->measurePoints[i];
+		tf::Vector3 groundNormal(measurePoint.groundData.a,
+				measurePoint.groundData.b, measurePoint.groundData.c);
+		tf::Vector3 transformedGroundNormal =
+				measurePoint.fixedToFootprint
+						* (measurePoint.headToFixed
+								* (cameraToHead
+										* (measurePoint.opticalToCamera
+												* groundNormal)));
+		GroundData transformedGroundData;
+		transformedGroundData.a = transformedGroundNormal[0];
+		transformedGroundData.b = transformedGroundNormal[1];
+		transformedGroundData.c = transformedGroundNormal[2];
+		transformedGroundData.d = 0;
+		transformedGroundData.getRPY(roll, pitch, yaw);
+		r += std::abs(roll);
+		p += std::abs(pitch);
+	}
+	r /= size;
+	p /= size;
 }
 
 bool CameraTransformOptimization::canStop() {
-	if(numOfIterations++ > maxIterations)
+	if (numOfIterations++ > maxIterations)
 		return true;
 
-	if(error < minError)
+	if (error < minError)
 		return true;
 
-	if(std::abs(lastError - error) < errorImprovement)
+	if (std::abs(lastError - error) < errorImprovement)
 		return true;
 
-	return  false;
+	return false;
 }
 
 void CameraTransformOptimization::calculateSqrtDistCameraHead(
@@ -169,19 +192,19 @@ void CameraTransformOptimization::calculateSqrtDistCameraHead(
 	// Calculate the sum of the squared distances between both pointclouds (X and P).
 	for (int i = 0; i < numOfPoints; i++) {
 		/*std::cout << "X(x,y,z): " << pointcloudX[i].getX() << ","
-				<< pointcloudX[i].getY() << "," << pointcloudX[i].getZ()
-				<< "\t";
-		std::cout << "P(x,y,z):" << pointcloudP[i].getX() << ","
-				<< pointcloudP[i].getY() << "," << pointcloudP[i].getZ()
-				<< std::endl << std::endl;*/
+		 << pointcloudX[i].getY() << "," << pointcloudX[i].getZ()
+		 << "\t";
+		 std::cout << "P(x,y,z):" << pointcloudP[i].getX() << ","
+		 << pointcloudP[i].getY() << "," << pointcloudP[i].getZ()
+		 << std::endl << std::endl;*/
 		error += std::pow(pointcloudX[i].getX() - pointcloudP[i].getX(), 2)
 				+ std::pow(pointcloudX[i].getY() - pointcloudP[i].getY(), 2)
 				+ std::pow(pointcloudX[i].getZ() - pointcloudP[i].getZ(), 2);
 	}
 }
 
-void CompositeTransformOptimization::addTransformOptimization(
-		std::string name, CameraTransformOptimization* to) {
+void CompositeTransformOptimization::addTransformOptimization(std::string name,
+		CameraTransformOptimization* to) {
 	this->optimizer.insert(make_pair(name, to));
 }
 
@@ -191,14 +214,15 @@ void CompositeTransformOptimization::optimizeTransform(
 	float currentError = 0;
 
 	// return the transform with the smallest error
-	for(map<string, CameraTransformOptimization*>::const_iterator it = this->optimizer.begin();
-	    it != this->optimizer.end(); ++it) {
+	for (map<string, CameraTransformOptimization*>::const_iterator it =
+			this->optimizer.begin(); it != this->optimizer.end(); ++it) {
 		tf::Transform transform;
 		tf::Vector3 markerPosition;
 		it->second->optimizeTransform(transform);
 		it->second->getMarkerEstimate(transform, markerPosition);
-		this->calculateSqrtDistFromMarker(transform, markerPosition, currentError);
-		if(currentError < smallestError) {
+		this->calculateSqrtDistFromMarker(transform, markerPosition,
+				currentError);
+		if (currentError < smallestError) {
 			smallestError = currentError;
 			cameraToHead = tf::Transform(transform);
 		}
@@ -207,16 +231,16 @@ void CompositeTransformOptimization::optimizeTransform(
 }
 
 void CompositeTransformOptimization::addMeasurePoint(MeasurePoint newPoint) {
-	for(map<string, CameraTransformOptimization*>::const_iterator it = this->optimizer.begin();
-	    it != this->optimizer.end(); ++it) {
+	for (map<string, CameraTransformOptimization*>::const_iterator it =
+			this->optimizer.begin(); it != this->optimizer.end(); ++it) {
 		it->second->addMeasurePoint(newPoint);
 	}
 	this->CameraTransformOptimization::addMeasurePoint(newPoint);
 }
 
 void CompositeTransformOptimization::clearMeasurePoints() {
-	for(map<string, CameraTransformOptimization*>::const_iterator it = this->optimizer.begin();
-	    it != this->optimizer.end(); ++it) {
+	for (map<string, CameraTransformOptimization*>::const_iterator it =
+			this->optimizer.begin(); it != this->optimizer.end(); ++it) {
 		it->second->clearMeasurePoints();
 	}
 	this->CameraTransformOptimization::clearMeasurePoints();
@@ -224,12 +248,11 @@ void CompositeTransformOptimization::clearMeasurePoints() {
 
 void CompositeTransformOptimization::setInitialTransformCameraToHead(
 		tf::Transform cameraToHead) {
-	for(map<string, CameraTransformOptimization*>::const_iterator it = this->optimizer.begin();
-	    it != this->optimizer.end(); ++it) {
+	for (map<string, CameraTransformOptimization*>::const_iterator it =
+			this->optimizer.begin(); it != this->optimizer.end(); ++it) {
 		it->second->setInitialTransformCameraToHead(cameraToHead);
 	}
-	this->CameraTransformOptimization::setInitialTransformCameraToHead(cameraToHead);
+	this->CameraTransformOptimization::setInitialTransformCameraToHead(
+			cameraToHead);
 }
-
-
 

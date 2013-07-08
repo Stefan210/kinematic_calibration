@@ -11,9 +11,6 @@
 #include <tf/tf.h>
 #include "../include/CameraMeasurePoint.h"
 
-
-
-
 /*
  * Class for calibrating the transformation between robot and camera.
  */
@@ -77,6 +74,12 @@ public:
 	 */
 	void printResult(std::string pre, tf::Transform& cameraToHead,
 			tf::Vector3 markerPosition);
+
+	/**
+	 * Calculates the average roll and pitch of the grond using the passed transformation.
+	 */
+	void getAvgRP(const tf::Transform&  cameraToHead, double& r,
+			double& p);
 
 	float getMaxIterations() const {
 		return maxIterations;
