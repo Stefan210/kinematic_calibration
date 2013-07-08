@@ -7,6 +7,7 @@
 
 #include "../include/G2oTransformOptimization.h"
 #include "../include/EdgeMarkerMeasurement.h"
+#include "../include/EdgeGroundMeasurement.h"
 #include "../include/VertexPosition3D.h"
 #include "../include/VertexTransformation3D.h"
 
@@ -22,11 +23,12 @@
 
 G2oTransformOptimization::G2oTransformOptimization() {
 	this->markerPositionOptimized = false;
-	this->correlationMatrix.setConstant(0,0,1.0);
-	this->correlationMatrix.setConstant(1,1,1.0);
-	this->correlationMatrix.setConstant(2,2,1.0);
-	this->correlationMatrix.setConstant(3,3,1.0);
-	this->correlationMatrix.setConstant(4,4,1.0);
+//	this->correlationMatrix = Eigen::Matrix<double, 5, 5>::Identity();
+//	this->correlationMatrix.setConstant(0, 0, 1.0);
+//	this->correlationMatrix.setConstant(1, 1, 1.0);
+//	this->correlationMatrix.setConstant(2, 2, 1.0);
+//	this->correlationMatrix.setConstant(3, 3, 1.0);
+//	this->correlationMatrix.setConstant(4, 4, 1.0);
 }
 
 G2oTransformOptimization::~G2oTransformOptimization() {
@@ -56,6 +58,7 @@ void G2oTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 
 	optimizer.setAlgorithm(algorithm);
 
+	// add a vertex representing the estimated marker position
 	VertexPosition3D* positionVertex = new VertexPosition3D();
 	tf::Vector3 position;
 	getMarkerEstimate(initialTransformCameraToHead, position);
@@ -64,25 +67,46 @@ void G2oTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 	positionVertex->setId(1);
 	optimizer.addVertex(positionVertex);
 
+	// add a vertex representing the current transformation
 	VertexTransformation3D* transformationVertex = new VertexTransformation3D();
 	transformationVertex->setEstimate(initialTransformCameraToHead);
 	transformationVertex->setId(2);
 	optimizer.addVertex(transformationVertex);
 
+	int id = 1;
+
+	// add edges constraining marker position and transformation
+	Eigen::Matrix3d mm = Eigen::Matrix3d::Identity(3, 3);
+	mm(0, 0) = this->correlationMatrix(0, 0);
+	mm(1, 1) = this->correlationMatrix(1, 1);
+	mm(2, 2) = this->correlationMatrix(2, 2);
 	for (int i = 0; i < this->measurePoints.size(); i++) {
 		EdgeMarkerMeasurement* edge = new EdgeMarkerMeasurement(
 				this->measurePoints[i]);
-		edge->setId(i);
-		edge->setInformation(this->correlationMatrix);
+		edge->setId(id++);
+		edge->setInformation(mm);
 		edge->vertices()[0] = positionVertex;
 		edge->vertices()[1] = transformationVertex;
+		optimizer.addEdge(edge);
+	}
+
+	// add edges constraining roll and pitch of the ground
+	Eigen::Matrix2d mg = Eigen::Matrix2d::Identity(2, 2);
+	mg(0, 0) = this->correlationMatrix(3, 3);
+	mg(1, 1) = this->correlationMatrix(4, 4);
+	for (int i = 0; i < this->measurePoints.size(); i++) {
+		EdgeGroundMeasurement* edge = new EdgeGroundMeasurement(
+				this->measurePoints[i]);
+		edge->setId(id++);
+		edge->setInformation(mg);
+		edge->vertices()[0] = transformationVertex;
 		optimizer.addEdge(edge);
 	}
 
 	optimizer.initializeOptimization();
 	optimizer.computeActiveErrors();
 	//optimizer.setVerbose(true);
-	optimizer.optimize(1000);
+	optimizer.optimize(100);
 	cameraToHead = transformationVertex->estimate();
 
 	this->markerPosition = tf::Vector3(positionVertex->estimate()[0],
@@ -107,7 +131,8 @@ void G2oTransformOptimization::getMarkerEstimate(
 	if (this->markerPositionOptimized == true) {
 		position = this->markerPosition;
 	} else {
-		this->CameraTransformOptimization::getMarkerEstimate(cameraToHead, position);
+		this->CameraTransformOptimization::getMarkerEstimate(cameraToHead,
+				position);
 	}
 }
 

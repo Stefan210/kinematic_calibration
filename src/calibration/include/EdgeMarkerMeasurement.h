@@ -17,15 +17,23 @@
 using namespace g2o;
 
 /*
- * Represents an edge for a measurement.
+ * Represents an edge that constraints the marker position
+ * and the transformation for the camera according to the measurement.
  */
-class EdgeMarkerMeasurement : public BaseBinaryEdge<5, MeasurePoint, VertexPosition3D, VertexTransformation3D> {
+class EdgeMarkerMeasurement: public BaseBinaryEdge<3, MeasurePoint,
+		VertexPosition3D, VertexTransformation3D> {
 public:
 	EdgeMarkerMeasurement(MeasurePoint& measurePoint);
 	virtual ~EdgeMarkerMeasurement();
 	virtual void computeError();
-    virtual bool read(std::istream& is) {return false;}; // todo
-    virtual bool write(std::ostream& os) const {return false;}; // todo
+	virtual bool read(std::istream& is) {
+		return false;
+	}
+	; // todo
+	virtual bool write(std::ostream& os) const {
+		return false;
+	}
+	; // todo
 
 protected:
 	MeasurePoint& measurePoint;

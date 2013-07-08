@@ -135,6 +135,7 @@ target_link_libraries(GroundDetectionMain ${catkin_LIBRARIES})
 
 add_library(G2oOptimization 
 	src/EdgeMarkerMeasurement.cpp
+	src/EdgeGroundMeasurement.cpp
 	src/VertexPosition3D.cpp
 	src/VertexTransformation3D.cpp
 	)
