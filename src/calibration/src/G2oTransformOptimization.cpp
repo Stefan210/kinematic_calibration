@@ -81,8 +81,8 @@ void G2oTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 
 	optimizer.initializeOptimization();
 	optimizer.computeActiveErrors();
-	optimizer.setVerbose(true);
-	optimizer.optimize(15000);
+	//optimizer.setVerbose(true);
+	optimizer.optimize(1000);
 	cameraToHead = transformationVertex->estimate();
 
 	this->markerPosition = tf::Vector3(positionVertex->estimate()[0],

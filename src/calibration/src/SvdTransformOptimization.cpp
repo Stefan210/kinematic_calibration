@@ -98,7 +98,9 @@ void SvdTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 
 		std::cout << std::endl;*/
 	}
-	cameraToHead = tf::Transform(currentCameraToHead);
+	tf::TransformDoubleData data;
+	currentCameraToHead.serialize(data);
+	cameraToHead.deSerialize(data);
 }
 
 

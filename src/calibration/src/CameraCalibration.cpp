@@ -62,19 +62,82 @@ int main(int argc, char** argv) {
 	options.setMinBallRadius(0.074);
 	options.setMinNumOfMeasurements(3);
 	options.setPointCloudTopic(DEFAULT_POINTCLOUD_MSG);
-	CameraTransformOptimization* svdTransformOptimization =
+	SvdTransformOptimization* svdTransformOptimization =
 			new SvdTransformOptimization();
 	svdTransformOptimization->setMaxIterations(100000);
 	svdTransformOptimization->setMinError(0.000001);
 	svdTransformOptimization->setErrorImprovement(0.000000001);
-	CameraTransformOptimization* g2oTransformOptimization =
-			new G2oTransformOptimization();
+
 	CompositeTransformOptimization* compositeTransformOptimization =
 			new CompositeTransformOptimization();
 	compositeTransformOptimization->addTransformOptimization("svd",
 			svdTransformOptimization);
-	compositeTransformOptimization->addTransformOptimization("g2o",
-			g2oTransformOptimization);
+
+	// 1st g2o
+	G2oTransformOptimization* g2oTransformOptimization1 =
+			new G2oTransformOptimization();
+	Eigen::Matrix<double,5,5> correlationMatrix1 = Eigen::Matrix<double,5,5>::Identity();
+	correlationMatrix1.setConstant(0,0,1.0);
+	correlationMatrix1.setConstant(1,1,1.0);
+	correlationMatrix1.setConstant(2,2,1.0);
+	correlationMatrix1.setConstant(3,3,1.0);
+	correlationMatrix1.setConstant(4,4,1.0);
+	g2oTransformOptimization1->setCorrelationMatrix(correlationMatrix1);
+	compositeTransformOptimization->addTransformOptimization("g2o(1,1,1,1,1)",
+			g2oTransformOptimization1);
+
+	// 2nd g2o
+	G2oTransformOptimization* g2oTransformOptimization2 =
+			new G2oTransformOptimization();
+	Eigen::Matrix<double,5,5> correlationMatrix2 = Eigen::Matrix<double,5,5>::Identity();
+	correlationMatrix2.setConstant(0,0,1.0);
+	correlationMatrix2.setConstant(1,1,1.0);
+	correlationMatrix2.setConstant(2,2,1.0);
+	correlationMatrix2.setConstant(3,3,0.0);
+	correlationMatrix2.setConstant(4,4,0.0);
+	g2oTransformOptimization2->setCorrelationMatrix(correlationMatrix2);
+	compositeTransformOptimization->addTransformOptimization("g2o(1,1,1,0,0)",
+			g2oTransformOptimization2);
+
+	// 3rd g2o
+	G2oTransformOptimization* g2oTransformOptimization3 =
+			new G2oTransformOptimization();
+	Eigen::Matrix<double,5,5> correlationMatrix3 = Eigen::Matrix<double,5,5>::Identity();
+	correlationMatrix3.setConstant(0,0,0.0);
+	correlationMatrix3.setConstant(1,1,0.0);
+	correlationMatrix3.setConstant(2,2,0.0);
+	correlationMatrix3.setConstant(3,3,1.0);
+	correlationMatrix3.setConstant(4,4,1.0);
+	g2oTransformOptimization3->setCorrelationMatrix(correlationMatrix3);
+	compositeTransformOptimization->addTransformOptimization("g2o(0,0,0,1,1)",
+			g2oTransformOptimization3);
+
+	// 4th g2o
+	G2oTransformOptimization* g2oTransformOptimization4 =
+			new G2oTransformOptimization();
+	Eigen::Matrix<double,5,5> correlationMatrix4 = Eigen::Matrix<double,5,5>::Identity();
+	correlationMatrix4.setConstant(0,0,1.0);
+	correlationMatrix4.setConstant(1,1,1.0);
+	correlationMatrix4.setConstant(2,2,1.0);
+	correlationMatrix4.setConstant(3,3,10.0);
+	correlationMatrix4.setConstant(4,4,10.0);
+	g2oTransformOptimization4->setCorrelationMatrix(correlationMatrix4);
+	compositeTransformOptimization->addTransformOptimization("g2o(1,1,1,10,10)",
+			g2oTransformOptimization4);
+
+	// 5th g2o
+	G2oTransformOptimization* g2oTransformOptimization5 =
+			new G2oTransformOptimization();
+	Eigen::Matrix<double,5,5> correlationMatrix5 = Eigen::Matrix<double,5,5>::Identity();
+	correlationMatrix5.setConstant(0,0,1.0);
+	correlationMatrix5.setConstant(1,1,1.0);
+	correlationMatrix5.setConstant(2,2,1.0);
+	correlationMatrix5.setConstant(3,3,0.1);
+	correlationMatrix5.setConstant(4,4,0.1);
+	g2oTransformOptimization5->setCorrelationMatrix(correlationMatrix5);
+	compositeTransformOptimization->addTransformOptimization("g2o(1,1,1,0.1,0.1)",
+			g2oTransformOptimization5);
+
 	options.setTransformOptimization(compositeTransformOptimization);
 
 	// parse command line arguments
@@ -85,9 +148,10 @@ int main(int argc, char** argv) {
 					atof(argv[i + 1]), atof(argv[i + 2]), atof(argv[i + 3]),
 					atof(argv[i + 4]), atof(argv[i + 5]), atof(argv[i + 6]));
 			options.setInitialTransformFactory(mtf);
-		} else if(strcmp(argv[i], "--data-to-file") == 0) {
-			string fileName = argv[i+1];
-			CalibrationDataSerialization* calibrationDataSerialization = new CalibrationDataSerialization(fileName);
+		} else if (strcmp(argv[i], "--data-to-file") == 0) {
+			string fileName = argv[i + 1];
+			CalibrationDataSerialization* calibrationDataSerialization =
+					new CalibrationDataSerialization(fileName);
 			options.setTransformOptimization(calibrationDataSerialization);
 		}
 	}
@@ -96,33 +160,33 @@ int main(int argc, char** argv) {
 
 	// parse command line arguments
 	for (int i = 1; i < argc; i++) {
-		if(strcmp(argv[i], "--data-from-file") == 0) {
-			string fileName = argv[i+1];
+		if (strcmp(argv[i], "--data-from-file") == 0) {
+			string fileName = argv[i + 1];
 			CalibrationDataSerialization data(fileName);
-			cameraCalibration.setData(data.getMeasurementSeries(), data.getInitialTransform());
+			cameraCalibration.setData(data.getMeasurementSeries(),
+					data.getInitialTransform());
 			cameraCalibration.startOptimization();
 			return 0;
 		}
 	}
 	//ros::spin();
 
-	while(ros::ok()) {
-        fd_set set;
-        struct timeval tv;
+	while (ros::ok()) {
+		fd_set set;
+		struct timeval tv;
 
-        tv.tv_sec = 0;
-        tv.tv_usec = 10;
+		tv.tv_sec = 0;
+		tv.tv_usec = 10;
 
-        FD_ZERO( &set );
-        FD_SET( fileno( stdin ), &set );
+		FD_ZERO(&set);
+		FD_SET(fileno(stdin), &set);
 
-        int res = select( fileno( stdin )+1, &set, NULL, NULL, &tv );
+		int res = select(fileno(stdin) + 1, &set, NULL, NULL, &tv);
 
-        if( res > 0 )
-        {
-        	cameraCalibration.startOptimization();
-        	break;
-        }
+		if (res > 0) {
+			cameraCalibration.startOptimization();
+			break;
+		}
 		ros::spinOnce();
 	}
 
@@ -159,7 +223,8 @@ void CameraCalibration::pointcloudMsgCb(const sensor_msgs::PointCloud2& input) {
 			// if the current measurement has enough single measurements,
 			// take the average point and save the transformations
 			MeasurePoint newMeasurePoint;
-			createMeasurePoint(currentBallMeasurements, currentGroundMeasurements, currentTimestamps,
+			createMeasurePoint(currentBallMeasurements,
+					currentGroundMeasurements, currentTimestamps,
 					newMeasurePoint);
 			this->measurementSeries.push_back(newMeasurePoint);
 			outputMeasurePoint(newMeasurePoint);
@@ -202,7 +267,8 @@ void CameraCalibration::startOptimization() {
 void CameraCalibration::setData(std::vector<MeasurePoint> measurementSeries,
 		tf::Transform initialTransform) {
 	this->measurementSeries = measurementSeries;
-	this->initialTransformFactory = new ManualTransformFactory(initialTransform);
+	this->initialTransformFactory = new ManualTransformFactory(
+			initialTransform);
 }
 
 void CameraCalibration::outputMeasurePoint(
@@ -222,6 +288,20 @@ void CameraCalibration::outputMeasurePoint(
 			"Last measurement (average position, optical frame): %f, %f, %f.", newMeasurePoint.measuredPosition.getX(), newMeasurePoint.measuredPosition.getY(), newMeasurePoint.measuredPosition.getZ());
 	ROS_INFO(
 			"Last measurement (average position, fixed frame): %f, %f, %f.", pointFixed.getX(), pointFixed.getY(), pointFixed.getZ());
+
+	tf::Vector3 groundNormal(newMeasurePoint.groundData.a,
+			newMeasurePoint.groundData.b, newMeasurePoint.groundData.c);
+	tf::Vector3 transformedGroundNormal = (newMeasurePoint.headToFootprint()
+			* (cameraToHead * (newMeasurePoint.opticalToCamera * groundNormal)));
+	GroundData transformedGroundData;
+	transformedGroundData.a = transformedGroundNormal[0];
+	transformedGroundData.b = transformedGroundNormal[1];
+	transformedGroundData.c = transformedGroundNormal[2];
+	transformedGroundData.d = 0;
+	double roll, pitch, yaw;
+	transformedGroundData.getRPY(roll, pitch, yaw);
+	ROS_INFO(
+			"Ground (base_footprint): (roll, pitch): %f %f, (ax+by+cz+d=0), %fx+%fy+%fz+%f=0", roll, pitch, transformedGroundData.a, transformedGroundData.b, transformedGroundData.c, 0.0);
 }
 
 bool CameraCalibration::distanceTooBig(pcl::PointXYZ first,
@@ -266,7 +346,8 @@ void CameraCalibration::createMeasurePoint(
 	transformListener.lookupTransform(cameraFrame, opticalFrame, time,
 			opticalToCamera);
 	transformListener.lookupTransform(fixedFrame, headFrame, time, headToFixed);
-	transformListener.lookupTransform(footprintFrame, fixedFrame, time, fixedToFootprint);
+	transformListener.lookupTransform(footprintFrame, fixedFrame, time,
+			fixedToFootprint);
 	newMeasurePoint.opticalToCamera = opticalToCamera;
 	newMeasurePoint.headToFixed = headToFixed;
 	newMeasurePoint.fixedToFootprint = fixedToFootprint;

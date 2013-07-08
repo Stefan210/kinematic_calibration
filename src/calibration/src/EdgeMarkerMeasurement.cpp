@@ -30,6 +30,7 @@ void EdgeMarkerMeasurement::computeError() {
 	Eigen::Vector3d markerPosition = vertexPosition->estimate();
 	tf::Transform cameraToHeadTransform = vertexTransf->estimate();
 
+
 	tf::Vector3 transformedMeasurement = (measurePoint.headToFixed
 			* (cameraToHeadTransform
 					* (measurePoint.opticalToCamera
@@ -40,16 +41,23 @@ void EdgeMarkerMeasurement::computeError() {
 	_error[2] = transformedMeasurement.getZ() - markerPosition[2];
 
 	// calculate error from ground in respect to roll and pitch (which should be 0)
-	tf::Pose transformedGroundPose = (measurePoint.headToFootprint()
-			* (cameraToHeadTransform
-					* (measurePoint.opticalToCamera
-							* measurePoint.groundPose())));
-	double roll, pitch, yaw;
-	tf::Matrix3x3(transformedGroundPose.getRotation()).getRPY(roll, pitch, yaw);
-	std::cout << "ground (1: via pose transformation)(roll, pitch, yaw) " <<  roll << " " << pitch << " " << yaw << std::endl;
 
+//	tf::Pose transformedGroundPose = (measurePoint.headToFootprint()
+//			* (cameraToHeadTransform
+//					* (measurePoint.opticalToCamera
+//							* measurePoint.groundPose())));
+//	double roll, pitch, yaw;
+//	tf::Matrix3x3(transformedGroundPose.getRotation()).getRPY(roll, pitch, yaw);
+//	roll = GroundData::normalize(roll);
+//	pitch = GroundData::normalize(pitch);
+//	yaw = GroundData::normalize(yaw);
+//	std::cout << "ground (1: via pose transformation)(roll, pitch, yaw) " <<  roll << " " << pitch << " " << yaw << std::endl;
+
+
+
+	double roll, pitch, yaw;
 	tf::Vector3 groundNormal(measurePoint.groundData.a, measurePoint.groundData.b, measurePoint.groundData.c);
-	tf::Vector3 transformedGroundNormal = (measurePoint.headToFootprint()
+	tf::Vector3 transformedGroundNormal = measurePoint.fixedToFootprint * (measurePoint.headToFixed
 			* (cameraToHeadTransform
 					* (measurePoint.opticalToCamera
 							* groundNormal)));
@@ -58,13 +66,11 @@ void EdgeMarkerMeasurement::computeError() {
 	transformedGroundData.b = transformedGroundNormal[1];
 	transformedGroundData.c = transformedGroundNormal[2];
 	transformedGroundData.d = 0;
-	tf::Matrix3x3(transformedGroundData.getPose().getRotation()).getRPY(roll, pitch, yaw);
-	std::cout << "ground (2a: via normal transformation)(roll, pitch, yaw) " <<  roll << " " << pitch << " " << yaw << std::endl;
 	transformedGroundData.getRPY(roll, pitch, yaw);
-	std::cout << "ground (2b: via normal transformation)(roll, pitch, yaw) " <<  roll << " " << pitch << " " << yaw << std::endl;
+	//std::cout << "ground (2: via normal transformation)(roll, pitch, yaw) " <<  roll << " " << pitch << " " << yaw << std::endl;
 
-	_error[3] = roll*1;
-	_error[4] = pitch*1;
+	_error[3] = roll;
+	_error[4] = pitch;
 
 }
 

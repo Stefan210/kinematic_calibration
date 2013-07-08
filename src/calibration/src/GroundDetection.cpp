@@ -120,7 +120,7 @@ void GroundData::getRPY(double& roll, double& pitch, double& yaw) const {
 
 	// pitch is the angle between the normal vector projected into the XZ-plane
 	pitch = normalize(normalXY.angle(tf::Vector3(a, 0, c)));
-	std::cout << "(roll, pitch)(1): " << roll << " " << pitch << std::endl;
+	//std::cout << "(roll, pitch)(1): " << roll << " " << pitch << std::endl;
 
 	// NOTE: same as above, just without normals...
 	/*
