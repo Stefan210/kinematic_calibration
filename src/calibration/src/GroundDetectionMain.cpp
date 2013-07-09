@@ -36,24 +36,34 @@ void msg_cb(const sensor_msgs::PointCloud2& input) {
 	tf::Vector3 groundNormal(groundData.a, groundData.b, groundData.c);
 	tf::Vector3 transformedGroundNormal;
 	tf::StampedTransform transform;
+	double r, p, y;
 
 	ROS_INFO("Message received.");
 
-	ptf->lookupTransform("/base_footprint", input.header.frame_id, ros::Time(0), transform);
+	ptf->lookupTransform("/base_footprint", input.header.frame_id, ros::Time(0),
+			transform);
 
-	transformedGroundNormal = transform * groundNormal;
+	/*
+	transformedGroundNormal = (transform.getBasis().inverse()).transpose()
+			* groundNormal;
 	groundData.a = transformedGroundNormal[0];
 	groundData.b = transformedGroundNormal[1];
 	groundData.c = transformedGroundNormal[2];
 	groundData.d = 0;
 
 	tf::Pose tfPose = groundData.getPose();
-	double r, p, y;
+	*/
+
+	tf::Pose tfPose = transform * groundData.getPose();
+
 	tf::Matrix3x3(tfPose.getRotation()).getRPY(r, p, y);
+	r = GroundData::normalize(r);
+	p = GroundData::normalize(p);
+	y = GroundData::normalize(y);
 	ROS_INFO("r: %f, p: %f, y: %f", r, p, y);
 
 	ROS_INFO("Sending marker.");
-	marker.header.frame_id = "/base_footprint";//input.header.frame_id;
+	marker.header.frame_id = "/base_footprint"; //input.header.frame_id;
 	marker.header.stamp = input.header.stamp;
 	marker.ns = "my_namespace";
 	marker.id = 0;
@@ -62,12 +72,12 @@ void msg_cb(const sensor_msgs::PointCloud2& input) {
 	marker.pose.orientation.x = r;
 	marker.pose.orientation.y = p;
 	marker.pose.orientation.z = y;
-	marker.pose.position.x = 1;
+	marker.pose.position.x = 0;
 	marker.pose.position.y = 0;
 	marker.pose.position.z = 0;
-	marker.scale.x = 0.15;
-	marker.scale.y = 0.15;
-	marker.scale.z = 0.15;
+	marker.scale.x = 10;
+	marker.scale.y = 10;
+	marker.scale.z = 0.1;
 	marker.color.a = 1.0;
 	marker.color.r = 0.0;
 	marker.color.g = 1.0;
@@ -76,7 +86,6 @@ void msg_cb(const sensor_msgs::PointCloud2& input) {
 		marker_pub.publish(marker);
 	}
 	ros::spinOnce();
-
 
 }
 
