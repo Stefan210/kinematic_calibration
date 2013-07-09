@@ -27,6 +27,12 @@ class LocalTransformOptimization : public CameraTransformOptimization {
 public:
 	LocalTransformOptimization();
 	virtual ~LocalTransformOptimization();
+
+protected:
+	float stepwidth;
+	bool decreaseStepwidth();
+	float calculateError(tf::Transform& FrameAToFrameB);
+	std::vector<LtoState> getNeighbors(LtoState& current);
 };
 
 
@@ -36,10 +42,6 @@ public:
 	virtual ~HillClimbingTransformOptimization();
 	virtual void optimizeTransform(tf::Transform& FrameAToFrameB);
 
-protected:
-	float stepwidth;
-	bool decreaseStepwidth();
-	float calculateError(tf::Transform& FrameAToFrameB);
-	std::vector<LtoState> getNeighbors(LtoState& current);
+
 };
 #endif /* LOCALTRANSFORMOPTIMIZATION_H_ */

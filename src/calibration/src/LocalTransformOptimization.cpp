@@ -9,7 +9,7 @@
 
 #include <tf/tf.h>
 
-LocalTransformOptimization::LocalTransformOptimization() {
+LocalTransformOptimization::LocalTransformOptimization() : stepwidth(0.1) {
 	// TODO Auto-generated constructor stub
 
 }
@@ -18,7 +18,7 @@ LocalTransformOptimization::~LocalTransformOptimization() {
 	// TODO Auto-generated destructor stub
 }
 
-HillClimbingTransformOptimization::HillClimbingTransformOptimization() : stepwidth(0.1) {
+HillClimbingTransformOptimization::HillClimbingTransformOptimization() {
 }
 
 HillClimbingTransformOptimization::~HillClimbingTransformOptimization() {
@@ -63,8 +63,8 @@ void HillClimbingTransformOptimization::optimizeTransform(
 	FrameAToFrameB = *(new tf::Transform(currentState.cameraToHead));
 }
 
-bool HillClimbingTransformOptimization::decreaseStepwidth() {
-	double minStepwidth = 0.0000001; //todo: injection/parameterize
+bool LocalTransformOptimization::decreaseStepwidth() {
+	double minStepwidth = 1e-12; //todo: injection/parameterize
 	this->stepwidth /= 10;
 	if(this->stepwidth < minStepwidth) {
 		return false;
@@ -72,7 +72,7 @@ bool HillClimbingTransformOptimization::decreaseStepwidth() {
 	return true;
 }
 
-float HillClimbingTransformOptimization::calculateError(
+float LocalTransformOptimization::calculateError(
 		tf::Transform& cameraToHead) {
 	float error = 0;
 	int numOfPoints = this->measurePoints.size();
@@ -104,10 +104,14 @@ float HillClimbingTransformOptimization::calculateError(
 	}*/
 	this->calculateSqrtDistFromMarker(cameraToHead, centerPoint, error);
 
-	return error;
+	// add ground angles
+	double roll, pitch;
+	this->getAvgRP(cameraToHead, roll, pitch);
+
+	return error + roll + pitch;
 }
 
-std::vector<LtoState> HillClimbingTransformOptimization::getNeighbors(
+std::vector<LtoState> LocalTransformOptimization::getNeighbors(
 		LtoState& current) {
 	std::vector<LtoState> neighbours;
 	std::vector<tf::Transform> transforms;
