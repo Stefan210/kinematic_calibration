@@ -24,8 +24,23 @@ public:
 	tf::Transform fixedToFootprint;
 	ros::Time stamp;
 
-	inline const tf::Transform headToFootprint() const {return fixedToFootprint * headToFixed;}
-	inline const tf::Pose groundPose() const {return groundData.getPose();}
+	inline const tf::Transform headToFootprint() const {
+		return fixedToFootprint * headToFixed;
+	}
+
+	inline const tf::Pose groundPose() const {
+		return groundData.getPose();
+	}
+
+	inline const tf::Transform opticalToFootprint(
+			tf::Transform cameraToHead) const {
+		return fixedToFootprint * opticalToFixed(cameraToHead);
+	}
+
+	inline const tf::Transform opticalToFixed(
+			tf::Transform cameraToHead) const {
+		return headToFixed * cameraToHead * opticalToCamera;
+	}
 
 	friend ostream &operator<<(ostream &output, const CameraMeasurePoint &cmp) {
 		output << " " << cmp.measuredPosition;
@@ -48,7 +63,8 @@ public:
 		input >> cmp.stamp.nsec;
 		return input;
 	}
-};
+}
+;
 
 typedef CameraMeasurePoint MeasurePoint;
 
