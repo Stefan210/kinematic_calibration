@@ -124,15 +124,25 @@ void GroundData::getRPY(double& roll, double& pitch, double& yaw) const {
 
 	// NOTE: same as above, just without normals...
 	/*
-	roll = normalize(M_PI_2 - tf::Vector3(0, 1, 0).angle(tf::Vector3(0, b, c)));
-	pitch = normalize(
-			M_PI_2 - tf::Vector3(1, 0, 0).angle(tf::Vector3(a, 0, c)));
-	std::cout << "(roll, pitch)(2): " << roll << " " << pitch << std::endl;
-	*/
+	 roll = normalize(M_PI_2 - tf::Vector3(0, 1, 0).angle(tf::Vector3(0, b, c)));
+	 pitch = normalize(
+	 M_PI_2 - tf::Vector3(1, 0, 0).angle(tf::Vector3(a, 0, c)));
+	 std::cout << "(roll, pitch)(2): " << roll << " " << pitch << std::endl;
+	 */
 
 	// yaw is the angle between the normal to the XZ-plane and the normal of the plane projected into the XZ-Plane
+	// NOTE: we don't need yaw...
 	tf::Vector3 normalXZ(0, 1, 0);
 	yaw = normalize(normalXZ.angle(tf::Vector3(a, b, 0)));
+
+	// third way...
+	/*
+	tf::Vector3 v = tf::Vector3(a, b, c).cross(tf::Vector3(1, 0, 0));
+	tf::Vector3 u = v.cross(tf::Vector3(a, b, c));
+	roll = std::acos(v.normalized().dot(tf::Vector3(0, 1, 0)));
+	pitch = std::acos(u.normalized().dot(tf::Vector3(1, 0, 0)));
+	std::cout << "(roll, pitch)(3): " << roll << " " << pitch << std::endl;
+	*/
 }
 
 double GroundData::normalize(double angle) {
