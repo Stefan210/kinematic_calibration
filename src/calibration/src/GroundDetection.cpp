@@ -15,6 +15,8 @@
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl/filters/passthrough.h>
 
+#include <math.h>
+
 GroundDetection::GroundDetection() {
 	// TODO Auto-generated constructor stub
 
@@ -33,7 +35,11 @@ GroundData GroundDetection::getGroundData(
 					new pcl::PointCloud<pcl::PointXYZRGB>());
 
 	filterRange(initialCloud, cloudDistanceFiltered);
-	segmentPlane(cloudDistanceFiltered, gd);
+	//segmentPlane(cloudDistanceFiltered, gd);
+	segmentPlane(initialCloud, gd);
+
+	if(isnan(gd.a) || isnan(gd.b) || isnan(gd.c))
+		throw "Could not detect the plane: One or more of the plane coefficients is nan.";
 
 	return gd;
 }
