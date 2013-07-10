@@ -138,6 +138,10 @@ int main(int argc, char** argv) {
 	compositeTransformOptimization->addTransformOptimization("g2o(1,1,1,0.1,0.1)",
 			g2oTransformOptimization5);
 
+	// hill climbing
+	HillClimbingTransformOptimization* hillClimbing = new HillClimbingTransformOptimization();
+	compositeTransformOptimization->addTransformOptimization("hillClimbing", hillClimbing);
+
 	options.setTransformOptimization(compositeTransformOptimization);
 
 	// parse command line arguments
@@ -228,12 +232,6 @@ void CameraCalibration::pointcloudMsgCb(const sensor_msgs::PointCloud2& input) {
 					newMeasurePoint);
 			this->measurementSeries.push_back(newMeasurePoint);
 			outputMeasurePoint(newMeasurePoint);
-
-			// TODO: don't use a hard coded criteria for starting the optimization!
-			// if there are enough measurement series, start the optimization
-			if (this->measurementSeries.size() == 15 && false) {
-				startOptimization();
-			}
 		}
 		currentBallMeasurements.clear();
 		currentGroundMeasurements.clear();
