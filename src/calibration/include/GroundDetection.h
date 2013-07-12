@@ -32,6 +32,8 @@ public:
 	float a, b, c, d;
 	tf::Pose getPose() const;
 	void getRPY(double& roll, double& pitch, double& yaw) const;
+	void setEquation(float a, float b, float c, float d);
+	GroundData transform(tf::Transform) const;
 
 	friend ostream &operator<<(ostream &output, const GroundData &gd) {
 		output << " " << gd.a << " " << gd.b << " " << gd.c << " " << gd.d;
@@ -40,11 +42,19 @@ public:
 
 	friend istream &operator>>(istream &input, GroundData &gd) {
 		input >> gd.a >> gd.b >> gd.c >> gd.d;
+		gd.setEquation(gd.a, gd.b, gd.c, gd.d);
 		return input;
 	}
 
 	// returns an angle between [-PI_2, PI_2]
 	static double normalize(double angle);
+
+protected:
+	void calculatePointsFromEquation();
+	void calculateEquationFromPoints();
+	tf::Vector3 pointOne;
+	tf::Vector3 pointTwo;
+	tf::Vector3 pointThree;
 
 private:
 	FRIEND_TEST(GroundDataTest, normalizeTest);

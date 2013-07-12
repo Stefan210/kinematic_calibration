@@ -17,6 +17,8 @@
 
 #include <math.h>
 
+#include <Eigen/Dense>
+
 GroundDetection::GroundDetection() {
 	// TODO Auto-generated constructor stub
 
@@ -38,7 +40,7 @@ GroundData GroundDetection::getGroundData(
 	//segmentPlane(cloudDistanceFiltered, gd);
 	segmentPlane(initialCloud, gd);
 
-	if(isnan(gd.a) || isnan(gd.b) || isnan(gd.c))
+	if (isnan(gd.a) || isnan(gd.b) || isnan(gd.c))
 		throw "Could not detect the plane: One or more of the plane coefficients is nan.";
 
 	return gd;
@@ -143,12 +145,20 @@ void GroundData::getRPY(double& roll, double& pitch, double& yaw) const {
 
 	// third way...
 	/*
-	tf::Vector3 v = tf::Vector3(a, b, c).cross(tf::Vector3(1, 0, 0));
-	tf::Vector3 u = v.cross(tf::Vector3(a, b, c));
-	roll = std::acos(v.normalized().dot(tf::Vector3(0, 1, 0)));
-	pitch = std::acos(u.normalized().dot(tf::Vector3(1, 0, 0)));
-	std::cout << "(roll, pitch)(3): " << roll << " " << pitch << std::endl;
-	*/
+	 tf::Vector3 v = tf::Vector3(a, b, c).cross(tf::Vector3(1, 0, 0));
+	 tf::Vector3 u = v.cross(tf::Vector3(a, b, c));
+	 roll = std::acos(v.normalized().dot(tf::Vector3(0, 1, 0)));
+	 pitch = std::acos(u.normalized().dot(tf::Vector3(1, 0, 0)));
+	 std::cout << "(roll, pitch)(3): " << roll << " " << pitch << std::endl;
+	 */
+}
+
+void GroundData::setEquation(float a, float b, float c, float d) {
+	this->a = a;
+	this->b = b;
+	this->c = c;
+	this->d = d;
+	calculatePointsFromEquation();
 }
 
 double GroundData::normalize(double angle) {
@@ -161,5 +171,40 @@ double GroundData::normalize(double angle) {
 	}
 
 	return angle;
+}
+
+void GroundData::calculatePointsFromEquation() {
+	// points have to fulfill ax+by+cz+d=0 <=> ax+by+cz=-d
+
+	// x=-d/a, y=z=0 fulfills the equation
+	this->pointOne = tf::Vector3(-d / a, 0, 0);
+
+	// y=-d/b, x=z=0 fulfills the equation
+	this->pointTwo = tf::Vector3(0, -d / b, 0);
+
+	// z=-d/c, x=y=0 fulfills the equation
+	this->pointThree = tf::Vector3(0, 0, -d / c);
+}
+
+GroundData GroundData::transform(tf::Transform transform) const {
+	GroundData gd;
+	gd.pointOne = transform * this->pointOne;
+	gd.pointTwo = transform * this->pointTwo;
+	gd.pointThree = transform * this->pointThree;
+	gd.calculateEquationFromPoints();
+	return gd;
+}
+
+void GroundData::calculateEquationFromPoints() {
+	// using the three points, solve the LGS and get a, b, c (fixing d=1)
+	Eigen::Matrix3f A;
+	Eigen::Vector3f b;
+	A << pointOne.x(), pointOne.y(), pointOne.z(), pointTwo.x(), pointTwo.y(), pointTwo.z(), pointThree.x(), pointThree.y(), pointThree.z();
+	b << 1, 1, 1;
+	Eigen::Vector3f x = A.fullPivLu().solve(b);
+	this->a = x[0];
+	this->b = x[1];
+	this->c = x[2];
+	this->d = 1;
 }
 

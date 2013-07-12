@@ -42,7 +42,7 @@ TEST(GroundDetectionTest, simpleTest) {
 	ASSERT_DOUBLE_EQ(0.0, groundData.d);
 }
 
-TEST(GroundDetectionTest, transformTest) {
+TEST(GroundDetectionTest, transformNormalTest) {
 
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudPtr = pcl::PointCloud<
 			pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
@@ -91,7 +91,7 @@ TEST(GroundDetectionTest, transformTest) {
 
 	// transform normal vector
 	tf::Vector3 normalVector(groundData.a, groundData.b, groundData.c);
-	tf::Vector3 transformedNormalVector = transform.getBasis().transpose() * normalVector;
+	tf::Vector3 transformedNormalVector = transform.getBasis().transpose().inverse() * normalVector;
 	groundData.a = transformedNormalVector[0];
 	groundData.b = transformedNormalVector[1];
 	groundData.c = transformedNormalVector[2];
@@ -168,6 +168,24 @@ TEST(GroundDataTest, normalizeTest) {
 	ASSERT_NEAR(gd.normalize(-M_PI_2), -M_PI_2, 1e-6);
 	ASSERT_NEAR(gd.normalize(M_PI_2 + 1.0), - M_PI_2 + 1.0, 1e-6);
 	ASSERT_NEAR(gd.normalize(-M_PI_2 - 1.0), M_PI_2 -1.0, 1e-6);
+}
+
+TEST(GroundDataTest, transformTest) {
+	GroundData gd;
+	gd.setEquation(1, 2, 3, 4);
+	tf::Vector3 normal = tf::Vector3(1, 2, 3);
+	tf::Transform transform(tf::Quaternion(0.5, 0.7, 0.3, 1), tf::Vector3(2, 1, 5));
+
+	// transform the normal "by hand"
+	tf::Vector3 transformedNormal1 = (transform.getBasis().transpose().inverse() * normal).normalized();
+
+	// transform using the GroundData API
+	GroundData transformedGd = gd.transform(transform);
+	tf::Vector3 transformedNormal2 = tf::Vector3(transformedGd.a, transformedGd.b, transformedGd.c).normalized();
+
+	ASSERT_NEAR(transformedNormal1.x(), transformedNormal2.x(), 1e-6);
+	ASSERT_NEAR(transformedNormal1.y(), transformedNormal2.y(), 1e-6);
+	ASSERT_NEAR(transformedNormal1.z(), transformedNormal2.z(), 1e-6);
 }
 
 

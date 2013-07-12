@@ -213,6 +213,10 @@ void CompositeTransformOptimization::optimizeTransform(
 	float smallestError = INFINITY;
 	float currentError = 0;
 
+	tf::Vector3 initialMarkerEstimate;
+	this->getMarkerEstimate(this->initialTransformCameraToHead, initialMarkerEstimate);
+	printResult("initial", this->initialTransformCameraToHead, initialMarkerEstimate);
+
 	// return the transform with the smallest error
 	for (map<string, CameraTransformOptimization*>::const_iterator it =
 			this->optimizer.begin(); it != this->optimizer.end(); ++it) {
