@@ -103,27 +103,22 @@ void CameraTransformOptimization::printResult(std::string pre,
 	std::cout << "\n\n";
 }
 
-void CameraTransformOptimization::getAvgRP(const tf::Transform&  cameraToHead, double& r,
-		double& p) {
+void CameraTransformOptimization::getAvgRP(const tf::Transform& cameraToHead,
+		double& r, double& p) {
 	r = 0;
 	p = 0;
 	double roll, pitch, yaw;
 	int size = this->measurePoints.size();
 	for (int i = 0; i < size; i++) {
 		CameraMeasurePoint measurePoint = this->measurePoints[i];
-		tf::Vector3 groundNormal(measurePoint.groundData.a,
-				measurePoint.groundData.b, measurePoint.groundData.c);
-		tf::Vector3 transformedGroundNormal =
-				measurePoint.fixedToFootprint
-						* (measurePoint.headToFixed
-								* (cameraToHead
-										* (measurePoint.opticalToCamera
-												* groundNormal)));
 		GroundData transformedGroundData;
-		transformedGroundData.a = transformedGroundNormal[0];
-		transformedGroundData.b = transformedGroundNormal[1];
-		transformedGroundData.c = transformedGroundNormal[2];
-		transformedGroundData.d = 0;
+		transformedGroundData =
+				measurePoint.groundData.transform(
+						measurePoint.fixedToFootprint
+								* (measurePoint.headToFixed
+										* (cameraToHead
+												* (measurePoint.opticalToCamera))));
+
 		transformedGroundData.getRPY(roll, pitch, yaw);
 		r += std::abs(roll);
 		p += std::abs(pitch);
@@ -214,8 +209,10 @@ void CompositeTransformOptimization::optimizeTransform(
 	float currentError = 0;
 
 	tf::Vector3 initialMarkerEstimate;
-	this->getMarkerEstimate(this->initialTransformCameraToHead, initialMarkerEstimate);
-	printResult("initial", this->initialTransformCameraToHead, initialMarkerEstimate);
+	this->getMarkerEstimate(this->initialTransformCameraToHead,
+			initialMarkerEstimate);
+	printResult("initial", this->initialTransformCameraToHead,
+			initialMarkerEstimate);
 
 	// return the transform with the smallest error
 	for (map<string, CameraTransformOptimization*>::const_iterator it =
