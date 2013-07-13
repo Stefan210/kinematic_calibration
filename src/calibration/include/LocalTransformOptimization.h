@@ -32,7 +32,7 @@ protected:
 	float stepwidth;
 	bool decreaseStepwidth();
 	float calculateError(tf::Transform& FrameAToFrameB);
-	std::vector<LtoState> getNeighbors(LtoState& current);
+	virtual std::vector<LtoState> getNeighbors(LtoState& current);
 };
 
 
@@ -41,5 +41,16 @@ public:
 	HillClimbingTransformOptimization();
 	virtual ~HillClimbingTransformOptimization();
 	virtual void optimizeTransform(tf::Transform& FrameAToFrameB);
+};
+
+class SimulatedAnnealingTransformOptimization : public LocalTransformOptimization {
+public:
+	SimulatedAnnealingTransformOptimization();
+	virtual ~SimulatedAnnealingTransformOptimization();
+	virtual void optimizeTransform(tf::Transform& FrameAToFrameB);
+	virtual std::vector<LtoState> getNeighbors(LtoState& current);
+
+protected:
+	float startTemperature;
 };
 #endif /* LOCALTRANSFORMOPTIMIZATION_H_ */
