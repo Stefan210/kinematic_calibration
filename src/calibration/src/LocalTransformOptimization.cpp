@@ -64,7 +64,7 @@ void HillClimbingTransformOptimization::optimizeTransform(
 }
 
 bool LocalTransformOptimization::decreaseStepwidth() {
-	double minStepwidth = 1e-12; //todo: injection/parameterize
+	double minStepwidth = 1e-15; //1e-12 //todo: injection/parameterize
 	this->stepwidth /= 10;
 	if(this->stepwidth < minStepwidth) {
 		return false;

@@ -41,7 +41,5 @@ public:
 	HillClimbingTransformOptimization();
 	virtual ~HillClimbingTransformOptimization();
 	virtual void optimizeTransform(tf::Transform& FrameAToFrameB);
-
-
 };
 #endif /* LOCALTRANSFORMOPTIMIZATION_H_ */
