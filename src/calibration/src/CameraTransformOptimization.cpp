@@ -53,13 +53,11 @@ void CameraTransformOptimization::setInitialTransformCameraToHead(
 void CameraTransformOptimization::getMarkerEstimate(
 		const tf::Transform& cameraToHead, tf::Vector3& position) {
 	int numOfPoints = measurePoints.size();
-	float centerX = 0, centerY = 0, centerZ = 0;
+	double centerX = 0, centerY = 0, centerZ = 0;
 	for (int i = 0; i < numOfPoints; i++) {
 		MeasurePoint currentMeasure = measurePoints[i];
-		tf::Vector3 pointFixed = currentMeasure.headToFixed
-				* (cameraToHead
-						* (currentMeasure.opticalToCamera
-								* currentMeasure.measuredPosition));
+		tf::Vector3 pointFixed = currentMeasure.opticalToFixed(cameraToHead)
+				* currentMeasure.measuredPosition;
 		centerX += pointFixed.getX();
 		centerY += pointFixed.getY();
 		centerZ += pointFixed.getZ();
@@ -72,9 +70,9 @@ void CameraTransformOptimization::getMarkerEstimate(
 		 */
 	}
 
-	position[0] = (centerX / (float) numOfPoints);
-	position[1] = (centerY / (float) numOfPoints);
-	position[2] = (centerZ / (float) numOfPoints);
+	position[0] = (centerX / (double) numOfPoints);
+	position[1] = (centerY / (double) numOfPoints);
+	position[2] = (centerZ / (double) numOfPoints);
 }
 
 void CameraTransformOptimization::printResult(std::string pre,
@@ -112,8 +110,8 @@ void CameraTransformOptimization::getAvgRP(const tf::Transform& cameraToHead,
 	for (int i = 0; i < size; i++) {
 		CameraMeasurePoint measurePoint = this->measurePoints[i];
 		GroundData transformedGroundData;
-		transformedGroundData =
-				measurePoint.groundData.transform(measurePoint.opticalToFootprint(cameraToHead));
+		transformedGroundData = measurePoint.groundData.transform(
+				measurePoint.opticalToFootprint(cameraToHead));
 
 		transformedGroundData.getRPY(roll, pitch, yaw);
 		r += fabs(roll);
@@ -130,7 +128,7 @@ bool CameraTransformOptimization::canStop() {
 	if (error < minError)
 		return true;
 
-	if (std::abs(lastError - error) < errorImprovement)
+	if (fabs(lastError - error) < errorImprovement)
 		return true;
 
 	return false;
