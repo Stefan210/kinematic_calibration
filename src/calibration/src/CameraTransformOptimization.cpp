@@ -113,11 +113,7 @@ void CameraTransformOptimization::getAvgRP(const tf::Transform& cameraToHead,
 		CameraMeasurePoint measurePoint = this->measurePoints[i];
 		GroundData transformedGroundData;
 		transformedGroundData =
-				measurePoint.groundData.transform(
-						measurePoint.fixedToFootprint
-								* (measurePoint.headToFixed
-										* (cameraToHead
-												* (measurePoint.opticalToCamera))));
+				measurePoint.groundData.transform(measurePoint.opticalToFootprint(cameraToHead));
 
 		transformedGroundData.getRPY(roll, pitch, yaw);
 		r += fabs(roll);

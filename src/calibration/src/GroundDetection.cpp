@@ -200,11 +200,11 @@ void GroundData::calculateEquationFromPoints() {
 	Eigen::Matrix3f A;
 	Eigen::Vector3f b;
 	A << pointOne.x(), pointOne.y(), pointOne.z(), pointTwo.x(), pointTwo.y(), pointTwo.z(), pointThree.x(), pointThree.y(), pointThree.z();
-	b << 1, 1, 1;
+	b << -1, -1, -1;
 	Eigen::Vector3f x = A.fullPivLu().solve(b);
 	this->a = x[0];
 	this->b = x[1];
 	this->c = x[2];
-	this->d = -1;
+	this->d = 1;
 }
 

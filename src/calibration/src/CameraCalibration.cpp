@@ -76,12 +76,13 @@ int main(int argc, char** argv) {
 	// 1st g2o
 	G2oTransformOptimization* g2oTransformOptimization1 =
 			new G2oTransformOptimization();
-	Eigen::Matrix<double,5,5> correlationMatrix1 = Eigen::Matrix<double,5,5>::Identity();
-	correlationMatrix1(0,0) = 1.0;
-	correlationMatrix1(1,1) = 1.0;
-	correlationMatrix1(2,2) = 1.0;
-	correlationMatrix1(3,3) = 1.0;
-	correlationMatrix1(4,4) = 1.0;
+	Eigen::Matrix<double, 5, 5> correlationMatrix1 =
+			Eigen::Matrix<double, 5, 5>::Identity();
+	correlationMatrix1(0, 0) = 1.0;
+	correlationMatrix1(1, 1) = 1.0;
+	correlationMatrix1(2, 2) = 1.0;
+	correlationMatrix1(3, 3) = 1.0;
+	correlationMatrix1(4, 4) = 1.0;
 	g2oTransformOptimization1->setCorrelationMatrix(correlationMatrix1);
 	compositeTransformOptimization->addTransformOptimization("g2o(1,1,1,1,1)",
 			g2oTransformOptimization1);
@@ -89,12 +90,13 @@ int main(int argc, char** argv) {
 	// 2nd g2o
 	G2oTransformOptimization* g2oTransformOptimization2 =
 			new G2oTransformOptimization();
-	Eigen::Matrix<double,5,5> correlationMatrix2 = Eigen::Matrix<double,5,5>::Identity();
-	correlationMatrix2(0,0) = 1.0;
-	correlationMatrix2(1,1) = 1.0;
-	correlationMatrix2(2,2) = 1.0;
-	correlationMatrix2(3,3) = 0.0;
-	correlationMatrix2(4,4) = 0.0;
+	Eigen::Matrix<double, 5, 5> correlationMatrix2 =
+			Eigen::Matrix<double, 5, 5>::Identity();
+	correlationMatrix2(0, 0) = 1.0;
+	correlationMatrix2(1, 1) = 1.0;
+	correlationMatrix2(2, 2) = 1.0;
+	correlationMatrix2(3, 3) = 0.0;
+	correlationMatrix2(4, 4) = 0.0;
 	g2oTransformOptimization2->setCorrelationMatrix(correlationMatrix2);
 	compositeTransformOptimization->addTransformOptimization("g2o(1,1,1,0,0)",
 			g2oTransformOptimization2);
@@ -102,12 +104,13 @@ int main(int argc, char** argv) {
 	// 3rd g2o
 	G2oTransformOptimization* g2oTransformOptimization3 =
 			new G2oTransformOptimization();
-	Eigen::Matrix<double,5,5> correlationMatrix3 = Eigen::Matrix<double,5,5>::Identity();
-	correlationMatrix3(0,0) = 0.0;
-	correlationMatrix3(1,1) = 0.0;
-	correlationMatrix3(2,2) = 0.0;
-	correlationMatrix3(3,3) = 1.0;
-	correlationMatrix3(4,4) = 1.0;
+	Eigen::Matrix<double, 5, 5> correlationMatrix3 =
+			Eigen::Matrix<double, 5, 5>::Identity();
+	correlationMatrix3(0, 0) = 0.0;
+	correlationMatrix3(1, 1) = 0.0;
+	correlationMatrix3(2, 2) = 0.0;
+	correlationMatrix3(3, 3) = 1.0;
+	correlationMatrix3(4, 4) = 1.0;
 	g2oTransformOptimization3->setCorrelationMatrix(correlationMatrix3);
 	compositeTransformOptimization->addTransformOptimization("g2o(0,0,0,1,1)",
 			g2oTransformOptimization3);
@@ -115,12 +118,13 @@ int main(int argc, char** argv) {
 	// 4th g2o
 	G2oTransformOptimization* g2oTransformOptimization4 =
 			new G2oTransformOptimization();
-	Eigen::Matrix<double,5,5> correlationMatrix4 = Eigen::Matrix<double,5,5>::Identity();
-	correlationMatrix4(0,0) = 1.0;
-	correlationMatrix4(1,1) = 1.0;
-	correlationMatrix4(2,2) = 1.0;
-	correlationMatrix4(3,3) = 10.0;
-	correlationMatrix4(4,4) = 10.0;
+	Eigen::Matrix<double, 5, 5> correlationMatrix4 =
+			Eigen::Matrix<double, 5, 5>::Identity();
+	correlationMatrix4(0, 0) = 1.0;
+	correlationMatrix4(1, 1) = 1.0;
+	correlationMatrix4(2, 2) = 1.0;
+	correlationMatrix4(3, 3) = 10.0;
+	correlationMatrix4(4, 4) = 10.0;
 	g2oTransformOptimization4->setCorrelationMatrix(correlationMatrix4);
 	compositeTransformOptimization->addTransformOptimization("g2o(1,1,1,10,10)",
 			g2oTransformOptimization4);
@@ -128,37 +132,41 @@ int main(int argc, char** argv) {
 	// 5th g2o
 	G2oTransformOptimization* g2oTransformOptimization5 =
 			new G2oTransformOptimization();
-	Eigen::Matrix<double,5,5> correlationMatrix5 = Eigen::Matrix<double,5,5>::Identity();
-	correlationMatrix5(0,0) = 1.0;
-	correlationMatrix5(1,1) = 1.0;
-	correlationMatrix5(2,2) = 1.0;
-	correlationMatrix5(3,3) = 0.1;
-	correlationMatrix5(4,4) = 0.1;
+	Eigen::Matrix<double, 5, 5> correlationMatrix5 =
+			Eigen::Matrix<double, 5, 5>::Identity();
+	correlationMatrix5(0, 0) = 1.0;
+	correlationMatrix5(1, 1) = 1.0;
+	correlationMatrix5(2, 2) = 1.0;
+	correlationMatrix5(3, 3) = 0.1;
+	correlationMatrix5(4, 4) = 0.1;
 	g2oTransformOptimization5->setCorrelationMatrix(correlationMatrix5);
-	compositeTransformOptimization->addTransformOptimization("g2o(1,1,1,0.1,0.1)",
-			g2oTransformOptimization5);
+	compositeTransformOptimization->addTransformOptimization(
+			"g2o(1,1,1,0.1,0.1)", g2oTransformOptimization5);
 
 	// 6th g2o
 	G2oTransformOptimization* g2oTransformOptimization6 =
 			new G2oTransformOptimization();
-	Eigen::Matrix<double,5,5> correlationMatrix6 = Eigen::Matrix<double,5,5>::Identity();
-	correlationMatrix6(0,0) = 1.0;
-	correlationMatrix6(1,1) = 1.0;
-	correlationMatrix6(2,2) = 1.0;
-	correlationMatrix6(3,3) = 100.0;
-	correlationMatrix6(4,4) = 100.0;
+	Eigen::Matrix<double, 5, 5> correlationMatrix6 =
+			Eigen::Matrix<double, 5, 5>::Identity();
+	correlationMatrix6(0, 0) = 1.0;
+	correlationMatrix6(1, 1) = 1.0;
+	correlationMatrix6(2, 2) = 1.0;
+	correlationMatrix6(3, 3) = 100.0;
+	correlationMatrix6(4, 4) = 100.0;
 	g2oTransformOptimization6->setCorrelationMatrix(correlationMatrix6);
-	compositeTransformOptimization->addTransformOptimization("g2o(1,1,1,100,100)",
-			g2oTransformOptimization6);
+	compositeTransformOptimization->addTransformOptimization(
+			"g2o(1,1,1,100,100)", g2oTransformOptimization6);
 
 	// hill climbing
-	HillClimbingTransformOptimization* hillClimbing = new HillClimbingTransformOptimization();
-	compositeTransformOptimization->addTransformOptimization("hillClimbing", hillClimbing);
-/*
-	// simulated annealing
-	SimulatedAnnealingTransformOptimization* simulatedAnnealing = new SimulatedAnnealingTransformOptimization();
-	compositeTransformOptimization->addTransformOptimization("simulatedAnnealing", simulatedAnnealing);
-*/
+	HillClimbingTransformOptimization* hillClimbing =
+			new HillClimbingTransformOptimization();
+	compositeTransformOptimization->addTransformOptimization("hillClimbing",
+			hillClimbing);
+	/*
+	 // simulated annealing
+	 SimulatedAnnealingTransformOptimization* simulatedAnnealing = new SimulatedAnnealingTransformOptimization();
+	 compositeTransformOptimization->addTransformOptimization("simulatedAnnealing", simulatedAnnealing);
+	 */
 
 	options.setTransformOptimization(compositeTransformOptimization);
 
@@ -294,10 +302,8 @@ void CameraCalibration::outputMeasurePoint(
 	// get the transform between headFrame and cameraFrame and transform the current point to fixed frame
 	this->transformListener.lookupTransform(headFrame, cameraFrame,
 			currentTimestamps[currentTimestamps.size() - 1], cameraToHead);
-	tf::Vector3 pointFixed = newMeasurePoint.headToFixed
-			* (cameraToHead
-					* (newMeasurePoint.opticalToCamera
-							* newMeasurePoint.measuredPosition));
+	tf::Vector3 pointFixed = newMeasurePoint.opticalToFixed(cameraToHead)
+			* newMeasurePoint.measuredPosition;
 
 	// output ball position in optical and fixed frame
 	ROS_INFO(
@@ -305,13 +311,13 @@ void CameraCalibration::outputMeasurePoint(
 	ROS_INFO(
 			"Last measurement (average position, fixed frame): %f, %f, %f.", pointFixed.getX(), pointFixed.getY(), pointFixed.getZ());
 
-	GroundData transformedGroundData = newMeasurePoint.groundData.transform((newMeasurePoint.headToFootprint()
-			* (cameraToHead * (newMeasurePoint.opticalToCamera))));
+	GroundData transformedGroundData = newMeasurePoint.groundData.transform(
+			newMeasurePoint.opticalToFootprint(cameraToHead));
 
 	double roll, pitch, yaw;
 	transformedGroundData.getRPY(roll, pitch, yaw);
 	ROS_INFO(
-			"Ground (base_footprint): (roll, pitch): %f %f, (ax+by+cz+d=0), %fx+%fy+%fz+%f=0", roll, pitch, transformedGroundData.a, transformedGroundData.b, transformedGroundData.c, 0.0);
+			"Ground (base_footprint): (roll, pitch): %f %f, (ax+by+cz+d=0), %fx+%fy+%fz+%f=0", roll, pitch, transformedGroundData.a, transformedGroundData.b, transformedGroundData.c, transformedGroundData.d);
 }
 
 bool CameraCalibration::distanceTooBig(pcl::PointXYZ first,
