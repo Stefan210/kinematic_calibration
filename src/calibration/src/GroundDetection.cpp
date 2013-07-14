@@ -205,6 +205,6 @@ void GroundData::calculateEquationFromPoints() {
 	this->a = x[0];
 	this->b = x[1];
 	this->c = x[2];
-	this->d = 1;
+	this->d = -1;
 }
 

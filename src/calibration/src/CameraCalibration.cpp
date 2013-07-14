@@ -138,9 +138,27 @@ int main(int argc, char** argv) {
 	compositeTransformOptimization->addTransformOptimization("g2o(1,1,1,0.1,0.1)",
 			g2oTransformOptimization5);
 
+	// 6th g2o
+	G2oTransformOptimization* g2oTransformOptimization6 =
+			new G2oTransformOptimization();
+	Eigen::Matrix<double,5,5> correlationMatrix6 = Eigen::Matrix<double,5,5>::Identity();
+	correlationMatrix6(0,0) = 1.0;
+	correlationMatrix6(1,1) = 1.0;
+	correlationMatrix6(2,2) = 1.0;
+	correlationMatrix6(3,3) = 100.0;
+	correlationMatrix6(4,4) = 100.0;
+	g2oTransformOptimization6->setCorrelationMatrix(correlationMatrix6);
+	compositeTransformOptimization->addTransformOptimization("g2o(1,1,1,100,100)",
+			g2oTransformOptimization6);
+
 	// hill climbing
 	HillClimbingTransformOptimization* hillClimbing = new HillClimbingTransformOptimization();
 	compositeTransformOptimization->addTransformOptimization("hillClimbing", hillClimbing);
+/*
+	// simulated annealing
+	SimulatedAnnealingTransformOptimization* simulatedAnnealing = new SimulatedAnnealingTransformOptimization();
+	compositeTransformOptimization->addTransformOptimization("simulatedAnnealing", simulatedAnnealing);
+*/
 
 	options.setTransformOptimization(compositeTransformOptimization);
 
@@ -287,15 +305,9 @@ void CameraCalibration::outputMeasurePoint(
 	ROS_INFO(
 			"Last measurement (average position, fixed frame): %f, %f, %f.", pointFixed.getX(), pointFixed.getY(), pointFixed.getZ());
 
-	tf::Vector3 groundNormal(newMeasurePoint.groundData.a,
-			newMeasurePoint.groundData.b, newMeasurePoint.groundData.c);
-	tf::Vector3 transformedGroundNormal = (newMeasurePoint.headToFootprint()
-			* (cameraToHead * (newMeasurePoint.opticalToCamera * groundNormal)));
-	GroundData transformedGroundData;
-	transformedGroundData.a = transformedGroundNormal[0];
-	transformedGroundData.b = transformedGroundNormal[1];
-	transformedGroundData.c = transformedGroundNormal[2];
-	transformedGroundData.d = 0;
+	GroundData transformedGroundData = newMeasurePoint.groundData.transform((newMeasurePoint.headToFootprint()
+			* (cameraToHead * (newMeasurePoint.opticalToCamera))));
+
 	double roll, pitch, yaw;
 	transformedGroundData.getRPY(roll, pitch, yaw);
 	ROS_INFO(

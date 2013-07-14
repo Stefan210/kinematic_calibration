@@ -50,11 +50,15 @@ void G2oTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 
 	// create the block solver on top of the linear solver
 	MyBlockSolver* blockSolver = new MyBlockSolver(linearSolver);
+	blockSolver->setLevenberg(true);
 
 	// create the algorithm to carry out the optimization
-	//OptimizationAlgorithmGaussNewton* optimizationAlgorithm = new OptimizationAlgorithmGaussNewton(blockSolver);
+//	OptimizationAlgorithmGaussNewton* algorithm = new OptimizationAlgorithmGaussNewton(blockSolver);
+
 	OptimizationAlgorithmLevenberg* algorithm =
 			new OptimizationAlgorithmLevenberg(blockSolver);
+//	algorithm->setMaxTrialsAfterFailure(10000);
+//	algorithm->setUserLambdaInit(1/1000);
 
 	optimizer.setAlgorithm(algorithm);
 
@@ -105,7 +109,7 @@ void G2oTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 
 	optimizer.initializeOptimization();
 	optimizer.computeActiveErrors();
-	//optimizer.setVerbose(true);
+//	optimizer.setVerbose(true);
 	optimizer.optimize(100);
 	cameraToHead = transformationVertex->estimate();
 

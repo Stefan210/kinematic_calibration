@@ -81,11 +81,11 @@ public:
 	void getAvgRP(const tf::Transform&  cameraToHead, double& r,
 			double& p);
 
-	float getMaxIterations() const {
+	int getMaxIterations() const {
 		return maxIterations;
 	}
 
-	void setMaxIterations(float maxIterations) {
+	void setMaxIterations(int maxIterations) {
 		this->maxIterations = maxIterations;
 	}
 
@@ -114,7 +114,7 @@ protected:
 	float lastError;
 	float errorImprovement;
 	float minError;
-	float maxIterations;
+	int maxIterations;
 
 };
 
