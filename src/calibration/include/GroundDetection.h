@@ -29,7 +29,7 @@ using namespace std;
 
 class GroundData {
 public:
-	float a, b, c, d;
+	double a, b, c, d;
 	tf::Pose getPose() const;
 	void getRPY(double& roll, double& pitch, double& yaw) const;
 	void setEquation(float a, float b, float c, float d);
@@ -52,12 +52,14 @@ public:
 protected:
 	void calculatePointsFromEquation();
 	void calculateEquationFromPoints();
+	void normalizeEquation();
 	tf::Vector3 pointOne;
 	tf::Vector3 pointTwo;
 	tf::Vector3 pointThree;
 
 private:
 	FRIEND_TEST(GroundDataTest, normalizeTest);
+	FRIEND_TEST(GroundDataTest, equationRoundtripTest);
 };
 
 /*

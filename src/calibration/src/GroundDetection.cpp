@@ -104,10 +104,8 @@ void GroundDetection::segmentPlane(
 	// Obtain the plane inliers and coefficients
 	segPlane.segment(*inliers_plane, *coefficients_plane);
 
-	gd.a = coefficients_plane->values[0];
-	gd.b = coefficients_plane->values[1];
-	gd.c = coefficients_plane->values[2];
-	gd.d = coefficients_plane->values[3];
+	gd.setEquation(coefficients_plane->values[0], coefficients_plane->values[1],
+			coefficients_plane->values[2], coefficients_plane->values[3]);
 }
 
 tf::Pose GroundData::getPose() const {
@@ -158,6 +156,11 @@ void GroundData::setEquation(float a, float b, float c, float d) {
 	this->b = b;
 	this->c = c;
 	this->d = d;
+	normalizeEquation();
+	/*
+	std::cout << "setEquation() " << a << "," << b << "," << c << "," << d
+			<< "\n";
+	*/
 	calculatePointsFromEquation();
 }
 
@@ -184,6 +187,15 @@ void GroundData::calculatePointsFromEquation() {
 
 	// z=-d/c, x=y=0 fulfills the equation
 	this->pointThree = tf::Vector3(0, 0, -d / c);
+
+	/*
+	std::cout << "c pointOne " << pointOne.x() << " " << pointOne.y() << " "
+			<< pointOne.z() << " ";
+	std::cout << "c pointTwo " << pointTwo.x() << " " << pointTwo.y() << " "
+			<< pointTwo.z() << " ";
+	std::cout << "c pointThree " << pointThree.x() << " " << pointThree.y()
+			<< " " << pointThree.z() << "\n";
+	*/
 }
 
 GroundData GroundData::transform(tf::Transform transform) const {
@@ -191,6 +203,16 @@ GroundData GroundData::transform(tf::Transform transform) const {
 	gd.pointOne = transform * this->pointOne;
 	gd.pointTwo = transform * this->pointTwo;
 	gd.pointThree = transform * this->pointThree;
+
+	/*
+	std::cout << "t pointOne " << pointOne.x() << " " << pointOne.y() << " "
+			<< pointOne.z() << " ";
+	std::cout << "t pointTwo " << pointTwo.x() << " " << pointTwo.y() << " "
+			<< pointTwo.z() << " ";
+	std::cout << "t pointThree " << pointThree.x() << " " << pointThree.y()
+			<< " " << pointThree.z() << "\n";
+	*/
+
 	gd.calculateEquationFromPoints();
 	return gd;
 }
@@ -206,5 +228,18 @@ void GroundData::calculateEquationFromPoints() {
 	this->b = x[1];
 	this->c = x[2];
 	this->d = 1;
+	normalizeEquation();
+	/*
+	std::cout << "calculateEquationFromPoints() " << this->a << "," << this->b
+			<< "," << this->c << "," << this->d << "\n";
+	*/
+}
+
+void GroundData::normalizeEquation() {
+	double length = fabs(a) + fabs(b) + fabs(c) + fabs(d);
+	a /= length;
+	b /= length;
+	c /= length;
+	d /= length;
 }
 
