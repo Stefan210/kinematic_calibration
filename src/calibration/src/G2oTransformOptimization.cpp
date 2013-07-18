@@ -20,6 +20,7 @@
 #include <g2o/core/optimization_algorithm_levenberg.h>
 #include <g2o/solvers/dense/linear_solver_dense.h>
 #include <g2o/solvers/pcg/linear_solver_pcg.h>
+#include <g2o/solvers/dense/linear_solver_dense.h>
 
 G2oTransformOptimization::G2oTransformOptimization() {
 	this->markerPositionOptimized = false;
@@ -38,14 +39,15 @@ G2oTransformOptimization::~G2oTransformOptimization() {
 void G2oTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 
 	typedef BlockSolver<BlockSolverTraits<-1, -1> > MyBlockSolver;
-	typedef LinearSolverPCG<MyBlockSolver::PoseMatrixType> MyLinearSolver;
+	typedef LinearSolverDense<MyBlockSolver::PoseMatrixType> MyLinearSolver;
+	//typedef LinearSolverPCG<MyBlockSolver::PoseMatrixType> MyLinearSolver;
 
 	// allocating the optimizer
 	SparseOptimizer optimizer;
 
 	// create the linear solver
 	MyLinearSolver* linearSolver = new MyLinearSolver();
-	linearSolver->setTolerance(1e-9);
+	//linearSolver->setTolerance(1e-9);
 	//linearSolver->setVerbose(true);
 
 	// create the block solver on top of the linear solver
