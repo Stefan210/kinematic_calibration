@@ -157,6 +157,34 @@ int main(int argc, char** argv) {
 	compositeTransformOptimization->addTransformOptimization(
 			"g2o(1,1,1,100,100)", g2oTransformOptimization6);
 
+	// 7th g2o
+	G2oTransformOptimization* g2oTransformOptimization7 =
+			new G2oTransformOptimization();
+	Eigen::Matrix<double, 5, 5> correlationMatrix7 =
+			Eigen::Matrix<double, 5, 5>::Identity();
+	correlationMatrix7(0, 0) = 1.0;
+	correlationMatrix7(1, 1) = 1.0;
+	correlationMatrix7(2, 2) = 1.0;
+	correlationMatrix7(3, 3) = 1000.0;
+	correlationMatrix7(4, 4) = 1000.0;
+	g2oTransformOptimization7->setCorrelationMatrix(correlationMatrix7);
+	compositeTransformOptimization->addTransformOptimization(
+			"g2o(1,1,1,1000,1000)", g2oTransformOptimization7);
+
+	// 8th g2o
+	G2oTransformOptimization* g2oTransformOptimization8 =
+			new G2oTransformOptimization();
+	Eigen::Matrix<double, 5, 5> correlationMatrix8 =
+			Eigen::Matrix<double, 5, 5>::Identity();
+	correlationMatrix8(0, 0) = 1.0;
+	correlationMatrix8(1, 1) = 1.0;
+	correlationMatrix8(2, 2) = 1.0;
+	correlationMatrix8(3, 3) = 10000.0;
+	correlationMatrix8(4, 4) = 10000.0;
+	g2oTransformOptimization8->setCorrelationMatrix(correlationMatrix8);
+	compositeTransformOptimization->addTransformOptimization(
+			"g2o(1,1,1,10000,10000)", g2oTransformOptimization8);
+
 	// hill climbing
 	HillClimbingTransformOptimization* hillClimbing =
 			new HillClimbingTransformOptimization();
@@ -311,13 +339,15 @@ void CameraCalibration::outputMeasurePoint(
 	ROS_INFO(
 			"Last measurement (average position, fixed frame): %f, %f, %f.", pointFixed.getX(), pointFixed.getY(), pointFixed.getZ());
 
-	GroundData transformedGroundData = newMeasurePoint.groundData.transform(
-			newMeasurePoint.opticalToFootprint(cameraToHead));
+	tf::Transform opticalToFootprint;
+	opticalToFootprint = newMeasurePoint.opticalToFootprint(cameraToHead);
+	GroundData transformedGroundData = newMeasurePoint.groundData.transform(opticalToFootprint);
 
 	double roll, pitch, yaw;
 	transformedGroundData.getRPY(roll, pitch, yaw);
 	ROS_INFO(
-			"Ground (base_footprint): (roll, pitch): %f %f, (ax+by+cz+d=0), %fx+%fy+%fz+%f=0", roll, pitch, transformedGroundData.a, transformedGroundData.b, transformedGroundData.c, transformedGroundData.d);
+			"Ground (base_footprint): (roll, pitch): %10f %10f, (ax+by+cz+d=0), %10fx+%10fy+%10fz+%10f=0", roll, pitch, transformedGroundData.a, transformedGroundData.b, transformedGroundData.c, transformedGroundData.d);
+	std::cout << "ground (r,p):" << roll << "," << pitch << ";" << "(ax+by+cz+d=0)" << transformedGroundData.a << "," << transformedGroundData.b << "," << transformedGroundData.c << "," << transformedGroundData.d;
 }
 
 bool CameraCalibration::distanceTooBig(pcl::PointXYZ first,
@@ -369,7 +399,7 @@ void CameraCalibration::createMeasurePoint(
 	newMeasurePoint.fixedToFootprint = fixedToFootprint;
 
 	// determine average position
-	float x = 0, y = 0, z = 0;
+	double x = 0, y = 0, z = 0;
 	int size = ballMeasurements.size();
 	for (int i = 0; i < size; i++) {
 		pcl::PointXYZ position = ballMeasurements[i].position;
@@ -378,22 +408,25 @@ void CameraCalibration::createMeasurePoint(
 		z += position.z;
 	}
 	newMeasurePoint.measuredPosition.setValue(x / size, y / size, z / size);
-
+/*
 	GroundData gdAvg;
+	gdAvg.setEquation(0,0,0,0);
 	size = groundMeasurements.size();
+	double a = 0, b = 0, c = 0, d = 0;
 	for (int i = 0; i < size; i++) {
-		float a = 0, b = 0, c = 0, d = 0;
 		GroundData gd = groundMeasurements[i];
-		gdAvg.a += gd.a;
-		gdAvg.b += gd.b;
-		gdAvg.c += gd.c;
-		gdAvg.d += gd.d;
+		a += gd.a;
+		b += gd.b;
+		c += gd.c;
+		d += gd.d;
 	}
-	gdAvg.a /= size;
-	gdAvg.b /= size;
-	gdAvg.c /= size;
-	gdAvg.d /= size;
-	newMeasurePoint.groundData = gdAvg;
+	a /= (double)size;
+	b /= (double)size;
+	c /= (double)size;
+	d /= (double)size;
+	gdAvg.setEquation(a, b, c, d);
+	newMeasurePoint.groundData = gdAvg;*/
+	newMeasurePoint.groundData = groundMeasurements[groundMeasurements.size()/2];
 }
 
 std::string CameraCalibrationOptions::getCameraFrame() const {
