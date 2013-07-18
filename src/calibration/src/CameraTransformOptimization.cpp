@@ -213,6 +213,7 @@ void CompositeTransformOptimization::optimizeTransform(
 			this->optimizer.begin(); it != this->optimizer.end(); ++it) {
 		tf::Transform transform;
 		tf::Vector3 markerPosition;
+		//it->second->removeOutliers();
 		it->second->optimizeTransform(transform);
 		it->second->getMarkerEstimate(transform, markerPosition);
 		this->calculateSqrtDistFromMarker(transform, markerPosition,
@@ -250,4 +251,32 @@ void CompositeTransformOptimization::setInitialTransformCameraToHead(
 	this->CameraTransformOptimization::setInitialTransformCameraToHead(
 			cameraToHead);
 }
+
+void CameraTransformOptimization::removeOutliers() {
+	std::vector<MeasurePoint> filteredMeasurePoints;
+	tf::Vector3 markerPosition;
+	getMarkerEstimate(this->initialTransformCameraToHead, markerPosition);
+	for(int i = 0; i < this->measurePoints.size(); i++) {
+		double r, p, y;
+		float error;
+		CameraMeasurePoint measurePoint = this->measurePoints[i];
+		markerPosition = measurePoint.opticalToFixed(this->initialTransformCameraToHead)*measurePoint.measuredPosition;
+		GroundData transformedGroundData;
+		transformedGroundData = measurePoint.groundData.transform(
+				measurePoint.opticalToFootprint(this->initialTransformCameraToHead));
+		transformedGroundData.getRPY(r, p, y);
+		std::cout << "(i) " << i << ";";
+		std::cout << "position (x,y,z):" << markerPosition[0] << ","
+				<< markerPosition[1] << "," << markerPosition[2] << ";";
+		std::cout << "ground (r,p):" << r << "," << p << ";";
+		std::cout << "\n";
+		if(fabs(r)+fabs(p) < 0.1) {
+			filteredMeasurePoints.push_back(measurePoint);
+		} else {
+			std::cout << "Removed!\n";
+		}
+	}
+	this->measurePoints = filteredMeasurePoints;
+}
+
 

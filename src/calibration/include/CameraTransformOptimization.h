@@ -81,6 +81,8 @@ public:
 	void getAvgRP(const tf::Transform&  cameraToHead, double& r,
 			double& p);
 
+	virtual void removeOutliers();
+
 	int getMaxIterations() const {
 		return maxIterations;
 	}
