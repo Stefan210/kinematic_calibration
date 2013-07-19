@@ -27,10 +27,10 @@ void EdgeMarkerMeasurement::computeError() {
 	Eigen::Vector3d markerPosition = vertexPosition->estimate();
 	tf::Transform cameraToHeadTransform = vertexTransf->estimate();
 
-	tf::Vector3 transformedMeasurement = (measurePoint.headToFixed
-			* (cameraToHeadTransform
-					* (measurePoint.opticalToCamera
-							* measurePoint.measuredPosition)));
+	tf::Transform opticalToFixedTransform = measurePoint.opticalToFixed(
+			cameraToHeadTransform);
+	tf::Vector3 transformedMeasurement = opticalToFixedTransform
+			* measurePoint.measuredPosition;
 
 	_error[0] = transformedMeasurement.getX() - markerPosition[0];
 	_error[1] = transformedMeasurement.getY() - markerPosition[1];
