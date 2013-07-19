@@ -79,12 +79,16 @@ void CameraTransformOptimization::printResult(std::string pre,
 		tf::Transform& cameraToHead, tf::Vector3 markerPosition) {
 	float error;
 	double r, p, y;
+	tf::Vector3 markerEstimate;
 
+	getMarkerEstimate(cameraToHead, markerEstimate);
 	calculateSqrtDistFromMarker(cameraToHead, markerPosition, error);
 	getAvgRP(cameraToHead, r, p);
 	std::cout << pre << ";";
-	std::cout << "position (x,y,z):" << markerPosition[0] << ","
+	std::cout << "position optimized (x,y,z):" << markerPosition[0] << ","
 			<< markerPosition[1] << "," << markerPosition[2] << ";";
+	std::cout << "position estimated (x,y,z):" << markerEstimate[0] << ","
+			<< markerEstimate[1] << "," << markerEstimate[2] << ";";
 	std::cout << "ground (r,p):" << r << "," << p << ";";
 	std::cout << "translation (x,y,z):" << cameraToHead.getOrigin()[0] << ","
 			<< cameraToHead.getOrigin()[1] << "," << cameraToHead.getOrigin()[2]
