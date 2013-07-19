@@ -111,7 +111,29 @@ float LocalTransformOptimization::calculateError(tf::Transform& cameraToHead) {
 	double roll, pitch;
 	this->getAvgRP(cameraToHead, roll, pitch);
 
-	return error + roll + pitch;
+	double a = 0, b = 0, c = 0, d = 0;
+	for (int i = 0; i < this->measurePoints.size(); i++) {
+		MeasurePoint& current = this->measurePoints[i];
+		tf::Transform opticalToFootprint = current.opticalToFootprint(
+				cameraToHead);
+		GroundData transformedGroundData = current.groundData.transform(
+				opticalToFootprint);
+		a += fabs(transformedGroundData.a);
+		b += fabs(transformedGroundData.b);
+		c += fabs(transformedGroundData.c);
+		d += fabs(transformedGroundData.d);
+	}
+	a /= (double) this->measurePoints.size();
+	b /= (double) this->measurePoints.size();
+	c /= (double) this->measurePoints.size();
+	d /= (double) this->measurePoints.size();
+
+	return fabs(d) + tf::Vector3(a, b, c).normalized().angle(tf::Vector3(0, 0, 1));
+	//return error + roll + pitch;
+//	return d * d
+//			+ tf::Vector3(a, b, c).normalized().angle(tf::Vector3(0, 0, 1))
+//					* tf::Vector3(a, b, c).normalized().angle(
+//							tf::Vector3(0, 0, 1));
 }
 
 std::vector<LtoState> LocalTransformOptimization::getNeighbors(
@@ -290,10 +312,10 @@ std::vector<LtoState> SimulatedAnnealingTransformOptimization::getNeighbors(
 
 	std::vector<LtoState> neighbours, allNeighbours;
 
-	for(double i = 0.01; i > 1e-8; i /= 10) {
+	for (double i = 0.01; i > 1e-8; i /= 10) {
 		stepwidth = i;
 		neighbours = LocalTransformOptimization::getNeighbors(current);
-		for(int j = 0; j < neighbours.size(); j++) {
+		for (int j = 0; j < neighbours.size(); j++) {
 			allNeighbours.push_back(neighbours[j]);
 		}
 		neighbours.clear();
