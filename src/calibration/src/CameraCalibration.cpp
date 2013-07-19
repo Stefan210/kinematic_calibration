@@ -185,6 +185,21 @@ int main(int argc, char** argv) {
 	compositeTransformOptimization->addTransformOptimization(
 			"g2o(1,1,1,10000,10000)", g2oTransformOptimization8);
 
+	// 9th g2o
+	G2oTransformOptimization* g2oTransformOptimization9 =
+			new G2oTransformOptimization();
+	Eigen::Matrix<double, 5, 5> correlationMatrix9 =
+			Eigen::Matrix<double, 5, 5>::Identity();
+	correlationMatrix9(0, 0) = 0.001;
+	correlationMatrix9(1, 1) = 0.001;
+	correlationMatrix9(2, 2) = 0.001;
+	correlationMatrix9(3, 3) = 1.0;
+	correlationMatrix9(4, 4) = 1.0;
+	g2oTransformOptimization9->setCorrelationMatrix(correlationMatrix9);
+	compositeTransformOptimization->addTransformOptimization(
+			"g2o(0.001,0.001,0.001,1,1)", g2oTransformOptimization9);
+
+
 	// hill climbing
 	HillClimbingTransformOptimization* hillClimbing =
 			new HillClimbingTransformOptimization();
