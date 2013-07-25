@@ -138,6 +138,7 @@ add_library(G2oOptimization
 	src/EdgeGroundMeasurement.cpp
 	src/VertexPosition3D.cpp
 	src/VertexTransformation3D.cpp
+	src/VertexOffset.cpp
 	)
 	
 target_link_libraries(G2oOptimization 
