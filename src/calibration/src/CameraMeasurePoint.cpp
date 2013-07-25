@@ -17,8 +17,32 @@ CameraMeasurePoint::~CameraMeasurePoint() {
 }
 
 CameraMeasurePoint CameraMeasurePoint::withHeadYawOffset(double headYawOffset) {
+	tf::Transform newHeadYawToTorso;
+	newHeadYawToTorso.setOrigin(this->headYawToTorso.getOrigin());
+	double r, p, y;
+	tf::Matrix3x3(this->headYawToTorso.getRotation()).getRPY(r, p, y);
+	tf::Quaternion newRotation;
+	newRotation.setRPY(r, p, y + headYawOffset);
+	newHeadYawToTorso.setRotation(newRotation);
+
+	CameraMeasurePoint newCameraMeasurePoint(*this);
+	newCameraMeasurePoint.setHeadYawToTorso(newHeadYawToTorso);
+
+	return newCameraMeasurePoint;
 }
 
 CameraMeasurePoint CameraMeasurePoint::withHeadPitchOffset(
 		double headPitchOffset) {
+	tf::Transform newHeadPitchToHeadYaw;
+	newHeadPitchToHeadYaw.setOrigin(this->headPitchToHeadYaw.getOrigin());
+	double r, p, y;
+	tf::Matrix3x3(this->headYawToTorso.getRotation()).getRPY(r, p, y);
+	tf::Quaternion newRotation;
+	newRotation.setRPY(r, p + headPitchOffset, y);
+	newHeadPitchToHeadYaw.setRotation(newRotation);
+
+	CameraMeasurePoint newCameraMeasurePoint(*this);
+	newCameraMeasurePoint.setHeadPitchToHeadYaw(newHeadPitchToHeadYaw);
+
+	return newCameraMeasurePoint;
 }
