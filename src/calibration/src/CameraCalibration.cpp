@@ -396,8 +396,10 @@ void CameraCalibration::createMeasurePoint(
 
 	// get transforms
 	tf::StampedTransform opticalToCamera;
-	tf::StampedTransform headToFixed;
+	tf::StampedTransform torsoToFixed;
 	tf::StampedTransform fixedToFootprint;
+	tf::StampedTransform headPitchToHeadYaw;
+	tf::StampedTransform headYawToTorso;
 
 	ros::Time time;
 	for (int i = timestamps.size() / 2; i < timestamps.size(); i++) {
@@ -410,12 +412,18 @@ void CameraCalibration::createMeasurePoint(
 	}
 	transformListener.lookupTransform(cameraFrame, opticalFrame, time,
 			opticalToCamera);
-	transformListener.lookupTransform(fixedFrame, headPitchFrame, time, headToFixed);
+	transformListener.lookupTransform(fixedFrame, torsoFrame, time, torsoToFixed);
 	transformListener.lookupTransform(footprintFrame, fixedFrame, time,
 			fixedToFootprint);
+	transformListener.lookupTransform(headYawFrame, headPitchFrame, time,
+			headPitchToHeadYaw);
+	transformListener.lookupTransform(torsoFrame, headYawFrame, time,
+			headYawToTorso);
 	newMeasurePoint.opticalToCamera = opticalToCamera;
-	newMeasurePoint.headToFixed = headToFixed;
+	newMeasurePoint.torsoToFixed = torsoToFixed;
 	newMeasurePoint.fixedToFootprint = fixedToFootprint;
+	newMeasurePoint.headPitchToHeadYaw = headPitchToHeadYaw;
+	newMeasurePoint.headYawToTorso = headYawToTorso;
 
 	// determine average position
 	double x = 0, y = 0, z = 0;
