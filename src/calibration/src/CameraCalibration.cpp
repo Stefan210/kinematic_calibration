@@ -23,6 +23,8 @@ CameraCalibration::CameraCalibration(CameraCalibrationOptions options) :
 	this->cameraFrame = options.getCameraFrame();
 	this->fixedFrame = options.getFixedFrame();
 	this->headPitchFrame = options.getHeadPitchFrame();
+	this->headYawFrame = options.getHeadYawFrame();
+	this->torsoFrame = options.getTorsoFrame();
 	this->footprintFrame = options.getFootprintFrame();
 	this->subscriber = nodeHandle.subscribe(this->pointCloudTopic, 1000,
 			&CameraCalibration::pointcloudMsgCb, this);
@@ -54,6 +56,8 @@ int main(int argc, char** argv) {
 	options.setCameraFrame(DEFAULT_CAMERA_FRAME);
 	options.setFixedFrame(DEFAULT_FIXED_FRAME);
 	options.setHeadPitchFrame(DEFAULT_HEADPITCH_FRAME);
+	options.setHeadYawFrame(DEFAULT_HEADYAW_FRAME);
+	options.setTorsoFrame(DEFAULT_TORSO_FRAME);
 	options.setFootprintFrame(DEFAULT_FOOTPRINT_FRAME);
 	TransformFactory* transformFactory = new TfTransformFactory(
 			DEFAULT_HEADPITCH_FRAME, DEFAULT_CAMERA_FRAME);
@@ -535,3 +539,18 @@ void CameraCalibrationOptions::setMinBallRadius(float minBallRadius) {
 	this->minBallRadius = minBallRadius;
 }
 
+std::string CameraCalibrationOptions::getHeadYawFrame() const {
+	return headYawFrame;
+}
+
+void CameraCalibrationOptions::setHeadYawFrame(std::string headYawFrame) {
+	this->headYawFrame = headYawFrame;
+}
+
+std::string CameraCalibrationOptions::getTorsoFrame() const {
+	return torsoFrame;
+}
+
+void CameraCalibrationOptions::setTorsoFrame(std::string torsoFrame) {
+	this->torsoFrame = torsoFrame;
+}

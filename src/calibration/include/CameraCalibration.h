@@ -32,7 +32,7 @@
 #define DEFAULT_CAMERA_FRAME "xtion_rgb_optical_frame"
 #define DEFAULT_HEADPITCH_FRAME "HeadPitch_link"
 #define DEFAULT_HEADYAW_FRAME "HeadYaw_link"
-#define DEFAULT_TORSO "torso"
+#define DEFAULT_TORSO_FRAME "torso"
 #define DEFAULT_FIXED_FRAME "r_sole"
 #define DEFAULT_FOOTPRINT_FRAME "base_footprint"
 
@@ -60,12 +60,18 @@ public:
 	void setMaxBallRadius(float maxBallRadius);
 	float getMinBallRadius() const;
 	void setMinBallRadius(float minBallRadius);
+	std::string getHeadYawFrame() const;
+	void setHeadYawFrame(std::string headYawFrame);
+	std::string getTorsoFrame() const;
+	void setTorsoFrame(std::string torsoFrame);
 
 protected:
 	std::string pointCloudTopic;
 	std::string opticalFrame;
 	std::string cameraFrame;
 	std::string headPitchFrame;
+	std::string headYawFrame;
+	std::string torsoFrame;
 	std::string fixedFrame;
 	std::string footprintFrame;
 	CameraTransformOptimization* transformOptimization;
@@ -102,6 +108,8 @@ private:
 	std::string opticalFrame;
 	std::string cameraFrame;
 	std::string headPitchFrame;
+	std::string headYawFrame;
+	std::string torsoFrame;
 	std::string fixedFrame;
 	std::string footprintFrame;
 	std::vector<BallDetection::BallData> currentBallMeasurements;
