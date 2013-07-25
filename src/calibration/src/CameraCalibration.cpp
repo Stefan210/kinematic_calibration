@@ -22,7 +22,7 @@ CameraCalibration::CameraCalibration(CameraCalibrationOptions options) :
 	this->pointCloudTopic = options.getPointCloudTopic();
 	this->cameraFrame = options.getCameraFrame();
 	this->fixedFrame = options.getFixedFrame();
-	this->headFrame = options.getHeadFrame();
+	this->headPitchFrame = options.getHeadPitchFrame();
 	this->footprintFrame = options.getFootprintFrame();
 	this->subscriber = nodeHandle.subscribe(this->pointCloudTopic, 1000,
 			&CameraCalibration::pointcloudMsgCb, this);
@@ -53,10 +53,10 @@ int main(int argc, char** argv) {
 	CameraCalibrationOptions options;
 	options.setCameraFrame(DEFAULT_CAMERA_FRAME);
 	options.setFixedFrame(DEFAULT_FIXED_FRAME);
-	options.setHeadFrame(DEFAULT_HEAD_FRAME);
+	options.setHeadPitchFrame(DEFAULT_HEADPITCH_FRAME);
 	options.setFootprintFrame(DEFAULT_FOOTPRINT_FRAME);
 	TransformFactory* transformFactory = new TfTransformFactory(
-			DEFAULT_HEAD_FRAME, DEFAULT_CAMERA_FRAME);
+			DEFAULT_HEADPITCH_FRAME, DEFAULT_CAMERA_FRAME);
 	options.setInitialTransformFactory(transformFactory);
 	options.setMaxBallRadius(0.076);
 	options.setMinBallRadius(0.074);
@@ -343,7 +343,7 @@ void CameraCalibration::outputMeasurePoint(
 	tf::StampedTransform cameraToHead;
 
 	// get the transform between headFrame and cameraFrame and transform the current point to fixed frame
-	this->transformListener.lookupTransform(headFrame, cameraFrame,
+	this->transformListener.lookupTransform(headPitchFrame, cameraFrame,
 			currentTimestamps[currentTimestamps.size() - 1], cameraToHead);
 	tf::Vector3 pointFixed = newMeasurePoint.opticalToFixed(cameraToHead)
 			* newMeasurePoint.measuredPosition;
@@ -399,14 +399,14 @@ void CameraCalibration::createMeasurePoint(
 	for (int i = timestamps.size() / 2; i < timestamps.size(); i++) {
 		time = timestamps[i];
 		if (transformListener.canTransform(cameraFrame, opticalFrame, time)
-				&& transformListener.canTransform(fixedFrame, headFrame,
+				&& transformListener.canTransform(fixedFrame, headPitchFrame,
 						time)) {
 			break;
 		}
 	}
 	transformListener.lookupTransform(cameraFrame, opticalFrame, time,
 			opticalToCamera);
-	transformListener.lookupTransform(fixedFrame, headFrame, time, headToFixed);
+	transformListener.lookupTransform(fixedFrame, headPitchFrame, time, headToFixed);
 	transformListener.lookupTransform(footprintFrame, fixedFrame, time,
 			fixedToFootprint);
 	newMeasurePoint.opticalToCamera = opticalToCamera;
@@ -460,12 +460,12 @@ void CameraCalibrationOptions::setFixedFrame(std::string fixedFrame) {
 	this->fixedFrame = fixedFrame;
 }
 
-std::string CameraCalibrationOptions::getHeadFrame() const {
-	return headFrame;
+std::string CameraCalibrationOptions::getHeadPitchFrame() const {
+	return headPitchFrame;
 }
 
-void CameraCalibrationOptions::setHeadFrame(std::string headFrame) {
-	this->headFrame = headFrame;
+void CameraCalibrationOptions::setHeadPitchFrame(std::string headPitchFrame) {
+	this->headPitchFrame = headPitchFrame;
 }
 
 std::string CameraCalibrationOptions::getFootprintFrame() const {

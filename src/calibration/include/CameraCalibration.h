@@ -30,7 +30,9 @@
 #define DEFAULT_POINTCLOUD_MSG "/xtion/depth_registered/points"
 //#define DEFAULT_CAMERA_FRAME "xtion_platform"
 #define DEFAULT_CAMERA_FRAME "xtion_rgb_optical_frame"
-#define DEFAULT_HEAD_FRAME "HeadPitch_link"
+#define DEFAULT_HEADPITCH_FRAME "HeadPitch_link"
+#define DEFAULT_HEADYAW_FRAME "HeadYaw_link"
+#define DEFAULT_TORSO "torso"
 #define DEFAULT_FIXED_FRAME "r_sole"
 #define DEFAULT_FOOTPRINT_FRAME "base_footprint"
 
@@ -40,8 +42,8 @@ public:
 	void setCameraFrame(std::string cameraFrame);
 	std::string getFixedFrame() const;
 	void setFixedFrame(std::string fixedFrame);
-	std::string getHeadFrame() const;
-	void setHeadFrame(std::string headFrame);
+	std::string getHeadPitchFrame() const;
+	void setHeadPitchFrame(std::string headPitchFrame);
 	TransformFactory* getInitialTransformFactory() const;
 	void setInitialTransformFactory(TransformFactory* initialTransformFactory);
 	int getMinNumOfMeasurements() const;
@@ -63,7 +65,7 @@ protected:
 	std::string pointCloudTopic;
 	std::string opticalFrame;
 	std::string cameraFrame;
-	std::string headFrame;
+	std::string headPitchFrame;
 	std::string fixedFrame;
 	std::string footprintFrame;
 	CameraTransformOptimization* transformOptimization;
@@ -99,7 +101,7 @@ private:
 	std::string pointCloudTopic;
 	std::string opticalFrame;
 	std::string cameraFrame;
-	std::string headFrame;
+	std::string headPitchFrame;
 	std::string fixedFrame;
 	std::string footprintFrame;
 	std::vector<BallDetection::BallData> currentBallMeasurements;
