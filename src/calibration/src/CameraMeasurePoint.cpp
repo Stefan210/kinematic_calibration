@@ -16,3 +16,9 @@ CameraMeasurePoint::~CameraMeasurePoint() {
 	// TODO Auto-generated destructor stub
 }
 
+CameraMeasurePoint CameraMeasurePoint::withHeadYawOffset(double headYawOffset) {
+}
+
+CameraMeasurePoint CameraMeasurePoint::withHeadPitchOffset(
+		double headPitchOffset) {
+}

@@ -21,6 +21,17 @@ public:
 	GroundData groundData;
 	ros::Time stamp;
 
+	/**
+	 * Returns the measure point with an offset set to the HeadYaw joint
+	 */
+	CameraMeasurePoint withHeadYawOffset(double headYawOffset);
+
+	/**
+	 * Returns the measure point with an offset set to the HeadPitch joint
+	 */
+	CameraMeasurePoint withHeadPitchOffset(double headPitchOffset);
+
+
 	inline const tf::Transform headToFootprint() const {
 		return fixedToFootprint * headToFixed();
 	}

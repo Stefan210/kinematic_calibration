@@ -180,6 +180,9 @@ if(TARGET BallDetectionTest)
   target_link_libraries(BallDetectionTest BallDetection)
 endif()
 
+catkin_add_gtest(CameraMeasurePointTest test/CameraMeasurePointTest.cpp src/CameraMeasurePoint.cpp)
+target_link_libraries(CameraMeasurePointTest ${catkin_LIBRARIES})
+
 catkin_add_gtest(GroundDetectionTest test/GroundDetectionTest.cpp src/GroundDetection.cpp src/CameraMeasurePoint.cpp)
 target_link_libraries(GroundDetectionTest ${catkin_LIBRARIES})
 
