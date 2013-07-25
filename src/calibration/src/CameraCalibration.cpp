@@ -419,11 +419,11 @@ void CameraCalibration::createMeasurePoint(
 			headPitchToHeadYaw);
 	transformListener.lookupTransform(torsoFrame, headYawFrame, time,
 			headYawToTorso);
-	newMeasurePoint.opticalToCamera = opticalToCamera;
-	newMeasurePoint.torsoToFixed = torsoToFixed;
-	newMeasurePoint.fixedToFootprint = fixedToFootprint;
-	newMeasurePoint.headPitchToHeadYaw = headPitchToHeadYaw;
-	newMeasurePoint.headYawToTorso = headYawToTorso;
+	newMeasurePoint.setOpticalToCamera(opticalToCamera);
+	newMeasurePoint.setTorsoToFixed(torsoToFixed);
+	newMeasurePoint.setFixedToFootprint(fixedToFootprint);
+	newMeasurePoint.setHeadPitchToHeadYaw(headPitchToHeadYaw);
+	newMeasurePoint.setHeadYawToTorso(headYawToTorso);
 
 	// determine average position
 	double x = 0, y = 0, z = 0;

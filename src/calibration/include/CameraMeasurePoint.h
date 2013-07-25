@@ -19,15 +19,14 @@ public:
 	virtual ~CameraMeasurePoint();
 	tf::Vector3 measuredPosition; // measured point within the optical frame
 	GroundData groundData;
-	tf::Transform opticalToCamera; // e.g. measure frame to first frame of the camera system
-	tf::Transform headPitchToHeadYaw; // first head link
-	tf::Transform headYawToTorso; // second head link
-	tf::Transform torsoToFixed; // e.g. first frame of body (after head) to last frame of body (r_sole)
-	tf::Transform fixedToFootprint;
 	ros::Time stamp;
 
 	inline const tf::Transform headToFootprint() const {
-		return fixedToFootprint * torsoToFixed * headYawToTorso
+		return fixedToFootprint * headToFixed();
+	}
+
+	inline const tf::Transform headToFixed() const {
+		return torsoToFixed * headYawToTorso
 				* headPitchToHeadYaw;
 	}
 
@@ -71,6 +70,53 @@ public:
 		input >> cmp.stamp.nsec;
 		return input;
 	}
+
+	const tf::Transform& getFixedToFootprint() const {
+		return fixedToFootprint;
+	}
+
+	void setFixedToFootprint(const tf::Transform& fixedToFootprint) {
+		this->fixedToFootprint = fixedToFootprint;
+	}
+
+	const tf::Transform& getHeadPitchToHeadYaw() const {
+		return headPitchToHeadYaw;
+	}
+
+	void setHeadPitchToHeadYaw(const tf::Transform& headPitchToHeadYaw) {
+		this->headPitchToHeadYaw = headPitchToHeadYaw;
+	}
+
+	const tf::Transform& getHeadYawToTorso() const {
+		return headYawToTorso;
+	}
+
+	void setHeadYawToTorso(const tf::Transform& headYawToTorso) {
+		this->headYawToTorso = headYawToTorso;
+	}
+
+	const tf::Transform& getOpticalToCamera() const {
+		return opticalToCamera;
+	}
+
+	void setOpticalToCamera(const tf::Transform& opticalToCamera) {
+		this->opticalToCamera = opticalToCamera;
+	}
+
+	const tf::Transform& getTorsoToFixed() const {
+		return torsoToFixed;
+	}
+
+	void setTorsoToFixed(const tf::Transform& torsoToFixed) {
+		this->torsoToFixed = torsoToFixed;
+	}
+
+private:
+	tf::Transform opticalToCamera; // e.g. measure frame to first frame of the camera system
+	tf::Transform headPitchToHeadYaw; // first head link
+	tf::Transform headYawToTorso; // second head link
+	tf::Transform torsoToFixed; // e.g. first frame of body (after head) to last frame of body (r_sole)
+	tf::Transform fixedToFootprint;
 }
 ;
 

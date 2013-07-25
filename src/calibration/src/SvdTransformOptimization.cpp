@@ -24,13 +24,13 @@ void SvdTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 	tf::Transform currentCameraToHead = initialTransformCameraToHead;
 	this->lastError = INFINITY;
 
-/*	std::cout << "initial origin " << currentCameraToHead.getOrigin().getX() << ","
-			<< currentCameraToHead.getOrigin().getY() << ","
-			<< currentCameraToHead.getOrigin().getZ() << ";";
+	/*	std::cout << "initial origin " << currentCameraToHead.getOrigin().getX() << ","
+	 << currentCameraToHead.getOrigin().getY() << ","
+	 << currentCameraToHead.getOrigin().getZ() << ";";
 
-	std::cout << "initial rotation " << currentCameraToHead.getRotation().getX() << ","
-			<< currentCameraToHead.getRotation().getY() << ","
-			<< currentCameraToHead.getRotation().getZ() << ";" << endl;*/
+	 std::cout << "initial rotation " << currentCameraToHead.getRotation().getX() << ","
+	 << currentCameraToHead.getRotation().getY() << ","
+	 << currentCameraToHead.getRotation().getZ() << ";" << endl;*/
 
 	int numOfPoints = measurePoints.size();
 
@@ -38,7 +38,7 @@ void SvdTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 	std::vector<tf::Vector3> pointcloudX;
 	for (int i = 0; i < numOfPoints; i++) {
 		MeasurePoint currentMeasure = measurePoints[i];
-		tf::Vector3 currentPointCamera = currentMeasure.opticalToCamera
+		tf::Vector3 currentPointCamera = currentMeasure.getOpticalToCamera()
 				* currentMeasure.measuredPosition;
 		pointcloudX.push_back(currentPointCamera);
 	}
@@ -51,23 +51,24 @@ void SvdTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 		for (int i = 0; i < numOfPoints; i++) {
 			MeasurePoint currentMeasure = measurePoints[i];
 			tf::Vector3 currentPointMeasure = currentMeasure.measuredPosition;
-			tf::Vector3 currentPointFixed = currentMeasure.headToFixed
-					* (currentCameraToHead
-							* (currentMeasure.opticalToCamera
-									* currentPointMeasure));
+			tf::Transform opticalToFixed = currentMeasure.opticalToFixed(
+					cameraToHead);
+			tf::Vector3 currentPointFixed = opticalToFixed
+					* currentPointMeasure;
 			centerX += currentPointFixed.getX();
 			centerY += currentPointFixed.getY();
 			centerZ += currentPointFixed.getZ();
 		}
-		tf::Vector3 centerPointFixed(centerX / numOfPoints, centerY / numOfPoints,
-				centerZ / numOfPoints);
+		tf::Vector3 centerPointFixed(centerX / numOfPoints,
+				centerY / numOfPoints, centerZ / numOfPoints);
 
 		// 2) Transform point from 1) to HeadPitch using transformations from measurements.
 		std::vector<tf::Vector3> pointcloudP;
 		for (int i = 0; i < numOfPoints; i++) {
 			MeasurePoint currentMeasure = measurePoints[i];
-			tf::Vector3 currentPointHead = (currentMeasure.headToFixed.inverse())
-					* centerPointFixed;
+			tf::Transform headPitchToFixed = currentMeasure.headToFixed();
+			tf::Vector3 currentPointHead =
+					(headPitchToFixed.inverse()) * centerPointFixed;
 			pointcloudP.push_back(currentPointHead);
 		}
 
@@ -79,30 +80,29 @@ void SvdTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 		this->lastError = error;
 		calculateSqrtDistCameraHead(currentCameraToHead, error);
 
-/*		std::cout << "[optimization]";
+		/*		std::cout << "[optimization]";
 
-		std::cout << "iteration " << numOfIterations << ";";
+		 std::cout << "iteration " << numOfIterations << ";";
 
-		std::cout << "position " << centerPointFixed.getX() << ","
-				<< centerPointFixed.getY() << "," << centerPointFixed.getZ() << ";";
+		 std::cout << "position " << centerPointFixed.getX() << ","
+		 << centerPointFixed.getY() << "," << centerPointFixed.getZ() << ";";
 
-		std::cout << "origin " << currentCameraToHead.getOrigin().getX() << ","
-				<< currentCameraToHead.getOrigin().getY() << ","
-				<< currentCameraToHead.getOrigin().getZ() << ";";
+		 std::cout << "origin " << currentCameraToHead.getOrigin().getX() << ","
+		 << currentCameraToHead.getOrigin().getY() << ","
+		 << currentCameraToHead.getOrigin().getZ() << ";";
 
-		std::cout << "rotation " << currentCameraToHead.getRotation().getX() << ","
-				<< currentCameraToHead.getRotation().getY() << ","
-				<< currentCameraToHead.getRotation().getZ() << ";";
+		 std::cout << "rotation " << currentCameraToHead.getRotation().getX() << ","
+		 << currentCameraToHead.getRotation().getY() << ","
+		 << currentCameraToHead.getRotation().getZ() << ";";
 
-		std::cout << "error " << error << ";";
+		 std::cout << "error " << error << ";";
 
-		std::cout << std::endl;*/
+		 std::cout << std::endl;*/
 	}
 	tf::TransformDoubleData data;
 	currentCameraToHead.serialize(data);
 	cameraToHead.deSerialize(data);
 }
-
 
 tf::Transform SvdTransformOptimization::svdOwnImpl(
 		std::vector<tf::Vector3> pointcloudX,
@@ -177,7 +177,7 @@ tf::Transform SvdTransformOptimization::svdPCL(
 		pointP.z = pointcloudP[i].getZ();
 		pclP.push_back(pointP);
 
-		correspondences.push_back(pcl::Correspondence(i,i,0));
+		correspondences.push_back(pcl::Correspondence(i, i, 0));
 	}
 	Eigen::Matrix4f tm;
 	svd.estimateRigidTransformation(pclX, pclP, correspondences, tm);

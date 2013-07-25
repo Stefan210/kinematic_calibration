@@ -83,9 +83,8 @@ float LocalTransformOptimization::calculateError(tf::Transform& cameraToHead) {
 	float centerX = 0, centerY = 0, centerZ = 0;
 	for (int i = 0; i < numOfPoints; i++) {
 		MeasurePoint& current = this->measurePoints[i];
-		tf::Vector3 transformedPoint = (current.headToFixed
-				* (cameraToHead
-						* (current.opticalToCamera * current.measuredPosition)));
+		tf::Transform opicalToFixed = current.opticalToFixed(cameraToHead);
+		tf::Vector3 transformedPoint = opicalToFixed * current.measuredPosition;
 		centerX += transformedPoint.getX();
 		centerY += transformedPoint.getY();
 		centerZ += transformedPoint.getZ();

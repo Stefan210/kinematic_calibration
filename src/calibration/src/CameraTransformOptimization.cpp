@@ -34,8 +34,9 @@ void CameraTransformOptimization::calculateSqrtDistFromMarker(
 	for (int i = 0; i < this->measurePoints.size(); i++) {
 		float currentError = 0;
 		MeasurePoint& current = this->measurePoints[i];
-		tf::Vector3 transformedPoint = current.headToFixed * cameraToHead
-				* current.opticalToCamera * current.measuredPosition;
+		tf::Transform opticalToFixed = current.opticalToFixed(cameraToHead);
+		tf::Vector3 transformedPoint = opticalToFixed
+				* current.measuredPosition;
 		currentError += pow(markerPoint.x() - transformedPoint.x(), 2);
 		currentError += pow(markerPoint.y() - transformedPoint.y(), 2);
 		currentError += pow(markerPoint.z() - transformedPoint.z(), 2);
@@ -148,7 +149,7 @@ void CameraTransformOptimization::calculateSqrtDistCameraHead(
 	for (int i = 0; i < numOfPoints; i++) {
 		MeasurePoint currentMeasure = measurePoints[i];
 		tf::Vector3 currentPointB = cameraToHead
-				* (currentMeasure.opticalToCamera
+				* (currentMeasure.getOpticalToCamera()
 						* currentMeasure.measuredPosition);
 		pointcloudX.push_back(currentPointB);
 	}
@@ -159,11 +160,9 @@ void CameraTransformOptimization::calculateSqrtDistCameraHead(
 	for (int i = 0; i < numOfPoints; i++) {
 		MeasurePoint currentMeasure = measurePoints[i];
 		tf::Vector3 currentPointMeasure = currentMeasure.measuredPosition;
-		tf::Vector3 currentPointC =
-				currentMeasure.headToFixed
-						* (cameraToHead
-								* (currentMeasure.opticalToCamera
-										* currentPointMeasure));
+		tf::Transform opticalToFixed = currentMeasure.opticalToFixed(
+				cameraToHead);
+		tf::Vector3 currentPointC = opticalToFixed * currentPointMeasure;
 		centerX += currentPointC.getX();
 		centerY += currentPointC.getY();
 		centerZ += currentPointC.getZ();
@@ -177,7 +176,9 @@ void CameraTransformOptimization::calculateSqrtDistCameraHead(
 	std::vector<tf::Vector3> pointcloudP;
 	for (int i = 0; i < numOfPoints; i++) {
 		MeasurePoint currentMeasure = measurePoints[i];
-		tf::Vector3 currentPointB = (currentMeasure.headToFixed.inverse())
+		tf::Vector3 currentPointB = ((currentMeasure.getTorsoToFixed()
+				* currentMeasure.getHeadYawToTorso()
+				* currentMeasure.getHeadPitchToHeadYaw()).inverse())
 				* centerPointC;
 		pointcloudP.push_back(currentPointB);
 	}
@@ -260,21 +261,24 @@ void CameraTransformOptimization::removeOutliers() {
 	std::vector<MeasurePoint> filteredMeasurePoints;
 	tf::Vector3 markerPosition;
 	getMarkerEstimate(this->initialTransformCameraToHead, markerPosition);
-	for(int i = 0; i < this->measurePoints.size(); i++) {
+	for (int i = 0; i < this->measurePoints.size(); i++) {
 		double r, p, y;
 		float error;
 		CameraMeasurePoint measurePoint = this->measurePoints[i];
-		markerPosition = measurePoint.opticalToFixed(this->initialTransformCameraToHead)*measurePoint.measuredPosition;
+		markerPosition = measurePoint.opticalToFixed(
+				this->initialTransformCameraToHead)
+				* measurePoint.measuredPosition;
 		GroundData transformedGroundData;
 		transformedGroundData = measurePoint.groundData.transform(
-				measurePoint.opticalToFootprint(this->initialTransformCameraToHead));
+				measurePoint.opticalToFootprint(
+						this->initialTransformCameraToHead));
 		transformedGroundData.getRPY(r, p, y);
 		std::cout << "(i) " << i << ";";
 		std::cout << "position (x,y,z):" << markerPosition[0] << ","
 				<< markerPosition[1] << "," << markerPosition[2] << ";";
 		std::cout << "ground (r,p):" << r << "," << p << ";";
 		std::cout << "\n";
-		if(fabs(r)+fabs(p) < 0.1) {
+		if (fabs(r) + fabs(p) < 0.1) {
 			filteredMeasurePoints.push_back(measurePoint);
 		} else {
 			std::cout << "Removed!\n";
@@ -282,5 +286,4 @@ void CameraTransformOptimization::removeOutliers() {
 	}
 	this->measurePoints = filteredMeasurePoints;
 }
-
 
