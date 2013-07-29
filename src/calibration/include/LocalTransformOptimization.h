@@ -10,11 +10,8 @@
 
 #include "CameraTransformOptimization.h"
 
-class LtoState {
+class LtoState : public CalibrationState {
 public:
-	tf::Transform cameraToHead;
-	double headYawOffset;
-	double headPitchOffset;
 	double error;
 	bool isBetterThan(const LtoState other) {
 		return error < other.error;
@@ -33,7 +30,7 @@ public:
 protected:
 	float stepwidth;
 	bool decreaseStepwidth();
-	float calculateError(tf::Transform& FrameAToFrameB);
+	float calculateError(LtoState& other);
 	virtual std::vector<LtoState> getNeighbors(LtoState& current);
 };
 

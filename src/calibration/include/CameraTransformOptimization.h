@@ -73,7 +73,7 @@ public:
 	/**
 	 * Prints the results of the optimization onto the screen.
 	 */
-	void printResult(std::string pre, tf::Transform cameraToHead,
+	void printResult(std::string pre, const tf::Transform& cameraToHead,
 			tf::Vector3 markerPosition);
 
 	/**

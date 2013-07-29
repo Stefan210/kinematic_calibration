@@ -31,8 +31,8 @@ HillClimbingTransformOptimization::~HillClimbingTransformOptimization() {
 void HillClimbingTransformOptimization::optimizeTransform(
 		CalibrationState& calibrationState) {
 	LtoState currentState, bestState;
-	currentState.cameraToHead = this->initialTransformCameraToHead;
-	currentState.error = calculateError(this->initialTransformCameraToHead);
+	currentState.setCameraToHead(this->initialTransformCameraToHead);
+	currentState.error = calculateError(currentState);
 	bestState.error = INFINITY;
 	bool canImprove = true;
 	int numOfIterations = 0;
@@ -63,7 +63,7 @@ void HillClimbingTransformOptimization::optimizeTransform(
 		}
 	}
 
-	calibrationState.setCameraToHead(currentState.cameraToHead);
+	calibrationState.setCameraToHead(currentState.getCameraToHead());
 }
 
 bool LocalTransformOptimization::decreaseStepwidth() {
@@ -75,8 +75,9 @@ bool LocalTransformOptimization::decreaseStepwidth() {
 	return true;
 }
 
-float LocalTransformOptimization::calculateError(tf::Transform& cameraToHead) {
+float LocalTransformOptimization::calculateError(LtoState& state) {
 	float error = 0;
+	tf::Transform cameraToHead = state.getCameraToHead();
 	int numOfPoints = this->measurePoints.size();
 
 	// calculate centroid
@@ -140,7 +141,7 @@ std::vector<LtoState> LocalTransformOptimization::getNeighbors(
 	std::vector<LtoState> neighbours;
 	std::vector<tf::Transform> transforms;
 
-	tf::Transform currentTransform = current.cameraToHead;
+	tf::Transform currentTransform = current.getCameraToHead();
 
 	// get rotation
 	double roll, pitch, yaw;
@@ -200,10 +201,10 @@ std::vector<LtoState> LocalTransformOptimization::getNeighbors(
 
 	// calculate errors
 	for (int i = 0; i < transforms.size(); i++) {
-		double error = calculateError(transforms[i]);
 		LtoState newState;
+		newState.setCameraToHead(transforms[i]);
+		double error = calculateError(newState);
 		newState.error = error;
-		newState.cameraToHead = transforms[i];
 		neighbours.push_back(newState);
 	}
 
@@ -211,7 +212,7 @@ std::vector<LtoState> LocalTransformOptimization::getNeighbors(
 }
 
 std::ostream& operator<<(std::ostream &out, LtoState &state) {
-	tf::Transform currentTransform = state.cameraToHead;
+	tf::Transform currentTransform = state.getCameraToHead();
 
 	// get rotation
 	double roll, pitch, yaw;
@@ -245,8 +246,8 @@ void SimulatedAnnealingTransformOptimization::optimizeTransform(
 	srand(time(0));
 	int i = 0;
 	LtoState initialState;
-	initialState.cameraToHead = this->initialTransformCameraToHead;
-	initialState.error = calculateError(this->initialTransformCameraToHead);
+	initialState.setCameraToHead(this->initialTransformCameraToHead);
+	initialState.error = calculateError(initialState);
 
 	/* temperature */
 	double temperature = startTemperature; //startTemperature;
@@ -303,7 +304,7 @@ void SimulatedAnnealingTransformOptimization::optimizeTransform(
 		// maxIterations);
 	}
 
-	calibrationState.setCameraToHead(bestState.cameraToHead);
+	calibrationState.setCameraToHead(bestState.getCameraToHead());
 }
 
 std::vector<LtoState> SimulatedAnnealingTransformOptimization::getNeighbors(

@@ -77,7 +77,7 @@ void CameraTransformOptimization::getMarkerEstimate(
 }
 
 void CameraTransformOptimization::printResult(std::string pre,
-		tf::Transform cameraToHead, tf::Vector3 markerPosition) {
+		const tf::Transform& cameraToHead, tf::Vector3 markerPosition) {
 	float error;
 	double r, p, y;
 	tf::Vector3 markerEstimate;
@@ -225,7 +225,7 @@ void CompositeTransformOptimization::optimizeTransform(
 				currentError);
 		if (currentError < smallestError) {
 			smallestError = currentError;
-			calibrationState.setCameraToHead(currentState.getCameraToHead());
+			calibrationState = currentState;
 		}
 		printResult(it->first, currentState.getCameraToHead(), markerPosition);
 	}
