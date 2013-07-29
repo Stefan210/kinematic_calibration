@@ -10,6 +10,7 @@
 
 #include <tf/tf.h>
 #include "../include/CameraMeasurePoint.h"
+#include "../include/CalibrationState.h"
 
 /*
  * Class for calibrating the transformation between robot and camera.
@@ -30,7 +31,7 @@ public:
 	 * Optimizes the transform given the measured points,
 	 * initial transformation, and all other transformations needed.
 	 */
-	virtual void optimizeTransform(tf::Transform& cameraToHead) = 0;
+	virtual void optimizeTransform(CalibrationState& calibrationState) = 0;
 
 	/**
 	 * Adds a new measure point.
@@ -52,14 +53,14 @@ public:
 	 * position and the measured points given the current
 	 * estimation for the transformation.
 	 */
-	virtual void calculateSqrtDistFromMarker(tf::Transform& cameraToHead,
+	virtual void calculateSqrtDistFromMarker(tf::Transform cameraToHead,
 			tf::Vector3 markerPoint, float& error);
 
 	/**
 	 * Calculates the error between the point clouds in the first camera frame
 	 * and the transformed points in the last robot frame.
 	 */
-	virtual void calculateSqrtDistCameraHead(tf::Transform& cameraToHead,
+	virtual void calculateSqrtDistCameraHead(tf::Transform cameraToHead,
 			float& error);
 
 	/**
@@ -72,7 +73,7 @@ public:
 	/**
 	 * Prints the results of the optimization onto the screen.
 	 */
-	void printResult(std::string pre, tf::Transform& cameraToHead,
+	void printResult(std::string pre, tf::Transform cameraToHead,
 			tf::Vector3 markerPosition);
 
 	/**
@@ -121,7 +122,7 @@ protected:
 };
 
 /**
- * Container for multiple optimizer.
+ * Container for multiple optimizers.
  */
 class CompositeTransformOptimization: public CameraTransformOptimization {
 public:
@@ -131,7 +132,7 @@ public:
 	/**
 	 * Returns the best results with repsect to the error function.
 	 */
-	virtual void optimizeTransform(tf::Transform& cameraToHead);
+	virtual void optimizeTransform(CalibrationState& calibrationState);
 	virtual void addMeasurePoint(MeasurePoint newPoint);
 	virtual void clearMeasurePoints();
 	virtual void setInitialTransformCameraToHead(tf::Transform cameraToHead);

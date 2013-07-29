@@ -20,7 +20,7 @@ CalibrationDataSerialization::~CalibrationDataSerialization() {
 }
 
 void CalibrationDataSerialization::optimizeTransform(
-		tf::Transform& cameraToHead) {
+		CalibrationState& calibrationState) {
 	saveToFile();
 }
 

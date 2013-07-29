@@ -19,7 +19,7 @@ public:
 	CalibrationState(tf::Transform cameraToHead, double headYawOffset,
 			double headPitchOffset);
 	virtual ~CalibrationState();
-	const tf::Transform& getCameraToHead() const;
+	tf::Transform getCameraToHead() const;
 	void setCameraToHead(const tf::Transform& cameraToHead);
 	double getHeadPitchOffset() const;
 	void setHeadPitchOffset(double headPitchOffset);

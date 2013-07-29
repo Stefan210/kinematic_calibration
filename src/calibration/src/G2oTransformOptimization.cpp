@@ -37,7 +37,7 @@ G2oTransformOptimization::~G2oTransformOptimization() {
 	// TODO Auto-generated destructor stub
 }
 
-void G2oTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
+void G2oTransformOptimization::optimizeTransform(CalibrationState& calibrationState) {
 
 	typedef BlockSolver<BlockSolverTraits<-1, -1> > MyBlockSolver;
 	typedef LinearSolverDense<MyBlockSolver::PoseMatrixType> MyLinearSolver;
@@ -82,7 +82,7 @@ void G2oTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 
 	// add a vertex representing the offset for headYaw and headPitch joint
 	VertexOffset* offsetVertex = new VertexOffset();
-	offsetVertex->setEstimate(Eigen::Matrix<double, 2, 1>(0.0,0.0));
+	offsetVertex->setEstimate(Eigen::Matrix<double, 2, 1>(0.0, 0.0));
 	offsetVertex->setId(3);
 	optimizer.addVertex(offsetVertex);
 
@@ -118,11 +118,24 @@ void G2oTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 		optimizer.addEdge(edge);
 	}
 
+	/*int iterations = 30;
+	bool toggle = true;
+	while (iterations--) {
+		positionVertex->setFixed(toggle);
+		transformationVertex->setFixed(toggle);
+		offsetVertex->setFixed(!toggle);
+		toggle = !toggle;
+
+		optimizer.initializeOptimization();
+		optimizer.computeActiveErrors();
+		//optimizer.setVerbose(true);
+		optimizer.optimize(100);
+	}*/
+
 	optimizer.initializeOptimization();
 	optimizer.computeActiveErrors();
 	//optimizer.setVerbose(true);
-	optimizer.optimize(1000);
-	cameraToHead = transformationVertex->estimate();
+	optimizer.optimize(100);
 
 	this->markerPosition = tf::Vector3(positionVertex->estimate()[0],
 			positionVertex->estimate()[1], positionVertex->estimate()[2]);
@@ -130,7 +143,8 @@ void G2oTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 
 	double headYawOffset = offsetVertex->estimate()[0];
 	double headPitchOffset = offsetVertex->estimate()[1];
-	std::cout << "offset(yaw,pitch) " << headYawOffset << " " << headPitchOffset << ";";
+	std::cout << "offset(yaw,pitch) " << headYawOffset << " " << headPitchOffset
+			<< ";";
 
 	/*std::cout << "position (x,y,z):" << positionVertex->estimate()[0] << ","
 	 << positionVertex->estimate()[1] << ","
@@ -143,6 +157,10 @@ void G2oTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 	 << transformationVertex->estimate().getRotation()[1] << ","
 	 << transformationVertex->estimate().getRotation()[2] << ","
 	 << transformationVertex->estimate().getRotation()[3] << ";";*/
+
+	calibrationState.setCameraToHead(transformationVertex->estimate());
+	calibrationState.setHeadYawOffset(static_cast<double>(offsetVertex->estimate()[0]));
+	calibrationState.setHeadPitchOffset(static_cast<double>(offsetVertex->estimate()[1]));
 }
 
 void G2oTransformOptimization::getMarkerEstimate(

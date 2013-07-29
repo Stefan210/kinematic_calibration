@@ -13,6 +13,8 @@
 class LtoState {
 public:
 	tf::Transform cameraToHead;
+	double headYawOffset;
+	double headPitchOffset;
 	double error;
 	bool isBetterThan(const LtoState other) {
 		return error < other.error;
@@ -40,14 +42,14 @@ class HillClimbingTransformOptimization : public LocalTransformOptimization {
 public:
 	HillClimbingTransformOptimization();
 	virtual ~HillClimbingTransformOptimization();
-	virtual void optimizeTransform(tf::Transform& FrameAToFrameB);
+	virtual void optimizeTransform(CalibrationState& calibrationState);
 };
 
 class SimulatedAnnealingTransformOptimization : public LocalTransformOptimization {
 public:
 	SimulatedAnnealingTransformOptimization();
 	virtual ~SimulatedAnnealingTransformOptimization();
-	virtual void optimizeTransform(tf::Transform& FrameAToFrameB);
+	virtual void optimizeTransform(CalibrationState& calibrationState);
 	virtual std::vector<LtoState> getNeighbors(LtoState& current);
 
 protected:

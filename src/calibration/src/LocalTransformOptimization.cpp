@@ -29,7 +29,7 @@ HillClimbingTransformOptimization::~HillClimbingTransformOptimization() {
 }
 
 void HillClimbingTransformOptimization::optimizeTransform(
-		tf::Transform& FrameAToFrameB) {
+		CalibrationState& calibrationState) {
 	LtoState currentState, bestState;
 	currentState.cameraToHead = this->initialTransformCameraToHead;
 	currentState.error = calculateError(this->initialTransformCameraToHead);
@@ -63,7 +63,7 @@ void HillClimbingTransformOptimization::optimizeTransform(
 		}
 	}
 
-	FrameAToFrameB = *(new tf::Transform(currentState.cameraToHead));
+	calibrationState.setCameraToHead(currentState.cameraToHead);
 }
 
 bool LocalTransformOptimization::decreaseStepwidth() {
@@ -241,7 +241,7 @@ SimulatedAnnealingTransformOptimization::~SimulatedAnnealingTransformOptimizatio
 }
 
 void SimulatedAnnealingTransformOptimization::optimizeTransform(
-		tf::Transform& FrameAToFrameB) {
+		CalibrationState& calibrationState) {
 	srand(time(0));
 	int i = 0;
 	LtoState initialState;
@@ -303,7 +303,7 @@ void SimulatedAnnealingTransformOptimization::optimizeTransform(
 		// maxIterations);
 	}
 
-	FrameAToFrameB = *(new tf::Transform(bestState.cameraToHead));
+	calibrationState.setCameraToHead(bestState.cameraToHead);
 }
 
 std::vector<LtoState> SimulatedAnnealingTransformOptimization::getNeighbors(

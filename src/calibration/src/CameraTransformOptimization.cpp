@@ -28,7 +28,7 @@ void CameraTransformOptimization::clearMeasurePoints() {
 }
 
 void CameraTransformOptimization::calculateSqrtDistFromMarker(
-		tf::Transform& cameraToHead, tf::Vector3 markerPoint, float& error) {
+		tf::Transform cameraToHead, tf::Vector3 markerPoint, float& error) {
 	error = 0;
 
 	for (int i = 0; i < this->measurePoints.size(); i++) {
@@ -77,7 +77,7 @@ void CameraTransformOptimization::getMarkerEstimate(
 }
 
 void CameraTransformOptimization::printResult(std::string pre,
-		tf::Transform& cameraToHead, tf::Vector3 markerPosition) {
+		tf::Transform cameraToHead, tf::Vector3 markerPosition) {
 	float error;
 	double r, p, y;
 	tf::Vector3 markerEstimate;
@@ -140,7 +140,7 @@ bool CameraTransformOptimization::canStop() {
 }
 
 void CameraTransformOptimization::calculateSqrtDistCameraHead(
-		tf::Transform& cameraToHead, float& error) {
+		tf::Transform cameraToHead, float& error) {
 	error = 0;
 
 	// Transform points from optical frame to camera frame --> X.
@@ -203,7 +203,7 @@ void CompositeTransformOptimization::addTransformOptimization(std::string name,
 }
 
 void CompositeTransformOptimization::optimizeTransform(
-		tf::Transform& cameraToHead) {
+		CalibrationState& calibrationState) {
 	float smallestError = INFINITY;
 	float currentError = 0;
 
@@ -216,18 +216,18 @@ void CompositeTransformOptimization::optimizeTransform(
 	// return the transform with the smallest error
 	for (map<string, CameraTransformOptimization*>::const_iterator it =
 			this->optimizer.begin(); it != this->optimizer.end(); ++it) {
-		tf::Transform transform;
+		CalibrationState currentState;
 		tf::Vector3 markerPosition;
 		//it->second->removeOutliers();
-		it->second->optimizeTransform(transform);
-		it->second->getMarkerEstimate(transform, markerPosition);
-		this->calculateSqrtDistFromMarker(transform, markerPosition,
+		it->second->optimizeTransform(currentState);
+		it->second->getMarkerEstimate(currentState.getCameraToHead(), markerPosition);
+		this->calculateSqrtDistFromMarker(currentState.getCameraToHead(), markerPosition,
 				currentError);
 		if (currentError < smallestError) {
 			smallestError = currentError;
-			cameraToHead = tf::Transform(transform);
+			calibrationState.setCameraToHead(currentState.getCameraToHead());
 		}
-		printResult(it->first, transform, markerPosition);
+		printResult(it->first, currentState.getCameraToHead(), markerPosition);
 	}
 }
 

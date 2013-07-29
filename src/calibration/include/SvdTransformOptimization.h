@@ -17,7 +17,7 @@ class SvdTransformOptimization : public CameraTransformOptimization {
 public:
 	SvdTransformOptimization();
 	virtual ~SvdTransformOptimization();
-	virtual void optimizeTransform(tf::Transform& FrameAToFrameB);
+	virtual void optimizeTransform(CalibrationState& calibrationState);
 
 private:
 	tf::Transform svdOwnImpl(std::vector<tf::Vector3> pointcloudX,

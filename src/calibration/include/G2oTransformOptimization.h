@@ -18,7 +18,7 @@ public:
 	G2oTransformOptimization();
 	virtual ~G2oTransformOptimization();
 
-	virtual void optimizeTransform(tf::Transform& cameraToHead);
+	virtual void optimizeTransform(CalibrationState& calibrationState);
 	virtual void getMarkerEstimate(const tf::Transform& cameraToHead,
 			tf::Vector3& position);
 

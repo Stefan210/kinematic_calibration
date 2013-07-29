@@ -20,7 +20,7 @@ SvdTransformOptimization::~SvdTransformOptimization() {
 	// TODO Auto-generated destructor stub
 }
 
-void SvdTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
+void SvdTransformOptimization::optimizeTransform(CalibrationState& calibrationState) {
 	tf::Transform currentCameraToHead = initialTransformCameraToHead;
 	this->lastError = INFINITY;
 
@@ -52,7 +52,7 @@ void SvdTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 			MeasurePoint currentMeasure = measurePoints[i];
 			tf::Vector3 currentPointMeasure = currentMeasure.measuredPosition;
 			tf::Transform opticalToFixed = currentMeasure.opticalToFixed(
-					cameraToHead);
+					currentCameraToHead);
 			tf::Vector3 currentPointFixed = opticalToFixed
 					* currentPointMeasure;
 			centerX += currentPointFixed.getX();
@@ -99,9 +99,7 @@ void SvdTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 
 		 std::cout << std::endl;*/
 	}
-	tf::TransformDoubleData data;
-	currentCameraToHead.serialize(data);
-	cameraToHead.deSerialize(data);
+	calibrationState.setCameraToHead(currentCameraToHead);
 }
 
 tf::Transform SvdTransformOptimization::svdOwnImpl(

@@ -15,6 +15,8 @@
 #include <fcntl.h>
 #include <termios.h>
 
+#include "../include/CalibrationState.h"
+
 using namespace std;
 
 CameraCalibration::CameraCalibration(CameraCalibrationOptions options) :
@@ -330,8 +332,8 @@ void CameraCalibration::startOptimization() {
 				this->measurementSeries[j]);
 	}
 	// optimize!
-	tf::Transform optimizedTransform;
-	this->transformOptimization->optimizeTransform(optimizedTransform);
+	CalibrationState state;
+	this->transformOptimization->optimizeTransform(state);
 	// TODO: Do something with the optimized transform...
 }
 

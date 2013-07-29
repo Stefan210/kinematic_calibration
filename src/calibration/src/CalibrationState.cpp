@@ -23,7 +23,7 @@ CalibrationState::~CalibrationState() {
 	// TODO Auto-generated destructor stub
 }
 
-const tf::Transform& CalibrationState::getCameraToHead() const {
+tf::Transform CalibrationState::getCameraToHead() const {
 	return cameraToHead;
 }
 

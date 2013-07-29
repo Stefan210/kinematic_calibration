@@ -11,6 +11,7 @@
 #include "../include/Utils.h"
 #include "../include/CameraTransformOptimization.h"
 #include "../include/CameraMeasurePoint.h"
+#include "../include/CalibrationState.h"
 
 #include <tf/tf.h>
 
@@ -24,7 +25,7 @@ public:
 	CalibrationDataSerialization(std::string filename);
 	virtual ~CalibrationDataSerialization();
 
-	virtual void optimizeTransform(tf::Transform& cameraToHead);
+	virtual void optimizeTransform(CalibrationState& calibrationState);
 
 	std::vector<MeasurePoint> getMeasurementSeries();
 	tf::Transform getInitialTransform();
