@@ -7,7 +7,8 @@
 
 #include "VertexOffset.h"
 
-VertexOffset::VertexOffset() {
+VertexOffset::VertexOffset() :
+		BaseVertex<2, Vector2d>() {
 	// TODO Auto-generated constructor stub
 
 }
@@ -30,5 +31,5 @@ void VertexOffset::oplusImpl(const double* delta) {
 }
 
 void VertexOffset::setToOriginImpl() {
-    _estimate.setZero();
+	_estimate.setZero();
 }

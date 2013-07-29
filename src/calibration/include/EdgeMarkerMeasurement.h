@@ -10,9 +10,10 @@
 
 #include "../include/VertexPosition3D.h"
 #include "../include/VertexTransformation3D.h"
+#include "../include/VertexOffset.h"
 #include "../include/CameraTransformOptimization.h"
 
-#include <g2o/core/base_binary_edge.h>
+#include <g2o/core/base_multi_edge.h>
 
 using namespace g2o;
 
@@ -20,8 +21,7 @@ using namespace g2o;
  * Represents an edge that constraints the marker position
  * and the transformation for the camera according to the measurement.
  */
-class EdgeMarkerMeasurement: public BaseBinaryEdge<3, MeasurePoint,
-		VertexPosition3D, VertexTransformation3D> {
+class EdgeMarkerMeasurement: public BaseMultiEdge<3, MeasurePoint> {
 public:
 	EdgeMarkerMeasurement(MeasurePoint& measurePoint);
 	virtual ~EdgeMarkerMeasurement();

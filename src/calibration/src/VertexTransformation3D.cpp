@@ -7,7 +7,17 @@
 
 #include "../include/VertexTransformation3D.h"
 
-VertexTransformation3D::VertexTransformation3D() {
+VertexTransformation3D::VertexTransformation3D()  :
+#ifdef ANGLEAXIS
+BaseVertex<7, tf::Transform>()
+#endif
+#ifdef QUATERNION
+BaseVertex<7, tf::Transform>()
+#endif
+#ifdef RPY
+BaseVertex<6, tf::Transform>()
+#endif
+{
 
 }
 

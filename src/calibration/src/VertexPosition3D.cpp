@@ -7,7 +7,8 @@
 
 #include "../include/VertexPosition3D.h"
 
-VertexPosition3D::VertexPosition3D() {
+VertexPosition3D::VertexPosition3D() :
+		BaseVertex<3, Vector3d>() {
 
 }
 
@@ -32,5 +33,4 @@ void VertexPosition3D::oplusImpl(const double* delta) {
 void VertexPosition3D::setToOriginImpl() {
 	this->_estimate = Eigen::Vector3d::Identity();
 }
-
 

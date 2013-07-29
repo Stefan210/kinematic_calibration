@@ -8,9 +8,8 @@
 #include "../include/EdgeMarkerMeasurement.h"
 
 EdgeMarkerMeasurement::EdgeMarkerMeasurement(MeasurePoint& measurePoint) :
-		measurePoint(measurePoint) {
-	// TODO Auto-generated constructor stub
-
+BaseMultiEdge<3, CameraMeasurePoint>(), measurePoint(measurePoint) {
+	resize(3);
 }
 
 EdgeMarkerMeasurement::~EdgeMarkerMeasurement() {
@@ -23,12 +22,21 @@ void EdgeMarkerMeasurement::computeError() {
 			static_cast<const VertexPosition3D*>(_vertices[0]);
 	const VertexTransformation3D* vertexTransf =
 			static_cast<const VertexTransformation3D*>(_vertices[1]);
+	const VertexOffset* vertexOffset =
+			static_cast<const VertexOffset*>(_vertices[2]);
 
 	Eigen::Vector3d markerPosition = vertexPosition->estimate();
 	tf::Transform cameraToHeadTransform = vertexTransf->estimate();
+	double headYawOffset = vertexOffset->estimate()[0];
+	double headPitchOffset = vertexOffset->estimate()[1];
 
-	tf::Transform opticalToFixedTransform = measurePoint.opticalToFixed(
+	//std::cout << "headYawOffset " << headYawOffset << " headPitchOffset " << headPitchOffset << std::endl;
+
+	tf::Transform opticalToFixedTransform = measurePoint.withHeadYawOffset(
+			headYawOffset).withHeadPitchOffset(headPitchOffset).opticalToFixed(
 			cameraToHeadTransform);
+/*	tf::Transform opticalToFixedTransform = measurePoint.opticalToFixed(
+			cameraToHeadTransform);*/
 	tf::Vector3 transformedMeasurement = opticalToFixedTransform
 			* measurePoint.measuredPosition;
 

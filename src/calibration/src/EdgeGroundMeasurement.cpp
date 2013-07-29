@@ -19,16 +19,21 @@ EdgeGroundMeasurement::~EdgeGroundMeasurement() {
 void EdgeGroundMeasurement::computeError() {
 	const VertexTransformation3D* vertexTransf =
 			static_cast<const VertexTransformation3D*>(_vertices[0]);
+	const VertexOffset* vertexOffset =
+			static_cast<const VertexOffset*>(_vertices[1]);
 
 	tf::Transform cameraToHeadTransform = vertexTransf->estimate();
+	double headYawOffset = vertexOffset->estimate()[0];
+	double headPitchOffset = vertexOffset->estimate()[1];
 
 	// calculate error from ground in respect to roll and pitch (which should be 0)
 	double roll, pitch, yaw;
 
 	tf::Transform transform;
 	transform = measurePoint.opticalToFootprint(cameraToHeadTransform);
-	GroundData transformedGroundData = measurePoint.groundData.transform(
-			transform);
+	GroundData transformedGroundData =
+			measurePoint.withHeadPitchOffset(headPitchOffset).withHeadYawOffset(
+					headYawOffset).groundData.transform(transform);
 
 	double length = transformedGroundData.a + transformedGroundData.b
 			+ transformedGroundData.c + transformedGroundData.d;
@@ -45,7 +50,7 @@ void EdgeGroundMeasurement::computeError() {
 //	_error[0] = roll;
 //	_error[1] = pitch;
 
-	_error[0] = d;
+	_error[0] = fabs(d) - 2.0;
 	_error[1] = tf::Vector3(a, b, c).normalized().angle(tf::Vector3(0, 0, 1));
 
 //	_error[0] = fabs(roll) < 0.05  ? 0 : 1000;

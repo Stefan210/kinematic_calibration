@@ -10,6 +10,7 @@
 #include "../include/EdgeGroundMeasurement.h"
 #include "../include/VertexPosition3D.h"
 #include "../include/VertexTransformation3D.h"
+#include "../include/VertexOffset.h"
 
 #include <g2o/core/sparse_optimizer.h>
 #include <g2o/core/block_solver.h>
@@ -59,7 +60,7 @@ void G2oTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 
 	OptimizationAlgorithmLevenberg* algorithm =
 			new OptimizationAlgorithmLevenberg(blockSolver);
-//	algorithm->setMaxTrialsAfterFailure(10000);
+	algorithm->setMaxTrialsAfterFailure(10000);
 //	algorithm->setUserLambdaInit(1/1000);
 
 	optimizer.setAlgorithm(algorithm);
@@ -79,6 +80,12 @@ void G2oTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 	transformationVertex->setId(2);
 	optimizer.addVertex(transformationVertex);
 
+	// add a vertex representing the offset for headYaw and headPitch joint
+	VertexOffset* offsetVertex = new VertexOffset();
+	offsetVertex->setEstimate(Eigen::Matrix<double, 2, 1>(0.0,0.0));
+	offsetVertex->setId(3);
+	optimizer.addVertex(offsetVertex);
+
 	int id = 1;
 
 	// add edges constraining marker position and transformation
@@ -93,6 +100,7 @@ void G2oTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 		edge->setInformation(mm);
 		edge->vertices()[0] = positionVertex;
 		edge->vertices()[1] = transformationVertex;
+		edge->vertices()[2] = offsetVertex;
 		optimizer.addEdge(edge);
 	}
 
@@ -106,18 +114,23 @@ void G2oTransformOptimization::optimizeTransform(tf::Transform& cameraToHead) {
 		edge->setId(id++);
 		edge->setInformation(mg);
 		edge->vertices()[0] = transformationVertex;
+		edge->vertices()[1] = offsetVertex;
 		optimizer.addEdge(edge);
 	}
 
 	optimizer.initializeOptimization();
 	optimizer.computeActiveErrors();
-//	optimizer.setVerbose(true);
-	optimizer.optimize(100);
+	//optimizer.setVerbose(true);
+	optimizer.optimize(1000);
 	cameraToHead = transformationVertex->estimate();
 
 	this->markerPosition = tf::Vector3(positionVertex->estimate()[0],
 			positionVertex->estimate()[1], positionVertex->estimate()[2]);
 	this->markerPositionOptimized = true;
+
+	double headYawOffset = offsetVertex->estimate()[0];
+	double headPitchOffset = offsetVertex->estimate()[1];
+	std::cout << "offset(yaw,pitch) " << headYawOffset << " " << headPitchOffset << ";";
 
 	/*std::cout << "position (x,y,z):" << positionVertex->estimate()[0] << ","
 	 << positionVertex->estimate()[1] << ","
