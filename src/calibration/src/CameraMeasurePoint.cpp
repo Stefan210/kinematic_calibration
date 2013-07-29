@@ -46,3 +46,27 @@ CameraMeasurePoint CameraMeasurePoint::withHeadPitchOffset(
 
 	return newCameraMeasurePoint;
 }
+
+tf::Transform CameraMeasurePoint::addPitchOffset(tf::Transform transform,
+		double pitchOffset) const {
+	tf::Transform newTransform;
+	newTransform.setOrigin(transform.getOrigin());
+	double r, p, y;
+	tf::Matrix3x3(transform.getRotation()).getRPY(r, p, y);
+	tf::Quaternion newRotation;
+	newRotation.setRPY(r, p + pitchOffset, y);
+	newTransform.setRotation(newRotation);
+	return newTransform;
+}
+
+tf::Transform CameraMeasurePoint::addYawOffset(tf::Transform transform,
+		double yawOffset) const {
+	tf::Transform newTransform;
+	newTransform.setOrigin(transform.getOrigin());
+	double r, p, y;
+	tf::Matrix3x3(transform.getRotation()).getRPY(r, p, y);
+	tf::Quaternion newRotation;
+	newRotation.setRPY(r, p, y + yawOffset);
+	newTransform.setRotation(newRotation);
+	return newTransform;
+}

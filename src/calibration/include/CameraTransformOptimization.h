@@ -53,7 +53,7 @@ public:
 	 * position and the measured points given the current
 	 * estimation for the transformation.
 	 */
-	virtual void calculateSqrtDistFromMarker(tf::Transform cameraToHead,
+	virtual void calculateSqrtDistFromMarker(CalibrationState state,
 			tf::Vector3 markerPoint, float& error);
 
 	/**
@@ -67,19 +67,19 @@ public:
 	 * Calculates an estimate for the marker position given a guess
 	 * for the transformation.
 	 */
-	virtual void getMarkerEstimate(const tf::Transform& cameraToHead,
+	virtual void getMarkerEstimate(const CalibrationState& cameraToHead,
 			tf::Vector3& position);
 
 	/**
 	 * Prints the results of the optimization onto the screen.
 	 */
-	void printResult(std::string pre, const tf::Transform& cameraToHead,
+	void printResult(std::string pre, const CalibrationState& cameraToHead,
 			tf::Vector3 markerPosition);
 
 	/**
 	 * Calculates the average roll and pitch of the grond using the passed transformation.
 	 */
-	void getAvgRP(const tf::Transform&  cameraToHead, double& r,
+	void getAvgRP(const CalibrationState& state, double& r,
 			double& p);
 
 	virtual void removeOutliers();

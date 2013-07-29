@@ -52,7 +52,7 @@ void SvdTransformOptimization::optimizeTransform(CalibrationState& calibrationSt
 			MeasurePoint currentMeasure = measurePoints[i];
 			tf::Vector3 currentPointMeasure = currentMeasure.measuredPosition;
 			tf::Transform opticalToFixed = currentMeasure.opticalToFixed(
-					currentCameraToHead);
+					CalibrationState(currentCameraToHead, 0, 0));
 			tf::Vector3 currentPointFixed = opticalToFixed
 					* currentPointMeasure;
 			centerX += currentPointFixed.getX();
@@ -66,7 +66,8 @@ void SvdTransformOptimization::optimizeTransform(CalibrationState& calibrationSt
 		std::vector<tf::Vector3> pointcloudP;
 		for (int i = 0; i < numOfPoints; i++) {
 			MeasurePoint currentMeasure = measurePoints[i];
-			tf::Transform headPitchToFixed = currentMeasure.headToFixed();
+			tf::Transform headPitchToFixed = currentMeasure.headToFixed(
+					CalibrationState(currentCameraToHead, 0, 0));
 			tf::Vector3 currentPointHead =
 					(headPitchToFixed.inverse()) * centerPointFixed;
 			pointcloudP.push_back(currentPointHead);

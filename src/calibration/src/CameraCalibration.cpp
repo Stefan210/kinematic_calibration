@@ -78,7 +78,7 @@ int main(int argc, char** argv) {
 			new CompositeTransformOptimization();
 	compositeTransformOptimization->addTransformOptimization("svd",
 			svdTransformOptimization);
-
+/*
 	// 1st g2o
 	G2oTransformOptimization* g2oTransformOptimization1 =
 			new G2oTransformOptimization();
@@ -204,18 +204,18 @@ int main(int argc, char** argv) {
 	g2oTransformOptimization9->setCorrelationMatrix(correlationMatrix9);
 	compositeTransformOptimization->addTransformOptimization(
 			"g2o(0.001,0.001,0.001,1,1)", g2oTransformOptimization9);
-
+*/
 
 	// hill climbing
 	HillClimbingTransformOptimization* hillClimbing =
 			new HillClimbingTransformOptimization();
 	compositeTransformOptimization->addTransformOptimization("hillClimbing",
 			hillClimbing);
-	/*
+
 	 // simulated annealing
-	 SimulatedAnnealingTransformOptimization* simulatedAnnealing = new SimulatedAnnealingTransformOptimization();
-	 compositeTransformOptimization->addTransformOptimization("simulatedAnnealing", simulatedAnnealing);
-	 */
+//	 SimulatedAnnealingTransformOptimization* simulatedAnnealing = new SimulatedAnnealingTransformOptimization();
+//	 compositeTransformOptimization->addTransformOptimization("simulatedAnnealing", simulatedAnnealing);
+
 
 	options.setTransformOptimization(compositeTransformOptimization);
 
@@ -351,7 +351,7 @@ void CameraCalibration::outputMeasurePoint(
 	// get the transform between headFrame and cameraFrame and transform the current point to fixed frame
 	this->transformListener.lookupTransform(headPitchFrame, cameraFrame,
 			currentTimestamps[currentTimestamps.size() - 1], cameraToHead);
-	tf::Vector3 pointFixed = newMeasurePoint.opticalToFixed(cameraToHead)
+	tf::Vector3 pointFixed = newMeasurePoint.opticalToFixed(CalibrationState(cameraToHead, 0.0, 0.0))
 			* newMeasurePoint.measuredPosition;
 
 	// output ball position in optical and fixed frame
@@ -361,7 +361,7 @@ void CameraCalibration::outputMeasurePoint(
 			"Last measurement (average position, fixed frame): %f, %f, %f.", pointFixed.getX(), pointFixed.getY(), pointFixed.getZ());
 
 	tf::Transform opticalToFootprint;
-	opticalToFootprint = newMeasurePoint.opticalToFootprint(cameraToHead);
+	opticalToFootprint = newMeasurePoint.opticalToFootprint(CalibrationState(cameraToHead, 0.0, 0.0));
 	GroundData transformedGroundData = newMeasurePoint.groundData.transform(opticalToFootprint);
 
 	double roll, pitch, yaw;

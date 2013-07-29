@@ -65,6 +65,54 @@ TEST(CameraMeasurePointTest, withHeadPitchOffsetTest) {
 	ASSERT_NEAR(0.3, y, 1e-10);
 }
 
+TEST(CameraMeasurePointTest, yawOffsetTest) {
+	CameraMeasurePoint initialMeasure;
+	tf::Quaternion initialRotation, modifiedRotation;
+	tf::Vector3 initialTranslation(1.0, 2.0, 3.0), modifiedTranslation;
+	tf::Transform initialTransform, modifiedTransform;
+	initialRotation.setRPY(0.1, 0.2, 0.3);
+	initialTransform.setOrigin(initialTranslation);
+	initialTransform.setRotation(initialRotation);
+
+	modifiedTransform = initialMeasure.addYawOffset(initialTransform, 0.5);
+	modifiedTranslation = modifiedTransform.getOrigin();
+	modifiedRotation = modifiedTransform.getRotation();
+
+	ASSERT_NEAR(1.0, modifiedTranslation.getX(), 1e-10);
+	ASSERT_NEAR(2.0, modifiedTranslation.getY(), 1e-10);
+	ASSERT_NEAR(3.0, modifiedTranslation.getZ(), 1e-10);
+
+	double r, p, y;
+	tf::Matrix3x3(modifiedRotation).getRPY(r, p, y);
+	ASSERT_NEAR(0.1, r, 1e-10);
+	ASSERT_NEAR(0.2, p, 1e-10);
+	ASSERT_NEAR(0.3+0.5, y, 1e-10);
+}
+
+TEST(CameraMeasurePointTest, pitchOffsetTest) {
+	CameraMeasurePoint initialMeasure;
+	tf::Quaternion initialRotation, modifiedRotation;
+	tf::Vector3 initialTranslation(1.0, 2.0, 3.0), modifiedTranslation;
+	tf::Transform initialTransform, modifiedTransform;
+	initialRotation.setRPY(0.1, 0.2, 0.3);
+	initialTransform.setOrigin(initialTranslation);
+	initialTransform.setRotation(initialRotation);
+
+	modifiedTransform = initialMeasure.addPitchOffset(initialTransform, 0.5);
+	modifiedTranslation = modifiedTransform.getOrigin();
+	modifiedRotation = modifiedTransform.getRotation();
+
+	ASSERT_NEAR(1.0, modifiedTranslation.getX(), 1e-10);
+	ASSERT_NEAR(2.0, modifiedTranslation.getY(), 1e-10);
+	ASSERT_NEAR(3.0, modifiedTranslation.getZ(), 1e-10);
+
+	double r, p, y;
+	tf::Matrix3x3(modifiedRotation).getRPY(r, p, y);
+	ASSERT_NEAR(0.1, r, 1e-10);
+	ASSERT_NEAR(0.2+0.5, p, 1e-10);
+	ASSERT_NEAR(0.3, y, 1e-10);
+}
+
 // Run all the tests that were declared with TEST()
 int main(int argc, char **argv) {
 	testing::InitGoogleTest(&argc, argv);

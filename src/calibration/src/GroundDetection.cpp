@@ -237,6 +237,7 @@ void GroundData::calculateEquationFromPoints() {
 
 void GroundData::normalizeEquation() {
 	double length = fabs(a) + fabs(b) + fabs(c) + fabs(d);
+	length *= c > 0 ? 1 : -1;
 	a /= length;
 	b /= length;
 	c /= length;

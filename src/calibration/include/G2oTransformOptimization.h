@@ -19,7 +19,7 @@ public:
 	virtual ~G2oTransformOptimization();
 
 	virtual void optimizeTransform(CalibrationState& calibrationState);
-	virtual void getMarkerEstimate(const tf::Transform& cameraToHead,
+	virtual void getMarkerEstimate(const CalibrationState& state,
 			tf::Vector3& position);
 
     Eigen::Matrix<double,5,5> getCorrelationMatrix() const

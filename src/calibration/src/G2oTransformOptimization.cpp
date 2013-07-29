@@ -68,7 +68,7 @@ void G2oTransformOptimization::optimizeTransform(CalibrationState& calibrationSt
 	// add a vertex representing the estimated marker position
 	VertexPosition3D* positionVertex = new VertexPosition3D();
 	tf::Vector3 position;
-	getMarkerEstimate(initialTransformCameraToHead, position);
+	getMarkerEstimate(CalibrationState(initialTransformCameraToHead,0,0), position);
 	positionVertex->setEstimate(
 			Eigen::Vector3d(position[0], position[1], position[2]));
 	positionVertex->setId(1);
@@ -132,10 +132,13 @@ void G2oTransformOptimization::optimizeTransform(CalibrationState& calibrationSt
 		optimizer.optimize(100);
 	}*/
 
+	offsetVertex->setFixed(!true);
+	transformationVertex->setFixed(!true);
+	positionVertex->setFixed(!true);
 	optimizer.initializeOptimization();
 	optimizer.computeActiveErrors();
 	//optimizer.setVerbose(true);
-	optimizer.optimize(100);
+	optimizer.optimize(1000);
 
 	this->markerPosition = tf::Vector3(positionVertex->estimate()[0],
 			positionVertex->estimate()[1], positionVertex->estimate()[2]);
@@ -164,11 +167,11 @@ void G2oTransformOptimization::optimizeTransform(CalibrationState& calibrationSt
 }
 
 void G2oTransformOptimization::getMarkerEstimate(
-		const tf::Transform& cameraToHead, tf::Vector3& position) {
+		const CalibrationState& state, tf::Vector3& position) {
 	if (this->markerPositionOptimized == true) {
 		position = this->markerPosition;
 	} else {
-		this->CameraTransformOptimization::getMarkerEstimate(cameraToHead,
+		this->CameraTransformOptimization::getMarkerEstimate(state,
 				position);
 	}
 }

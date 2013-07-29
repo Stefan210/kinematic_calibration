@@ -28,13 +28,13 @@ void CameraTransformOptimization::clearMeasurePoints() {
 }
 
 void CameraTransformOptimization::calculateSqrtDistFromMarker(
-		tf::Transform cameraToHead, tf::Vector3 markerPoint, float& error) {
+		CalibrationState state, tf::Vector3 markerPoint, float& error) {
 	error = 0;
 
 	for (int i = 0; i < this->measurePoints.size(); i++) {
 		float currentError = 0;
 		MeasurePoint& current = this->measurePoints[i];
-		tf::Transform opticalToFixed = current.opticalToFixed(cameraToHead);
+		tf::Transform opticalToFixed = current.opticalToFixed(state);
 		tf::Vector3 transformedPoint = opticalToFixed
 				* current.measuredPosition;
 		currentError += pow(markerPoint.x() - transformedPoint.x(), 2);
@@ -52,12 +52,12 @@ void CameraTransformOptimization::setInitialTransformCameraToHead(
 }
 
 void CameraTransformOptimization::getMarkerEstimate(
-		const tf::Transform& cameraToHead, tf::Vector3& position) {
+		const CalibrationState& state, tf::Vector3& position) {
 	int numOfPoints = measurePoints.size();
 	double centerX = 0, centerY = 0, centerZ = 0;
 	for (int i = 0; i < numOfPoints; i++) {
 		MeasurePoint currentMeasure = measurePoints[i];
-		tf::Vector3 pointFixed = currentMeasure.opticalToFixed(cameraToHead)
+		tf::Vector3 pointFixed = currentMeasure.opticalToFixed(state)
 				* currentMeasure.measuredPosition;
 		centerX += pointFixed.getX();
 		centerY += pointFixed.getY();
@@ -77,14 +77,15 @@ void CameraTransformOptimization::getMarkerEstimate(
 }
 
 void CameraTransformOptimization::printResult(std::string pre,
-		const tf::Transform& cameraToHead, tf::Vector3 markerPosition) {
+		const CalibrationState& state, tf::Vector3 markerPosition) {
 	float error;
 	double r, p, y;
 	tf::Vector3 markerEstimate;
+	tf::Transform cameraToHead = state.getCameraToHead();
 
-	getMarkerEstimate(cameraToHead, markerEstimate);
-	calculateSqrtDistFromMarker(cameraToHead, markerPosition, error);
-	getAvgRP(cameraToHead, r, p);
+	getMarkerEstimate(state, markerEstimate);
+	calculateSqrtDistFromMarker(state, markerPosition, error);
+	getAvgRP(state, r, p);
 	std::cout << pre << ";";
 	std::cout << "position optimized (x,y,z):" << markerPosition[0] << ","
 			<< markerPosition[1] << "," << markerPosition[2] << ";";
@@ -106,7 +107,7 @@ void CameraTransformOptimization::printResult(std::string pre,
 	std::cout << "\n\n";
 }
 
-void CameraTransformOptimization::getAvgRP(const tf::Transform& cameraToHead,
+void CameraTransformOptimization::getAvgRP(const CalibrationState& state,
 		double& r, double& p) {
 	r = 0;
 	p = 0;
@@ -116,7 +117,7 @@ void CameraTransformOptimization::getAvgRP(const tf::Transform& cameraToHead,
 		CameraMeasurePoint measurePoint = this->measurePoints[i];
 		GroundData transformedGroundData;
 		transformedGroundData = measurePoint.groundData.transform(
-				measurePoint.opticalToFootprint(cameraToHead));
+				measurePoint.opticalToFootprint(state));
 
 		transformedGroundData.getRPY(roll, pitch, yaw);
 		r += fabs(roll);
@@ -161,7 +162,7 @@ void CameraTransformOptimization::calculateSqrtDistCameraHead(
 		MeasurePoint currentMeasure = measurePoints[i];
 		tf::Vector3 currentPointMeasure = currentMeasure.measuredPosition;
 		tf::Transform opticalToFixed = currentMeasure.opticalToFixed(
-				cameraToHead);
+				CalibrationState(cameraToHead, 0.0, 0.0));
 		tf::Vector3 currentPointC = opticalToFixed * currentPointMeasure;
 		centerX += currentPointC.getX();
 		centerY += currentPointC.getY();
@@ -208,9 +209,11 @@ void CompositeTransformOptimization::optimizeTransform(
 	float currentError = 0;
 
 	tf::Vector3 initialMarkerEstimate;
-	this->getMarkerEstimate(this->initialTransformCameraToHead,
+	this->getMarkerEstimate(
+			CalibrationState(this->initialTransformCameraToHead, 0, 0),
 			initialMarkerEstimate);
-	printResult("initial", this->initialTransformCameraToHead,
+	printResult("initial",
+			CalibrationState(this->initialTransformCameraToHead, 0, 0),
 			initialMarkerEstimate);
 
 	// return the transform with the smallest error
@@ -220,14 +223,14 @@ void CompositeTransformOptimization::optimizeTransform(
 		tf::Vector3 markerPosition;
 		//it->second->removeOutliers();
 		it->second->optimizeTransform(currentState);
-		it->second->getMarkerEstimate(currentState.getCameraToHead(), markerPosition);
-		this->calculateSqrtDistFromMarker(currentState.getCameraToHead(), markerPosition,
+		it->second->getMarkerEstimate(currentState, markerPosition);
+		this->calculateSqrtDistFromMarker(currentState, markerPosition,
 				currentError);
 		if (currentError < smallestError) {
 			smallestError = currentError;
 			calibrationState = currentState;
 		}
-		printResult(it->first, currentState.getCameraToHead(), markerPosition);
+		printResult(it->first, currentState, markerPosition);
 	}
 }
 
@@ -260,18 +263,17 @@ void CompositeTransformOptimization::setInitialTransformCameraToHead(
 void CameraTransformOptimization::removeOutliers() {
 	std::vector<MeasurePoint> filteredMeasurePoints;
 	tf::Vector3 markerPosition;
-	getMarkerEstimate(this->initialTransformCameraToHead, markerPosition);
+	CalibrationState initialState(this->initialTransformCameraToHead, 0, 0);
+	getMarkerEstimate(initialState, markerPosition);
 	for (int i = 0; i < this->measurePoints.size(); i++) {
 		double r, p, y;
 		float error;
 		CameraMeasurePoint measurePoint = this->measurePoints[i];
-		markerPosition = measurePoint.opticalToFixed(
-				this->initialTransformCameraToHead)
+		markerPosition = measurePoint.opticalToFixed(initialState)
 				* measurePoint.measuredPosition;
 		GroundData transformedGroundData;
 		transformedGroundData = measurePoint.groundData.transform(
-				measurePoint.opticalToFootprint(
-						this->initialTransformCameraToHead));
+				measurePoint.opticalToFootprint(initialState));
 		transformedGroundData.getRPY(r, p, y);
 		std::cout << "(i) " << i << ";";
 		std::cout << "position (x,y,z):" << markerPosition[0] << ","

@@ -11,9 +11,9 @@
 #include <tf/tf.h>
 #include "../include/GroundDetection.h"
 #include "../include/Utils.h"
+#include "../include/CalibrationState.h"
 
 class CameraMeasurePoint {
-public:
 public:
 	CameraMeasurePoint();
 	virtual ~CameraMeasurePoint();
@@ -31,14 +31,19 @@ public:
 	 */
 	CameraMeasurePoint withHeadPitchOffset(double headPitchOffset);
 
-
-	inline const tf::Transform headToFootprint() const {
-		return fixedToFootprint * headToFixed();
+	inline const tf::Transform headToFootprint(
+			const CalibrationState& state) const {
+		return fixedToFootprint * headToFixed(state);
 	}
 
-	inline const tf::Transform headToFixed() const {
-		return torsoToFixed * headYawToTorso
-				* headPitchToHeadYaw;
+	inline const tf::Transform headToFixed(
+			const CalibrationState& state) const {
+		tf::Transform headYawToTorsoWithOffset = addYawOffset(
+				this->getHeadYawToTorso(), state.getHeadYawOffset());
+		tf::Transform headPitchToHeadYawWithOffset = addPitchOffset(
+				this->headPitchToHeadYaw, state.getHeadPitchOffset());
+		return torsoToFixed * headYawToTorsoWithOffset
+				* headPitchToHeadYawWithOffset;
 	}
 
 	inline const tf::Pose groundPose() const {
@@ -46,14 +51,13 @@ public:
 	}
 
 	inline const tf::Transform opticalToFootprint(
-			tf::Transform cameraToHead) const {
-		return fixedToFootprint * opticalToFixed(cameraToHead);
+			const CalibrationState& state) const {
+		return fixedToFootprint * opticalToFixed(state);
 	}
 
 	inline const tf::Transform opticalToFixed(
-			tf::Transform cameraToHead) const {
-		return torsoToFixed * headYawToTorso * headPitchToHeadYaw * cameraToHead
-				* opticalToCamera;
+			const CalibrationState& state) const {
+		return headToFixed(state) * state.getCameraToHead() * opticalToCamera;
 	}
 
 	friend ostream &operator<<(ostream &output, const CameraMeasurePoint &cmp) {
@@ -128,8 +132,14 @@ private:
 	tf::Transform headYawToTorso; // second head link
 	tf::Transform torsoToFixed; // e.g. first frame of body (after head) to last frame of body (r_sole)
 	tf::Transform fixedToFootprint;
-}
-;
+
+	tf::Transform addPitchOffset(tf::Transform transform,
+			double pitchOffset) const;
+	tf::Transform addYawOffset(tf::Transform transform,
+			double yawOffset) const;
+
+	FRIEND_TEST(CameraMeasurePointTest, yawOffsetTest);FRIEND_TEST(CameraMeasurePointTest, pitchOffsetTest);
+};
 
 typedef CameraMeasurePoint MeasurePoint;
 

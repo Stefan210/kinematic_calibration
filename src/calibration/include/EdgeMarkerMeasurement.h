@@ -12,6 +12,7 @@
 #include "../include/VertexTransformation3D.h"
 #include "../include/VertexOffset.h"
 #include "../include/CameraTransformOptimization.h"
+#include "../include/CalibrationState.h"
 
 #include <g2o/core/base_multi_edge.h>
 

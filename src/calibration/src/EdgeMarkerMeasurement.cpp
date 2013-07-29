@@ -32,9 +32,8 @@ void EdgeMarkerMeasurement::computeError() {
 
 	//std::cout << "headYawOffset " << headYawOffset << " headPitchOffset " << headPitchOffset << std::endl;
 
-	tf::Transform opticalToFixedTransform = measurePoint.withHeadYawOffset(
-			headYawOffset).withHeadPitchOffset(headPitchOffset).opticalToFixed(
-			cameraToHeadTransform);
+	tf::Transform opticalToFixedTransform = measurePoint.opticalToFixed(
+			CalibrationState(cameraToHeadTransform, headYawOffset, headPitchOffset));
 /*	tf::Transform opticalToFixedTransform = measurePoint.opticalToFixed(
 			cameraToHeadTransform);*/
 	tf::Vector3 transformedMeasurement = opticalToFixedTransform

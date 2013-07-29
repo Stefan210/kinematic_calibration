@@ -76,7 +76,7 @@ bool LocalTransformOptimization::decreaseStepwidth() {
 }
 
 float LocalTransformOptimization::calculateError(LtoState& state) {
-	float error = 0;
+	float positionError = 0;
 	tf::Transform cameraToHead = state.getCameraToHead();
 	int numOfPoints = this->measurePoints.size();
 
@@ -84,7 +84,8 @@ float LocalTransformOptimization::calculateError(LtoState& state) {
 	float centerX = 0, centerY = 0, centerZ = 0;
 	for (int i = 0; i < numOfPoints; i++) {
 		MeasurePoint& current = this->measurePoints[i];
-		tf::Transform opicalToFixed = current.opticalToFixed(cameraToHead);
+		//tf::Transform opicalToFixed = current.opticalToFixed(cameraToHead);
+		tf::Transform opicalToFixed = current.opticalToFixed(state);
 		tf::Vector3 transformedPoint = opicalToFixed * current.measuredPosition;
 		centerX += transformedPoint.getX();
 		centerY += transformedPoint.getY();
@@ -105,31 +106,37 @@ float LocalTransformOptimization::calculateError(LtoState& state) {
 	 error += (centerPoint.z() - transformedPoint.z())
 	 * (centerPoint.z() - transformedPoint.z());
 	 }*/
-	this->calculateSqrtDistFromMarker(cameraToHead, centerPoint, error);
+	this->calculateSqrtDistFromMarker(state, centerPoint, positionError);
 
 	// add ground angles
 	double roll, pitch;
-	this->getAvgRP(cameraToHead, roll, pitch);
+	this->getAvgRP(state, roll, pitch);
 
+	double groundError = 0;
 	double a = 0, b = 0, c = 0, d = 0;
 	for (int i = 0; i < this->measurePoints.size(); i++) {
 		MeasurePoint& current = this->measurePoints[i];
-		tf::Transform opticalToFootprint = current.opticalToFootprint(
-				cameraToHead);
+		tf::Transform opticalToFootprint = current.opticalToFootprint(state);
 		GroundData transformedGroundData = current.groundData.transform(
 				opticalToFootprint);
 		a += fabs(transformedGroundData.a);
 		b += fabs(transformedGroundData.b);
 		c += fabs(transformedGroundData.c);
 		d += fabs(transformedGroundData.d);
+		groundError += fabs(fabs(transformedGroundData.d) - 0.02)
+				+ fabs(tf::Vector3(transformedGroundData.a, transformedGroundData.b,
+						transformedGroundData.c).normalized().angle(
+						tf::Vector3(0, 0, 1)));
 	}
 	a /= (double) this->measurePoints.size();
 	b /= (double) this->measurePoints.size();
 	c /= (double) this->measurePoints.size();
 	d /= (double) this->measurePoints.size();
 
-	return fabs(d) + tf::Vector3(a, b, c).normalized().angle(tf::Vector3(0, 0, 1));
-	//return error + roll + pitch;
+	return positionError + groundError;
+//	return error + fabs(fabs(d) - 0.02)
+//			+ fabs(tf::Vector3(a, b, c).normalized().angle(tf::Vector3(0, 0, 1)));
+//	return error + roll + pitch;
 //	return d * d
 //			+ tf::Vector3(a, b, c).normalized().angle(tf::Vector3(0, 0, 1))
 //					* tf::Vector3(a, b, c).normalized().angle(
@@ -203,6 +210,48 @@ std::vector<LtoState> LocalTransformOptimization::getNeighbors(
 	for (int i = 0; i < transforms.size(); i++) {
 		LtoState newState;
 		newState.setCameraToHead(transforms[i]);
+		newState.setHeadPitchOffset(current.getHeadPitchOffset());
+		newState.setHeadYawOffset(current.getHeadYawOffset());
+		double error = calculateError(newState);
+		newState.error = error;
+		neighbours.push_back(newState);
+	}
+
+	{
+		LtoState newState;
+		newState.setCameraToHead(currentTransform);
+		newState.setHeadPitchOffset(current.getHeadPitchOffset() + stepwidth);
+		newState.setHeadYawOffset(current.getHeadYawOffset());
+		double error = calculateError(newState);
+		newState.error = error;
+		neighbours.push_back(newState);
+	}
+
+	{
+		LtoState newState;
+		newState.setCameraToHead(currentTransform);
+		newState.setHeadPitchOffset(current.getHeadPitchOffset() - stepwidth);
+		newState.setHeadYawOffset(current.getHeadYawOffset());
+		double error = calculateError(newState);
+		newState.error = error;
+		neighbours.push_back(newState);
+	}
+
+	{
+		LtoState newState;
+		newState.setCameraToHead(currentTransform);
+		newState.setHeadPitchOffset(current.getHeadPitchOffset());
+		newState.setHeadYawOffset(current.getHeadYawOffset() + stepwidth);
+		double error = calculateError(newState);
+		newState.error = error;
+		neighbours.push_back(newState);
+	}
+
+	{
+		LtoState newState;
+		newState.setCameraToHead(currentTransform);
+		newState.setHeadPitchOffset(current.getHeadPitchOffset());
+		newState.setHeadYawOffset(current.getHeadYawOffset() - stepwidth);
 		double error = calculateError(newState);
 		newState.error = error;
 		neighbours.push_back(newState);
@@ -280,11 +329,17 @@ void SimulatedAnnealingTransformOptimization::optimizeTransform(
 		i = rand() % neighbors.size();
 		successorState = neighbors[i];
 
-		//cout << successorState;
 		difference = currentState.error - successorState.error;
-		//cout << "currentState.error " << currentState.error << endl;
-		//cout << "successorState.error " << successorState.error << endl;
-		//cout << "exp(difference / temperature " << exp(difference / temperature) << endl;
+
+		if (iterations % 10 == 0) {
+			cout << "temperature " << temperature << endl;
+			cout << successorState;
+			cout << "currentState.error " << currentState.error << endl;
+			cout << "successorState.error " << successorState.error << endl;
+			cout << "exp(difference / temperature) "
+					<< exp(difference / temperature) << endl;
+		}
+
 		if (difference > 0) {
 			// always improve
 			currentState = successorState;

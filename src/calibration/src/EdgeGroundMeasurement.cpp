@@ -30,21 +30,23 @@ void EdgeGroundMeasurement::computeError() {
 	double roll, pitch, yaw;
 
 	tf::Transform transform;
-	transform = measurePoint.opticalToFootprint(cameraToHeadTransform);
+	transform = measurePoint.opticalToFootprint(
+			CalibrationState(cameraToHeadTransform, headYawOffset,
+					headPitchOffset));
 	GroundData transformedGroundData =
 			measurePoint.withHeadPitchOffset(headPitchOffset).withHeadYawOffset(
 					headYawOffset).groundData.transform(transform);
 
 	transformedGroundData.getRPY(roll, pitch, yaw);
 
-	double length = fabs(transformedGroundData.a) + fabs(transformedGroundData.b)
-			+ fabs(transformedGroundData.c) + fabs(transformedGroundData.d);
+	double length = fabs(transformedGroundData.a)
+			+ fabs(transformedGroundData.b) + fabs(transformedGroundData.c)
+			+ fabs(transformedGroundData.d);
 	length *= transformedGroundData.c > 0 ? 1 : -1;
 	double a = transformedGroundData.a / length;
 	double b = transformedGroundData.b / length;
 	double c = transformedGroundData.c / length;
 	double d = transformedGroundData.d / length;
-
 
 //	std::cout << "ground (roll, pitch, yaw) "
 //				<< roll << " " << pitch << " " << yaw << " ";
