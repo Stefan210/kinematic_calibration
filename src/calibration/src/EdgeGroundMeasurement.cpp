@@ -50,7 +50,7 @@ void EdgeGroundMeasurement::computeError() {
 //	_error[0] = roll;
 //	_error[1] = pitch;
 
-	_error[0] = fabs(d) - 2.0;
+	_error[0] = fabs(d) - 0.2;
 	_error[1] = tf::Vector3(a, b, c).normalized().angle(tf::Vector3(0, 0, 1));
 
 //	_error[0] = fabs(roll) < 0.05  ? 0 : 1000;
