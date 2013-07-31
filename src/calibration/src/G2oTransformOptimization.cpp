@@ -146,10 +146,10 @@ void G2oTransformOptimization::optimizeTransform(CalibrationState& calibrationSt
 
 	double headYawOffset = offsetVertex->estimate()[0];
 	double headPitchOffset = offsetVertex->estimate()[1];
-	std::cout << "offset(yaw,pitch) " << headYawOffset << " " << headPitchOffset
+	/*std::cout << "offset(yaw,pitch) " << headYawOffset << " " << headPitchOffset
 			<< ";";
 
-	/*std::cout << "position (x,y,z):" << positionVertex->estimate()[0] << ","
+	std::cout << "position (x,y,z):" << positionVertex->estimate()[0] << ","
 	 << positionVertex->estimate()[1] << ","
 	 << positionVertex->estimate()[2] << ";";
 	 std::cout << "translation (x,y,z):" << transformationVertex->estimate().getOrigin()[0]

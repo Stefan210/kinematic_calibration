@@ -78,7 +78,7 @@ int main(int argc, char** argv) {
 			new CompositeTransformOptimization();
 	compositeTransformOptimization->addTransformOptimization("svd",
 			svdTransformOptimization);
-/*
+
 	// 1st g2o
 	G2oTransformOptimization* g2oTransformOptimization1 =
 			new G2oTransformOptimization();
@@ -204,7 +204,7 @@ int main(int argc, char** argv) {
 	g2oTransformOptimization9->setCorrelationMatrix(correlationMatrix9);
 	compositeTransformOptimization->addTransformOptimization(
 			"g2o(0.001,0.001,0.001,1,1)", g2oTransformOptimization9);
-*/
+
 
 	// hill climbing
 	HillClimbingTransformOptimization* hillClimbing =

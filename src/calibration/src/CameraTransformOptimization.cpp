@@ -92,6 +92,8 @@ void CameraTransformOptimization::printResult(std::string pre,
 	std::cout << "position estimated (x,y,z):" << markerEstimate[0] << ","
 			<< markerEstimate[1] << "," << markerEstimate[2] << ";";
 	std::cout << "ground (r,p):" << r << "," << p << ";";
+	std::cout << "offset (yaw, pitch):" << state.getHeadYawOffset() << ","
+			<< state.getHeadPitchOffset() << ";";
 	std::cout << "translation (x,y,z):" << cameraToHead.getOrigin()[0] << ","
 			<< cameraToHead.getOrigin()[1] << "," << cameraToHead.getOrigin()[2]
 			<< ";";
@@ -280,7 +282,7 @@ void CameraTransformOptimization::removeOutliers() {
 				<< markerPosition[1] << "," << markerPosition[2] << ";";
 		std::cout << "ground (r,p):" << r << "," << p << ";";
 		std::cout << "\n";
-		if (fabs(r) + fabs(p) < 0.1) {
+		if (/*fabs(r) + fabs(p) < 0.05 && */markerPosition[2] > 0.2) {
 			filteredMeasurePoints.push_back(measurePoint);
 		} else {
 			std::cout << "Removed!\n";
