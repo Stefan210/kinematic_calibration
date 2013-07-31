@@ -36,7 +36,7 @@ CameraMeasurePoint CameraMeasurePoint::withHeadPitchOffset(
 	tf::Transform newHeadPitchToHeadYaw;
 	newHeadPitchToHeadYaw.setOrigin(this->headPitchToHeadYaw.getOrigin());
 	double r, p, y;
-	tf::Matrix3x3(this->headYawToTorso.getRotation()).getRPY(r, p, y);
+	tf::Matrix3x3(this->headPitchToHeadYaw.getRotation()).getRPY(r, p, y);
 	tf::Quaternion newRotation;
 	newRotation.setRPY(r, p + headPitchOffset, y);
 	newHeadPitchToHeadYaw.setRotation(newRotation);
