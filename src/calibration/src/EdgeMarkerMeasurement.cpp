@@ -34,8 +34,6 @@ void EdgeMarkerMeasurement::computeError() {
 
 	tf::Transform opticalToFixedTransform = measurePoint.opticalToFixed(
 			CalibrationState(cameraToHeadTransform, headYawOffset, headPitchOffset));
-/*	tf::Transform opticalToFixedTransform = measurePoint.opticalToFixed(
-			cameraToHeadTransform);*/
 	tf::Vector3 transformedMeasurement = opticalToFixedTransform
 			* measurePoint.measuredPosition;
 

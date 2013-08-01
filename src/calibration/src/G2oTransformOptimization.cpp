@@ -82,7 +82,7 @@ void G2oTransformOptimization::optimizeTransform(CalibrationState& calibrationSt
 
 	// add a vertex representing the offset for headYaw and headPitch joint
 	VertexOffset* offsetVertex = new VertexOffset();
-	offsetVertex->setEstimate(Eigen::Matrix<double, 2, 1>(0.0, 0.0));
+	offsetVertex->setEstimate(Eigen::Matrix<double, 2, 1>(0.01, 0.01));
 	offsetVertex->setId(3);
 	optimizer.addVertex(offsetVertex);
 
@@ -118,9 +118,9 @@ void G2oTransformOptimization::optimizeTransform(CalibrationState& calibrationSt
 		optimizer.addEdge(edge);
 	}
 
-	/*int iterations = 30;
-	bool toggle = true;
-	while (iterations--) {
+	int iterations = 2;
+	bool toggle = false;
+	/*while (iterations--) {
 		positionVertex->setFixed(toggle);
 		transformationVertex->setFixed(toggle);
 		offsetVertex->setFixed(!toggle);

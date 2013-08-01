@@ -58,12 +58,15 @@ void HillClimbingTransformOptimization::optimizeTransform(
 		// check whether the current best neighbor improves
 		if (bestNeighbor.isBetterThan(currentState)) {
 			currentState = bestNeighbor;
+			stepwidth = 0.1;
 		} else if (!decreaseStepwidth()) {
 			canImprove = false;
 		}
 	}
 
 	calibrationState.setCameraToHead(currentState.getCameraToHead());
+	calibrationState.setHeadYawOffset(currentState.getHeadYawOffset());
+	calibrationState.setHeadPitchOffset(currentState.getHeadPitchOffset());
 }
 
 bool LocalTransformOptimization::decreaseStepwidth() {
@@ -109,29 +112,28 @@ float LocalTransformOptimization::calculateError(LtoState& state) {
 	this->calculateSqrtDistFromMarker(state, centerPoint, positionError);
 
 	// add ground angles
-	double roll, pitch;
+	double roll, pitch, yaw;
 	this->getAvgRP(state, roll, pitch);
 
 	double groundError = 0;
-	double a = 0, b = 0, c = 0, d = 0;
+
 	for (int i = 0; i < this->measurePoints.size(); i++) {
 		MeasurePoint& current = this->measurePoints[i];
 		tf::Transform opticalToFootprint = current.opticalToFootprint(state);
 		GroundData transformedGroundData = current.groundData.transform(
 				opticalToFootprint);
-		a += fabs(transformedGroundData.a);
-		b += fabs(transformedGroundData.b);
-		c += fabs(transformedGroundData.c);
-		d += fabs(transformedGroundData.d);
-		groundError += fabs(fabs(transformedGroundData.d) - 0.02)
-				+ fabs(tf::Vector3(transformedGroundData.a, transformedGroundData.b,
-						transformedGroundData.c).normalized().angle(
-						tf::Vector3(0, 0, 1)));
+		double a = transformedGroundData.a;
+		double b = transformedGroundData.b;
+		double c = transformedGroundData.c;
+		double d = transformedGroundData.d;
+		transformedGroundData.getRPY(roll, pitch, yaw);
+		groundError += fabs(fabs(tf::Vector3(0, 0, -d / c).distance(tf::Vector3(0,0,0))) - 0.02)
+				+ fabs(
+						tf::Vector3(transformedGroundData.a,
+								transformedGroundData.b,
+								transformedGroundData.c).normalized().angle(
+								tf::Vector3(0, 0, 1)));
 	}
-	a /= (double) this->measurePoints.size();
-	b /= (double) this->measurePoints.size();
-	c /= (double) this->measurePoints.size();
-	d /= (double) this->measurePoints.size();
 
 	return positionError + groundError;
 //	return error + fabs(fabs(d) - 0.02)
@@ -260,6 +262,11 @@ std::vector<LtoState> LocalTransformOptimization::getNeighbors(
 	return neighbours;
 }
 
+void LocalTransformOptimization::setInitialState(LtoState initialState) {
+	this->initialState = initialState;
+	this->setInitialTransformCameraToHead(initialState.getCameraToHead());
+}
+
 std::ostream& operator<<(std::ostream &out, LtoState &state) {
 	tf::Transform currentTransform = state.getCameraToHead();
 
@@ -277,7 +284,9 @@ std::ostream& operator<<(std::ostream &out, LtoState &state) {
 
 	out << "error: " << state.error << ", ";
 	out << "translation: " << x << " " << y << " " << z << ",";
-	out << "rotation: " << roll << " " << pitch << " " << yaw;
+	out << "rotation: " << roll << " " << pitch << " " << yaw << ",";
+	out << "offset(y,p): " << state.getHeadYawOffset() << " "
+			<< state.getHeadPitchOffset();
 
 	return out;
 }
@@ -360,6 +369,8 @@ void SimulatedAnnealingTransformOptimization::optimizeTransform(
 	}
 
 	calibrationState.setCameraToHead(bestState.getCameraToHead());
+	calibrationState.setHeadYawOffset(bestState.getHeadYawOffset());
+	calibrationState.setHeadPitchOffset(bestState.getHeadPitchOffset());
 }
 
 std::vector<LtoState> SimulatedAnnealingTransformOptimization::getNeighbors(
@@ -376,5 +387,105 @@ std::vector<LtoState> SimulatedAnnealingTransformOptimization::getNeighbors(
 		neighbours.clear();
 	}
 	return allNeighbours;
+}
+
+/*
+ GeneticCameraOptimization::GeneticCameraOptimization() {
+ }
+
+ GeneticCameraOptimization::~GeneticCameraOptimization() {
+ }
+
+ void GeneticCameraOptimization::optimizeTransform(
+ CalibrationState& calibrationState) {
+ }
+
+ void GeneticCameraOptimization::mutate(const LtoState& state_in,
+ LtoState& state_out) const {
+ }
+
+ void GeneticCameraOptimization::reproduce(const LtoState& first_in,
+ LtoState& second_in, LtoState& first_out, LtoState& second_out) {
+ }
+
+ void GeneticCameraOptimization::select(const genetic_priority_queue& population,
+ const int& size, std::vector<LtoState> selection) {
+ double errorSum = 0.0;
+ for(int i = 0; i < population.size(); i++) {
+ //errorSum += population
+ }
+ }
+
+ void GeneticCameraOptimization::initializePopulation(
+ const CalibrationState& initialState, const int& size,
+ genetic_priority_queue& population) {
+ srand(time(0));
+ for (int i = 0; i < size; i++) {
+ LtoState individuum;
+ double trans_x = ((float) rand() / (float) (RAND_MAX)); //[0,1]
+ double trans_y = ((float) rand() / (float) (RAND_MAX)); //[0,1]
+ double trans_z = ((float) rand() / (float) (RAND_MAX)); //[0,1]
+ double rot_r = ((float) rand() / (float) (RAND_MAX)) * 2 * M_PI - M_PI; //[-Pi,Pi]
+ double rot_p = ((float) rand() / (float) (RAND_MAX)) * 2 * M_PI - M_PI; //[-Pi,Pi]
+ double rot_y = ((float) rand() / (float) (RAND_MAX)) * 2 * M_PI - M_PI; //[-Pi,Pi]
+ double offset_headyaw = ((float) rand() / (float) (RAND_MAX)); //[0,1]
+ double offset_headpitch = ((float) rand() / (float) (RAND_MAX)); //[0,1]
+ tf::Quaternion q;
+ q.setRPY(rot_r, rot_p, rot_y);
+ tf::Vector3 t(trans_x, trans_y, trans_z);
+ individuum.setCameraToHead(tf::Transform(q, t));
+ individuum.setHeadPitchOffset(offset_headpitch);
+ individuum.setHeadYawOffset(offset_headyaw);
+ individuum.error = calculateError(individuum);
+ population.push(individuum);
+ }
+ }*/
+
+RandomRestartLocalOptimization::RandomRestartLocalOptimization(
+		LocalTransformOptimization* algorithm, int numOfRestarts) :
+		algorithm(algorithm), numOfRestarts(numOfRestarts) {
+}
+
+RandomRestartLocalOptimization::~RandomRestartLocalOptimization() {
+}
+
+void RandomRestartLocalOptimization::optimizeTransform(
+		CalibrationState& calibrationState) {
+	LtoState bestState;
+	getRandomState(bestState);
+	for (int j = 0; j < this->measurePoints.size(); j++) {
+		algorithm->addMeasurePoint(this->measurePoints[j]);
+	}
+	for (int i = 0; i < numOfRestarts; i++) {
+		std::cout << "starting " << i + 1 << "th run...\n";
+		LtoState initialState, resultState;
+		getRandomState(initialState);
+		algorithm->setInitialState(initialState);
+		algorithm->optimizeTransform(resultState);
+		std::cout << "initial: " << initialState << "\nresult: " << resultState
+				<< "\n\n";
+		if (resultState.isBetterThan(bestState)) {
+			bestState = resultState;
+		}
+	}
+}
+
+void RandomRestartLocalOptimization::getRandomState(LtoState& randomState) {
+	srand(time(0));
+	double trans_x = ((float) rand() / (float) (RAND_MAX)); //[0,1]
+	double trans_y = ((float) rand() / (float) (RAND_MAX)); //[0,1]
+	double trans_z = ((float) rand() / (float) (RAND_MAX)); //[0,1]
+	double rot_r = ((float) rand() / (float) (RAND_MAX)) * 2 * M_PI - M_PI; //[-Pi,Pi]
+	double rot_p = ((float) rand() / (float) (RAND_MAX)) * 2 * M_PI - M_PI; //[-Pi,Pi]
+	double rot_y = ((float) rand() / (float) (RAND_MAX)) * 2 * M_PI - M_PI; //[-Pi,Pi]
+	double offset_headyaw = ((float) rand() / (float) (RAND_MAX)); //[0,1]
+	double offset_headpitch = ((float) rand() / (float) (RAND_MAX)); //[0,1]
+	tf::Quaternion q;
+	q.setRPY(rot_r, rot_p, rot_y);
+	tf::Vector3 t(trans_x, trans_y, trans_z);
+	randomState.setCameraToHead(tf::Transform(q, t));
+	randomState.setHeadPitchOffset(offset_headpitch);
+	randomState.setHeadYawOffset(offset_headyaw);
+	randomState.error = calculateError(randomState);
 }
 

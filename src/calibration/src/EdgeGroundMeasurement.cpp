@@ -34,8 +34,7 @@ void EdgeGroundMeasurement::computeError() {
 			CalibrationState(cameraToHeadTransform, headYawOffset,
 					headPitchOffset));
 	GroundData transformedGroundData =
-			measurePoint.withHeadPitchOffset(headPitchOffset).withHeadYawOffset(
-					headYawOffset).groundData.transform(transform);
+			measurePoint.groundData.transform(transform);
 
 	transformedGroundData.getRPY(roll, pitch, yaw);
 
@@ -52,13 +51,7 @@ void EdgeGroundMeasurement::computeError() {
 //				<< roll << " " << pitch << " " << yaw << " ";
 //	std::cout << a << "x+" << b << "y+" << c << "z+" << d << "=0" << std::endl;
 
-//	_error[0] = roll;
-//	_error[1] = pitch;
-
-	_error[0] = fabs(d) - 0.02;
+	_error[0] = fabs(tf::Vector3(0, 0, -d / c).distance(tf::Vector3(0,0,0))) - 0.02;
 	_error[1] = tf::Vector3(a, b, c).normalized().angle(tf::Vector3(0, 0, 1));
-
-//	_error[0] = fabs(roll) < 0.05  ? 0 : 1000;
-//	_error[0] = fabs(roll) < 0.05  ? 0 : 1000;
 }
 
