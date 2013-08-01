@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
 	options.setTorsoFrame(DEFAULT_TORSO_FRAME);
 	options.setFootprintFrame(DEFAULT_FOOTPRINT_FRAME);
 	TransformFactory* transformFactory = new TfTransformFactory(
-			DEFAULT_HEADPITCH_FRAME, DEFAULT_CAMERA_FRAME);
+	DEFAULT_HEADPITCH_FRAME, DEFAULT_CAMERA_FRAME);
 	options.setInitialTransformFactory(transformFactory);
 	options.setMaxBallRadius(0.076);
 	options.setMinBallRadius(0.074);
@@ -94,7 +94,7 @@ int main(int argc, char** argv) {
 			g2oTransformOptimization1);
 
 	// 2nd g2o
-	G2oTransformOptimization* g2oTransformOptimization2 =
+/*	G2oTransformOptimization* g2oTransformOptimization2 =
 			new G2oTransformOptimization();
 	Eigen::Matrix<double, 5, 5> correlationMatrix2 =
 			Eigen::Matrix<double, 5, 5>::Identity();
@@ -105,7 +105,7 @@ int main(int argc, char** argv) {
 	correlationMatrix2(4, 4) = 0.0;
 	g2oTransformOptimization2->setCorrelationMatrix(correlationMatrix2);
 	compositeTransformOptimization->addTransformOptimization("g2o(1,1,1,0,0)",
-			g2oTransformOptimization2);
+			g2oTransformOptimization2);*/
 
 	// 3rd g2o
 	G2oTransformOptimization* g2oTransformOptimization3 =
@@ -205,17 +205,18 @@ int main(int argc, char** argv) {
 	compositeTransformOptimization->addTransformOptimization(
 			"g2o(0.001,0.001,0.001,1,1)", g2oTransformOptimization9);
 
-
 	// hill climbing
 	HillClimbingTransformOptimization* hillClimbing =
 			new HillClimbingTransformOptimization();
 	compositeTransformOptimization->addTransformOptimization("hillClimbing",
 			hillClimbing);
+	RandomRestartLocalOptimization* rrlo = new RandomRestartLocalOptimization(
+		hillClimbing, 10);
+//	compositeTransformOptimization->addTransformOptimization("RaReHC", rrlo);
 
-	 // simulated annealing
+	// simulated annealing
 //	 SimulatedAnnealingTransformOptimization* simulatedAnnealing = new SimulatedAnnealingTransformOptimization();
 //	 compositeTransformOptimization->addTransformOptimization("simulatedAnnealing", simulatedAnnealing);
-
 
 	options.setTransformOptimization(compositeTransformOptimization);
 
@@ -351,24 +352,34 @@ void CameraCalibration::outputMeasurePoint(
 	// get the transform between headFrame and cameraFrame and transform the current point to fixed frame
 	this->transformListener.lookupTransform(headPitchFrame, cameraFrame,
 			currentTimestamps[currentTimestamps.size() - 1], cameraToHead);
-	tf::Vector3 pointFixed = newMeasurePoint.opticalToFixed(CalibrationState(cameraToHead, 0.0, 0.0))
+	tf::Vector3 pointFixed = newMeasurePoint.opticalToFixed(
+			CalibrationState(cameraToHead, 0.0, 0.0))
 			* newMeasurePoint.measuredPosition;
 
 	// output ball position in optical and fixed frame
-	ROS_INFO(
-			"Last measurement (average position, optical frame): %f, %f, %f.", newMeasurePoint.measuredPosition.getX(), newMeasurePoint.measuredPosition.getY(), newMeasurePoint.measuredPosition.getZ());
-	ROS_INFO(
-			"Last measurement (average position, fixed frame): %f, %f, %f.", pointFixed.getX(), pointFixed.getY(), pointFixed.getZ());
+	ROS_INFO("Last measurement (average position, optical frame): %f, %f, %f.",
+			newMeasurePoint.measuredPosition.getX(),
+			newMeasurePoint.measuredPosition.getY(),
+			newMeasurePoint.measuredPosition.getZ());
+	ROS_INFO("Last measurement (average position, fixed frame): %f, %f, %f.",
+			pointFixed.getX(), pointFixed.getY(), pointFixed.getZ());
 
 	tf::Transform opticalToFootprint;
-	opticalToFootprint = newMeasurePoint.opticalToFootprint(CalibrationState(cameraToHead, 0.0, 0.0));
-	GroundData transformedGroundData = newMeasurePoint.groundData.transform(opticalToFootprint);
+	opticalToFootprint = newMeasurePoint.opticalToFootprint(
+			CalibrationState(cameraToHead, 0.0, 0.0));
+	GroundData transformedGroundData = newMeasurePoint.groundData.transform(
+			opticalToFootprint);
 
 	double roll, pitch, yaw;
 	transformedGroundData.getRPY(roll, pitch, yaw);
 	ROS_INFO(
-			"Ground (base_footprint): (roll, pitch): %10f %10f, (ax+by+cz+d=0), %10fx+%10fy+%10fz+%10f=0", roll, pitch, transformedGroundData.a, transformedGroundData.b, transformedGroundData.c, transformedGroundData.d);
-	std::cout << "ground (r,p):" << roll << "," << pitch << ";" << "(ax+by+cz+d=0)" << transformedGroundData.a << "," << transformedGroundData.b << "," << transformedGroundData.c << "," << transformedGroundData.d;
+			"Ground (base_footprint): (roll, pitch): %10f %10f, (ax+by+cz+d=0), %10fx+%10fy+%10fz+%10f=0",
+			roll, pitch, transformedGroundData.a, transformedGroundData.b,
+			transformedGroundData.c, transformedGroundData.d);
+	std::cout << "ground (r,p):" << roll << "," << pitch << ";"
+			<< "(ax+by+cz+d=0)" << transformedGroundData.a << ","
+			<< transformedGroundData.b << "," << transformedGroundData.c << ","
+			<< transformedGroundData.d;
 }
 
 bool CameraCalibration::distanceTooBig(pcl::PointXYZ first,
@@ -414,7 +425,8 @@ void CameraCalibration::createMeasurePoint(
 	}
 	transformListener.lookupTransform(cameraFrame, opticalFrame, time,
 			opticalToCamera);
-	transformListener.lookupTransform(fixedFrame, torsoFrame, time, torsoToFixed);
+	transformListener.lookupTransform(fixedFrame, torsoFrame, time,
+			torsoToFixed);
 	transformListener.lookupTransform(footprintFrame, fixedFrame, time,
 			fixedToFootprint);
 	transformListener.lookupTransform(headYawFrame, headPitchFrame, time,
@@ -437,25 +449,26 @@ void CameraCalibration::createMeasurePoint(
 		z += position.z;
 	}
 	newMeasurePoint.measuredPosition.setValue(x / size, y / size, z / size);
-/*
-	GroundData gdAvg;
-	gdAvg.setEquation(0,0,0,0);
-	size = groundMeasurements.size();
-	double a = 0, b = 0, c = 0, d = 0;
-	for (int i = 0; i < size; i++) {
-		GroundData gd = groundMeasurements[i];
-		a += gd.a;
-		b += gd.b;
-		c += gd.c;
-		d += gd.d;
-	}
-	a /= (double)size;
-	b /= (double)size;
-	c /= (double)size;
-	d /= (double)size;
-	gdAvg.setEquation(a, b, c, d);
-	newMeasurePoint.groundData = gdAvg;*/
-	newMeasurePoint.groundData = groundMeasurements[groundMeasurements.size()/2];
+	/*
+	 GroundData gdAvg;
+	 gdAvg.setEquation(0,0,0,0);
+	 size = groundMeasurements.size();
+	 double a = 0, b = 0, c = 0, d = 0;
+	 for (int i = 0; i < size; i++) {
+	 GroundData gd = groundMeasurements[i];
+	 a += gd.a;
+	 b += gd.b;
+	 c += gd.c;
+	 d += gd.d;
+	 }
+	 a /= (double)size;
+	 b /= (double)size;
+	 c /= (double)size;
+	 d /= (double)size;
+	 gdAvg.setEquation(a, b, c, d);
+	 newMeasurePoint.groundData = gdAvg;*/
+	newMeasurePoint.groundData = groundMeasurements[groundMeasurements.size()
+			/ 2];
 }
 
 std::string CameraCalibrationOptions::getCameraFrame() const {
