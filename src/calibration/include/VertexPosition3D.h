@@ -9,13 +9,15 @@
 #define VERTEXPOSITION3D_H_
 
 #include <g2o/core/base_vertex.h>
+#include "../include/CalibrationState.h"
+#include "../include/CameraCalibration.h"
 
 using namespace g2o;
 
 /*
  * Vertex that represents a 3D point.
  */
-class VertexPosition3D : public BaseVertex<3, Eigen::Vector3d> {
+class VertexPosition3D: public BaseVertex<3, Eigen::Vector3d> {
 public:
 	VertexPosition3D();
 	virtual ~VertexPosition3D();
@@ -24,6 +26,7 @@ public:
 	virtual bool write(std::ostream&) const;
 	virtual void oplusImpl(const double*);
 	virtual void setToOriginImpl();
+	Eigen::Vector3d estimateMarkerPosition(const CalibrationState state) const;
 
 };
 

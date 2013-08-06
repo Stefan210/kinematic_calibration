@@ -13,6 +13,7 @@
 #include "../include/VertexOffset.h"
 #include "../include/CameraTransformOptimization.h"
 #include "../include/CalibrationState.h"
+#include "../include/MarkerEstimation.h"
 
 #include <g2o/core/base_multi_edge.h>
 
@@ -24,7 +25,7 @@ using namespace g2o;
  */
 class EdgeMarkerMeasurement: public BaseMultiEdge<3, MeasurePoint> {
 public:
-	EdgeMarkerMeasurement(MeasurePoint& measurePoint);
+	EdgeMarkerMeasurement(MeasurePoint& measurePoint, MarkerEstimation& markerEstimation);
 	virtual ~EdgeMarkerMeasurement();
 	virtual void computeError();
 	virtual bool read(std::istream& is) {
@@ -38,6 +39,7 @@ public:
 
 protected:
 	MeasurePoint& measurePoint;
+	MarkerEstimation& markerEstimation;
 };
 
 #endif /* EDGEMARKERMEASUREMENT_H_ */

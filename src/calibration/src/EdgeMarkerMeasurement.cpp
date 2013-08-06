@@ -7,9 +7,12 @@
 
 #include "../include/EdgeMarkerMeasurement.h"
 
-EdgeMarkerMeasurement::EdgeMarkerMeasurement(MeasurePoint& measurePoint) :
-BaseMultiEdge<3, CameraMeasurePoint>(), measurePoint(measurePoint) {
-	resize(3);
+EdgeMarkerMeasurement::EdgeMarkerMeasurement(MeasurePoint& measurePoint,
+		MarkerEstimation& markerEstimation) :
+		BaseMultiEdge<3, CameraMeasurePoint>(), measurePoint(measurePoint), markerEstimation(
+				markerEstimation) {
+	resize(2);
+	//resize(3);
 }
 
 EdgeMarkerMeasurement::~EdgeMarkerMeasurement() {
@@ -18,22 +21,32 @@ EdgeMarkerMeasurement::~EdgeMarkerMeasurement() {
 
 void EdgeMarkerMeasurement::computeError() {
 	// calculate error from distance to estimated marker position
-	const VertexPosition3D* vertexPosition =
-			static_cast<const VertexPosition3D*>(_vertices[0]);
+	/*
+	 const VertexPosition3D* vertexPosition =
+	 static_cast<const VertexPosition3D*>(_vertices[0]);
+	 const VertexTransformation3D* vertexTransf =
+	 static_cast<const VertexTransformation3D*>(_vertices[1]);
+	 const VertexOffset* vertexOffset =
+	 static_cast<const VertexOffset*>(_vertices[2]);
+	 */
 	const VertexTransformation3D* vertexTransf =
-			static_cast<const VertexTransformation3D*>(_vertices[1]);
+			static_cast<const VertexTransformation3D*>(_vertices[0]);
 	const VertexOffset* vertexOffset =
-			static_cast<const VertexOffset*>(_vertices[2]);
+			static_cast<const VertexOffset*>(_vertices[1]);
 
-	Eigen::Vector3d markerPosition = vertexPosition->estimate();
 	tf::Transform cameraToHeadTransform = vertexTransf->estimate();
 	double headYawOffset = vertexOffset->estimate()[0];
 	double headPitchOffset = vertexOffset->estimate()[1];
+	Eigen::Vector3d markerPosition;
+	markerPosition = markerEstimation.estimateMarkerPosition(
+			CalibrationState(cameraToHeadTransform, headYawOffset,
+					headPitchOffset));
 
 	//std::cout << "headYawOffset " << headYawOffset << " headPitchOffset " << headPitchOffset << std::endl;
 
 	tf::Transform opticalToFixedTransform = measurePoint.opticalToFixed(
-			CalibrationState(cameraToHeadTransform, headYawOffset, headPitchOffset));
+			CalibrationState(cameraToHeadTransform, headYawOffset,
+					headPitchOffset));
 	tf::Vector3 transformedMeasurement = opticalToFixedTransform
 			* measurePoint.measuredPosition;
 

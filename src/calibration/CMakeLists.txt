@@ -139,6 +139,7 @@ add_library(G2oOptimization
 	src/VertexPosition3D.cpp
 	src/VertexTransformation3D.cpp
 	src/VertexOffset.cpp
+	src/MarkerEstimation.cpp
 	)
 	
 target_link_libraries(G2oOptimization 
