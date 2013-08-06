@@ -439,7 +439,30 @@ void CameraCalibration::createMeasurePoint(
 	newMeasurePoint.setHeadPitchToHeadYaw(headPitchToHeadYaw);
 	newMeasurePoint.setHeadYawToTorso(headYawToTorso);
 
+	// test
+	tf::StampedTransform cameraToHead;
+	tf::StampedTransform headToCamera;
+	double rr, rp, ry;
+	transformListener.lookupTransform(headPitchFrame, cameraFrame, time,
+			cameraToHead);
+	transformListener.lookupTransform(cameraFrame, headPitchFrame, time,
+			headToCamera);
+	std::cout << "cameraToHead => translation (x,y,z):" << cameraToHead.getOrigin()[0] << ","
+			<< cameraToHead.getOrigin()[1] << "," << cameraToHead.getOrigin()[2]
+			<< ";";
+	std::cout << "rot.yaw:" << tf::getYaw(cameraToHead.getRotation());
+	tf::Matrix3x3(cameraToHead.getRotation()).getRPY(rr, rp, ry, 1);
+	std::cout << "rotation1 (r,p,y):" << rr << "," << rp << "," << ry << ";\n";
+
+	std::cout << "headToCamera => translation (x,y,z):" << headToCamera.getOrigin()[0] << ","
+			<< headToCamera.getOrigin()[1] << "," << headToCamera.getOrigin()[2]
+			<< ";";
+	tf::Matrix3x3(headToCamera.getRotation()).getRPY(rr, rp, ry, 1);
+	std::cout << "rotation1 (r,p,y):" << rr << "," << rp << "," << ry << ";\n\n";
+	// end test
+
 	// determine average position
+	/*
 	double x = 0, y = 0, z = 0;
 	int size = ballMeasurements.size();
 	for (int i = 0; i < size; i++) {
@@ -449,6 +472,10 @@ void CameraCalibration::createMeasurePoint(
 		z += position.z;
 	}
 	newMeasurePoint.measuredPosition.setValue(x / size, y / size, z / size);
+	*/
+	double x = 0, y = 0, z = 0;
+	pcl::PointXYZ position = ballMeasurements[ballMeasurements.size() / 2].position;
+	newMeasurePoint.measuredPosition.setValue(position.x, position.y, position.z);
 	/*
 	 GroundData gdAvg;
 	 gdAvg.setEquation(0,0,0,0);
