@@ -72,7 +72,7 @@ void VertexTransformation3D::oplusImpl(const double* delta) {
 	double angle_old = quat_old.getAngle();
 	tf::Vector3 axis_old = quat_old.getAxis();
 
-	double angle_new = angle_old + angle_new;
+	double angle_new = angle_old + angle_delta;
 	tf::Vector3 axis_new = axis_old + axis_delta;
 
 	tf::Quaternion quat_new(axis_new, angle_new);
