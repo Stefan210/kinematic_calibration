@@ -15,8 +15,8 @@
 #include <tf/tf.h>
 
 // todo: use strategy pattern instead of hard coded!
-#define ANGLEAXIS
-//#define RPY
+//#define ANGLEAXIS
+#define RPY
 //#define QUATERNION
 
 using namespace g2o;
