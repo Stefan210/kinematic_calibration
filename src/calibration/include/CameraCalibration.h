@@ -17,14 +17,27 @@
 #include "../include/G2oTransformOptimization.h"
 #include "../include/TransformFactory.h"
 #include "../include/CalibrationDataSerialization.h"
+#include "../include/CalibrationState.h"
 
 // ROS specific includes
 #include <ros/ros.h>
+#include <ros/callback_queue.h>
 #include <sensor_msgs/PointCloud2.h>
 
 // TF specific includes
 #include <tf/tf.h>
 #include <tf/transform_listener.h>
+
+// STD includes
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <termios.h>
+#include <unistd.h>
+
 
 // Default defines
 #define DEFAULT_POINTCLOUD_MSG "/xtion/depth_registered/points"
@@ -64,6 +77,8 @@ public:
 	void setHeadYawFrame(std::string headYawFrame);
 	std::string getTorsoFrame() const;
 	void setTorsoFrame(std::string torsoFrame);
+	int getBufferSize() const;
+	void setBufferSize(int bufferSize);
 
 protected:
 	std::string pointCloudTopic;
@@ -79,6 +94,7 @@ protected:
 	int minNumOfMeasurements;
 	float minBallRadius;
 	float maxBallRadius;
+	int bufferSize;
 };
 
 /*
@@ -92,9 +108,14 @@ public:
 			float roll, float pitch, float yaw);
 	void startOptimization();
 	void setData(std::vector<MeasurePoint> measurementSeries, tf::Transform initialTransform);
+	void startLoop();
 
 protected:
 	void pointcloudMsgCb(const sensor_msgs::PointCloud2& input);
+	void setupTerminal();
+	void restoreTerminal();
+	void spinOnce();
+	void printHelp();
 
 private:
 	BallDetection ballDetection;
@@ -118,6 +139,9 @@ private:
 	std::vector<MeasurePoint> measurementSeries;
 	std::vector<ros::Time> currentTimestamps;
 	int minNumOfMeasurements;
+	bool terminalModified;
+	termios origFlags;
+	bool skipPointcloud;
 	bool distanceTooBig(pcl::PointXYZ first, pcl::PointXYZ second);
 	void createMeasurePoint(std::vector<BallDetection::BallData> ballMeasurements,
 			std::vector<GroundData> groundMeasurements,

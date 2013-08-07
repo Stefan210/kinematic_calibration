@@ -7,16 +7,6 @@
 
 #include "../include/CameraCalibration.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <termios.h>
-
-#include "../include/CalibrationState.h"
-
 using namespace std;
 
 CameraCalibration::CameraCalibration(CameraCalibrationOptions options) :
@@ -28,13 +18,15 @@ CameraCalibration::CameraCalibration(CameraCalibrationOptions options) :
 	this->headYawFrame = options.getHeadYawFrame();
 	this->torsoFrame = options.getTorsoFrame();
 	this->footprintFrame = options.getFootprintFrame();
-	this->subscriber = nodeHandle.subscribe(this->pointCloudTopic, 1000,
+	this->subscriber = nodeHandle.subscribe(this->pointCloudTopic, options.getBufferSize(),
 			&CameraCalibration::pointcloudMsgCb, this);
 	this->ballDetection.setMinBallRadius(options.getMinBallRadius());
 	this->ballDetection.setMaxBallRadius(options.getMaxBallRadius());
 	this->minNumOfMeasurements = options.getMinNumOfMeasurements();
 	this->transformOptimization = options.getTransformOptimization();
 	this->initialTransformFactory = options.getInitialTransformFactory();
+	this->terminalModified = false;
+	this->skipPointcloud = false;
 }
 
 CameraCalibration::~CameraCalibration() {
@@ -68,6 +60,8 @@ int main(int argc, char** argv) {
 	options.setMinBallRadius(0.074);
 	options.setMinNumOfMeasurements(3);
 	options.setPointCloudTopic(DEFAULT_POINTCLOUD_MSG);
+	options.setBufferSize(1000);
+
 	SvdTransformOptimization* svdTransformOptimization =
 			new SvdTransformOptimization();
 	svdTransformOptimization->setMaxIterations(100000);
@@ -94,18 +88,18 @@ int main(int argc, char** argv) {
 			g2oTransformOptimization1);
 
 	// 2nd g2o
-/*	G2oTransformOptimization* g2oTransformOptimization2 =
-			new G2oTransformOptimization();
-	Eigen::Matrix<double, 5, 5> correlationMatrix2 =
-			Eigen::Matrix<double, 5, 5>::Identity();
-	correlationMatrix2(0, 0) = 1.0;
-	correlationMatrix2(1, 1) = 1.0;
-	correlationMatrix2(2, 2) = 1.0;
-	correlationMatrix2(3, 3) = 0.0;
-	correlationMatrix2(4, 4) = 0.0;
-	g2oTransformOptimization2->setCorrelationMatrix(correlationMatrix2);
-	compositeTransformOptimization->addTransformOptimization("g2o(1,1,1,0,0)",
-			g2oTransformOptimization2);*/
+	/*	G2oTransformOptimization* g2oTransformOptimization2 =
+	 new G2oTransformOptimization();
+	 Eigen::Matrix<double, 5, 5> correlationMatrix2 =
+	 Eigen::Matrix<double, 5, 5>::Identity();
+	 correlationMatrix2(0, 0) = 1.0;
+	 correlationMatrix2(1, 1) = 1.0;
+	 correlationMatrix2(2, 2) = 1.0;
+	 correlationMatrix2(3, 3) = 0.0;
+	 correlationMatrix2(4, 4) = 0.0;
+	 g2oTransformOptimization2->setCorrelationMatrix(correlationMatrix2);
+	 compositeTransformOptimization->addTransformOptimization("g2o(1,1,1,0,0)",
+	 g2oTransformOptimization2);*/
 
 	// 3rd g2o
 	G2oTransformOptimization* g2oTransformOptimization3 =
@@ -211,10 +205,10 @@ int main(int argc, char** argv) {
 	compositeTransformOptimization->addTransformOptimization("hillClimbing",
 			hillClimbing);
 	RandomRestartLocalOptimization* rrlo = new RandomRestartLocalOptimization(
-		hillClimbing, 10);
+			hillClimbing, 10);
 //	compositeTransformOptimization->addTransformOptimization("RaReHC", rrlo);
 
-	// simulated annealing
+// simulated annealing
 //	 SimulatedAnnealingTransformOptimization* simulatedAnnealing = new SimulatedAnnealingTransformOptimization();
 //	 compositeTransformOptimization->addTransformOptimization("simulatedAnnealing", simulatedAnnealing);
 
@@ -249,14 +243,21 @@ int main(int argc, char** argv) {
 			return 0;
 		}
 	}
-	//ros::spin();
+
+	cameraCalibration.startLoop();
+
+	return 0;
+}
+
+void CameraCalibration::startLoop() {
+	setupTerminal();
 
 	while (ros::ok()) {
 		fd_set set;
 		struct timeval tv;
 
 		tv.tv_sec = 0;
-		tv.tv_usec = 10;
+		tv.tv_usec = 0;
 
 		FD_ZERO(&set);
 		FD_SET(fileno(stdin), &set);
@@ -264,17 +265,77 @@ int main(int argc, char** argv) {
 		int res = select(fileno(stdin) + 1, &set, NULL, NULL, &tv);
 
 		if (res > 0) {
-			cameraCalibration.startOptimization();
-			break;
+			char c = getc(stdin);
+			//std::cout << "input: " << c << "\n";
+			switch(c) {
+				case 'h':
+					printHelp();
+					break;
+				case 's':
+					this->startOptimization();
+					exit(0);
+					break;
+				case 'p':
+					this->skipPointcloud = !this->skipPointcloud;
+					break;
+			}
 		}
-		ros::spinOnce();
+		this->spinOnce();
 	}
 
-	return 0;
+	restoreTerminal();
+}
+
+void CameraCalibration::setupTerminal() {
+	if (terminalModified)
+		return;
+
+	fd_set  stdinFdset;
+	const int fd = fileno(stdin);
+	termios flags;
+	tcgetattr(fd, &origFlags);
+	flags = origFlags;
+	flags.c_lflag &= ~ICANON; // set raw (unset canonical modes)
+	flags.c_cc[VMIN] = 0; // i.e. min 1 char for blocking, 0 chars for non-blocking
+	flags.c_cc[VTIME] = 0; // block if waiting for char
+	tcsetattr(fd, TCSANOW, &flags);
+
+	FD_ZERO (&stdinFdset);
+	FD_SET(fd, &stdinFdset);
+
+	terminalModified = true;
+}
+
+void CameraCalibration::restoreTerminal() {
+	if (!terminalModified)
+		return;
+
+	const int fd = fileno(stdin);
+	tcsetattr(fd, TCSANOW, &origFlags);
+	terminalModified = false;
+}
+
+void CameraCalibration::spinOnce() {
+	ros::getGlobalCallbackQueue()->callOne(ros::WallDuration(0));
+}
+
+void CameraCalibration::printHelp() {
+	cout << "The following commands are available:\n";
+	cout << "h: Print this help.\n";
+	cout << "p: Pause/unpause listening.\n";
+	cout << "s: Start the optimization.\n";
 }
 
 void CameraCalibration::pointcloudMsgCb(const sensor_msgs::PointCloud2& input) {
-	ROS_INFO("Pointcloud Message Received.");
+	static int numOfClouds = 0;
+
+
+	if(this->skipPointcloud) {
+		ROS_INFO("Pointcloud Message Received. (#%d, skipped)", ++numOfClouds);
+		return;
+	}
+
+	ROS_INFO("Pointcloud Message Received. (#%d)", ++numOfClouds);
 
 	// transform from msg
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr initialCloud = pcl::PointCloud<
@@ -404,8 +465,10 @@ void CameraCalibration::createMeasurePoint(
 		std::vector<BallDetection::BallData> ballMeasurements,
 		std::vector<GroundData> groundMeasurements,
 		std::vector<ros::Time> timestamps, MeasurePoint& newMeasurePoint) {
+	static int numOfMeasurePoints = 0;
 	bool transformationFound = false;
-	//cameraFrame = opticalFrame; //todo: hack!
+
+	std::cout << "Point #" << ++numOfMeasurePoints << "\n";
 
 	// get transforms
 	tf::StampedTransform opticalToCamera;
@@ -447,35 +510,38 @@ void CameraCalibration::createMeasurePoint(
 			cameraToHead);
 	transformListener.lookupTransform(cameraFrame, headPitchFrame, time,
 			headToCamera);
-	std::cout << "cameraToHead => translation (x,y,z):" << cameraToHead.getOrigin()[0] << ","
-			<< cameraToHead.getOrigin()[1] << "," << cameraToHead.getOrigin()[2]
-			<< ";";
+	std::cout << "cameraToHead => translation (x,y,z):"
+			<< cameraToHead.getOrigin()[0] << "," << cameraToHead.getOrigin()[1]
+			<< "," << cameraToHead.getOrigin()[2] << ";";
 	std::cout << "rot.yaw:" << tf::getYaw(cameraToHead.getRotation());
 	tf::Matrix3x3(cameraToHead.getRotation()).getRPY(rr, rp, ry, 1);
 	std::cout << "rotation1 (r,p,y):" << rr << "," << rp << "," << ry << ";\n";
 
-	std::cout << "headToCamera => translation (x,y,z):" << headToCamera.getOrigin()[0] << ","
-			<< headToCamera.getOrigin()[1] << "," << headToCamera.getOrigin()[2]
-			<< ";";
+	std::cout << "headToCamera => translation (x,y,z):"
+			<< headToCamera.getOrigin()[0] << "," << headToCamera.getOrigin()[1]
+			<< "," << headToCamera.getOrigin()[2] << ";";
 	tf::Matrix3x3(headToCamera.getRotation()).getRPY(rr, rp, ry, 1);
-	std::cout << "rotation1 (r,p,y):" << rr << "," << rp << "," << ry << ";\n\n";
+	std::cout << "rotation1 (r,p,y):" << rr << "," << rp << "," << ry
+			<< ";\n\n";
 	// end test
 
 	// determine average position
 	/*
+	 double x = 0, y = 0, z = 0;
+	 int size = ballMeasurements.size();
+	 for (int i = 0; i < size; i++) {
+	 pcl::PointXYZ position = ballMeasurements[i].position;
+	 x += position.x;
+	 y += position.y;
+	 z += position.z;
+	 }
+	 newMeasurePoint.measuredPosition.setValue(x / size, y / size, z / size);
+	 */
 	double x = 0, y = 0, z = 0;
-	int size = ballMeasurements.size();
-	for (int i = 0; i < size; i++) {
-		pcl::PointXYZ position = ballMeasurements[i].position;
-		x += position.x;
-		y += position.y;
-		z += position.z;
-	}
-	newMeasurePoint.measuredPosition.setValue(x / size, y / size, z / size);
-	*/
-	double x = 0, y = 0, z = 0;
-	pcl::PointXYZ position = ballMeasurements[ballMeasurements.size() / 2].position;
-	newMeasurePoint.measuredPosition.setValue(position.x, position.y, position.z);
+	pcl::PointXYZ position =
+			ballMeasurements[ballMeasurements.size() / 2].position;
+	newMeasurePoint.measuredPosition.setValue(position.x, position.y,
+			position.z);
 	/*
 	 GroundData gdAvg;
 	 gdAvg.setEquation(0,0,0,0);
@@ -603,4 +669,12 @@ std::string CameraCalibrationOptions::getTorsoFrame() const {
 
 void CameraCalibrationOptions::setTorsoFrame(std::string torsoFrame) {
 	this->torsoFrame = torsoFrame;
+}
+
+int CameraCalibrationOptions::getBufferSize() const {
+	return bufferSize;
+}
+
+void CameraCalibrationOptions::setBufferSize(int bufferSize) {
+	this->bufferSize = bufferSize;
 }
