@@ -273,6 +273,7 @@ void CameraCalibration::startLoop() {
 					break;
 				case 's':
 					this->startOptimization();
+					restoreTerminal();
 					exit(0);
 					break;
 				case 'p':
