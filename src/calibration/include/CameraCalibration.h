@@ -37,6 +37,7 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <unistd.h>
+#include <string>
 
 
 // Default defines
