@@ -126,23 +126,15 @@ private:
 	ros::NodeHandle nodeHandle;
 	ros::Subscriber subscriber;
 	tf::TransformListener transformListener;
-	std::string pointCloudTopic;
-	std::string opticalFrame;
-	std::string cameraFrame;
-	std::string headPitchFrame;
-	std::string headYawFrame;
-	std::string torsoFrame;
-	std::string fixedFrame;
-	std::string footprintFrame;
 	std::vector<BallDetection::BallData> currentBallMeasurements;
 	std::vector<GroundData> currentGroundMeasurements;
 	//ros::Time currentMeasurementTime;
 	std::vector<MeasurePoint> measurementSeries;
 	std::vector<ros::Time> currentTimestamps;
-	int minNumOfMeasurements;
 	bool terminalModified;
 	termios origFlags;
 	bool skipPointcloud;
+	CameraCalibrationOptions options;
 	bool distanceTooBig(pcl::PointXYZ first, pcl::PointXYZ second);
 	void createMeasurePoint(std::vector<BallDetection::BallData> ballMeasurements,
 			std::vector<GroundData> groundMeasurements,

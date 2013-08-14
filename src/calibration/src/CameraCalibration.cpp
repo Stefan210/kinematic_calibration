@@ -10,19 +10,11 @@
 using namespace std;
 
 CameraCalibration::CameraCalibration(CameraCalibrationOptions options) :
-		transformListener(ros::Duration(180, 0)) {
-	this->pointCloudTopic = options.getPointCloudTopic();
-	this->cameraFrame = options.getCameraFrame();
-	this->fixedFrame = options.getFixedFrame();
-	this->headPitchFrame = options.getHeadPitchFrame();
-	this->headYawFrame = options.getHeadYawFrame();
-	this->torsoFrame = options.getTorsoFrame();
-	this->footprintFrame = options.getFootprintFrame();
-	this->subscriber = nodeHandle.subscribe(this->pointCloudTopic, options.getBufferSize(),
-			&CameraCalibration::pointcloudMsgCb, this);
+		options(options), transformListener(ros::Duration(180, 0)) {
+	this->subscriber = nodeHandle.subscribe(options.getPointCloudTopic(),
+			options.getBufferSize(), &CameraCalibration::pointcloudMsgCb, this);
 	this->ballDetection.setMinBallRadius(options.getMinBallRadius());
 	this->ballDetection.setMaxBallRadius(options.getMaxBallRadius());
-	this->minNumOfMeasurements = options.getMinNumOfMeasurements();
 	this->transformOptimization = options.getTransformOptimization();
 	this->initialTransformFactory = options.getInitialTransformFactory();
 	this->terminalModified = false;
@@ -267,18 +259,18 @@ void CameraCalibration::startLoop() {
 		if (res > 0) {
 			char c = getc(stdin);
 			//std::cout << "input: " << c << "\n";
-			switch(c) {
-				case 'h':
-					printHelp();
-					break;
-				case 's':
-					this->startOptimization();
-					restoreTerminal();
-					exit(0);
-					break;
-				case 'p':
-					this->skipPointcloud = !this->skipPointcloud;
-					break;
+			switch (c) {
+			case 'h':
+				printHelp();
+				break;
+			case 's':
+				this->startOptimization();
+				restoreTerminal();
+				exit(0);
+				break;
+			case 'p':
+				this->skipPointcloud = !this->skipPointcloud;
+				break;
 			}
 		}
 		this->spinOnce();
@@ -291,7 +283,7 @@ void CameraCalibration::setupTerminal() {
 	if (terminalModified)
 		return;
 
-	fd_set  stdinFdset;
+	fd_set stdinFdset;
 	const int fd = fileno(stdin);
 	termios flags;
 	tcgetattr(fd, &origFlags);
@@ -301,7 +293,7 @@ void CameraCalibration::setupTerminal() {
 	flags.c_cc[VTIME] = 0; // block if waiting for char
 	tcsetattr(fd, TCSANOW, &flags);
 
-	FD_ZERO (&stdinFdset);
+	FD_ZERO(&stdinFdset);
 	FD_SET(fd, &stdinFdset);
 
 	terminalModified = true;
@@ -330,8 +322,7 @@ void CameraCalibration::printHelp() {
 void CameraCalibration::pointcloudMsgCb(const sensor_msgs::PointCloud2& input) {
 	static int numOfClouds = 0;
 
-
-	if(this->skipPointcloud) {
+	if (this->skipPointcloud) {
 		ROS_INFO("Pointcloud Message Received. (#%d, skipped)", ++numOfClouds);
 		return;
 	}
@@ -354,14 +345,15 @@ void CameraCalibration::pointcloudMsgCb(const sensor_msgs::PointCloud2& input) {
 	} catch (...) {
 		return;
 	}
-	this->opticalFrame = input.header.frame_id;
+	options.setOpticalFrame(input.header.frame_id);
 
 	// current pointcloud belongs to a new measurement
 	if (!this->currentBallMeasurements.empty()
 			&& distanceTooBig(bd.position,
 					(currentBallMeasurements[currentBallMeasurements.size() - 1]).position)) {
 		ROS_INFO("Beginning new measurement.");
-		if (currentBallMeasurements.size() > minNumOfMeasurements) {
+		if (currentBallMeasurements.size()
+				> options.getMinNumOfMeasurements()) {
 			// if the current measurement has enough single measurements,
 			// take the average point and save the transformations
 			MeasurePoint newMeasurePoint;
@@ -412,6 +404,8 @@ void CameraCalibration::outputMeasurePoint(
 	tf::StampedTransform cameraToHead;
 
 	// get the transform between headFrame and cameraFrame and transform the current point to fixed frame
+	string headPitchFrame = options.getHeadPitchFrame();
+	string cameraFrame = options.getCameraFrame();
 	this->transformListener.lookupTransform(headPitchFrame, cameraFrame,
 			currentTimestamps[currentTimestamps.size() - 1], cameraToHead);
 	tf::Vector3 pointFixed = newMeasurePoint.opticalToFixed(
@@ -481,50 +475,28 @@ void CameraCalibration::createMeasurePoint(
 	ros::Time time;
 	for (int i = timestamps.size() / 2; i < timestamps.size(); i++) {
 		time = timestamps[i];
-		if (transformListener.canTransform(cameraFrame, opticalFrame, time)
-				&& transformListener.canTransform(fixedFrame, headPitchFrame,
-						time)) {
+		if (transformListener.canTransform(options.getCameraFrame(),
+				options.getOpticalFrame(), time)
+				&& transformListener.canTransform(options.getFixedFrame(),
+						options.getHeadPitchFrame(), time)) {
 			break;
 		}
 	}
-	transformListener.lookupTransform(cameraFrame, opticalFrame, time,
-			opticalToCamera);
-	transformListener.lookupTransform(fixedFrame, torsoFrame, time,
-			torsoToFixed);
-	transformListener.lookupTransform(footprintFrame, fixedFrame, time,
-			fixedToFootprint);
-	transformListener.lookupTransform(headYawFrame, headPitchFrame, time,
-			headPitchToHeadYaw);
-	transformListener.lookupTransform(torsoFrame, headYawFrame, time,
-			headYawToTorso);
+	transformListener.lookupTransform(options.getCameraFrame(),
+			options.getOpticalFrame(), time, opticalToCamera);
+	transformListener.lookupTransform(options.getFixedFrame(),
+			options.getTorsoFrame(), time, torsoToFixed);
+	transformListener.lookupTransform(options.getFootprintFrame(),
+			options.getFixedFrame(), time, fixedToFootprint);
+	transformListener.lookupTransform(options.getHeadYawFrame(),
+			options.getHeadPitchFrame(), time, headPitchToHeadYaw);
+	transformListener.lookupTransform(options.getTorsoFrame(),
+			options.getHeadYawFrame(), time, headYawToTorso);
 	newMeasurePoint.setOpticalToCamera(opticalToCamera);
 	newMeasurePoint.setTorsoToFixed(torsoToFixed);
 	newMeasurePoint.setFixedToFootprint(fixedToFootprint);
 	newMeasurePoint.setHeadPitchToHeadYaw(headPitchToHeadYaw);
 	newMeasurePoint.setHeadYawToTorso(headYawToTorso);
-
-	// test
-	tf::StampedTransform cameraToHead;
-	tf::StampedTransform headToCamera;
-	double rr, rp, ry;
-	transformListener.lookupTransform(headPitchFrame, cameraFrame, time,
-			cameraToHead);
-	transformListener.lookupTransform(cameraFrame, headPitchFrame, time,
-			headToCamera);
-	std::cout << "cameraToHead => translation (x,y,z):"
-			<< cameraToHead.getOrigin()[0] << "," << cameraToHead.getOrigin()[1]
-			<< "," << cameraToHead.getOrigin()[2] << ";";
-	std::cout << "rot.yaw:" << tf::getYaw(cameraToHead.getRotation());
-	tf::Matrix3x3(cameraToHead.getRotation()).getRPY(rr, rp, ry, 1);
-	std::cout << "rotation1 (r,p,y):" << rr << "," << rp << "," << ry << ";\n";
-
-	std::cout << "headToCamera => translation (x,y,z):"
-			<< headToCamera.getOrigin()[0] << "," << headToCamera.getOrigin()[1]
-			<< "," << headToCamera.getOrigin()[2] << ";";
-	tf::Matrix3x3(headToCamera.getRotation()).getRPY(rr, rp, ry, 1);
-	std::cout << "rotation1 (r,p,y):" << rr << "," << rp << "," << ry
-			<< ";\n\n";
-	// end test
 
 	// determine average position
 	/*
