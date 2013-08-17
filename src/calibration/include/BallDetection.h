@@ -156,6 +156,11 @@ public:
 	void setMaxBallRadius(float maxBallRadius);
 
 protected:
+	/**
+	 * Removes points with a distance greater than detectionRange.
+	 * @param inCloud initial Point cloud.
+	 * @param outCloud filtered Point cloud.
+	 */
 	void filterRange(pcl::PointCloud<pcl::PointXYZRGB>::Ptr inCloud,
 			pcl::PointCloud<pcl::PointXYZRGB>::Ptr outCloud);
 
