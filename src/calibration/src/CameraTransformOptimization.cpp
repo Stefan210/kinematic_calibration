@@ -223,7 +223,7 @@ void CompositeTransformOptimization::optimizeTransform(
 			this->optimizer.begin(); it != this->optimizer.end(); ++it) {
 		CalibrationState currentState;
 		tf::Vector3 markerPosition;
-		//it->second->removeOutliers();
+		it->second->removeOutliers();
 		it->second->optimizeTransform(currentState);
 		it->second->getMarkerEstimate(currentState, markerPosition);
 		this->calculateSqrtDistFromMarker(currentState, markerPosition,
