@@ -189,9 +189,9 @@ TEST(GroundDataTest, transformTest1) {
 	tf::Vector3 transformedNormal2 = tf::Vector3(transformedGd.a,
 			transformedGd.b, transformedGd.c).normalized();
 
-	ASSERT_NEAR(transformedNormal1.x(), -transformedNormal2.x(), 1e-6);
-	ASSERT_NEAR(transformedNormal1.y(), -transformedNormal2.y(), 1e-6);
-	ASSERT_NEAR(transformedNormal1.z(), -transformedNormal2.z(), 1e-6);
+	ASSERT_NEAR(fabs(transformedNormal1.x()), fabs(transformedNormal2.x()), 1e-6);
+	ASSERT_NEAR(fabs(transformedNormal1.y()), fabs(transformedNormal2.y()), 1e-6);
+	ASSERT_NEAR(fabs(transformedNormal1.z()), fabs(transformedNormal2.z()), 1e-6);
 }
 
 TEST(GroundDataTest, transformTest2) {
