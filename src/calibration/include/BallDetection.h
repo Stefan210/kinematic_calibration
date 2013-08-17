@@ -20,6 +20,74 @@
 // Default parameter
 #define MIN_BALL_RADIUS (0.05)
 #define MAX_BALL_RADIUS (0.10)
+#define DETECTION_RANGE (1.5)
+
+/**
+ * Parameter for BallDetection.
+ */
+class BallDetectionParameter {
+public:
+	/// Constructor.
+	BallDetectionParameter();
+
+	/// Deconstructor.
+	~BallDetectionParameter();
+
+	/**
+	 * Returns the range in which the ball should be detected.
+	 */
+	float getDetectionRange() const {
+		return detectionRange;
+	}
+
+	/**
+	 * Sets the range in which the ball should be detected.
+	 * @param detectionRange range in which the ball should be detected.
+	 */
+	void setDetectionRange(float detectionRange) {
+		this->detectionRange = detectionRange;
+	}
+
+	/**
+	 * Returns the upper bound for the ball radius.
+	 */
+	float getMaxBallRadius() const {
+		return maxBallRadius;
+	}
+
+	/**
+	 * Sets an upper bound for the ball radius.
+	 * @param maxBallRadius Upper bound for the ball radius.
+	 */
+	void setMaxBallRadius(float maxBallRadius) {
+		this->maxBallRadius = maxBallRadius;
+	}
+
+	/**
+	 * Returns the lower bound for the ball radius.
+	 */
+	float getMinBallRadius() const {
+		return minBallRadius;
+	}
+
+	/**
+	 * Sets an lower bound for the ball radius.
+	 * @param minBallRadius Lower bound for the ball radius.
+	 */
+	void setMinBallRadius(float minBallRadius) {
+		this->minBallRadius = minBallRadius;
+	}
+
+protected:
+	/// Lower bound for the ball radius.
+	float minBallRadius;
+
+	/// Upper bound for the ball radius.
+	float maxBallRadius;
+
+	/// Range in which the ball should be detected.
+	float detectionRange;
+};
 
 /**
  * Class for detecting a ball contained in a point cloud.
@@ -32,9 +100,18 @@ public:
 		float radius;
 	};
 
-	/// Constructor
+	/// Default constructor
 	BallDetection() :
-			minBallRadius(MIN_BALL_RADIUS), maxBallRadius(MAX_BALL_RADIUS) {
+			minBallRadius(MIN_BALL_RADIUS), maxBallRadius(MAX_BALL_RADIUS), detectionRange(
+					DETECTION_RANGE) {
+	}
+
+	/// Parameterized constructor
+	BallDetection(BallDetectionParameter parameter) :
+			minBallRadius(parameter.getMinBallRadius()), maxBallRadius(
+					parameter.getMaxBallRadius()), detectionRange(
+					parameter.getDetectionRange()) {
+
 	}
 
 	/// Deconstructor
@@ -47,10 +124,10 @@ public:
 	 * @param initialCloud The point cloud containing the ball.
 	 * @return The position of the detected ball.
 	 */
-	BallData getPosition(
-			pcl::PointCloud<pcl::PointXYZRGB>::Ptr initialCloud);
+	BallData getPosition(pcl::PointCloud<pcl::PointXYZRGB>::Ptr initialCloud);
 
-	BallData getAvgPosition(std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> clouds);
+	BallData getAvgPosition(
+			std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> clouds);
 
 	/**
 	 * Returns the cloud after extracting the planes.
@@ -128,6 +205,12 @@ private:
 	 */
 	float maxBallRadius;
 
-};
+	/**
+	 * Range in which the ball should be detected.
+	 */
+	float detectionRange;
+
+}
+;
 
 #endif /* BALLDETECTION_H_ */

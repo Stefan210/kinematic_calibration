@@ -21,8 +21,9 @@ BallDetection::BallData BallDetection::getPosition(
 		pcl::PointCloud<pcl::PointXYZRGB>::Ptr initialCloud) {
 	BallDetection::BallData bd;
 
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudDistanceFiltered = pcl::PointCloud<
-			pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudDistanceFiltered =
+			pcl::PointCloud<pcl::PointXYZRGB>::Ptr(
+					new pcl::PointCloud<pcl::PointXYZRGB>());
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudWithoutPlanes = pcl::PointCloud<
 			pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudWithBallOnly = pcl::PointCloud<
@@ -49,8 +50,8 @@ BallDetection::BallData BallDetection::getAvgPosition(
 	int positionsFound = 0;
 
 	for (int numOfCloud = 0; numOfCloud < clouds.size(); numOfCloud++) {
-		ROS_INFO(
-				"Processing pointcloud #%i/%i", numOfCloud+1, (int)clouds.size());
+		ROS_INFO("Processing pointcloud #%i/%i", numOfCloud + 1,
+				(int )clouds.size());
 		BallDetection::BallData current = this->getPosition(clouds[numOfCloud]);
 		if (!isnan(current.position.x)) {
 			xSum += current.position.x;
@@ -58,8 +59,8 @@ BallDetection::BallData BallDetection::getAvgPosition(
 			zSum += current.position.z;
 			radiusSum += current.radius;
 			positionsFound++;
-			ROS_INFO(
-					"(x,y,z,r), %f, %f, %f, %f", current.position.x, current.position.y, current.position.z, current.radius);
+			ROS_INFO("(x,y,z,r), %f, %f, %f, %f", current.position.x,
+					current.position.y, current.position.z, current.radius);
 		}
 	}
 
@@ -83,20 +84,19 @@ void BallDetection::filterRange(pcl::PointCloud<pcl::PointXYZRGB>::Ptr inCloud,
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr filteredXY = pcl::PointCloud<
 			pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
 
-
 	pass.setInputCloud(inCloud);
 	pass.setFilterFieldName("x");
-	pass.setFilterLimits(-1.5, 1.5); //-1.0, 1.0
+	pass.setFilterLimits(-detectionRange, detectionRange); //-1.0, 1.0
 	pass.filter(*filteredX);
 
 	pass.setInputCloud(filteredX);
 	pass.setFilterFieldName("y");
-	pass.setFilterLimits(-1.5, 1.5); //-1.0, 1.0
+	pass.setFilterLimits(-detectionRange, detectionRange); //-1.0, 1.0
 	pass.filter(*filteredXY);
 
 	pass.setInputCloud(filteredXY);
 	pass.setFilterFieldName("z");
-	pass.setFilterLimits(-1.5, 1.5); //-1.0, 1.0
+	pass.setFilterLimits(-detectionRange, detectionRange); //-1.0, 1.0
 	pass.filter(*outCloud);
 }
 
