@@ -10,11 +10,10 @@
 using namespace std;
 
 CameraCalibration::CameraCalibration(CameraCalibrationOptions options) :
-		options(options), transformListener(ros::Duration(180, 0)) {
+		options(options), transformListener(ros::Duration(180, 0)), ballDetection(
+				options.getBallDetectionParameter()) {
 	this->subscriber = nodeHandle.subscribe(options.getPointCloudTopic(),
 			options.getBufferSize(), &CameraCalibration::pointcloudMsgCb, this);
-	this->ballDetection.setMinBallRadius(options.getMinBallRadius());
-	this->ballDetection.setMaxBallRadius(options.getMaxBallRadius());
 	this->transformOptimization = options.getTransformOptimization();
 	this->initialTransformFactory = options.getInitialTransformFactory();
 	this->terminalModified = false;
@@ -48,11 +47,15 @@ int main(int argc, char** argv) {
 	TransformFactory* transformFactory = new TfTransformFactory(
 	DEFAULT_HEADPITCH_FRAME, DEFAULT_CAMERA_FRAME);
 	options.setInitialTransformFactory(transformFactory);
-	options.setMaxBallRadius(0.076);
-	options.setMinBallRadius(0.074);
 	options.setMinNumOfMeasurements(3);
 	options.setPointCloudTopic(DEFAULT_POINTCLOUD_MSG);
 	options.setBufferSize(1000);
+
+	BallDetectionParameter ballDetectionParameter;
+	ballDetectionParameter.setDetectionRange(1.5);
+	ballDetectionParameter.setMaxBallRadius(0.076);
+	ballDetectionParameter.setMinBallRadius(0.074);
+	options.setBallDetectionParameter(ballDetectionParameter);
 
 	SvdTransformOptimization* svdTransformOptimization =
 			new SvdTransformOptimization();
@@ -612,22 +615,6 @@ void CameraCalibrationOptions::setTransformOptimization(
 	this->transformOptimization = transformOptimization;
 }
 
-float CameraCalibrationOptions::getMaxBallRadius() const {
-	return maxBallRadius;
-}
-
-void CameraCalibrationOptions::setMaxBallRadius(float maxBallRadius) {
-	this->maxBallRadius = maxBallRadius;
-}
-
-float CameraCalibrationOptions::getMinBallRadius() const {
-	return minBallRadius;
-}
-
-void CameraCalibrationOptions::setMinBallRadius(float minBallRadius) {
-	this->minBallRadius = minBallRadius;
-}
-
 std::string CameraCalibrationOptions::getHeadYawFrame() const {
 	return headYawFrame;
 }
@@ -650,4 +637,13 @@ int CameraCalibrationOptions::getBufferSize() const {
 
 void CameraCalibrationOptions::setBufferSize(int bufferSize) {
 	this->bufferSize = bufferSize;
+}
+
+const BallDetectionParameter& CameraCalibrationOptions::getBallDetectionParameter() const {
+	return ballDetectionParameter;
+}
+
+void CameraCalibrationOptions::setBallDetectionParameter(
+		const BallDetectionParameter& ballDetectionParameter) {
+	this->ballDetectionParameter = ballDetectionParameter;
 }

@@ -28,10 +28,14 @@
 class BallDetectionParameter {
 public:
 	/// Constructor.
-	BallDetectionParameter();
+	BallDetectionParameter() :
+			minBallRadius(MIN_BALL_RADIUS), maxBallRadius(MAX_BALL_RADIUS), detectionRange(
+			DETECTION_RANGE) {
+	}
 
 	/// Deconstructor.
-	~BallDetectionParameter();
+	virtual ~BallDetectionParameter() {
+	}
 
 	/**
 	 * Returns the range in which the ball should be detected.
@@ -103,7 +107,7 @@ public:
 	/// Default constructor
 	BallDetection() :
 			minBallRadius(MIN_BALL_RADIUS), maxBallRadius(MAX_BALL_RADIUS), detectionRange(
-					DETECTION_RANGE) {
+			DETECTION_RANGE) {
 	}
 
 	/// Parameterized constructor

@@ -70,16 +70,15 @@ public:
 	void setPointCloudTopic(std::string pointCloudTopic);
 	CameraTransformOptimization* getTransformOptimization() const;
 	void setTransformOptimization(CameraTransformOptimization* transformOptimization);
-	float getMaxBallRadius() const;
-	void setMaxBallRadius(float maxBallRadius);
-	float getMinBallRadius() const;
-	void setMinBallRadius(float minBallRadius);
 	std::string getHeadYawFrame() const;
 	void setHeadYawFrame(std::string headYawFrame);
 	std::string getTorsoFrame() const;
 	void setTorsoFrame(std::string torsoFrame);
 	int getBufferSize() const;
 	void setBufferSize(int bufferSize);
+	const BallDetectionParameter& getBallDetectionParameter() const;
+	void setBallDetectionParameter(
+			const BallDetectionParameter& ballDetectionParameter);
 
 protected:
 	std::string pointCloudTopic;
@@ -93,9 +92,8 @@ protected:
 	CameraTransformOptimization* transformOptimization;
 	TransformFactory* initialTransformFactory;
 	int minNumOfMeasurements;
-	float minBallRadius;
-	float maxBallRadius;
 	int bufferSize;
+	BallDetectionParameter ballDetectionParameter;
 };
 
 /*
