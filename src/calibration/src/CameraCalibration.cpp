@@ -12,8 +12,10 @@ using namespace std;
 CameraCalibration::CameraCalibration(CameraCalibrationOptions options) :
 		options(options), transformListener(ros::Duration(180, 0)), ballDetection(
 				options.getBallDetectionParameter()) {
-	this->subscriber = nodeHandle.subscribe(options.getPointCloudTopic(),
-			options.getBufferSize(), &CameraCalibration::pointcloudMsgCb, this);
+	this->subscriber = nodeHandle.subscribe(
+			options.getDataCaptureParameter().getPointCloudTopic(),
+			options.getDataCaptureParameter().getBufferSize(),
+			&CameraCalibration::pointcloudMsgCb, this);
 	this->transformOptimization = options.getTransformOptimization();
 	this->initialTransformFactory = options.getInitialTransformFactory();
 	this->terminalModified = false;
@@ -25,7 +27,7 @@ CameraCalibration::~CameraCalibration() {
 }
 
 int main(int argc, char** argv) {
-	std::string nodeName = "CameraCalibration";
+	string nodeName = "CameraCalibration";
 
 	// parse command line arguments
 	for (int i = 1; i < argc; i++) {
@@ -38,23 +40,26 @@ int main(int argc, char** argv) {
 
 	// Set all options.
 	CameraCalibrationOptions options;
-	options.setCameraFrame(DEFAULT_CAMERA_FRAME);
-	options.setFixedFrame(DEFAULT_FIXED_FRAME);
-	options.setHeadPitchFrame(DEFAULT_HEADPITCH_FRAME);
-	options.setHeadYawFrame(DEFAULT_HEADYAW_FRAME);
-	options.setTorsoFrame(DEFAULT_TORSO_FRAME);
-	options.setFootprintFrame(DEFAULT_FOOTPRINT_FRAME);
 	TransformFactory* transformFactory = new TfTransformFactory(
 	DEFAULT_HEADPITCH_FRAME, DEFAULT_CAMERA_FRAME);
 	options.setInitialTransformFactory(transformFactory);
-	options.setMinNumOfMeasurements(3);
-	options.setPointCloudTopic(DEFAULT_POINTCLOUD_MSG);
-	options.setBufferSize(1000);
+
+	DataCaptureParameter dataCaptureParameter;
+	dataCaptureParameter.setCameraFrame(DEFAULT_CAMERA_FRAME);
+	dataCaptureParameter.setFixedFrame(DEFAULT_FIXED_FRAME);
+	dataCaptureParameter.setHeadPitchFrame(DEFAULT_HEADPITCH_FRAME);
+	dataCaptureParameter.setHeadYawFrame(DEFAULT_HEADYAW_FRAME);
+	dataCaptureParameter.setTorsoFrame(DEFAULT_TORSO_FRAME);
+	dataCaptureParameter.setFootprintFrame(DEFAULT_FOOTPRINT_FRAME);
+	dataCaptureParameter.setPointCloudTopic(DEFAULT_POINTCLOUD_MSG);
+	dataCaptureParameter.setBufferSize(DEFAULT_MSG_BUFFER);
+	dataCaptureParameter.setMinNumOfMeasurements(DEFAULT_NUM_OF_MEAUSREMENTS);
+	options.setDataCaptureParameter(dataCaptureParameter);
 
 	BallDetectionParameter ballDetectionParameter;
-	ballDetectionParameter.setDetectionRange(1.5);
-	ballDetectionParameter.setMaxBallRadius(0.076);
-	ballDetectionParameter.setMinBallRadius(0.074);
+	ballDetectionParameter.setDetectionRange(DETECTION_RANGE);
+	ballDetectionParameter.setMaxBallRadius(MAX_BALL_RADIUS);
+	ballDetectionParameter.setMinBallRadius(MIN_BALL_RADIUS);
 	options.setBallDetectionParameter(ballDetectionParameter);
 
 	SvdTransformOptimization* svdTransformOptimization =
@@ -348,7 +353,7 @@ void CameraCalibration::pointcloudMsgCb(const sensor_msgs::PointCloud2& input) {
 	} catch (...) {
 		return;
 	}
-	options.setOpticalFrame(input.header.frame_id);
+	options.getDataCaptureParameter().setOpticalFrame(input.header.frame_id);
 
 	// current pointcloud belongs to a new measurement
 	if (!this->currentBallMeasurements.empty()
@@ -356,7 +361,7 @@ void CameraCalibration::pointcloudMsgCb(const sensor_msgs::PointCloud2& input) {
 					(currentBallMeasurements[currentBallMeasurements.size() - 1]).position)) {
 		ROS_INFO("Beginning new measurement.");
 		if (currentBallMeasurements.size()
-				> options.getMinNumOfMeasurements()) {
+				> options.getDataCaptureParameter().getMinNumOfMeasurements()) {
 			// if the current measurement has enough single measurements,
 			// take the average point and save the transformations
 			MeasurePoint newMeasurePoint;
@@ -407,8 +412,9 @@ void CameraCalibration::outputMeasurePoint(
 	tf::StampedTransform cameraToHead;
 
 	// get the transform between headFrame and cameraFrame and transform the current point to fixed frame
-	string headPitchFrame = options.getHeadPitchFrame();
-	string cameraFrame = options.getCameraFrame();
+	string headPitchFrame =
+			options.getDataCaptureParameter().getHeadPitchFrame();
+	string cameraFrame = options.getDataCaptureParameter().getCameraFrame();
 	this->transformListener.lookupTransform(headPitchFrame, cameraFrame,
 			currentTimestamps[currentTimestamps.size() - 1], cameraToHead);
 	tf::Vector3 pointFixed = newMeasurePoint.opticalToFixed(
@@ -465,6 +471,7 @@ void CameraCalibration::createMeasurePoint(
 		std::vector<ros::Time> timestamps, MeasurePoint& newMeasurePoint) {
 	static int numOfMeasurePoints = 0;
 	bool transformationFound = false;
+	DataCaptureParameter options = this->options.getDataCaptureParameter();
 
 	std::cout << "Point #" << ++numOfMeasurePoints << "\n";
 
@@ -540,38 +547,6 @@ void CameraCalibration::createMeasurePoint(
 			/ 2];
 }
 
-std::string CameraCalibrationOptions::getCameraFrame() const {
-	return cameraFrame;
-}
-
-void CameraCalibrationOptions::setCameraFrame(std::string cameraFrame) {
-	this->cameraFrame = cameraFrame;
-}
-
-std::string CameraCalibrationOptions::getFixedFrame() const {
-	return fixedFrame;
-}
-
-void CameraCalibrationOptions::setFixedFrame(std::string fixedFrame) {
-	this->fixedFrame = fixedFrame;
-}
-
-std::string CameraCalibrationOptions::getHeadPitchFrame() const {
-	return headPitchFrame;
-}
-
-void CameraCalibrationOptions::setHeadPitchFrame(std::string headPitchFrame) {
-	this->headPitchFrame = headPitchFrame;
-}
-
-std::string CameraCalibrationOptions::getFootprintFrame() const {
-	return footprintFrame;
-}
-
-void CameraCalibrationOptions::setFootprintFrame(std::string footprintFrame) {
-	this->footprintFrame = footprintFrame;
-}
-
 TransformFactory* CameraCalibrationOptions::getInitialTransformFactory() const {
 	return initialTransformFactory;
 }
@@ -579,31 +554,6 @@ TransformFactory* CameraCalibrationOptions::getInitialTransformFactory() const {
 void CameraCalibrationOptions::setInitialTransformFactory(
 		TransformFactory* initialTransformFactory) {
 	this->initialTransformFactory = initialTransformFactory;
-}
-
-int CameraCalibrationOptions::getMinNumOfMeasurements() const {
-	return minNumOfMeasurements;
-}
-
-void CameraCalibrationOptions::setMinNumOfMeasurements(
-		int minNumOfMeasurements) {
-	this->minNumOfMeasurements = minNumOfMeasurements;
-}
-
-std::string CameraCalibrationOptions::getOpticalFrame() const {
-	return opticalFrame;
-}
-
-void CameraCalibrationOptions::setOpticalFrame(std::string opticalFrame) {
-	this->opticalFrame = opticalFrame;
-}
-
-std::string CameraCalibrationOptions::getPointCloudTopic() const {
-	return pointCloudTopic;
-}
-
-void CameraCalibrationOptions::setPointCloudTopic(std::string pointCloudTopic) {
-	this->pointCloudTopic = pointCloudTopic;
 }
 
 CameraTransformOptimization* CameraCalibrationOptions::getTransformOptimization() const {
@@ -615,35 +565,20 @@ void CameraCalibrationOptions::setTransformOptimization(
 	this->transformOptimization = transformOptimization;
 }
 
-std::string CameraCalibrationOptions::getHeadYawFrame() const {
-	return headYawFrame;
-}
-
-void CameraCalibrationOptions::setHeadYawFrame(std::string headYawFrame) {
-	this->headYawFrame = headYawFrame;
-}
-
-std::string CameraCalibrationOptions::getTorsoFrame() const {
-	return torsoFrame;
-}
-
-void CameraCalibrationOptions::setTorsoFrame(std::string torsoFrame) {
-	this->torsoFrame = torsoFrame;
-}
-
-int CameraCalibrationOptions::getBufferSize() const {
-	return bufferSize;
-}
-
-void CameraCalibrationOptions::setBufferSize(int bufferSize) {
-	this->bufferSize = bufferSize;
-}
-
-const BallDetectionParameter& CameraCalibrationOptions::getBallDetectionParameter() const {
+BallDetectionParameter& CameraCalibrationOptions::getBallDetectionParameter() {
 	return ballDetectionParameter;
 }
 
 void CameraCalibrationOptions::setBallDetectionParameter(
 		const BallDetectionParameter& ballDetectionParameter) {
 	this->ballDetectionParameter = ballDetectionParameter;
+}
+
+DataCaptureParameter& CameraCalibrationOptions::getDataCaptureParameter() {
+	return dataCaptureParameter;
+}
+
+void CameraCalibrationOptions::setDataCaptureParameter(
+		const DataCaptureParameter& dataCaptureParameter) {
+	this->dataCaptureParameter = dataCaptureParameter;
 }

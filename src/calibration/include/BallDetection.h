@@ -18,8 +18,8 @@
 #include <pcl/point_types.h>
 
 // Default parameter
-#define MIN_BALL_RADIUS (0.05)
-#define MAX_BALL_RADIUS (0.10)
+#define MIN_BALL_RADIUS (0.074)
+#define MAX_BALL_RADIUS (0.076)
 #define DETECTION_RANGE (1.5)
 
 /**
