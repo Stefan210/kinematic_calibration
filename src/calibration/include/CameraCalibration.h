@@ -18,6 +18,9 @@
 #include "../include/TransformFactory.h"
 #include "../include/CalibrationDataSerialization.h"
 #include "../include/CalibrationState.h"
+#include "../include/ParameterAccess.h"
+#include "../include/Parameter.h"
+#include "../include/OptimizationInstanceBuilder.h"
 
 // ROS specific includes
 #include <ros/ros.h>
@@ -40,135 +43,7 @@
 #include <string>
 #include <vector>
 
-// Default defines
-#define DEFAULT_POINTCLOUD_MSG "/xtion/depth_registered/points"
-//#define DEFAULT_CAMERA_FRAME "xtion_platform"
-#define DEFAULT_CAMERA_FRAME "xtion_link"
-#define DEFAULT_HEADPITCH_FRAME "HeadPitch_link"
-#define DEFAULT_HEADYAW_FRAME "HeadYaw_link"
-#define DEFAULT_TORSO_FRAME "torso"
-#define DEFAULT_FIXED_FRAME "r_sole"
-#define DEFAULT_FOOTPRINT_FRAME "base_footprint"
-#define DEFAULT_MSG_BUFFER (1000)
-#define DEFAULT_NUM_OF_MEAUSREMENTS (3)
-
 using namespace std;
-
-class DataCaptureParameter {
-public:
-	int getBufferSize() const {
-		return bufferSize;
-	}
-
-	void setBufferSize(int bufferSize) {
-		this->bufferSize = bufferSize;
-	}
-
-	string getCameraFrame() const {
-		return cameraFrame;
-	}
-
-	void setCameraFrame(string cameraFrame) {
-		this->cameraFrame = cameraFrame;
-	}
-
-	string getFixedFrame() const {
-		return fixedFrame;
-	}
-
-	void setFixedFrame(string fixedFrame) {
-		this->fixedFrame = fixedFrame;
-	}
-
-	string getFootprintFrame() const {
-		return footprintFrame;
-	}
-
-	void setFootprintFrame(string footprintFrame) {
-		this->footprintFrame = footprintFrame;
-	}
-
-	string getHeadPitchFrame() const {
-		return headPitchFrame;
-	}
-
-	void setHeadPitchFrame(string headPitchFrame) {
-		this->headPitchFrame = headPitchFrame;
-	}
-
-	string getHeadYawFrame() const {
-		return headYawFrame;
-	}
-
-	void setHeadYawFrame(string headYawFrame) {
-		this->headYawFrame = headYawFrame;
-	}
-
-	int getMinNumOfMeasurements() const {
-		return minNumOfMeasurements;
-	}
-
-	void setMinNumOfMeasurements(int minNumOfMeasurements) {
-		this->minNumOfMeasurements = minNumOfMeasurements;
-	}
-
-	string getOpticalFrame() const {
-		return opticalFrame;
-	}
-
-	void setOpticalFrame(string opticalFrame) {
-		this->opticalFrame = opticalFrame;
-	}
-
-	string getPointCloudTopic() const {
-		return pointCloudTopic;
-	}
-
-	void setPointCloudTopic(string pointCloudTopic) {
-		this->pointCloudTopic = pointCloudTopic;
-	}
-
-	string getTorsoFrame() const {
-		return torsoFrame;
-	}
-
-	void setTorsoFrame(string torsoFrame) {
-		this->torsoFrame = torsoFrame;
-	}
-
-protected:
-	string pointCloudTopic;
-	string opticalFrame;
-	string cameraFrame;
-	string headPitchFrame;
-	string headYawFrame;
-	string torsoFrame;
-	string fixedFrame;
-	string footprintFrame;
-	int minNumOfMeasurements;
-	int bufferSize;
-};
-
-class CameraCalibrationOptions {
-public:
-	TransformFactory* getInitialTransformFactory() const;
-	void setInitialTransformFactory(TransformFactory* initialTransformFactory);
-	CameraTransformOptimization* getTransformOptimization() const;
-	void setTransformOptimization(
-			CameraTransformOptimization* transformOptimization);
-	BallDetectionParameter& getBallDetectionParameter();
-	void setBallDetectionParameter(
-			const BallDetectionParameter& ballDetectionParameter);
-	DataCaptureParameter& getDataCaptureParameter();
-	void setDataCaptureParameter(
-			const DataCaptureParameter& dataCaptureParameter);
-
-protected:
-	CameraTransformOptimization* transformOptimization;
-	TransformFactory* initialTransformFactory;
-	BallDetectionParameter ballDetectionParameter;
-	DataCaptureParameter dataCaptureParameter;
-};
 
 /*
  *
@@ -177,12 +52,13 @@ class CameraCalibration {
 public:
 	CameraCalibration(CameraCalibrationOptions options);
 	virtual ~CameraCalibration();
-	void setInitialCameraToHeadTransform(float tx, float ty, float tz,
-			float roll, float pitch, float yaw);
 	void startOptimization();
 	void setData(std::vector<MeasurePoint> measurementSeries,
 			tf::Transform initialTransform);
 	void startLoop();
+	const CameraTransformOptimization* getTransformOptimization() const;
+	void setTransformOptimization(
+			CameraTransformOptimization* transformOptimization);
 
 protected:
 	void pointcloudMsgCb(const sensor_msgs::PointCloud2& input);
@@ -195,7 +71,6 @@ private:
 	BallDetection ballDetection;
 	GroundDetection groundDetection;
 	CameraTransformOptimization* transformOptimization;
-	TransformFactory* initialTransformFactory;
 	ros::NodeHandle nodeHandle;
 	ros::Subscriber subscriber;
 	tf::TransformListener transformListener;

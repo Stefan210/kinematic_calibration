@@ -154,6 +154,8 @@ target_link_libraries(G2oOptimization
 
 add_executable(CameraCalibration 
 	src/CameraCalibration.cpp 
+	src/ParameterAccess.cpp
+	src/OptimizationInstanceBuilder.cpp
 	src/BallDetection.cpp 
 	src/GroundDetection.cpp
 	src/CameraMeasurePoint.cpp

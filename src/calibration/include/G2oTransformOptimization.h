@@ -15,7 +15,7 @@
  */
 class G2oTransformOptimization: public CameraTransformOptimization {
 public:
-	G2oTransformOptimization();
+	G2oTransformOptimization(CameraTransformOptimizationParameter parameter = CameraTransformOptimizationParameter());
 	virtual ~G2oTransformOptimization();
 
 	virtual void optimizeTransform(CalibrationState& calibrationState);

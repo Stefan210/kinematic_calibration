@@ -10,9 +10,15 @@
 #include <iostream>
 #include <fstream>
 
-CalibrationDataSerialization::CalibrationDataSerialization(std::string filename) :
-		dataLoaded(false), dataSaved(false) {
+CalibrationDataSerialization::CalibrationDataSerialization(
+		DataCaptureParameter dataCaptureParameter, std::string filename) :
+		dataCaptureParameter(dataCaptureParameter), dataLoaded(false), dataSaved(
+				false) {
 	this->fileName = filename;
+	TfTransformFactory* transformFactory = new TfTransformFactory(
+			dataCaptureParameter.getCameraFrame(),
+			dataCaptureParameter.getHeadPitchFrame());
+	this->parameter.setInitialTransformFactory(transformFactory);
 }
 
 CalibrationDataSerialization::~CalibrationDataSerialization() {
@@ -25,14 +31,14 @@ void CalibrationDataSerialization::optimizeTransform(
 }
 
 std::vector<MeasurePoint> CalibrationDataSerialization::getMeasurementSeries() {
-	if(!dataLoaded) {
+	if (!dataLoaded) {
 		loadFromFile();
 	}
 	return this->measurePoints;
 }
 
 tf::Transform CalibrationDataSerialization::getInitialTransform() {
-	if(!dataLoaded) {
+	if (!dataLoaded) {
 		loadFromFile();
 	}
 	return this->initialTransformCameraToHead;
@@ -46,6 +52,7 @@ void CalibrationDataSerialization::saveToFile() {
 	for (int i = 0; i < this->measurePoints.size(); i++) {
 		file << " " << this->measurePoints[i];
 	}
+	this->initialTransformCameraToHead = getInitialCameraToHead();
 	file << " " << this->initialTransformCameraToHead;
 	file.close();
 	dataSaved = true;
@@ -61,8 +68,8 @@ void CalibrationDataSerialization::loadFromFile() {
 		file >> current;
 		this->measurePoints.push_back(current);
 	}
-
 	file >> this->initialTransformCameraToHead;
+	cout << "loading " << this->initialTransformCameraToHead << "\n";
 	file.close();
 	dataLoaded = true;
 }

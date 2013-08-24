@@ -16,8 +16,9 @@ CameraCalibration::CameraCalibration(CameraCalibrationOptions options) :
 			options.getDataCaptureParameter().getPointCloudTopic(),
 			options.getDataCaptureParameter().getBufferSize(),
 			&CameraCalibration::pointcloudMsgCb, this);
-	this->transformOptimization = options.getTransformOptimization();
-	this->initialTransformFactory = options.getInitialTransformFactory();
+	this->transformOptimization = OptimizationInstanceBuilder::getInstance(
+			options.getCameraTransformOptimizationParameter());
+	//this->initialTransformFactory = options.getCameraTransformOptimizationParameter().getInitialTransformFactory();
 	this->terminalModified = false;
 	this->skipPointcloud = false;
 }
@@ -28,6 +29,10 @@ CameraCalibration::~CameraCalibration() {
 
 int main(int argc, char** argv) {
 	string nodeName = "CameraCalibration";
+
+	for (int i = 0; i < argc; i++) {
+		cout << i << ": " << argv[i] << "\n";
+	}
 
 	// parse command line arguments
 	for (int i = 1; i < argc; i++) {
@@ -40,55 +45,51 @@ int main(int argc, char** argv) {
 
 	// Set all options.
 	CameraCalibrationOptions options;
-	TransformFactory* transformFactory = new TfTransformFactory(
-	DEFAULT_HEADPITCH_FRAME, DEFAULT_CAMERA_FRAME);
-	options.setInitialTransformFactory(transformFactory);
+	ParameterAccess& param = ParameterAccessFactory::getRosparamInstance();
+	/*TransformFactory* transformFactory = new TfTransformFactory(
+	 DEFAULT_HEADPITCH_FRAME, DEFAULT_CAMERA_FRAME);
+	 options.getCameraTransformOptimizationParameter().setInitialTransformFactory(transformFactory);*/
+	std::vector<CameraTransformOptimizationParameter> cameraTransformOptimizationParameter =
+			param.getCameraTransformOptimizationParameter();
+	options.setCameraTransformOptimizationParameter(
+			cameraTransformOptimizationParameter);
 
 	DataCaptureParameter dataCaptureParameter;
-	dataCaptureParameter.setCameraFrame(DEFAULT_CAMERA_FRAME);
-	dataCaptureParameter.setFixedFrame(DEFAULT_FIXED_FRAME);
-	dataCaptureParameter.setHeadPitchFrame(DEFAULT_HEADPITCH_FRAME);
-	dataCaptureParameter.setHeadYawFrame(DEFAULT_HEADYAW_FRAME);
-	dataCaptureParameter.setTorsoFrame(DEFAULT_TORSO_FRAME);
-	dataCaptureParameter.setFootprintFrame(DEFAULT_FOOTPRINT_FRAME);
-	dataCaptureParameter.setPointCloudTopic(DEFAULT_POINTCLOUD_MSG);
-	dataCaptureParameter.setBufferSize(DEFAULT_MSG_BUFFER);
-	dataCaptureParameter.setMinNumOfMeasurements(DEFAULT_NUM_OF_MEAUSREMENTS);
+	dataCaptureParameter = param.getDataCaptureParameter();
 	options.setDataCaptureParameter(dataCaptureParameter);
 
 	BallDetectionParameter ballDetectionParameter;
-	ballDetectionParameter.setDetectionRange(DETECTION_RANGE);
-	ballDetectionParameter.setMaxBallRadius(MAX_BALL_RADIUS);
-	ballDetectionParameter.setMinBallRadius(MIN_BALL_RADIUS);
+	ballDetectionParameter = param.getBallDetectionParameter();
 	options.setBallDetectionParameter(ballDetectionParameter);
 
-	SvdTransformOptimization* svdTransformOptimization =
-			new SvdTransformOptimization();
-	svdTransformOptimization->setMaxIterations(100000);
-	svdTransformOptimization->setMinError(0.000001);
-	svdTransformOptimization->setErrorImprovement(0.000000001);
+	/*
+	 SvdTransformOptimization* svdTransformOptimization =
+	 new SvdTransformOptimization();
+	 svdTransformOptimization->setMaxIterations(100000);
+	 svdTransformOptimization->setMinError(0.000001);
+	 svdTransformOptimization->setErrorImprovement(0.000000001);
 
-	CompositeTransformOptimization* compositeTransformOptimization =
-			new CompositeTransformOptimization();
-	compositeTransformOptimization->addTransformOptimization("svd",
-			svdTransformOptimization);
+	 CompositeTransformOptimization* compositeTransformOptimization =
+	 new CompositeTransformOptimization();
+	 compositeTransformOptimization->addTransformOptimization("svd",
+	 svdTransformOptimization);
 
-	// 1st g2o
-	G2oTransformOptimization* g2oTransformOptimization1 =
-			new G2oTransformOptimization();
-	Eigen::Matrix<double, 5, 5> correlationMatrix1 =
-			Eigen::Matrix<double, 5, 5>::Identity();
-	correlationMatrix1(0, 0) = 1.0;
-	correlationMatrix1(1, 1) = 1.0;
-	correlationMatrix1(2, 2) = 1.0;
-	correlationMatrix1(3, 3) = 1.0;
-	correlationMatrix1(4, 4) = 1.0;
-	g2oTransformOptimization1->setCorrelationMatrix(correlationMatrix1);
-	compositeTransformOptimization->addTransformOptimization("g2o(1,1,1,1,1)",
-			g2oTransformOptimization1);
+	 // 1st g2o
+	 G2oTransformOptimization* g2oTransformOptimization1 =
+	 new G2oTransformOptimization();
+	 Eigen::Matrix<double, 5, 5> correlationMatrix1 =
+	 Eigen::Matrix<double, 5, 5>::Identity();
+	 correlationMatrix1(0, 0) = 1.0;
+	 correlationMatrix1(1, 1) = 1.0;
+	 correlationMatrix1(2, 2) = 1.0;
+	 correlationMatrix1(3, 3) = 1.0;
+	 correlationMatrix1(4, 4) = 1.0;
+	 g2oTransformOptimization1->setCorrelationMatrix(correlationMatrix1);
+	 compositeTransformOptimization->addTransformOptimization("g2o(1,1,1,1,1)",
+	 g2oTransformOptimization1);
 
-	// 2nd g2o
-	/*	G2oTransformOptimization* g2oTransformOptimization2 =
+	 // 2nd g2o
+	 G2oTransformOptimization* g2oTransformOptimization2 =
 	 new G2oTransformOptimization();
 	 Eigen::Matrix<double, 5, 5> correlationMatrix2 =
 	 Eigen::Matrix<double, 5, 5>::Identity();
@@ -99,136 +100,121 @@ int main(int argc, char** argv) {
 	 correlationMatrix2(4, 4) = 0.0;
 	 g2oTransformOptimization2->setCorrelationMatrix(correlationMatrix2);
 	 compositeTransformOptimization->addTransformOptimization("g2o(1,1,1,0,0)",
-	 g2oTransformOptimization2);*/
+	 g2oTransformOptimization2);
 
-	// 3rd g2o
-	G2oTransformOptimization* g2oTransformOptimization3 =
-			new G2oTransformOptimization();
-	Eigen::Matrix<double, 5, 5> correlationMatrix3 =
-			Eigen::Matrix<double, 5, 5>::Identity();
-	correlationMatrix3(0, 0) = 0.0;
-	correlationMatrix3(1, 1) = 0.0;
-	correlationMatrix3(2, 2) = 0.0;
-	correlationMatrix3(3, 3) = 1.0;
-	correlationMatrix3(4, 4) = 1.0;
-	g2oTransformOptimization3->setCorrelationMatrix(correlationMatrix3);
-	compositeTransformOptimization->addTransformOptimization("g2o(0,0,0,1,1)",
-			g2oTransformOptimization3);
+	 // 3rd g2o
+	 G2oTransformOptimization* g2oTransformOptimization3 =
+	 new G2oTransformOptimization();
+	 Eigen::Matrix<double, 5, 5> correlationMatrix3 =
+	 Eigen::Matrix<double, 5, 5>::Identity();
+	 correlationMatrix3(0, 0) = 0.0;
+	 correlationMatrix3(1, 1) = 0.0;
+	 correlationMatrix3(2, 2) = 0.0;
+	 correlationMatrix3(3, 3) = 1.0;
+	 correlationMatrix3(4, 4) = 1.0;
+	 g2oTransformOptimization3->setCorrelationMatrix(correlationMatrix3);
+	 compositeTransformOptimization->addTransformOptimization("g2o(0,0,0,1,1)",
+	 g2oTransformOptimization3);
 
-	// 4th g2o
-	G2oTransformOptimization* g2oTransformOptimization4 =
-			new G2oTransformOptimization();
-	Eigen::Matrix<double, 5, 5> correlationMatrix4 =
-			Eigen::Matrix<double, 5, 5>::Identity();
-	correlationMatrix4(0, 0) = 1.0;
-	correlationMatrix4(1, 1) = 1.0;
-	correlationMatrix4(2, 2) = 1.0;
-	correlationMatrix4(3, 3) = 10.0;
-	correlationMatrix4(4, 4) = 10.0;
-	g2oTransformOptimization4->setCorrelationMatrix(correlationMatrix4);
-	compositeTransformOptimization->addTransformOptimization("g2o(1,1,1,10,10)",
-			g2oTransformOptimization4);
+	 // 4th g2o
+	 G2oTransformOptimization* g2oTransformOptimization4 =
+	 new G2oTransformOptimization();
+	 Eigen::Matrix<double, 5, 5> correlationMatrix4 =
+	 Eigen::Matrix<double, 5, 5>::Identity();
+	 correlationMatrix4(0, 0) = 1.0;
+	 correlationMatrix4(1, 1) = 1.0;
+	 correlationMatrix4(2, 2) = 1.0;
+	 correlationMatrix4(3, 3) = 10.0;
+	 correlationMatrix4(4, 4) = 10.0;
+	 g2oTransformOptimization4->setCorrelationMatrix(correlationMatrix4);
+	 compositeTransformOptimization->addTransformOptimization("g2o(1,1,1,10,10)",
+	 g2oTransformOptimization4);
 
-	// 5th g2o
-	G2oTransformOptimization* g2oTransformOptimization5 =
-			new G2oTransformOptimization();
-	Eigen::Matrix<double, 5, 5> correlationMatrix5 =
-			Eigen::Matrix<double, 5, 5>::Identity();
-	correlationMatrix5(0, 0) = 1.0;
-	correlationMatrix5(1, 1) = 1.0;
-	correlationMatrix5(2, 2) = 1.0;
-	correlationMatrix5(3, 3) = 0.1;
-	correlationMatrix5(4, 4) = 0.1;
-	g2oTransformOptimization5->setCorrelationMatrix(correlationMatrix5);
-	compositeTransformOptimization->addTransformOptimization(
-			"g2o(1,1,1,0.1,0.1)", g2oTransformOptimization5);
+	 // 5th g2o
+	 G2oTransformOptimization* g2oTransformOptimization5 =
+	 new G2oTransformOptimization();
+	 Eigen::Matrix<double, 5, 5> correlationMatrix5 =
+	 Eigen::Matrix<double, 5, 5>::Identity();
+	 correlationMatrix5(0, 0) = 1.0;
+	 correlationMatrix5(1, 1) = 1.0;
+	 correlationMatrix5(2, 2) = 1.0;
+	 correlationMatrix5(3, 3) = 0.1;
+	 correlationMatrix5(4, 4) = 0.1;
+	 g2oTransformOptimization5->setCorrelationMatrix(correlationMatrix5);
+	 compositeTransformOptimization->addTransformOptimization(
+	 "g2o(1,1,1,0.1,0.1)", g2oTransformOptimization5);
 
-	// 6th g2o
-	G2oTransformOptimization* g2oTransformOptimization6 =
-			new G2oTransformOptimization();
-	Eigen::Matrix<double, 5, 5> correlationMatrix6 =
-			Eigen::Matrix<double, 5, 5>::Identity();
-	correlationMatrix6(0, 0) = 1.0;
-	correlationMatrix6(1, 1) = 1.0;
-	correlationMatrix6(2, 2) = 1.0;
-	correlationMatrix6(3, 3) = 100.0;
-	correlationMatrix6(4, 4) = 100.0;
-	g2oTransformOptimization6->setCorrelationMatrix(correlationMatrix6);
-	compositeTransformOptimization->addTransformOptimization(
-			"g2o(1,1,1,100,100)", g2oTransformOptimization6);
+	 // 6th g2o
+	 G2oTransformOptimization* g2oTransformOptimization6 =
+	 new G2oTransformOptimization();
+	 Eigen::Matrix<double, 5, 5> correlationMatrix6 =
+	 Eigen::Matrix<double, 5, 5>::Identity();
+	 correlationMatrix6(0, 0) = 1.0;
+	 correlationMatrix6(1, 1) = 1.0;
+	 correlationMatrix6(2, 2) = 1.0;
+	 correlationMatrix6(3, 3) = 100.0;
+	 correlationMatrix6(4, 4) = 100.0;
+	 g2oTransformOptimization6->setCorrelationMatrix(correlationMatrix6);
+	 compositeTransformOptimization->addTransformOptimization(
+	 "g2o(1,1,1,100,100)", g2oTransformOptimization6);
 
-	// 7th g2o
-	G2oTransformOptimization* g2oTransformOptimization7 =
-			new G2oTransformOptimization();
-	Eigen::Matrix<double, 5, 5> correlationMatrix7 =
-			Eigen::Matrix<double, 5, 5>::Identity();
-	correlationMatrix7(0, 0) = 1.0;
-	correlationMatrix7(1, 1) = 1.0;
-	correlationMatrix7(2, 2) = 1.0;
-	correlationMatrix7(3, 3) = 1000.0;
-	correlationMatrix7(4, 4) = 1000.0;
-	g2oTransformOptimization7->setCorrelationMatrix(correlationMatrix7);
-	compositeTransformOptimization->addTransformOptimization(
-			"g2o(1,1,1,1000,1000)", g2oTransformOptimization7);
+	 // 7th g2o
+	 G2oTransformOptimization* g2oTransformOptimization7 =
+	 new G2oTransformOptimization();
+	 Eigen::Matrix<double, 5, 5> correlationMatrix7 =
+	 Eigen::Matrix<double, 5, 5>::Identity();
+	 correlationMatrix7(0, 0) = 1.0;
+	 correlationMatrix7(1, 1) = 1.0;
+	 correlationMatrix7(2, 2) = 1.0;
+	 correlationMatrix7(3, 3) = 1000.0;
+	 correlationMatrix7(4, 4) = 1000.0;
+	 g2oTransformOptimization7->setCorrelationMatrix(correlationMatrix7);
+	 compositeTransformOptimization->addTransformOptimization(
+	 "g2o(1,1,1,1000,1000)", g2oTransformOptimization7);
 
-	// 8th g2o
-	G2oTransformOptimization* g2oTransformOptimization8 =
-			new G2oTransformOptimization();
-	Eigen::Matrix<double, 5, 5> correlationMatrix8 =
-			Eigen::Matrix<double, 5, 5>::Identity();
-	correlationMatrix8(0, 0) = 1.0;
-	correlationMatrix8(1, 1) = 1.0;
-	correlationMatrix8(2, 2) = 1.0;
-	correlationMatrix8(3, 3) = 10000.0;
-	correlationMatrix8(4, 4) = 10000.0;
-	g2oTransformOptimization8->setCorrelationMatrix(correlationMatrix8);
-	compositeTransformOptimization->addTransformOptimization(
-			"g2o(1,1,1,10000,10000)", g2oTransformOptimization8);
+	 // 8th g2o
+	 G2oTransformOptimization* g2oTransformOptimization8 =
+	 new G2oTransformOptimization();
+	 Eigen::Matrix<double, 5, 5> correlationMatrix8 =
+	 Eigen::Matrix<double, 5, 5>::Identity();
+	 correlationMatrix8(0, 0) = 1.0;
+	 correlationMatrix8(1, 1) = 1.0;
+	 correlationMatrix8(2, 2) = 1.0;
+	 correlationMatrix8(3, 3) = 10000.0;
+	 correlationMatrix8(4, 4) = 10000.0;
+	 g2oTransformOptimization8->setCorrelationMatrix(correlationMatrix8);
+	 compositeTransformOptimization->addTransformOptimization(
+	 "g2o(1,1,1,10000,10000)", g2oTransformOptimization8);
 
-	// 9th g2o
-	G2oTransformOptimization* g2oTransformOptimization9 =
-			new G2oTransformOptimization();
-	Eigen::Matrix<double, 5, 5> correlationMatrix9 =
-			Eigen::Matrix<double, 5, 5>::Identity();
-	correlationMatrix9(0, 0) = 0.001;
-	correlationMatrix9(1, 1) = 0.001;
-	correlationMatrix9(2, 2) = 0.001;
-	correlationMatrix9(3, 3) = 1.0;
-	correlationMatrix9(4, 4) = 1.0;
-	g2oTransformOptimization9->setCorrelationMatrix(correlationMatrix9);
-	compositeTransformOptimization->addTransformOptimization(
-			"g2o(0.001,0.001,0.001,1,1)", g2oTransformOptimization9);
+	 // 9th g2o
+	 G2oTransformOptimization* g2oTransformOptimization9 =
+	 new G2oTransformOptimization();
+	 Eigen::Matrix<double, 5, 5> correlationMatrix9 =
+	 Eigen::Matrix<double, 5, 5>::Identity();
+	 correlationMatrix9(0, 0) = 0.001;
+	 correlationMatrix9(1, 1) = 0.001;
+	 correlationMatrix9(2, 2) = 0.001;
+	 correlationMatrix9(3, 3) = 1.0;
+	 correlationMatrix9(4, 4) = 1.0;
+	 g2oTransformOptimization9->setCorrelationMatrix(correlationMatrix9);
+	 compositeTransformOptimization->addTransformOptimization(
+	 "g2o(0.001,0.001,0.001,1,1)", g2oTransformOptimization9);
 
-	// hill climbing
-	HillClimbingTransformOptimization* hillClimbing =
-			new HillClimbingTransformOptimization();
-	compositeTransformOptimization->addTransformOptimization("hillClimbing",
-			hillClimbing);
-	RandomRestartLocalOptimization* rrlo = new RandomRestartLocalOptimization(
-			hillClimbing, 10);
-//	compositeTransformOptimization->addTransformOptimization("RaReHC", rrlo);
+	 // hill climbing
+	 HillClimbingTransformOptimization* hillClimbing =
+	 new HillClimbingTransformOptimization();
+	 compositeTransformOptimization->addTransformOptimization("hillClimbing",
+	 hillClimbing);
+	 RandomRestartLocalOptimization* rrlo = new RandomRestartLocalOptimization(
+	 hillClimbing, 10);
+	 //	compositeTransformOptimization->addTransformOptimization("RaReHC", rrlo);
 
-// simulated annealing
-//	 SimulatedAnnealingTransformOptimization* simulatedAnnealing = new SimulatedAnnealingTransformOptimization();
-//	 compositeTransformOptimization->addTransformOptimization("simulatedAnnealing", simulatedAnnealing);
+	 // simulated annealing
+	 //	 SimulatedAnnealingTransformOptimization* simulatedAnnealing = new SimulatedAnnealingTransformOptimization();
+	 //	 compositeTransformOptimization->addTransformOptimization("simulatedAnnealing", simulatedAnnealing);
 
-	options.setTransformOptimization(compositeTransformOptimization);
-
-	// parse command line arguments
-	for (int i = 1; i < argc; i++) {
-		if (strcmp(argv[i], "-ig") == 0
-				|| strcmp(argv[i], "--initial-guess") == 0) {
-			TransformFactory* mtf = new ManualTransformFactory(
-					atof(argv[i + 1]), atof(argv[i + 2]), atof(argv[i + 3]),
-					atof(argv[i + 4]), atof(argv[i + 5]), atof(argv[i + 6]));
-			options.setInitialTransformFactory(mtf);
-		} else if (strcmp(argv[i], "--data-to-file") == 0) {
-			string fileName = argv[i + 1];
-			CalibrationDataSerialization* calibrationDataSerialization =
-					new CalibrationDataSerialization(fileName);
-			options.setTransformOptimization(calibrationDataSerialization);
-		}
-	}
+	 options.setTransformOptimization(compositeTransformOptimization);
+	 */
 
 	CameraCalibration cameraCalibration(options);
 
@@ -236,11 +222,20 @@ int main(int argc, char** argv) {
 	for (int i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "--data-from-file") == 0) {
 			string fileName = argv[i + 1];
-			CalibrationDataSerialization data(fileName);
+			cout << "fileName: " << fileName << endl;
+			CalibrationDataSerialization data(dataCaptureParameter, fileName);
 			cameraCalibration.setData(data.getMeasurementSeries(),
 					data.getInitialTransform());
 			cameraCalibration.startOptimization();
 			return 0;
+		}
+
+		if (strcmp(argv[i], "--data-to-file") == 0) {
+			string fileName = argv[i + 1];
+			CalibrationDataSerialization* calibrationDataSerialization =
+					new CalibrationDataSerialization(dataCaptureParameter, fileName);
+			cameraCalibration.setTransformOptimization(
+					calibrationDataSerialization);
 		}
 	}
 
@@ -384,11 +379,6 @@ void CameraCalibration::pointcloudMsgCb(const sensor_msgs::PointCloud2& input) {
 
 void CameraCalibration::startOptimization() {
 	ROS_INFO("optimizing...");
-	// initialize TransformOptization
-	tf::Transform initialTransform;
-	this->initialTransformFactory->getTransform(initialTransform);
-	this->transformOptimization->setInitialTransformCameraToHead(
-			initialTransform);
 	// TODO: Add method to pass the list, not a single point!
 	for (int j = 0; j < this->measurementSeries.size(); j++) {
 		this->transformOptimization->addMeasurePoint(
@@ -403,15 +393,14 @@ void CameraCalibration::startOptimization() {
 void CameraCalibration::setData(std::vector<MeasurePoint> measurementSeries,
 		tf::Transform initialTransform) {
 	this->measurementSeries = measurementSeries;
-	this->initialTransformFactory = new ManualTransformFactory(
-			initialTransform);
+	this->transformOptimization->setInitialCameraToHead(initialTransform);
 }
 
 void CameraCalibration::outputMeasurePoint(
 		const MeasurePoint& newMeasurePoint) {
 	tf::StampedTransform cameraToHead;
 
-	// get the transform between headFrame and cameraFrame and transform the current point to fixed frame
+// get the transform between headFrame and cameraFrame and transform the current point to fixed frame
 	string headPitchFrame =
 			options.getDataCaptureParameter().getHeadPitchFrame();
 	string cameraFrame = options.getDataCaptureParameter().getCameraFrame();
@@ -421,7 +410,7 @@ void CameraCalibration::outputMeasurePoint(
 			CalibrationState(cameraToHead, 0.0, 0.0))
 			* newMeasurePoint.measuredPosition;
 
-	// output ball position in optical and fixed frame
+// output ball position in optical and fixed frame
 	ROS_INFO("Last measurement (average position, optical frame): %f, %f, %f.",
 			newMeasurePoint.measuredPosition.getX(),
 			newMeasurePoint.measuredPosition.getY(),
@@ -455,16 +444,6 @@ bool CameraCalibration::distanceTooBig(pcl::PointXYZ first,
 	return (distance > 0.01);
 }
 
-void CameraCalibration::setInitialCameraToHeadTransform(float tx, float ty,
-		float tz, float roll, float pitch, float yaw) {
-	if (this->initialTransformFactory) {
-		delete this->initialTransformFactory;
-	}
-
-	this->initialTransformFactory = new ManualTransformFactory(tx, ty, tz, roll,
-			pitch, yaw);
-}
-
 void CameraCalibration::createMeasurePoint(
 		std::vector<BallDetection::BallData> ballMeasurements,
 		std::vector<GroundData> groundMeasurements,
@@ -475,7 +454,7 @@ void CameraCalibration::createMeasurePoint(
 
 	std::cout << "Point #" << ++numOfMeasurePoints << "\n";
 
-	// get transforms
+// get transforms
 	tf::StampedTransform opticalToCamera;
 	tf::StampedTransform torsoToFixed;
 	tf::StampedTransform fixedToFootprint;
@@ -508,7 +487,7 @@ void CameraCalibration::createMeasurePoint(
 	newMeasurePoint.setHeadPitchToHeadYaw(headPitchToHeadYaw);
 	newMeasurePoint.setHeadYawToTorso(headYawToTorso);
 
-	// determine average position
+// determine average position
 	/*
 	 double x = 0, y = 0, z = 0;
 	 int size = ballMeasurements.size();
@@ -547,38 +526,11 @@ void CameraCalibration::createMeasurePoint(
 			/ 2];
 }
 
-TransformFactory* CameraCalibrationOptions::getInitialTransformFactory() const {
-	return initialTransformFactory;
-}
-
-void CameraCalibrationOptions::setInitialTransformFactory(
-		TransformFactory* initialTransformFactory) {
-	this->initialTransformFactory = initialTransformFactory;
-}
-
-CameraTransformOptimization* CameraCalibrationOptions::getTransformOptimization() const {
+const CameraTransformOptimization* CameraCalibration::getTransformOptimization() const {
 	return transformOptimization;
 }
 
-void CameraCalibrationOptions::setTransformOptimization(
+void CameraCalibration::setTransformOptimization(
 		CameraTransformOptimization* transformOptimization) {
 	this->transformOptimization = transformOptimization;
-}
-
-BallDetectionParameter& CameraCalibrationOptions::getBallDetectionParameter() {
-	return ballDetectionParameter;
-}
-
-void CameraCalibrationOptions::setBallDetectionParameter(
-		const BallDetectionParameter& ballDetectionParameter) {
-	this->ballDetectionParameter = ballDetectionParameter;
-}
-
-DataCaptureParameter& CameraCalibrationOptions::getDataCaptureParameter() {
-	return dataCaptureParameter;
-}
-
-void CameraCalibrationOptions::setDataCaptureParameter(
-		const DataCaptureParameter& dataCaptureParameter) {
-	this->dataCaptureParameter = dataCaptureParameter;
 }

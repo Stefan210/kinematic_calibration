@@ -1,0 +1,5 @@
+<launch>
+  <node name="camera_calibration" pkg="calibration" type="CameraCalibration" output="screen">
+    <rosparam file="$(find calibration)/config/camera_calibration_params.yaml" command="load" />
+  </node>
+</launch>

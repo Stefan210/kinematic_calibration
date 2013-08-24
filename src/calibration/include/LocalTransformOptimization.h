@@ -25,7 +25,7 @@ public:
  */
 class LocalTransformOptimization: public CameraTransformOptimization {
 public:
-	LocalTransformOptimization();
+	LocalTransformOptimization(CameraTransformOptimizationParameter parameter = CameraTransformOptimizationParameter());
 	virtual ~LocalTransformOptimization();
 	virtual void setInitialState(LtoState initialState);
 
@@ -39,14 +39,14 @@ protected:
 
 class HillClimbingTransformOptimization: public LocalTransformOptimization {
 public:
-	HillClimbingTransformOptimization();
+	HillClimbingTransformOptimization(CameraTransformOptimizationParameter parameter = CameraTransformOptimizationParameter());
 	virtual ~HillClimbingTransformOptimization();
 	virtual void optimizeTransform(CalibrationState& calibrationState);
 };
 
 class SimulatedAnnealingTransformOptimization: public LocalTransformOptimization {
 public:
-	SimulatedAnnealingTransformOptimization();
+	SimulatedAnnealingTransformOptimization(CameraTransformOptimizationParameter parameter = CameraTransformOptimizationParameter());
 	virtual ~SimulatedAnnealingTransformOptimization();
 	virtual void optimizeTransform(CalibrationState& calibrationState);
 	virtual std::vector<LtoState> getNeighbors(LtoState& current);

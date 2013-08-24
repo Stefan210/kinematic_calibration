@@ -12,9 +12,9 @@
 #include <stdlib.h>
 #include <time.h>
 
-LocalTransformOptimization::LocalTransformOptimization() :
-		stepwidth(0.1) {
-	// TODO Auto-generated constructor stub
+LocalTransformOptimization::LocalTransformOptimization(
+		CameraTransformOptimizationParameter param) :
+		CameraTransformOptimization(param), stepwidth(0.1) {
 
 }
 
@@ -22,7 +22,9 @@ LocalTransformOptimization::~LocalTransformOptimization() {
 	// TODO Auto-generated destructor stub
 }
 
-HillClimbingTransformOptimization::HillClimbingTransformOptimization() {
+HillClimbingTransformOptimization::HillClimbingTransformOptimization(
+		CameraTransformOptimizationParameter param) :
+		LocalTransformOptimization(param) {
 }
 
 HillClimbingTransformOptimization::~HillClimbingTransformOptimization() {
@@ -31,7 +33,7 @@ HillClimbingTransformOptimization::~HillClimbingTransformOptimization() {
 void HillClimbingTransformOptimization::optimizeTransform(
 		CalibrationState& calibrationState) {
 	LtoState currentState, bestState;
-	currentState.setCameraToHead(this->initialTransformCameraToHead);
+	currentState.setCameraToHead(this->getInitialCameraToHead());
 	currentState.error = calculateError(currentState);
 	bestState.error = INFINITY;
 	bool canImprove = true;
@@ -127,7 +129,9 @@ float LocalTransformOptimization::calculateError(LtoState& state) {
 		double c = transformedGroundData.c;
 		double d = transformedGroundData.d;
 		transformedGroundData.getRPY(roll, pitch, yaw);
-		groundError += fabs(fabs(tf::Vector3(0, 0, -d / c).distance(tf::Vector3(0,0,0))) - 0.02)
+		groundError += fabs(
+				fabs(tf::Vector3(0, 0, -d / c).distance(tf::Vector3(0, 0, 0)))
+						- 0.02)
 				+ fabs(
 						tf::Vector3(transformedGroundData.a,
 								transformedGroundData.b,
@@ -264,7 +268,9 @@ std::vector<LtoState> LocalTransformOptimization::getNeighbors(
 
 void LocalTransformOptimization::setInitialState(LtoState initialState) {
 	this->initialState = initialState;
-	this->setInitialTransformCameraToHead(initialState.getCameraToHead());
+	TransformFactory* tfFactory = new ManualTransformFactory(initialState.getCameraToHead());
+	delete this->parameter.getInitialTransformFactory();
+	this->parameter.setInitialTransformFactory(tfFactory);
 }
 
 std::ostream& operator<<(std::ostream &out, LtoState &state) {
@@ -291,7 +297,9 @@ std::ostream& operator<<(std::ostream &out, LtoState &state) {
 	return out;
 }
 
-SimulatedAnnealingTransformOptimization::SimulatedAnnealingTransformOptimization() {
+SimulatedAnnealingTransformOptimization::SimulatedAnnealingTransformOptimization(
+		CameraTransformOptimizationParameter param) :
+		LocalTransformOptimization(param) {
 	maxIterations = 1000;
 	startTemperature = 1e-10;
 }
@@ -304,7 +312,7 @@ void SimulatedAnnealingTransformOptimization::optimizeTransform(
 	srand(time(0));
 	int i = 0;
 	LtoState initialState;
-	initialState.setCameraToHead(this->initialTransformCameraToHead);
+	initialState.setCameraToHead(this->getInitialCameraToHead());
 	initialState.error = calculateError(initialState);
 
 	/* temperature */

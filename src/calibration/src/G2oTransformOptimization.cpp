@@ -24,14 +24,16 @@
 #include <g2o/solvers/pcg/linear_solver_pcg.h>
 #include <g2o/solvers/dense/linear_solver_dense.h>
 
-G2oTransformOptimization::G2oTransformOptimization() {
+G2oTransformOptimization::G2oTransformOptimization(
+		CameraTransformOptimizationParameter param) :
+		CameraTransformOptimization(param) {
 	this->markerPositionOptimized = false;
-//	this->correlationMatrix = Eigen::Matrix<double, 5, 5>::Identity();
-//	this->correlationMatrix.setConstant(0, 0, 1.0);
-//	this->correlationMatrix.setConstant(1, 1, 1.0);
-//	this->correlationMatrix.setConstant(2, 2, 1.0);
-//	this->correlationMatrix.setConstant(3, 3, 1.0);
-//	this->correlationMatrix.setConstant(4, 4, 1.0);
+	this->correlationMatrix = Eigen::Matrix<double, 5, 5>::Identity();
+	this->correlationMatrix.setConstant(0, 0, parameter.getMarkerWeight());
+	this->correlationMatrix.setConstant(1, 1, parameter.getMarkerWeight());
+	this->correlationMatrix.setConstant(2, 2, parameter.getMarkerWeight());
+	this->correlationMatrix.setConstant(3, 3, parameter.getGroundWeight());
+	this->correlationMatrix.setConstant(4, 4, parameter.getGroundWeight());
 }
 
 G2oTransformOptimization::~G2oTransformOptimization() {
@@ -84,7 +86,7 @@ void G2oTransformOptimization::optimizeTransform(
 
 	// add a vertex representing the current transformation
 	VertexTransformation3D* transformationVertex = new VertexTransformation3D();
-	transformationVertex->setEstimate(initialTransformCameraToHead);
+	transformationVertex->setEstimate(getInitialCameraToHead());
 	transformationVertex->setId(2);
 	optimizer.addVertex(transformationVertex);
 

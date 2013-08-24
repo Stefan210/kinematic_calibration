@@ -15,7 +15,7 @@
  */
 class SvdTransformOptimization : public CameraTransformOptimization {
 public:
-	SvdTransformOptimization();
+	SvdTransformOptimization(CameraTransformOptimizationParameter parameter = CameraTransformOptimizationParameter());
 	virtual ~SvdTransformOptimization();
 	virtual void optimizeTransform(CalibrationState& calibrationState);
 

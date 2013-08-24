@@ -11,7 +11,9 @@
 #include <pcl/registration/transformation_estimation.h>
 #include <pcl/registration/transformation_estimation_svd.h>
 
-SvdTransformOptimization::SvdTransformOptimization() {
+SvdTransformOptimization::SvdTransformOptimization(
+		CameraTransformOptimizationParameter param) :
+		CameraTransformOptimization(param) {
 	// TODO Auto-generated constructor stub
 
 }
@@ -20,8 +22,9 @@ SvdTransformOptimization::~SvdTransformOptimization() {
 	// TODO Auto-generated destructor stub
 }
 
-void SvdTransformOptimization::optimizeTransform(CalibrationState& calibrationState) {
-	tf::Transform currentCameraToHead = initialTransformCameraToHead;
+void SvdTransformOptimization::optimizeTransform(
+		CalibrationState& calibrationState) {
+	tf::Transform currentCameraToHead = getInitialCameraToHead();
 	this->lastError = INFINITY;
 
 	/*	std::cout << "initial origin " << currentCameraToHead.getOrigin().getX() << ","
@@ -68,8 +71,8 @@ void SvdTransformOptimization::optimizeTransform(CalibrationState& calibrationSt
 			MeasurePoint currentMeasure = measurePoints[i];
 			tf::Transform headPitchToFixed = currentMeasure.headToFixed(
 					CalibrationState(currentCameraToHead, 0, 0));
-			tf::Vector3 currentPointHead =
-					(headPitchToFixed.inverse()) * centerPointFixed;
+			tf::Vector3 currentPointHead = (headPitchToFixed.inverse())
+					* centerPointFixed;
 			pointcloudP.push_back(currentPointHead);
 		}
 

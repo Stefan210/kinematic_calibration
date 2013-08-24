@@ -12,6 +12,8 @@
 #include "../include/CameraTransformOptimization.h"
 #include "../include/CameraMeasurePoint.h"
 #include "../include/CalibrationState.h"
+#include "../include/Parameter.h"
+#include "../include/TransformFactory.h"
 
 #include <tf/tf.h>
 
@@ -20,15 +22,16 @@ using namespace std;
 /*
  *
  */
-class CalibrationDataSerialization : public CameraTransformOptimization {
+class CalibrationDataSerialization: public CameraTransformOptimization {
 public:
-	CalibrationDataSerialization(std::string filename);
+	CalibrationDataSerialization(DataCaptureParameter dataCaptureParameter,
+			std::string filename);
 	virtual ~CalibrationDataSerialization();
 
 	virtual void optimizeTransform(CalibrationState& calibrationState);
 
-	std::vector<MeasurePoint> getMeasurementSeries();
-	tf::Transform getInitialTransform();
+	virtual std::vector<MeasurePoint> getMeasurementSeries();
+	virtual tf::Transform getInitialTransform();
 
 protected:
 	void saveToFile();
@@ -38,6 +41,8 @@ private:
 	std::string fileName;
 	bool dataLoaded;
 	bool dataSaved;
+	tf::Transform initialTransformCameraToHead;
+	DataCaptureParameter dataCaptureParameter;
 };
 
 #endif /* CALIBRATIONDATASERIALIZATION_H_ */

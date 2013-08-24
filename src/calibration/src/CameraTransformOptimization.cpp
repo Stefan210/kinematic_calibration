@@ -9,10 +9,9 @@
 
 using namespace std;
 
-CameraTransformOptimization::CameraTransformOptimization() :
-		numOfIterations(0) {
-	// TODO Auto-generated constructor stub
-
+CameraTransformOptimization::CameraTransformOptimization(
+		CameraTransformOptimizationParameter parameter) :
+		parameter(parameter), numOfIterations(0) {
 }
 
 CameraTransformOptimization::~CameraTransformOptimization() {
@@ -44,11 +43,6 @@ void CameraTransformOptimization::calculateSqrtDistFromMarker(
 	}
 
 	error /= this->measurePoints.size();
-}
-
-void CameraTransformOptimization::setInitialTransformCameraToHead(
-		tf::Transform frameAToFrameB) {
-	this->initialTransformCameraToHead = frameAToFrameB;
 }
 
 void CameraTransformOptimization::getMarkerEstimate(
@@ -212,10 +206,10 @@ void CompositeTransformOptimization::optimizeTransform(
 
 	tf::Vector3 initialMarkerEstimate;
 	this->getMarkerEstimate(
-			CalibrationState(this->initialTransformCameraToHead, 0, 0),
+			CalibrationState(this->getInitialCameraToHead(), 0, 0),
 			initialMarkerEstimate);
 	printResult("initial",
-			CalibrationState(this->initialTransformCameraToHead, 0, 0),
+			CalibrationState(this->getInitialCameraToHead(), 0, 0),
 			initialMarkerEstimate);
 
 	// return the transform with the smallest error
@@ -252,20 +246,19 @@ void CompositeTransformOptimization::clearMeasurePoints() {
 	this->CameraTransformOptimization::clearMeasurePoints();
 }
 
-void CompositeTransformOptimization::setInitialTransformCameraToHead(
-		tf::Transform cameraToHead) {
+void CompositeTransformOptimization::setInitialCameraToHead(
+		tf::Transform initialTransform) {
 	for (map<string, CameraTransformOptimization*>::const_iterator it =
 			this->optimizer.begin(); it != this->optimizer.end(); ++it) {
-		it->second->setInitialTransformCameraToHead(cameraToHead);
+		it->second->setInitialCameraToHead(initialTransform);
 	}
-	this->CameraTransformOptimization::setInitialTransformCameraToHead(
-			cameraToHead);
+	this->CameraTransformOptimization::setInitialCameraToHead(initialTransform);
 }
 
 void CameraTransformOptimization::removeOutliers() {
 	std::vector<MeasurePoint> filteredMeasurePoints;
 	tf::Vector3 markerPosition;
-	CalibrationState initialState(this->initialTransformCameraToHead, 0, 0);
+	CalibrationState initialState(this->getInitialCameraToHead(), 0, 0);
 	getMarkerEstimate(initialState, markerPosition);
 	for (int i = 0; i < this->measurePoints.size(); i++) {
 		double r, p, y;
@@ -290,4 +283,3 @@ void CameraTransformOptimization::removeOutliers() {
 	}
 	this->measurePoints = filteredMeasurePoints;
 }
-
