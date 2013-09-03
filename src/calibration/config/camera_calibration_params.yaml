@@ -22,8 +22,134 @@ detectionRange:   1.5
 # Parameter concerning the optimization
 ###############################################################################
 optimization: 
-
-  HillClimbing_1_1:
+      
+      
+  G2O_M1_G1:
+      # Selects the optimization type.
+      optimizationType:       G2O
+      
+      # Selects whether the joint offsets should be calibrated or not.
+      calibrateJointOffsets:  true
+      
+      # Weight of the squared error between the estimated
+      # marker position and the transformed measured positions.
+      markerWeight:     1.0
+      
+      # Weight of the squared error of ground angle and ground distance.
+      groundWeight:     1.0
+      
+      # Distance between footprint and ground.
+      groundDistance:   0.02
+      
+      
+  G2O_M1_G0:
+      # Selects the optimization type.
+      optimizationType:       G2O
+      
+      # Selects whether the joint offsets should be calibrated or not.
+      calibrateJointOffsets:  true
+      
+      # Weight of the squared error between the estimated
+      # marker position and the transformed measured positions.
+      markerWeight:     1.0
+      
+      # Weight of the squared error of ground angle and ground distance.
+      groundWeight:     0.0
+      
+      # Distance between footprint and ground.
+      groundDistance:   0.02
+      
+      
+  G2O_M0_G1:
+      # Selects the optimization type.
+      optimizationType:       G2O
+      
+      # Selects whether the joint offsets should be calibrated or not.
+      calibrateJointOffsets:  true
+      
+      # Weight of the squared error between the estimated
+      # marker position and the transformed measured positions.
+      markerWeight:     0.0
+      
+      # Weight of the squared error of ground angle and ground distance.
+      groundWeight:     1.0
+      
+      # Distance between footprint and ground.
+      groundDistance:   0.02
+      
+      
+  G2O_M1_G10:
+      # Selects the optimization type.
+      optimizationType:       G2O
+      
+      # Selects whether the joint offsets should be calibrated or not.
+      calibrateJointOffsets:  true
+      
+      # Weight of the squared error between the estimated
+      # marker position and the transformed measured positions.
+      markerWeight:     1.0
+      
+      # Weight of the squared error of ground angle and ground distance.
+      groundWeight:     10.0
+      
+      # Distance between footprint and ground.
+      groundDistance:   0.02
+      
+      
+  G2O_M1_G100:
+      # Selects the optimization type.
+      optimizationType:       G2O
+      
+      # Selects whether the joint offsets should be calibrated or not.
+      calibrateJointOffsets:  true
+      
+      # Weight of the squared error between the estimated
+      # marker position and the transformed measured positions.
+      markerWeight:     1.0
+      
+      # Weight of the squared error of ground angle and ground distance.
+      groundWeight:     100.0
+      
+      # Distance between footprint and ground.
+      groundDistance:   0.02
+      
+      
+  G2O_M1_G1000:
+      # Selects the optimization type.
+      optimizationType:       G2O
+      
+      # Selects whether the joint offsets should be calibrated or not.
+      calibrateJointOffsets:  true
+      
+      # Weight of the squared error between the estimated
+      # marker position and the transformed measured positions.
+      markerWeight:     1.0
+      
+      # Weight of the squared error of ground angle and ground distance.
+      groundWeight:     1000.0
+      
+      # Distance between footprint and ground.
+      groundDistance:   0.02
+     
+  G2O_M1_G10000:
+      # Selects the optimization type.
+      optimizationType:       G2O
+      
+      # Selects whether the joint offsets should be calibrated or not.
+      calibrateJointOffsets:  true
+      
+      # Weight of the squared error between the estimated
+      # marker position and the transformed measured positions.
+      markerWeight:     1.0
+      
+      # Weight of the squared error of ground angle and ground distance.
+      groundWeight:     10000.0
+      
+      # Distance between footprint and ground.
+      groundDistance:   0.02
+      
+      
+  HillClimbing_M1_G1:
       # Selects the optimization type.
       optimizationType:       HILL_CLIMBING
       
@@ -41,27 +167,29 @@ optimization:
       groundDistance:         0.02
       
       # Initial transformation:
-      initial_tx:              0.0
-      initial_ty:              0.0
-      initial_tz:              0.15
-      initial_rr:              0.0
-      initial_rp:              0.0
-      initial_ry:              0.0
-     
-  G2O_1_10000:
+      # initial_tx:              0.0
+      # initial_ty:              0.0
+      # initial_tz:              0.15
+      # initial_rr:              0.0
+      # initial_rp:              0.0
+      # initial_ry:              0.0
+      
+      
+
+  SVD_M1_G1:
       # Selects the optimization type.
-      optimizationType:       G2O
+      optimizationType:       SVD
       
       # Selects whether the joint offsets should be calibrated or not.
-      calibrateJointOffsets:  true
+      calibrateJointOffsets:  true 
       
       # Weight of the squared error between the estimated
       # marker position and the transformed measured positions.
-      markerWeight:     1.0
+      markerWeight:    1.0
       
       # Weight of the squared error of ground angle and ground distance.
-      groundWeight:     10000.0
+      groundWeight:    1.0
       
       # Distance between footprint and ground.
-      groundDistance:   0.02
+      groundDistance:         0.02
 
