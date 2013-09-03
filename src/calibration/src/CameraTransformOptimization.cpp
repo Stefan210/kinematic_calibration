@@ -260,6 +260,7 @@ void CameraTransformOptimization::removeOutliers() {
 	tf::Vector3 markerPosition;
 	CalibrationState initialState(this->getInitialCameraToHead(), 0, 0);
 	getMarkerEstimate(initialState, markerPosition);
+	int count = 0;
 	for (int i = 0; i < this->measurePoints.size(); i++) {
 		double r, p, y;
 		float error;
@@ -270,16 +271,18 @@ void CameraTransformOptimization::removeOutliers() {
 		transformedGroundData = measurePoint.groundData.transform(
 				measurePoint.opticalToFootprint(initialState));
 		transformedGroundData.getRPY(r, p, y);
-		std::cout << "(i) " << i << ";";
+		/*std::cout << "(i) " << i << ";";
 		std::cout << "position (x,y,z):" << markerPosition[0] << ","
 				<< markerPosition[1] << "," << markerPosition[2] << ";";
 		std::cout << "ground (r,p):" << r << "," << p << ";";
-		std::cout << "\n";
-		if (/*fabs(r) + fabs(p) < 0.05 && */markerPosition[2] > 0.2) {
+		std::cout << "\n";*/
+		if (/*fabs(r) + fabs(p) < 0.05 && */markerPosition[2] > 0.0) {
 			filteredMeasurePoints.push_back(measurePoint);
 		} else {
-			std::cout << "Removed!\n";
+			//std::cout << "Removed!\n";
+			count++;
 		}
+		cout << "Removed " << count << " measure points because they had non-positive z-value.\n";
 	}
 	this->measurePoints = filteredMeasurePoints;
 }
