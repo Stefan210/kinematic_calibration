@@ -23,7 +23,7 @@ using namespace g2o;
 class EdgeGroundMeasurement: public BaseBinaryEdge<2, MeasurePoint,
 		VertexTransformation3D, VertexOffset> {
 public:
-	EdgeGroundMeasurement(MeasurePoint& measurePoint);
+	EdgeGroundMeasurement(MeasurePoint& measurePoint, double groundDistance);
 	virtual ~EdgeGroundMeasurement();
 	virtual void computeError();
 	virtual bool read(std::istream& is) {
@@ -37,6 +37,7 @@ public:
 
 protected:
 	MeasurePoint& measurePoint;
+	double groundDistance;
 };
 
 #endif /* EDGEGROUNDMEASUREMENT_H_ */

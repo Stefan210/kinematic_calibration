@@ -124,7 +124,7 @@ void G2oTransformOptimization::optimizeTransform(
 	mg(1, 1) = this->correlationMatrix(4, 4);
 	for (int i = 0; i < this->measurePoints.size(); i++) {
 		EdgeGroundMeasurement* edge = new EdgeGroundMeasurement(
-				this->measurePoints[i]);
+				this->measurePoints[i], parameter.getGroundDistance());
 		edge->setId(id++);
 		edge->setInformation(mg);
 		edge->vertices()[0] = transformationVertex;

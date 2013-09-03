@@ -7,8 +7,8 @@
 
 #include "../include/EdgeGroundMeasurement.h"
 
-EdgeGroundMeasurement::EdgeGroundMeasurement(MeasurePoint& measurePoint) :
-		measurePoint(measurePoint) {
+EdgeGroundMeasurement::EdgeGroundMeasurement(MeasurePoint& measurePoint, double groundDistance) :
+		measurePoint(measurePoint), groundDistance(groundDistance) {
 
 }
 
@@ -51,7 +51,7 @@ void EdgeGroundMeasurement::computeError() {
 //				<< roll << " " << pitch << " " << yaw << " ";
 //	std::cout << a << "x+" << b << "y+" << c << "z+" << d << "=0" << std::endl;
 
-	_error[0] = fabs(tf::Vector3(0, 0, -d / c).distance(tf::Vector3(0,0,0))) - 0.02;
+	_error[0] = fabs(tf::Vector3(0, 0, -d / c).distance(tf::Vector3(0,0,0))) - groundDistance;
 	_error[1] = tf::Vector3(a, b, c).normalized().angle(tf::Vector3(0, 0, 1));
 }
 
