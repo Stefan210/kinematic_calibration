@@ -156,21 +156,41 @@ std::vector<CameraTransformOptimizationParameter> RosParameterAccess::getCameraT
 		}
 
 		if (it->second.hasMember("groundDistance")) {
-			bool groundDistance = static_cast<double>(it->second["groundDistance"]);
+			bool groundDistance =
+					static_cast<double>(it->second["groundDistance"]);
 			parameter.setGroundDistance(groundDistance);
 		} else {
 			ROS_ERROR("No parameter found for groundDistance!");
 		}
 
-		string source, target;
-		if (!nh.getParam("cameraFrame", source))
-			ROS_ERROR("No parameter found for cameraFrame!");
+		TransformFactory* factory;
+		if (it->second.hasMember("initial_tx")
+				&& it->second.hasMember("initial_ty")
+				&& it->second.hasMember("initial_tz")
+				&& it->second.hasMember("initial_rr")
+				&& it->second.hasMember("initial_rp")
+				&& it->second.hasMember("initial_ry")) {
+			double tx, ty, tz, rr, rp, ry;
+			tx = static_cast<double>(it->second["initial_tx"]);
+			ty = static_cast<double>(it->second["initial_ty"]);
+			tz = static_cast<double>(it->second["initial_tz"]);
+			rr = static_cast<double>(it->second["initial_rr"]);
+			rp = static_cast<double>(it->second["initial_rp"]);
+			ry = static_cast<double>(it->second["initial_ry"]);
+			factory = new ManualTransformFactory(
+					tf::Transform(tf::createQuaternionFromRPY(tx, ty, tz),
+							tf::Vector3(rr, rp, ry)));
+		}
 
-		if (!nh.getParam("headPitchFrame", target))
-			ROS_ERROR("No parameter found for headPitchFrame!");
-
-		//TransformFactory* factory = new TfTransformFactory(target, source);
-		TransformFactory* factory = new ManualTransformFactory(tf::Transform(tf::createQuaternionFromRPY(1,1,1), tf::Vector3(2,2,2)));
+		else if (nh.getParam("cameraFrame", source)
+				&& nh.getParam("headPitchFrame", target)) {
+			string source, target;
+			factory = new TfTransformFactory(target, source);
+		} else {
+			ROS_ERROR("Could not create transform factory:"
+					" Either the names for cameraFrame and headPitchFrame "
+					"or the manual parameters are needed!");
+		}
 		parameter.setInitialTransformFactory(factory);
 
 		paramList.push_back(parameter);

@@ -41,12 +41,12 @@ optimization:
       groundDistance:         0.02
       
       # Initial transformation:
-      initial_x:              0.0
-      initial_y:              0.0
-      initial_z:              0.15
-      initial_r:              0.0
-      initial_p:              0.0
-      initial_y:              0.0
+      initial_tx:              0.0
+      initial_ty:              0.0
+      initial_tz:              0.15
+      initial_rr:              0.0
+      initial_rp:              0.0
+      initial_ry:              0.0
      
   G2O_1_10000:
       # Selects the optimization type.
