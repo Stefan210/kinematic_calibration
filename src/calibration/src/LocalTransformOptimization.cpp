@@ -100,25 +100,15 @@ float LocalTransformOptimization::calculateError(LtoState& state) {
 			centerZ / numOfPoints);
 
 	// calculate squared error
-	/*for (int i = 0; i < numOfPoints; i++) {
-	 MeasurePoint& current = this->measurePoints[i];
-	 tf::Vector3 transformedPoint = (current.headToFixed * (cameraToHead
-	 * (current.opticalToCamera * current.measuredPosition)));
-	 error += (centerPoint.x() - transformedPoint.x())
-	 * (centerPoint.x() - transformedPoint.x());
-	 error += (centerPoint.y() - transformedPoint.y())
-	 * (centerPoint.y() - transformedPoint.y());
-	 error += (centerPoint.z() - transformedPoint.z())
-	 * (centerPoint.z() - transformedPoint.z());
-	 }*/
 	this->calculateSqrtDistFromMarker(state, centerPoint, positionError);
 
-	// add ground angles
+	// calculate ground angles
 	double roll, pitch, yaw;
 	this->getAvgRP(state, roll, pitch);
 
 	double groundError = 0;
 
+	// calculate ground error
 	for (int i = 0; i < this->measurePoints.size(); i++) {
 		MeasurePoint& current = this->measurePoints[i];
 		tf::Transform opticalToFootprint = current.opticalToFootprint(state);
@@ -131,7 +121,7 @@ float LocalTransformOptimization::calculateError(LtoState& state) {
 		transformedGroundData.getRPY(roll, pitch, yaw);
 		groundError += fabs(
 				fabs(tf::Vector3(0, 0, -d / c).distance(tf::Vector3(0, 0, 0)))
-						- 0.02)
+						- parameter.getGroundDistance())
 				+ fabs(
 						tf::Vector3(transformedGroundData.a,
 								transformedGroundData.b,
@@ -139,10 +129,14 @@ float LocalTransformOptimization::calculateError(LtoState& state) {
 								tf::Vector3(0, 0, 1)));
 	}
 
-	return positionError + groundError;
+	return parameter.getMarkerWeight() * positionError
+			+ parameter.getGroundWeight() * groundError;
+
 //	return error + fabs(fabs(d) - 0.02)
 //			+ fabs(tf::Vector3(a, b, c).normalized().angle(tf::Vector3(0, 0, 1)));
+
 //	return error + roll + pitch;
+
 //	return d * d
 //			+ tf::Vector3(a, b, c).normalized().angle(tf::Vector3(0, 0, 1))
 //					* tf::Vector3(a, b, c).normalized().angle(
@@ -268,7 +262,8 @@ std::vector<LtoState> LocalTransformOptimization::getNeighbors(
 
 void LocalTransformOptimization::setInitialState(LtoState initialState) {
 	this->initialState = initialState;
-	TransformFactory* tfFactory = new ManualTransformFactory(initialState.getCameraToHead());
+	TransformFactory* tfFactory = new ManualTransformFactory(
+			initialState.getCameraToHead());
 	delete this->parameter.getInitialTransformFactory();
 	this->parameter.setInitialTransformFactory(tfFactory);
 }
