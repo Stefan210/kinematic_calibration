@@ -164,6 +164,7 @@ std::vector<CameraTransformOptimizationParameter> RosParameterAccess::getCameraT
 		}
 
 		TransformFactory* factory;
+		string source, target;
 		if (it->second.hasMember("initial_tx")
 				&& it->second.hasMember("initial_ty")
 				&& it->second.hasMember("initial_tz")
@@ -180,11 +181,8 @@ std::vector<CameraTransformOptimizationParameter> RosParameterAccess::getCameraT
 			factory = new ManualTransformFactory(
 					tf::Transform(tf::createQuaternionFromRPY(tx, ty, tz),
 							tf::Vector3(rr, rp, ry)));
-		}
-
-		else if (nh.getParam("cameraFrame", source)
+		} else if (nh.getParam("cameraFrame", source)
 				&& nh.getParam("headPitchFrame", target)) {
-			string source, target;
 			factory = new TfTransformFactory(target, source);
 		} else {
 			ROS_ERROR("Could not create transform factory:"
