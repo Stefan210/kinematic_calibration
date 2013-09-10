@@ -80,30 +80,6 @@ public:
 
 	virtual void removeOutliers();
 
-	int getMaxIterations() const {
-		return maxIterations;
-	}
-
-	void setMaxIterations(int maxIterations) {
-		this->maxIterations = maxIterations;
-	}
-
-	float getMinError() const {
-		return minError;
-	}
-
-	void setMinError(float minError) {
-		this->minError = minError;
-	}
-
-	float getErrorImprovement() const {
-		return errorImprovement;
-	}
-
-	void setErrorImprovement(float errorImprovement) {
-		this->errorImprovement = errorImprovement;
-	}
-
 	virtual tf::Transform getInitialCameraToHead() {
 		tf::Transform initialTransform;
 		parameter.getInitialTransformFactory()->getTransform(initialTransform);
@@ -116,14 +92,17 @@ public:
 		parameter.setInitialTransformFactory(tfFactory);
 	}
 
+	int getMaxIterations() const {
+		return maxIterations;
+	}
+
+	void setMaxIterations(int maxIterations) {
+		this->maxIterations = maxIterations;
+	}
+
 protected:
-	virtual bool canStop();
 	int numOfIterations;
 	std::vector<MeasurePoint> measurePoints;
-	float error;
-	float lastError;
-	float errorImprovement;
-	float minError;
 	int maxIterations;
 	CameraTransformOptimizationParameter parameter;
 

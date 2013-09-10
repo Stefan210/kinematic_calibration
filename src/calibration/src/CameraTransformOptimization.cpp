@@ -123,19 +123,6 @@ void CameraTransformOptimization::getAvgRP(const CalibrationState& state,
 	p /= size;
 }
 
-bool CameraTransformOptimization::canStop() {
-	if (numOfIterations++ > maxIterations)
-		return true;
-
-	if (error < minError)
-		return true;
-
-	if (fabs(lastError - error) < errorImprovement)
-		return true;
-
-	return false;
-}
-
 void CameraTransformOptimization::calculateSqrtDistCameraHead(
 		tf::Transform cameraToHead, float& error) {
 	error = 0;

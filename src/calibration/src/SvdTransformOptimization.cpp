@@ -189,3 +189,16 @@ tf::Transform SvdTransformOptimization::svdPCL(
 	tf::Transform newTransform(Rtf, ttf);
 	return newTransform;
 }
+
+bool SvdTransformOptimization::canStop() {
+	if (numOfIterations++ > maxIterations)
+		return true;
+
+	if (error < minError)
+		return true;
+
+	if (fabs(lastError - error) < errorImprovement)
+		return true;
+
+	return false;
+}
