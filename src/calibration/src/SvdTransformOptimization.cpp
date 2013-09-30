@@ -13,9 +13,9 @@
 
 SvdTransformOptimization::SvdTransformOptimization(
 		CameraTransformOptimizationParameter param) :
-		CameraTransformOptimization(param), maxIterations(100000), minError(
+		CameraTransformOptimization(param), minError(
 				0.000001), errorImprovement(0.000000001) {
-	// TODO Auto-generated constructor stub
+	this->setMaxIterations(100000);
 
 }
 
