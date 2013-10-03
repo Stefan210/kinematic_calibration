@@ -128,6 +128,7 @@ float LocalTransformOptimization::calculateError(LtoState& state) {
 								transformedGroundData.c).normalized().angle(
 								tf::Vector3(0, 0, 1)));
 	}
+	groundError /= this->measurePoints.size();
 
 	return parameter.getMarkerWeight() * positionError
 			+ parameter.getGroundWeight() * groundError;

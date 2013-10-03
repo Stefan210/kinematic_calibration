@@ -41,7 +41,7 @@ public:
 		tf::Transform headYawToTorsoWithOffset = addYawOffset(
 				this->getHeadYawToTorso(), state.getHeadYawOffset());
 		tf::Transform headPitchToHeadYawWithOffset = addPitchOffset(
-				this->headPitchToHeadYaw, state.getHeadPitchOffset());
+				this->getHeadPitchToHeadYaw(), state.getHeadPitchOffset());
 		return torsoToFixed * headYawToTorsoWithOffset
 				* headPitchToHeadYawWithOffset;
 	}

@@ -45,6 +45,58 @@ void CameraTransformOptimization::calculateSqrtDistFromMarker(
 	error /= this->measurePoints.size();
 }
 
+void CameraTransformOptimization::calculateAvgGroundAngle(
+		const CalibrationState& state, float& angle) {
+	angle = 0;
+
+	double headYawOffset = state.getHeadYawOffset();
+	double headPitchOffset = state.getHeadPitchOffset();
+	int numOfPoints = measurePoints.size();
+
+
+	for (int i = 0; i < numOfPoints; i++) {
+		MeasurePoint measurePoint = measurePoints[i];
+		tf::Transform cameraToHeadTransform;
+		cameraToHeadTransform = measurePoint.opticalToFootprint(
+				CalibrationState(cameraToHeadTransform, headYawOffset,
+						headPitchOffset));
+		GroundData transformedGroundData =
+				measurePoint.groundData.transform(cameraToHeadTransform);
+		double a = transformedGroundData.a;
+		double b = transformedGroundData.b;
+		double c = transformedGroundData.c;
+		double d = transformedGroundData.d;
+		angle += fabs(tf::Vector3(a, b, c).normalized().angle(tf::Vector3(0, 0, 1)));
+	}
+	angle /= numOfPoints;
+}
+
+void CameraTransformOptimization::calculateAvgGroundDistance(
+		const CalibrationState& state, float& distance) {
+	distance = 0;
+
+	double headYawOffset = state.getHeadYawOffset();
+	double headPitchOffset = state.getHeadPitchOffset();
+	int numOfPoints = measurePoints.size();
+	double groundDistance = this->parameter.getGroundDistance();
+
+	for (int i = 0; i < numOfPoints; i++) {
+		MeasurePoint measurePoint = measurePoints[i];
+		tf::Transform cameraToHeadTransform;
+		cameraToHeadTransform = measurePoint.opticalToFootprint(
+				CalibrationState(cameraToHeadTransform, headYawOffset,
+						headPitchOffset));
+		GroundData transformedGroundData =
+				measurePoint.groundData.transform(cameraToHeadTransform);
+		double a = transformedGroundData.a;
+		double b = transformedGroundData.b;
+		double c = transformedGroundData.c;
+		double d = transformedGroundData.d;
+		distance += fabs(tf::Vector3(0, 0, -d / c).distance(tf::Vector3(0,0,0))) - groundDistance;
+	}
+	distance /= numOfPoints;
+}
+
 void CameraTransformOptimization::getMarkerEstimate(
 		const CalibrationState& state, tf::Vector3& position) {
 	int numOfPoints = measurePoints.size();
@@ -74,12 +126,15 @@ void CameraTransformOptimization::printResult(std::string pre,
 		const CalibrationState& state, tf::Vector3 markerPosition) {
 	float error;
 	double r, p, y;
+	float angle, distance;
 	tf::Vector3 markerEstimate;
 	tf::Transform cameraToHead = state.getCameraToHead();
 
 	getMarkerEstimate(state, markerEstimate);
 	calculateSqrtDistFromMarker(state, markerPosition, error);
 	getAvgRP(state, r, p);
+	calculateAvgGroundAngle(state, angle);
+	calculateAvgGroundDistance(state, distance);
 	std::cout << pre << ";";
 	std::cout << "position optimized (x,y,z):" << markerPosition[0] << ","
 			<< markerPosition[1] << "," << markerPosition[2] << ";";
@@ -91,15 +146,18 @@ void CameraTransformOptimization::printResult(std::string pre,
 	std::cout << "translation (x,y,z):" << cameraToHead.getOrigin()[0] << ","
 			<< cameraToHead.getOrigin()[1] << "," << cameraToHead.getOrigin()[2]
 			<< ";";
-	std::cout << "rotation (q0,q1,q2,q3):" << cameraToHead.getRotation()[0]
+	/*std::cout << "rotation (q0,q1,q2,q3):" << cameraToHead.getRotation()[0]
 			<< "," << cameraToHead.getRotation()[1] << ","
 			<< cameraToHead.getRotation()[2] << ","
-			<< cameraToHead.getRotation()[3] << ";";
+			<< cameraToHead.getRotation()[3] << ";";*/
 	tf::Matrix3x3(cameraToHead.getRotation()).getRPY(r, p, y, 1);
 	std::cout << "rotation1 (r,p,y):" << r << "," << p << "," << y << ";";
 	tf::Matrix3x3(cameraToHead.getRotation()).getRPY(r, p, y, 2);
-	std::cout << "rotation2 (r,p,y):" << r << "," << p << "," << y << ";";
-	std::cout << "error: " << error;
+	//std::cout << "rotation2 (r,p,y):" << r << "," << p << "," << y << ";";
+	std::cout << "markerError: " << error << ";";
+	std::cout << "angleError: " << angle << ";";
+	std::cout << "distanceError: " << distance << ";";
+
 	std::cout << "\n\n";
 }
 
@@ -189,26 +247,29 @@ void CompositeTransformOptimization::addTransformOptimization(std::string name,
 void CompositeTransformOptimization::optimizeTransform(
 		CalibrationState& calibrationState) {
 	float smallestError = INFINITY;
-	float currentError = 0;
+	float currentError = INFINITY;
+	this->removeOutliers();
 
 	tf::Vector3 initialMarkerEstimate;
 	this->getMarkerEstimate(
-			CalibrationState(this->getInitialCameraToHead(), 0, 0),
+			CalibrationState(this->getInitialCameraToHead(), 0.0, 0.0),
 			initialMarkerEstimate);
 	printResult("initial",
-			CalibrationState(this->getInitialCameraToHead(), 0, 0),
+			CalibrationState(this->getInitialCameraToHead(), 0.0, 0.0),
 			initialMarkerEstimate);
 
 	// return the transform with the smallest error
 	for (map<string, CameraTransformOptimization*>::const_iterator it =
 			this->optimizer.begin(); it != this->optimizer.end(); ++it) {
 		CalibrationState currentState;
+		//cout << "transf before: " << it->second->getInitialCameraToHead() << "\n";
 		tf::Vector3 markerPosition;
 		it->second->removeOutliers();
 		it->second->optimizeTransform(currentState);
 		it->second->getMarkerEstimate(currentState, markerPosition);
 		this->calculateSqrtDistFromMarker(currentState, markerPosition,
 				currentError);
+		//cout << "transf after: " << currentState.getCameraToHead() << "\n";
 		if (currentError < smallestError) {
 			smallestError = currentError;
 			calibrationState = currentState;
@@ -245,7 +306,8 @@ void CompositeTransformOptimization::setInitialCameraToHead(
 void CameraTransformOptimization::removeOutliers() {
 	std::vector<MeasurePoint> filteredMeasurePoints;
 	tf::Vector3 markerPosition;
-	CalibrationState initialState(this->getInitialCameraToHead(), 0, 0);
+
+	CalibrationState initialState(this->getInitialCameraToHead(), 0.0, 0.0);
 	getMarkerEstimate(initialState, markerPosition);
 	int count = 0;
 	for (int i = 0; i < this->measurePoints.size(); i++) {
@@ -269,7 +331,9 @@ void CameraTransformOptimization::removeOutliers() {
 			//std::cout << "Removed!\n";
 			count++;
 		}
-		cout << "Removed " << count << " measure points because they had non-positive z-value.\n";
 	}
+	cout << "Removed " << count << " measure points because they had non-positive z-value.\n";
 	this->measurePoints = filteredMeasurePoints;
 }
+
+

@@ -46,12 +46,30 @@ public:
 	virtual void clearMeasurePoints();
 
 	/**
-	 * Calculates the squared distance from the estimated marker
-	 * position and the measured points given the current
+	 * Calculates the average squared distance from the estimated
+	 * marker position and the measured points given the current
 	 * estimation for the transformation.
 	 */
 	virtual void calculateSqrtDistFromMarker(CalibrationState state,
 			tf::Vector3 markerPoint, float& error);
+
+	/**
+	 * Calculates the average angle between real ground plane and
+	 * measured ground plane, using the transformation from the
+	 * passed state.
+	 * @param[in] state State containing the transformation to use.
+	 * @param[out] angle Will contain the average angle.
+	 */
+	virtual void calculateAvgGroundAngle(const CalibrationState& state, float& angle);
+
+	/**
+	 * Calculates the average distance between real ground plane and
+	 * measured ground plane, using the transformation from the
+	 * passed state.
+	 * @param[in] state State containing the transformation to use.
+	 * @param[out] distance Will contain the average distance.
+	 */
+	virtual void calculateAvgGroundDistance(const CalibrationState& state, float& distance);
 
 	/**
 	 * Calculates the error between the point clouds in the first camera frame
@@ -90,6 +108,7 @@ public:
 		delete parameter.getInitialTransformFactory();
 		ManualTransformFactory* tfFactory = new ManualTransformFactory(initialTransform);
 		parameter.setInitialTransformFactory(tfFactory);
+		//std::cout << "setInitialCameraToHead called with " << initialTransform << "\n";
 	}
 
 	int getMaxIterations() const {

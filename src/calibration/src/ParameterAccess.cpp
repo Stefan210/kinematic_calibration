@@ -142,21 +142,21 @@ std::vector<CameraTransformOptimizationParameter> RosParameterAccess::getCameraT
 		}
 
 		if (it->second.hasMember("markerWeight")) {
-			bool markerWeight = static_cast<double>(it->second["markerWeight"]);
+			double markerWeight = static_cast<double>(it->second["markerWeight"]);
 			parameter.setMarkerWeight(markerWeight);
 		} else {
 			ROS_ERROR("No parameter found for markerWeight!");
 		}
 
 		if (it->second.hasMember("groundWeight")) {
-			bool groundWeight = static_cast<double>(it->second["groundWeight"]);
+			double groundWeight = static_cast<double>(it->second["groundWeight"]);
 			parameter.setGroundWeight(groundWeight);
 		} else {
 			ROS_ERROR("No parameter found for groundWeight!");
 		}
 
 		if (it->second.hasMember("groundDistance")) {
-			bool groundDistance =
+			double groundDistance =
 					static_cast<double>(it->second["groundDistance"]);
 			parameter.setGroundDistance(groundDistance);
 		} else {
@@ -179,8 +179,8 @@ std::vector<CameraTransformOptimizationParameter> RosParameterAccess::getCameraT
 			rp = static_cast<double>(it->second["initial_rp"]);
 			ry = static_cast<double>(it->second["initial_ry"]);
 			factory = new ManualTransformFactory(
-					tf::Transform(tf::createQuaternionFromRPY(tx, ty, tz),
-							tf::Vector3(rr, rp, ry)));
+					tf::Transform(tf::createQuaternionFromRPY(rr, rp, ry),
+							tf::Vector3(tx, ty, tz)));
 		} else if (nh.getParam("cameraFrame", source)
 				&& nh.getParam("headPitchFrame", target)) {
 			factory = new TfTransformFactory(target, source);

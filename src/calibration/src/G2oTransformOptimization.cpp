@@ -94,15 +94,16 @@ void G2oTransformOptimization::optimizeTransform(
 	VertexOffset* offsetVertex = new VertexOffset();
 	offsetVertex->setEstimate(Eigen::Matrix<double, 2, 1>(0.0, 0.0));
 	offsetVertex->setId(3);
+	offsetVertex->setFixed(!parameter.isCalibrateJointOffsets());
 	optimizer.addVertex(offsetVertex);
 
 	int id = 1;
 
 	// add edges constraining marker position and transformation
 	Eigen::Matrix3d mm = Eigen::Matrix3d::Identity(3, 3);
-	mm(0, 0) = this->correlationMatrix(0, 0);
-	mm(1, 1) = this->correlationMatrix(1, 1);
-	mm(2, 2) = this->correlationMatrix(2, 2);
+	mm(0, 0) = parameter.getMarkerWeight();
+	mm(1, 1) = parameter.getMarkerWeight();
+	mm(2, 2) = parameter.getMarkerWeight();
 	for (int i = 0; i < this->measurePoints.size(); i++) {
 		EdgeMarkerMeasurement* edge = new EdgeMarkerMeasurement(
 				this->measurePoints[i], markerEstimation);
@@ -120,8 +121,8 @@ void G2oTransformOptimization::optimizeTransform(
 
 	// add edges constraining roll and pitch of the ground
 	Eigen::Matrix2d mg = Eigen::Matrix2d::Identity(2, 2);
-	mg(0, 0) = this->correlationMatrix(3, 3);
-	mg(1, 1) = this->correlationMatrix(4, 4);
+	mg(0, 0) = parameter.getGroundWeight();
+	mg(1, 1) = parameter.getGroundWeight();
 	for (int i = 0; i < this->measurePoints.size(); i++) {
 		EdgeGroundMeasurement* edge = new EdgeGroundMeasurement(
 				this->measurePoints[i], parameter.getGroundDistance());
@@ -153,20 +154,6 @@ void G2oTransformOptimization::optimizeTransform(
 
 	double headYawOffset = offsetVertex->estimate()[0];
 	double headPitchOffset = offsetVertex->estimate()[1];
-	/*std::cout << "offset(yaw,pitch) " << headYawOffset << " " << headPitchOffset
-	 << ";";
-
-	 std::cout << "position (x,y,z):" << positionVertex->estimate()[0] << ","
-	 << positionVertex->estimate()[1] << ","
-	 << positionVertex->estimate()[2] << ";";
-	 std::cout << "translation (x,y,z):" << transformationVertex->estimate().getOrigin()[0]
-	 << "," << transformationVertex->estimate().getOrigin()[1] << ","
-	 << transformationVertex->estimate().getOrigin()[2] << ";";
-	 std::cout << "rotation (q0,q1,q2,q3):"
-	 << transformationVertex->estimate().getRotation()[0] << ","
-	 << transformationVertex->estimate().getRotation()[1] << ","
-	 << transformationVertex->estimate().getRotation()[2] << ","
-	 << transformationVertex->estimate().getRotation()[3] << ";";*/
 
 	calibrationState.setCameraToHead(transformationVertex->estimate());
 	calibrationState.setHeadYawOffset(
@@ -186,6 +173,21 @@ void G2oTransformOptimization::optimizeTransform(
 	this->markerPosition[1] = markerPositionEigen[1];
 	this->markerPosition[2] = markerPositionEigen[2];
 	this->markerPositionOptimized = true;
+
+	/*std::cout << "offset(yaw,pitch) " << headYawOffset << " " << headPitchOffset
+			<< ";";
+
+	std::cout << "position (x,y,z):" << markerPosition[0] << ","
+			<< markerPosition[1] << "," << markerPosition[2] << ";";
+	std::cout << "translation (x,y,z):"
+			<< transformationVertex->estimate().getOrigin()[0] << ","
+			<< transformationVertex->estimate().getOrigin()[1] << ","
+			<< transformationVertex->estimate().getOrigin()[2] << ";";
+	std::cout << "rotation (q0,q1,q2,q3):"
+			<< transformationVertex->estimate().getRotation()[0] << ","
+			<< transformationVertex->estimate().getRotation()[1] << ","
+			<< transformationVertex->estimate().getRotation()[2] << ","
+			<< transformationVertex->estimate().getRotation()[3] << ";";*/
 }
 
 void G2oTransformOptimization::getMarkerEstimate(const CalibrationState& state,

@@ -16,7 +16,7 @@
 
 using namespace g2o;
 
-/*
+/**
  * Represents an edge that constrains the transformation
  * using the roll and pitch measurements of the ground.
  */

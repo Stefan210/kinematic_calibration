@@ -16,8 +16,8 @@ CalibrationDataSerialization::CalibrationDataSerialization(
 				false) {
 	this->fileName = filename;
 	TfTransformFactory* transformFactory = new TfTransformFactory(
-			dataCaptureParameter.getCameraFrame(),
-			dataCaptureParameter.getHeadPitchFrame());
+			dataCaptureParameter.getHeadPitchFrame(),
+			dataCaptureParameter.getCameraFrame());
 	this->parameter.setInitialTransformFactory(transformFactory);
 }
 
@@ -54,6 +54,7 @@ void CalibrationDataSerialization::saveToFile() {
 	}
 	this->initialTransformCameraToHead = getInitialCameraToHead();
 	file << " " << this->initialTransformCameraToHead;
+	//cout << "saving " << this->initialTransformCameraToHead << "\n";
 	file.close();
 	dataSaved = true;
 }
@@ -67,10 +68,22 @@ void CalibrationDataSerialization::loadFromFile() {
 		MeasurePoint current;
 		file >> current;
 		this->measurePoints.push_back(current);
+		/*cout << "loaded position " << i << "(measured): "
+				<< current.measuredPosition << "\n";*/
 	}
 	file >> this->initialTransformCameraToHead;
-	cout << "loading " << this->initialTransformCameraToHead << "\n";
+	//cout << "loading " << this->initialTransformCameraToHead << "\n";
 	file.close();
 	dataLoaded = true;
+
+	/*
+	for (int i = 0; i < size; i++) {
+		MeasurePoint current = measurePoints[i];
+		tf::Vector3 transformedPos = current.opticalToFixed(
+				CalibrationState(initialTransformCameraToHead, 0, 0))
+				* current.measuredPosition;
+		cout << "loaded position " << i << "(transformed): " << transformedPos
+				<< "\n";
+	}*/
 }
 
