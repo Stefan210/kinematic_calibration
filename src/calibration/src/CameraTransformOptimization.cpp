@@ -45,22 +45,34 @@ void CameraTransformOptimization::calculateAvgDistFromMarker(
 	error /= this->measurePoints.size();
 }
 
+void CameraTransformOptimization::calculateMarkerError(CalibrationState state,
+		tf::Vector3 markerPoint, float& error) {
+	error = 0;
+
+	for (int i = 0; i < this->measurePoints.size(); i++) {
+		float currentError = 0;
+		MeasurePoint& current = this->measurePoints[i];
+		tf::Transform opticalToFixed = current.opticalToFixed(state);
+		tf::Vector3 transformedPoint = opticalToFixed
+				* current.measuredPosition;
+		currentError += pow(markerPoint.x() - transformedPoint.x(), 2);
+		currentError += pow(markerPoint.y() - transformedPoint.y(), 2);
+		currentError += pow(markerPoint.z() - transformedPoint.z(), 2);
+		error += currentError;
+	}
+}
+
 void CameraTransformOptimization::calculateAvgGroundAngle(
 		const CalibrationState& state, float& angle) {
 	angle = 0;
-
-	double headYawOffset = state.getHeadYawOffset();
-	double headPitchOffset = state.getHeadPitchOffset();
 	int numOfPoints = measurePoints.size();
 
 	for (int i = 0; i < numOfPoints; i++) {
 		MeasurePoint measurePoint = measurePoints[i];
-		tf::Transform cameraToHeadTransform;
-		cameraToHeadTransform = measurePoint.opticalToFootprint(
-				CalibrationState(cameraToHeadTransform, headYawOffset,
-						headPitchOffset));
+		tf::Transform opticalToFootprint;
+		opticalToFootprint = measurePoint.opticalToFootprint(state);
 		GroundData transformedGroundData = measurePoint.groundData.transform(
-				cameraToHeadTransform);
+				opticalToFootprint);
 		double a = transformedGroundData.a;
 		double b = transformedGroundData.b;
 		double c = transformedGroundData.c;
@@ -71,26 +83,38 @@ void CameraTransformOptimization::calculateAvgGroundAngle(
 	angle /= numOfPoints;
 }
 
+void CameraTransformOptimization::calculateGroundAngleError(
+		const CalibrationState& state, float& angle) {
+	angle = 0;
+	int numOfPoints = measurePoints.size();
+
+	for (int i = 0; i < numOfPoints; i++) {
+		MeasurePoint measurePoint = measurePoints[i];
+		tf::Transform opticalToFootprint;
+		opticalToFootprint = measurePoint.opticalToFootprint(state);
+		GroundData transformedGroundData = measurePoint.groundData.transform(
+				opticalToFootprint);
+		double a = transformedGroundData.a;
+		double b = transformedGroundData.b;
+		double c = transformedGroundData.c;
+		double curAngle = tf::Vector3(a, b, c).normalized().angle(
+				tf::Vector3(0, 0, 1));
+		angle += curAngle * curAngle;
+	}
+}
+
 void CameraTransformOptimization::calculateAvgGroundDistance(
 		const CalibrationState& state, float& distance) {
 	distance = 0;
-
-	double headYawOffset = state.getHeadYawOffset();
-	double headPitchOffset = state.getHeadPitchOffset();
-	tf::Transform cameraToHeadTransform = state.getCameraToHead();
 	int numOfPoints = measurePoints.size();
 	double groundDistance = this->parameter.getGroundDistance();
 
 	for (int i = 0; i < numOfPoints; i++) {
 		MeasurePoint measurePoint = measurePoints[i];
 		tf::Transform opticalToFootprintTransform;
-		opticalToFootprintTransform = measurePoint.opticalToFootprint(
-				CalibrationState(cameraToHeadTransform, headYawOffset,
-						headPitchOffset));
+		opticalToFootprintTransform = measurePoint.opticalToFootprint(state);
 		GroundData transformedGroundData = measurePoint.groundData.transform(
 				opticalToFootprintTransform);
-		double a = transformedGroundData.a;
-		double b = transformedGroundData.b;
 		double c = transformedGroundData.c;
 		double d = transformedGroundData.d;
 		distance += fabs(
@@ -98,6 +122,27 @@ void CameraTransformOptimization::calculateAvgGroundDistance(
 						- groundDistance);
 	}
 	distance /= numOfPoints;
+}
+
+void CameraTransformOptimization::calculateGroundDistanceError(
+		const CalibrationState& state, float& distance) {
+	distance = 0;
+	int numOfPoints = measurePoints.size();
+	double groundDistance = this->parameter.getGroundDistance();
+
+	for (int i = 0; i < numOfPoints; i++) {
+		MeasurePoint measurePoint = measurePoints[i];
+		tf::Transform opticalToFootprintTransform;
+		opticalToFootprintTransform = measurePoint.opticalToFootprint(state);
+		GroundData transformedGroundData = measurePoint.groundData.transform(
+				opticalToFootprintTransform);
+		double c = transformedGroundData.c;
+		double d = transformedGroundData.d;
+		float curDistance = fabs(
+				tf::Vector3(0, 0, -d / c).distance(tf::Vector3(0, 0, 0)))
+				- groundDistance;
+		distance += curDistance * curDistance;
+	}
 }
 
 void CameraTransformOptimization::getMarkerEstimate(
@@ -299,7 +344,7 @@ void CompositeTransformOptimization::optimizeTransform(
 	this->getMarkerEstimate(
 			CalibrationState(this->getInitialCameraToHead(), 0.0, 0.0),
 			initialMarkerEstimate);
-	printResult("initial",
+	printResultCSV("initial",
 			CalibrationState(this->getInitialCameraToHead(), 0.0, 0.0),
 			initialMarkerEstimate);
 
@@ -320,7 +365,7 @@ void CompositeTransformOptimization::optimizeTransform(
 			smallestError = currentError;
 			calibrationState = currentState;
 		}
-		printResult(it->first, currentState, markerPosition);
+		printResultCSV(it->first, currentState, markerPosition);
 	}
 }
 
@@ -379,7 +424,7 @@ void CameraTransformOptimization::removeOutliers() {
 		}
 	}
 	/*cout << "Removed " << count
-			<< " measure points because they had non-positive z-value.\n";*/
+	 << " measure points because they had non-positive z-value.\n";*/
 	this->measurePoints = filteredMeasurePoints;
 }
 

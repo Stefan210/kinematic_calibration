@@ -42,7 +42,7 @@ void HillClimbingTransformOptimization::optimizeTransform(
 	while (canImprove) {
 
 		if (numOfIterations++ % 100 == 0) {
-			std::cout << currentState << std::endl;
+			//std::cout << currentState << std::endl;
 		}
 
 		std::vector<LtoState> neighbors = getNeighbors(currentState);
@@ -100,16 +100,16 @@ float LocalTransformOptimization::calculateError(LtoState& state) {
 			centerZ / numOfPoints);
 
 	// calculate marker error
-	this->calculateAvgDistFromMarker(state, centerPoint, positionError);
+	this->calculateMarkerError(state, centerPoint, positionError);
 
 	// calculate ground error
-	double groundError = 0;
+	float groundError = 0;
 
 	float groundAngle;
-	this->calculateAvgGroundAngle(state, groundAngle);
+	this->calculateGroundAngleError(state, groundAngle);
 	float groundDist;
-	this->calculateAvgGroundDistance(state, groundDist);
-	groundError = groundAngle + groundDist;
+	this->calculateGroundDistanceError(state, groundDist);
+	groundError = groundAngle + groundDist;// cout << "groundAngle " << groundAngle << " groundDist " << groundDist << "\n";
 
 	return parameter.getMarkerWeight() * positionError
 			+ parameter.getGroundWeight() * groundError;
