@@ -26,7 +26,7 @@ void CameraTransformOptimization::clearMeasurePoints() {
 	this->measurePoints.clear();
 }
 
-void CameraTransformOptimization::calculateSqrtDistFromMarker(
+void CameraTransformOptimization::calculateAvgDistFromMarker(
 		CalibrationState state, tf::Vector3 markerPoint, float& error) {
 	error = 0;
 
@@ -132,7 +132,7 @@ void CameraTransformOptimization::printResult(std::string pre,
 	tf::Transform cameraToHead = state.getCameraToHead();
 
 	getMarkerEstimate(state, markerEstimate);
-	calculateSqrtDistFromMarker(state, markerPosition, error);
+	calculateAvgDistFromMarker(state, markerPosition, error);
 	getAvgRP(state, r, p);
 	calculateAvgGroundAngle(state, angle);
 	calculateAvgGroundDistance(state, distance);
@@ -269,7 +269,7 @@ void CompositeTransformOptimization::optimizeTransform(
 		it->second->removeOutliers();
 		it->second->optimizeTransform(currentState);
 		it->second->getMarkerEstimate(currentState, markerPosition);
-		this->calculateSqrtDistFromMarker(currentState, markerPosition,
+		this->calculateAvgDistFromMarker(currentState, markerPosition,
 				currentError);
 		//cout << "transf after: " << currentState.getCameraToHead() << "\n";
 		if (currentError < smallestError) {

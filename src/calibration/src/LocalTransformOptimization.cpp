@@ -100,7 +100,7 @@ float LocalTransformOptimization::calculateError(LtoState& state) {
 			centerZ / numOfPoints);
 
 	// calculate squared error
-	this->calculateSqrtDistFromMarker(state, centerPoint, positionError);
+	this->calculateAvgDistFromMarker(state, centerPoint, positionError);
 
 	// calculate ground angles
 	double roll, pitch, yaw;
@@ -129,6 +129,12 @@ float LocalTransformOptimization::calculateError(LtoState& state) {
 								tf::Vector3(0, 0, 1)));
 	}
 	groundError /= this->measurePoints.size();
+
+	float groundAngle;
+	this->calculateAvgGroundAngle(state, groundAngle); cout << "groundAngle " << groundAngle << "\n";
+	float groundDist;
+	this->calculateAvgGroundDistance(state, groundDist); cout << "groundDist " << groundDist << "\n";
+	groundError = groundAngle + groundDist;
 
 	return parameter.getMarkerWeight() * positionError
 			+ parameter.getGroundWeight() * groundError;

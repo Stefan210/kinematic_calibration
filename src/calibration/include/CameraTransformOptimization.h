@@ -50,7 +50,7 @@ public:
 	 * marker position and the measured points given the current
 	 * estimation for the transformation.
 	 */
-	virtual void calculateSqrtDistFromMarker(CalibrationState state,
+	virtual void calculateAvgDistFromMarker(CalibrationState state,
 			tf::Vector3 markerPoint, float& error);
 
 	/**
