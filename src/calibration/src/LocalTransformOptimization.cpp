@@ -106,9 +106,9 @@ float LocalTransformOptimization::calculateError(LtoState& state) {
 	double groundError = 0;
 
 	float groundAngle;
-	this->calculateAvgGroundAngle(state, groundAngle); cout << "groundAngle " << groundAngle << "\n";
+	this->calculateAvgGroundAngle(state, groundAngle);
 	float groundDist;
-	this->calculateAvgGroundDistance(state, groundDist); cout << "groundDist " << groundDist << "\n";
+	this->calculateAvgGroundDistance(state, groundDist);
 	groundError = groundAngle + groundDist;
 
 	return parameter.getMarkerWeight() * positionError
