@@ -53,20 +53,20 @@ void CameraTransformOptimization::calculateAvgGroundAngle(
 	double headPitchOffset = state.getHeadPitchOffset();
 	int numOfPoints = measurePoints.size();
 
-
 	for (int i = 0; i < numOfPoints; i++) {
 		MeasurePoint measurePoint = measurePoints[i];
 		tf::Transform cameraToHeadTransform;
 		cameraToHeadTransform = measurePoint.opticalToFootprint(
 				CalibrationState(cameraToHeadTransform, headYawOffset,
 						headPitchOffset));
-		GroundData transformedGroundData =
-				measurePoint.groundData.transform(cameraToHeadTransform);
+		GroundData transformedGroundData = measurePoint.groundData.transform(
+				cameraToHeadTransform);
 		double a = transformedGroundData.a;
 		double b = transformedGroundData.b;
 		double c = transformedGroundData.c;
 		double d = transformedGroundData.d;
-		angle += fabs(tf::Vector3(a, b, c).normalized().angle(tf::Vector3(0, 0, 1)));
+		angle += fabs(
+				tf::Vector3(a, b, c).normalized().angle(tf::Vector3(0, 0, 1)));
 	}
 	angle /= numOfPoints;
 }
@@ -87,13 +87,15 @@ void CameraTransformOptimization::calculateAvgGroundDistance(
 		opticalToFootprintTransform = measurePoint.opticalToFootprint(
 				CalibrationState(cameraToHeadTransform, headYawOffset,
 						headPitchOffset));
-		GroundData transformedGroundData =
-				measurePoint.groundData.transform(opticalToFootprintTransform);
+		GroundData transformedGroundData = measurePoint.groundData.transform(
+				opticalToFootprintTransform);
 		double a = transformedGroundData.a;
 		double b = transformedGroundData.b;
 		double c = transformedGroundData.c;
 		double d = transformedGroundData.d;
-		distance += fabs(tf::Vector3(0, 0, -d / c).distance(tf::Vector3(0,0,0))) - groundDistance;
+		distance += fabs(
+				fabs(tf::Vector3(0, 0, -d / c).distance(tf::Vector3(0, 0, 0)))
+						- groundDistance);
 	}
 	distance /= numOfPoints;
 }
@@ -148,9 +150,9 @@ void CameraTransformOptimization::printResult(std::string pre,
 			<< cameraToHead.getOrigin()[1] << "," << cameraToHead.getOrigin()[2]
 			<< ";";
 	/*std::cout << "rotation (q0,q1,q2,q3):" << cameraToHead.getRotation()[0]
-			<< "," << cameraToHead.getRotation()[1] << ","
-			<< cameraToHead.getRotation()[2] << ","
-			<< cameraToHead.getRotation()[3] << ";";*/
+	 << "," << cameraToHead.getRotation()[1] << ","
+	 << cameraToHead.getRotation()[2] << ","
+	 << cameraToHead.getRotation()[3] << ";";*/
 	tf::Matrix3x3(cameraToHead.getRotation()).getRPY(r, p, y, 1);
 	std::cout << "rotation1 (r,p,y):" << r << "," << p << "," << y << ";";
 	tf::Matrix3x3(cameraToHead.getRotation()).getRPY(r, p, y, 2);
@@ -323,10 +325,10 @@ void CameraTransformOptimization::removeOutliers() {
 				measurePoint.opticalToFootprint(initialState));
 		transformedGroundData.getRPY(r, p, y);
 		/*std::cout << "(i) " << i << ";";
-		std::cout << "position (x,y,z):" << markerPosition[0] << ","
-				<< markerPosition[1] << "," << markerPosition[2] << ";";
-		std::cout << "ground (r,p):" << r << "," << p << ";";
-		std::cout << "\n";*/
+		 std::cout << "position (x,y,z):" << markerPosition[0] << ","
+		 << markerPosition[1] << "," << markerPosition[2] << ";";
+		 std::cout << "ground (r,p):" << r << "," << p << ";";
+		 std::cout << "\n";*/
 		if (/*fabs(r) + fabs(p) < 0.05 && */markerPosition[2] > 0.0) {
 			filteredMeasurePoints.push_back(measurePoint);
 		} else {
@@ -334,8 +336,8 @@ void CameraTransformOptimization::removeOutliers() {
 			count++;
 		}
 	}
-	cout << "Removed " << count << " measure points because they had non-positive z-value.\n";
+	cout << "Removed " << count
+			<< " measure points because they had non-positive z-value.\n";
 	this->measurePoints = filteredMeasurePoints;
 }
-
 
