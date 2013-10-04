@@ -164,6 +164,48 @@ void CameraTransformOptimization::printResult(std::string pre,
 	std::cout << "\n\n";
 }
 
+void CameraTransformOptimization::printResultCSV(std::string pre,
+		const CalibrationState& state, tf::Vector3 markerPosition) {
+	static bool headlinePrinted = false;
+
+	float error;
+	double r, p, y;
+	float angle, distance;
+	tf::Vector3 markerEstimate;
+	tf::Transform cameraToHead = state.getCameraToHead();
+
+	getMarkerEstimate(state, markerEstimate);
+	calculateAvgDistFromMarker(state, markerPosition, error);
+	getAvgRP(state, r, p);
+	calculateAvgGroundAngle(state, angle);
+	calculateAvgGroundDistance(state, distance);
+
+	if (!headlinePrinted) {
+		std::cout << "description,marker_x,marker_y,marker_z,"
+				"headyaw_offset,headpitch_offset,"
+				"tx,ty,tz,rr,rp,ry,markerError,"
+				"groundAngleError,groundDistanceError\n";
+		headlinePrinted = true;
+	}
+
+	std::cout << pre << ",";
+	std::cout << markerEstimate[0] << "," << markerEstimate[1] << ","
+			<< markerEstimate[2] << ",";
+	std::cout << state.getHeadYawOffset() << "," << state.getHeadPitchOffset()
+			<< ",";
+	std::cout << cameraToHead.getOrigin()[0] << ","
+			<< cameraToHead.getOrigin()[1] << "," << cameraToHead.getOrigin()[2]
+			<< ",";
+	tf::Matrix3x3(cameraToHead.getRotation()).getRPY(r, p, y, 1);
+	std::cout << r << "," << p << "," << y << ",";
+
+	std::cout << error << ",";
+	std::cout << angle << ",";
+	std::cout << distance << "";
+
+	std::cout << "\n";
+}
+
 void CameraTransformOptimization::getAvgRP(const CalibrationState& state,
 		double& r, double& p) {
 	r = 0;
@@ -336,8 +378,8 @@ void CameraTransformOptimization::removeOutliers() {
 			count++;
 		}
 	}
-	cout << "Removed " << count
-			<< " measure points because they had non-positive z-value.\n";
+	/*cout << "Removed " << count
+			<< " measure points because they had non-positive z-value.\n";*/
 	this->measurePoints = filteredMeasurePoints;
 }
 

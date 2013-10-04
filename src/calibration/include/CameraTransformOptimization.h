@@ -92,6 +92,12 @@ public:
 			tf::Vector3 markerPosition);
 
 	/**
+	 * Prints the results of the optimization onto the screen using CSV format.
+	 */
+	void printResultCSV(std::string pre, const CalibrationState& cameraToHead,
+			tf::Vector3 markerPosition);
+
+	/**
 	 * Calculates the average roll and pitch of the grond using the passed transformation.
 	 */
 	void getAvgRP(const CalibrationState& state, double& r, double& p);
