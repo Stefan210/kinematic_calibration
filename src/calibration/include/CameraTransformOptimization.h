@@ -119,6 +119,14 @@ public:
 		this->maxIterations = maxIterations;
 	}
 
+	const CameraTransformOptimizationParameter& getParameter() const {
+		return parameter;
+	}
+
+	void setParameter(const CameraTransformOptimizationParameter& parameter) {
+		this->parameter = parameter;
+	}
+
 protected:
 	int numOfIterations;
 	std::vector<MeasurePoint> measurePoints;

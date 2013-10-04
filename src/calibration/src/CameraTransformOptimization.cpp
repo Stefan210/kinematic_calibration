@@ -77,17 +77,18 @@ void CameraTransformOptimization::calculateAvgGroundDistance(
 
 	double headYawOffset = state.getHeadYawOffset();
 	double headPitchOffset = state.getHeadPitchOffset();
+	tf::Transform cameraToHeadTransform = state.getCameraToHead();
 	int numOfPoints = measurePoints.size();
 	double groundDistance = this->parameter.getGroundDistance();
 
 	for (int i = 0; i < numOfPoints; i++) {
 		MeasurePoint measurePoint = measurePoints[i];
-		tf::Transform cameraToHeadTransform;
-		cameraToHeadTransform = measurePoint.opticalToFootprint(
+		tf::Transform opticalToFootprintTransform;
+		opticalToFootprintTransform = measurePoint.opticalToFootprint(
 				CalibrationState(cameraToHeadTransform, headYawOffset,
 						headPitchOffset));
 		GroundData transformedGroundData =
-				measurePoint.groundData.transform(cameraToHeadTransform);
+				measurePoint.groundData.transform(opticalToFootprintTransform);
 		double a = transformedGroundData.a;
 		double b = transformedGroundData.b;
 		double c = transformedGroundData.c;
@@ -261,6 +262,7 @@ void CompositeTransformOptimization::optimizeTransform(
 	// return the transform with the smallest error
 	for (map<string, CameraTransformOptimization*>::const_iterator it =
 			this->optimizer.begin(); it != this->optimizer.end(); ++it) {
+		this->parameter = it->second->getParameter();
 		CalibrationState currentState;
 		//cout << "transf before: " << it->second->getInitialCameraToHead() << "\n";
 		tf::Vector3 markerPosition;
