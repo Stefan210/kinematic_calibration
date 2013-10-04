@@ -99,36 +99,11 @@ float LocalTransformOptimization::calculateError(LtoState& state) {
 	tf::Vector3 centerPoint(centerX / numOfPoints, centerY / numOfPoints,
 			centerZ / numOfPoints);
 
-	// calculate squared error
+	// calculate marker error
 	this->calculateAvgDistFromMarker(state, centerPoint, positionError);
 
-	// calculate ground angles
-	double roll, pitch, yaw;
-	this->getAvgRP(state, roll, pitch);
-
-	double groundError = 0;
-
 	// calculate ground error
-	for (int i = 0; i < this->measurePoints.size(); i++) {
-		MeasurePoint& current = this->measurePoints[i];
-		tf::Transform opticalToFootprint = current.opticalToFootprint(state);
-		GroundData transformedGroundData = current.groundData.transform(
-				opticalToFootprint);
-		double a = transformedGroundData.a;
-		double b = transformedGroundData.b;
-		double c = transformedGroundData.c;
-		double d = transformedGroundData.d;
-		transformedGroundData.getRPY(roll, pitch, yaw);
-		groundError += fabs(
-				fabs(tf::Vector3(0, 0, -d / c).distance(tf::Vector3(0, 0, 0)))
-						- parameter.getGroundDistance())
-				+ fabs(
-						tf::Vector3(transformedGroundData.a,
-								transformedGroundData.b,
-								transformedGroundData.c).normalized().angle(
-								tf::Vector3(0, 0, 1)));
-	}
-	groundError /= this->measurePoints.size();
+	double groundError = 0;
 
 	float groundAngle;
 	this->calculateAvgGroundAngle(state, groundAngle); cout << "groundAngle " << groundAngle << "\n";
