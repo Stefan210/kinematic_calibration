@@ -109,7 +109,7 @@ float LocalTransformOptimization::calculateError(LtoState& state) {
 	this->calculateGroundAngleError(state, groundAngle);
 	float groundDist;
 	this->calculateGroundDistanceError(state, groundDist);
-	groundError = groundAngle + groundDist;// cout << "groundAngle " << groundAngle << " groundDist " << groundDist << "\n";
+	groundError = groundAngle + groundDist; // cout << "groundAngle " << groundAngle << " groundDist " << groundDist << "\n";
 
 	return parameter.getMarkerWeight() * positionError
 			+ parameter.getGroundWeight() * groundError;
@@ -199,44 +199,48 @@ std::vector<LtoState> LocalTransformOptimization::getNeighbors(
 		neighbours.push_back(newState);
 	}
 
-	{
-		LtoState newState;
-		newState.setCameraToHead(currentTransform);
-		newState.setHeadPitchOffset(current.getHeadPitchOffset() + stepwidth);
-		newState.setHeadYawOffset(current.getHeadYawOffset());
-		double error = calculateError(newState);
-		newState.error = error;
-		neighbours.push_back(newState);
-	}
+	if (parameter.isCalibrateJointOffsets()) {
+		{
+			LtoState newState;
+			newState.setCameraToHead(currentTransform);
+			newState.setHeadPitchOffset(
+					current.getHeadPitchOffset() + stepwidth);
+			newState.setHeadYawOffset(current.getHeadYawOffset());
+			double error = calculateError(newState);
+			newState.error = error;
+			neighbours.push_back(newState);
+		}
 
-	{
-		LtoState newState;
-		newState.setCameraToHead(currentTransform);
-		newState.setHeadPitchOffset(current.getHeadPitchOffset() - stepwidth);
-		newState.setHeadYawOffset(current.getHeadYawOffset());
-		double error = calculateError(newState);
-		newState.error = error;
-		neighbours.push_back(newState);
-	}
+		{
+			LtoState newState;
+			newState.setCameraToHead(currentTransform);
+			newState.setHeadPitchOffset(
+					current.getHeadPitchOffset() - stepwidth);
+			newState.setHeadYawOffset(current.getHeadYawOffset());
+			double error = calculateError(newState);
+			newState.error = error;
+			neighbours.push_back(newState);
+		}
 
-	{
-		LtoState newState;
-		newState.setCameraToHead(currentTransform);
-		newState.setHeadPitchOffset(current.getHeadPitchOffset());
-		newState.setHeadYawOffset(current.getHeadYawOffset() + stepwidth);
-		double error = calculateError(newState);
-		newState.error = error;
-		neighbours.push_back(newState);
-	}
+		{
+			LtoState newState;
+			newState.setCameraToHead(currentTransform);
+			newState.setHeadPitchOffset(current.getHeadPitchOffset());
+			newState.setHeadYawOffset(current.getHeadYawOffset() + stepwidth);
+			double error = calculateError(newState);
+			newState.error = error;
+			neighbours.push_back(newState);
+		}
 
-	{
-		LtoState newState;
-		newState.setCameraToHead(currentTransform);
-		newState.setHeadPitchOffset(current.getHeadPitchOffset());
-		newState.setHeadYawOffset(current.getHeadYawOffset() - stepwidth);
-		double error = calculateError(newState);
-		newState.error = error;
-		neighbours.push_back(newState);
+		{
+			LtoState newState;
+			newState.setCameraToHead(currentTransform);
+			newState.setHeadPitchOffset(current.getHeadPitchOffset());
+			newState.setHeadYawOffset(current.getHeadYawOffset() - stepwidth);
+			double error = calculateError(newState);
+			newState.error = error;
+			neighbours.push_back(newState);
+		}
 	}
 
 	return neighbours;
