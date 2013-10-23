@@ -13,8 +13,8 @@
 
 SvdTransformOptimization::SvdTransformOptimization(
 		CameraTransformOptimizationParameter param) :
-		CameraTransformOptimization(param), minError(
-				0.000001), errorImprovement(0.000000001) {
+		CameraTransformOptimization(param), minError(0.000001), errorImprovement(
+				0.000000001) {
 	this->setMaxIterations(100000);
 
 }
@@ -85,26 +85,30 @@ void SvdTransformOptimization::optimizeTransform(
 		this->lastError = error;
 		calculateSqrtDistCameraHead(currentCameraToHead, error);
 
-		/*		std::cout << "[optimization]";
+		/*
+		std::cout << "[optimization]";
 
-		 std::cout << "iteration " << numOfIterations << ";";
+		std::cout << "iteration " << numOfIterations << ";";
 
-		 std::cout << "position " << centerPointFixed.getX() << ","
-		 << centerPointFixed.getY() << "," << centerPointFixed.getZ() << ";";
+		std::cout << "position " << centerPointFixed.getX() << ","
+				<< centerPointFixed.getY() << "," << centerPointFixed.getZ()
+				<< ";";
 
-		 std::cout << "origin " << currentCameraToHead.getOrigin().getX() << ","
-		 << currentCameraToHead.getOrigin().getY() << ","
-		 << currentCameraToHead.getOrigin().getZ() << ";";
+		std::cout << "origin " << currentCameraToHead.getOrigin().getX() << ","
+				<< currentCameraToHead.getOrigin().getY() << ","
+				<< currentCameraToHead.getOrigin().getZ() << ";";
 
-		 std::cout << "rotation " << currentCameraToHead.getRotation().getX() << ","
-		 << currentCameraToHead.getRotation().getY() << ","
-		 << currentCameraToHead.getRotation().getZ() << ";";
+		double rr, rp, ry;
+		tf::Matrix3x3(currentCameraToHead.getRotation()).getRPY(rr, rp, ry);
+		std::cout << "rotation " << rr << "," << rp << "," << ry << ";";
 
-		 std::cout << "error " << error << ";";
+		std::cout << "error " << error << ";";
 
-		 std::cout << std::endl;*/
+		std::cout << std::endl;*/
 	}
 	calibrationState.setCameraToHead(currentCameraToHead);
+	calibrationState.setHeadPitchOffset(0.0);
+	calibrationState.setHeadYawOffset(0.0);
 }
 
 tf::Transform SvdTransformOptimization::svdOwnImpl(

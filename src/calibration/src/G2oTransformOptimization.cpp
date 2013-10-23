@@ -133,20 +133,6 @@ void G2oTransformOptimization::optimizeTransform(
 		optimizer.addEdge(edge);
 	}
 
-	/*int iterations = 2;
-	 bool toggle = false;
-	 while (iterations--) {
-	 positionVertex->setFixed(toggle);
-	 transformationVertex->setFixed(toggle);
-	 offsetVertex->setFixed(!toggle);
-	 toggle = !toggle;
-
-	 optimizer.initializeOptimization();
-	 optimizer.computeActiveErrors();
-	 //optimizer.setVerbose(true);
-	 optimizer.optimize(100);
-	 }*/
-
 	optimizer.initializeOptimization();
 	optimizer.computeActiveErrors();
 	//optimizer.setVerbose(true);
