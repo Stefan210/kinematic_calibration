@@ -1,0 +1,6 @@
+<launch>
+  <arg name="ser_file" />
+  <node name="camera_calibration" pkg="calibration" type="CameraCalibration" output="screen" args="--data-from-file $(arg ser_file)">
+    <rosparam file="$(find calibration)/config/evaluation_params_standing.yaml" command="load" />
+  </node>
+</launch>

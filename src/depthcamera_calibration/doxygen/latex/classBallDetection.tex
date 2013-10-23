@@ -1,0 +1,173 @@
+\hypertarget{classBallDetection}{\section{\-Ball\-Detection \-Class \-Reference}
+\label{classBallDetection}\index{\-Ball\-Detection@{\-Ball\-Detection}}
+}
+
+
+{\ttfamily \#include $<$\-Ball\-Detection.\-h$>$}
+
+\subsection*{\-Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structBallDetection_1_1BallData}{\-Ball\-Data}
+\end{DoxyCompactItemize}
+\subsection*{\-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classBallDetection_ad9d5c2d58f523f50f4c5043442613c57}{\hyperlink{classBallDetection_ad9d5c2d58f523f50f4c5043442613c57}{\-Ball\-Detection} ()}\label{classBallDetection_ad9d5c2d58f523f50f4c5043442613c57}
+
+\begin{DoxyCompactList}\small\item\em \-Default constructor. \end{DoxyCompactList}\item 
+\hypertarget{classBallDetection_a831e88ded921b14f7daa271491632ab1}{\hyperlink{classBallDetection_a831e88ded921b14f7daa271491632ab1}{\-Ball\-Detection} (\hyperlink{classBallDetectionParameter}{\-Ball\-Detection\-Parameter} parameter)}\label{classBallDetection_a831e88ded921b14f7daa271491632ab1}
+
+\begin{DoxyCompactList}\small\item\em \-Parameterized constructor. \end{DoxyCompactList}\item 
+\hypertarget{classBallDetection_ae36ea610b773934ef6bb44d65e5deda5}{\hyperlink{classBallDetection_ae36ea610b773934ef6bb44d65e5deda5}{$\sim$\-Ball\-Detection} ()}\label{classBallDetection_ae36ea610b773934ef6bb44d65e5deda5}
+
+\begin{DoxyCompactList}\small\item\em \-Deconstructor. \end{DoxyCompactList}\item 
+\hyperlink{structBallDetection_1_1BallData}{\-Ball\-Data} \hyperlink{classBallDetection_a8d23e7c2e31b2c65ae6701027bfb33b4}{get\-Position} (pcl\-::\-Point\-Cloud$<$ pcl\-::\-Point\-X\-Y\-Z\-R\-G\-B $>$\-::\-Ptr initial\-Cloud)
+\item 
+\hypertarget{classBallDetection_aa010084f79c69aeeddca287f504ec0ca}{\hyperlink{structBallDetection_1_1BallData}{\-Ball\-Data} {\bfseries get\-Avg\-Position} (std\-::vector$<$ pcl\-::\-Point\-Cloud$<$ pcl\-::\-Point\-X\-Y\-Z\-R\-G\-B $>$\-::\-Ptr $>$ clouds)}\label{classBallDetection_aa010084f79c69aeeddca287f504ec0ca}
+
+\item 
+pcl\-::\-Point\-Cloud\*
+$<$ pcl\-::\-Point\-X\-Y\-Z\-R\-G\-B $>$\-::\-Ptr \hyperlink{classBallDetection_acc5a355418a87b4f27f62aaea856d77b}{get\-Cloud\-Without\-Planes} ()
+\item 
+pcl\-::\-Point\-Cloud\*
+$<$ pcl\-::\-Point\-X\-Y\-Z\-R\-G\-B $>$\-::\-Ptr \hyperlink{classBallDetection_a00d7c20455d17e2dc18a20afcea65590}{get\-Cloud\-With\-Ball\-Only} ()
+\item 
+void \hyperlink{classBallDetection_afa3245d2178612a13fb2398f9fa6cfe5}{set\-Min\-Ball\-Radius} (float min\-Ball\-Radius)
+\item 
+void \hyperlink{classBallDetection_aeee9c66437f09a6535152433600ef0f3}{set\-Max\-Ball\-Radius} (float max\-Ball\-Radius)
+\end{DoxyCompactItemize}
+\subsection*{\-Protected \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classBallDetection_a7da699c0edd8d370b4fd8706d3c2b197}{filter\-Range} (pcl\-::\-Point\-Cloud$<$ pcl\-::\-Point\-X\-Y\-Z\-R\-G\-B $>$\-::\-Ptr in\-Cloud, pcl\-::\-Point\-Cloud$<$ pcl\-::\-Point\-X\-Y\-Z\-R\-G\-B $>$\-::\-Ptr out\-Cloud)
+\item 
+bool \hyperlink{classBallDetection_a6a3b7bb225e15eb2ad7e2db16d1f7692}{remove\-Planes} (pcl\-::\-Point\-Cloud$<$ pcl\-::\-Point\-X\-Y\-Z\-R\-G\-B $>$\-::\-Ptr in\-Cloud, pcl\-::\-Point\-Cloud$<$ pcl\-::\-Point\-X\-Y\-Z\-R\-G\-B $>$\-::\-Ptr out\-Cloud)
+\item 
+bool \hyperlink{classBallDetection_a4712a4606665043af81fcda001b19393}{segment\-Ball} (pcl\-::\-Point\-Cloud$<$ pcl\-::\-Point\-X\-Y\-Z\-R\-G\-B $>$\-::\-Ptr in\-Cloud, pcl\-::\-Point\-Cloud$<$ pcl\-::\-Point\-X\-Y\-Z\-R\-G\-B $>$\-::\-Ptr out\-Cloud, \hyperlink{structBallDetection_1_1BallData}{\-Ball\-Detection\-::\-Ball\-Data} \&ball\-Data)
+\end{DoxyCompactItemize}
+
+
+\subsection{\-Detailed \-Description}
+\-Class for detecting a ball contained in a point cloud. 
+
+\subsection{\-Member \-Function \-Documentation}
+\hypertarget{classBallDetection_a7da699c0edd8d370b4fd8706d3c2b197}{\index{\-Ball\-Detection@{\-Ball\-Detection}!filter\-Range@{filter\-Range}}
+\index{filter\-Range@{filter\-Range}!BallDetection@{\-Ball\-Detection}}
+\subsubsection[{filter\-Range}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf \-Ball\-Detection\-::filter\-Range} (
+\begin{DoxyParamCaption}
+\item[{pcl\-::\-Point\-Cloud$<$ pcl\-::\-Point\-X\-Y\-Z\-R\-G\-B $>$\-::\-Ptr}]{in\-Cloud, }
+\item[{pcl\-::\-Point\-Cloud$<$ pcl\-::\-Point\-X\-Y\-Z\-R\-G\-B $>$\-::\-Ptr}]{out\-Cloud}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}protected\mbox{]}}}}\label{classBallDetection_a7da699c0edd8d370b4fd8706d3c2b197}
+\-Removes points with a distance greater than detection\-Range. 
+\begin{DoxyParams}{\-Parameters}
+{\em in\-Cloud} & initial \-Point cloud. \\
+\hline
+{\em out\-Cloud} & filtered \-Point cloud. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classBallDetection_a00d7c20455d17e2dc18a20afcea65590}{\index{\-Ball\-Detection@{\-Ball\-Detection}!get\-Cloud\-With\-Ball\-Only@{get\-Cloud\-With\-Ball\-Only}}
+\index{get\-Cloud\-With\-Ball\-Only@{get\-Cloud\-With\-Ball\-Only}!BallDetection@{\-Ball\-Detection}}
+\subsubsection[{get\-Cloud\-With\-Ball\-Only}]{\setlength{\rightskip}{0pt plus 5cm}pcl\-::\-Point\-Cloud$<$ pcl\-::\-Point\-X\-Y\-Z\-R\-G\-B $>$\-::\-Ptr {\bf \-Ball\-Detection\-::get\-Cloud\-With\-Ball\-Only} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classBallDetection_a00d7c20455d17e2dc18a20afcea65590}
+\-Returns the cloud which contains only the ball. \-Should only be called after a call to \hyperlink{classBallDetection_a8d23e7c2e31b2c65ae6701027bfb33b4}{get\-Position()}. \begin{DoxyReturn}{\-Returns}
+\-The cloud which contains only the ball. 
+\end{DoxyReturn}
+\hypertarget{classBallDetection_acc5a355418a87b4f27f62aaea856d77b}{\index{\-Ball\-Detection@{\-Ball\-Detection}!get\-Cloud\-Without\-Planes@{get\-Cloud\-Without\-Planes}}
+\index{get\-Cloud\-Without\-Planes@{get\-Cloud\-Without\-Planes}!BallDetection@{\-Ball\-Detection}}
+\subsubsection[{get\-Cloud\-Without\-Planes}]{\setlength{\rightskip}{0pt plus 5cm}pcl\-::\-Point\-Cloud$<$ pcl\-::\-Point\-X\-Y\-Z\-R\-G\-B $>$\-::\-Ptr {\bf \-Ball\-Detection\-::get\-Cloud\-Without\-Planes} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classBallDetection_acc5a355418a87b4f27f62aaea856d77b}
+\-Returns the cloud after extracting the planes. \-Should only be called after a call to \hyperlink{classBallDetection_a8d23e7c2e31b2c65ae6701027bfb33b4}{get\-Position()}. \begin{DoxyReturn}{\-Returns}
+\-The cloud after extracting the planes. 
+\end{DoxyReturn}
+\hypertarget{classBallDetection_a8d23e7c2e31b2c65ae6701027bfb33b4}{\index{\-Ball\-Detection@{\-Ball\-Detection}!get\-Position@{get\-Position}}
+\index{get\-Position@{get\-Position}!BallDetection@{\-Ball\-Detection}}
+\subsubsection[{get\-Position}]{\setlength{\rightskip}{0pt plus 5cm}{\bf \-Ball\-Detection\-::\-Ball\-Data} {\bf \-Ball\-Detection\-::get\-Position} (
+\begin{DoxyParamCaption}
+\item[{pcl\-::\-Point\-Cloud$<$ pcl\-::\-Point\-X\-Y\-Z\-R\-G\-B $>$\-::\-Ptr}]{initial\-Cloud}
+\end{DoxyParamCaption}
+)}}\label{classBallDetection_a8d23e7c2e31b2c65ae6701027bfb33b4}
+\-Given a point cloud containing a ball (general\-: sphere), tries to segment it and return its position (center). 
+\begin{DoxyParams}{\-Parameters}
+{\em initial\-Cloud} & \-The point cloud containing the ball. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+\-The position of the detected ball. 
+\end{DoxyReturn}
+\hypertarget{classBallDetection_a6a3b7bb225e15eb2ad7e2db16d1f7692}{\index{\-Ball\-Detection@{\-Ball\-Detection}!remove\-Planes@{remove\-Planes}}
+\index{remove\-Planes@{remove\-Planes}!BallDetection@{\-Ball\-Detection}}
+\subsubsection[{remove\-Planes}]{\setlength{\rightskip}{0pt plus 5cm}bool {\bf \-Ball\-Detection\-::remove\-Planes} (
+\begin{DoxyParamCaption}
+\item[{pcl\-::\-Point\-Cloud$<$ pcl\-::\-Point\-X\-Y\-Z\-R\-G\-B $>$\-::\-Ptr}]{in\-Cloud, }
+\item[{pcl\-::\-Point\-Cloud$<$ pcl\-::\-Point\-X\-Y\-Z\-R\-G\-B $>$\-::\-Ptr}]{out\-Cloud}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}protected\mbox{]}}}}\label{classBallDetection_a6a3b7bb225e15eb2ad7e2db16d1f7692}
+\-Extracts planes (e.\-g. floor) contained in the point cloud. 
+\begin{DoxyParams}{\-Parameters}
+{\em in\-Cloud} & \-Point cloud which contains planes. \\
+\hline
+{\em out\-Cloud} & \-Point cloud with planes being extracted. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+\char`\"{}\-True\char`\"{} if successful, \char`\"{}\-False\char`\"{} otherwise. 
+\end{DoxyReturn}
+\hypertarget{classBallDetection_a4712a4606665043af81fcda001b19393}{\index{\-Ball\-Detection@{\-Ball\-Detection}!segment\-Ball@{segment\-Ball}}
+\index{segment\-Ball@{segment\-Ball}!BallDetection@{\-Ball\-Detection}}
+\subsubsection[{segment\-Ball}]{\setlength{\rightskip}{0pt plus 5cm}bool {\bf \-Ball\-Detection\-::segment\-Ball} (
+\begin{DoxyParamCaption}
+\item[{pcl\-::\-Point\-Cloud$<$ pcl\-::\-Point\-X\-Y\-Z\-R\-G\-B $>$\-::\-Ptr}]{in\-Cloud, }
+\item[{pcl\-::\-Point\-Cloud$<$ pcl\-::\-Point\-X\-Y\-Z\-R\-G\-B $>$\-::\-Ptr}]{out\-Cloud, }
+\item[{{\bf \-Ball\-Detection\-::\-Ball\-Data} \&}]{ball\-Data}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}protected\mbox{]}}}}\label{classBallDetection_a4712a4606665043af81fcda001b19393}
+\-Segmentation of the ball. 
+\begin{DoxyParams}{\-Parameters}
+{\em in\-Cloud} & \-Initial point cloud (should contain exactly one sphere). \\
+\hline
+{\em out\-Cloud} & \-Point cloud containing only the ball. \\
+\hline
+{\em ball\-Position} & \-Position of the ball which was found. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{\-Returns}
+\char`\"{}\-True\char`\"{} if successful, \char`\"{}\-False\char`\"{} otherwise. 
+\end{DoxyReturn}
+\hypertarget{classBallDetection_aeee9c66437f09a6535152433600ef0f3}{\index{\-Ball\-Detection@{\-Ball\-Detection}!set\-Max\-Ball\-Radius@{set\-Max\-Ball\-Radius}}
+\index{set\-Max\-Ball\-Radius@{set\-Max\-Ball\-Radius}!BallDetection@{\-Ball\-Detection}}
+\subsubsection[{set\-Max\-Ball\-Radius}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf \-Ball\-Detection\-::set\-Max\-Ball\-Radius} (
+\begin{DoxyParamCaption}
+\item[{float}]{max\-Ball\-Radius}
+\end{DoxyParamCaption}
+)}}\label{classBallDetection_aeee9c66437f09a6535152433600ef0f3}
+\-Sets an upper bound for the ball radius. 
+\begin{DoxyParams}{\-Parameters}
+{\em max\-Ball\-Radius} & \-Upper bound for the ball radius. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classBallDetection_afa3245d2178612a13fb2398f9fa6cfe5}{\index{\-Ball\-Detection@{\-Ball\-Detection}!set\-Min\-Ball\-Radius@{set\-Min\-Ball\-Radius}}
+\index{set\-Min\-Ball\-Radius@{set\-Min\-Ball\-Radius}!BallDetection@{\-Ball\-Detection}}
+\subsubsection[{set\-Min\-Ball\-Radius}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf \-Ball\-Detection\-::set\-Min\-Ball\-Radius} (
+\begin{DoxyParamCaption}
+\item[{float}]{min\-Ball\-Radius}
+\end{DoxyParamCaption}
+)}}\label{classBallDetection_afa3245d2178612a13fb2398f9fa6cfe5}
+\-Sets a lower bound for the ball radius. 
+\begin{DoxyParams}{\-Parameters}
+{\em min\-Ball\-Radius} & \-Lower bound for the ball radius. \\
+\hline
+\end{DoxyParams}
+
+
+\-The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/stefan/catkin\-\_\-ws/src/calibration/include/\-Ball\-Detection.\-h\item 
+/home/stefan/catkin\-\_\-ws/src/calibration/src/\-Ball\-Detection.\-cpp\end{DoxyCompactItemize}

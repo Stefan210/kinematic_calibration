@@ -1,0 +1,198 @@
+\hypertarget{classCameraTransformOptimization}{\section{\-Camera\-Transform\-Optimization \-Class \-Reference}
+\label{classCameraTransformOptimization}\index{\-Camera\-Transform\-Optimization@{\-Camera\-Transform\-Optimization}}
+}
+\-Inheritance diagram for \-Camera\-Transform\-Optimization\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=1.312500cm]{classCameraTransformOptimization}
+\end{center}
+\end{figure}
+\subsection*{\-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classCameraTransformOptimization_a8c184b6dd5e2db624109d76ffb90c026}{\-Camera\-Transform\-Optimization} (\hyperlink{classCameraTransformOptimizationParameter}{\-Camera\-Transform\-Optimization\-Parameter} parameter=\hyperlink{classCameraTransformOptimizationParameter}{\-Camera\-Transform\-Optimization\-Parameter}())
+\item 
+virtual \hyperlink{classCameraTransformOptimization_a1d34a5b00c8222fac7e5939f88f55e96}{$\sim$\-Camera\-Transform\-Optimization} ()
+\item 
+virtual void \hyperlink{classCameraTransformOptimization_a8a4a4a09325f4bae401bad62ec7e9f02}{optimize\-Transform} (\hyperlink{classCalibrationState}{\-Calibration\-State} \&calibration\-State)=0
+\item 
+virtual void \hyperlink{classCameraTransformOptimization_ac1ffbf2ddfc7e7de7639e870d0745957}{add\-Measure\-Point} (\hyperlink{classCameraMeasurePoint}{\-Measure\-Point} new\-Point)
+\item 
+virtual void \hyperlink{classCameraTransformOptimization_a53007c5c531dd86a5facf7cbc82f477e}{clear\-Measure\-Points} ()
+\item 
+virtual void \hyperlink{classCameraTransformOptimization_abdd025826d3ece8861c07d91fa5cb98e}{calculate\-Sqrt\-Dist\-From\-Marker} (\hyperlink{classCalibrationState}{\-Calibration\-State} state, tf\-::\-Vector3 marker\-Point, float \&error)
+\item 
+virtual void \hyperlink{classCameraTransformOptimization_ae23b52f59e2f4eb5e37eca8ba0e3fc1b}{calculate\-Sqrt\-Dist\-Camera\-Head} (tf\-::\-Transform camera\-To\-Head, float \&error)
+\item 
+virtual void \hyperlink{classCameraTransformOptimization_a63da0977758e7a4b63f946ada33e7dd5}{get\-Marker\-Estimate} (const \hyperlink{classCalibrationState}{\-Calibration\-State} \&camera\-To\-Head, tf\-::\-Vector3 \&position)
+\item 
+void \hyperlink{classCameraTransformOptimization_a2ac72c140004cc3b2259ef4d2438cafb}{print\-Result} (std\-::string pre, const \hyperlink{classCalibrationState}{\-Calibration\-State} \&camera\-To\-Head, tf\-::\-Vector3 marker\-Position)
+\item 
+void \hyperlink{classCameraTransformOptimization_a913127f90c84a4e4505b057939280f89}{get\-Avg\-R\-P} (const \hyperlink{classCalibrationState}{\-Calibration\-State} \&state, double \&r, double \&p)
+\item 
+\hypertarget{classCameraTransformOptimization_af11daaf2cd5178c7fe4d0596a9f544de}{virtual void {\bfseries remove\-Outliers} ()}\label{classCameraTransformOptimization_af11daaf2cd5178c7fe4d0596a9f544de}
+
+\item 
+\hypertarget{classCameraTransformOptimization_ac9e55b35f8ee89aff5bb3d33301f420f}{int {\bfseries get\-Max\-Iterations} () const }\label{classCameraTransformOptimization_ac9e55b35f8ee89aff5bb3d33301f420f}
+
+\item 
+\hypertarget{classCameraTransformOptimization_a04ea90d9c105f077afad21d88a3cddc4}{void {\bfseries set\-Max\-Iterations} (int max\-Iterations)}\label{classCameraTransformOptimization_a04ea90d9c105f077afad21d88a3cddc4}
+
+\item 
+\hypertarget{classCameraTransformOptimization_af4e92403855d44d3abb3d81a33ea3be9}{float {\bfseries get\-Min\-Error} () const }\label{classCameraTransformOptimization_af4e92403855d44d3abb3d81a33ea3be9}
+
+\item 
+\hypertarget{classCameraTransformOptimization_a2bc589d6107bde5c4c9485cc40df2693}{void {\bfseries set\-Min\-Error} (float min\-Error)}\label{classCameraTransformOptimization_a2bc589d6107bde5c4c9485cc40df2693}
+
+\item 
+\hypertarget{classCameraTransformOptimization_ae46ae0f7bf817dc0f1cd1528f3e40a40}{float {\bfseries get\-Error\-Improvement} () const }\label{classCameraTransformOptimization_ae46ae0f7bf817dc0f1cd1528f3e40a40}
+
+\item 
+\hypertarget{classCameraTransformOptimization_a0234fcab0dea261cc3c998af4a95a76a}{void {\bfseries set\-Error\-Improvement} (float error\-Improvement)}\label{classCameraTransformOptimization_a0234fcab0dea261cc3c998af4a95a76a}
+
+\item 
+\hypertarget{classCameraTransformOptimization_a5cd1ad3be856ba781dd5ce7a29ae3401}{virtual tf\-::\-Transform {\bfseries get\-Initial\-Camera\-To\-Head} ()}\label{classCameraTransformOptimization_a5cd1ad3be856ba781dd5ce7a29ae3401}
+
+\item 
+\hypertarget{classCameraTransformOptimization_a3e576d28d6fce0310bb35aa03e9d1223}{virtual void {\bfseries set\-Initial\-Camera\-To\-Head} (tf\-::\-Transform initial\-Transform)}\label{classCameraTransformOptimization_a3e576d28d6fce0310bb35aa03e9d1223}
+
+\end{DoxyCompactItemize}
+\subsection*{\-Protected \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classCameraTransformOptimization_a51edcef959641febc34e4191e049acf3}{virtual bool {\bfseries can\-Stop} ()}\label{classCameraTransformOptimization_a51edcef959641febc34e4191e049acf3}
+
+\end{DoxyCompactItemize}
+\subsection*{\-Protected \-Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classCameraTransformOptimization_abd78313124b14d012b208794942d2052}{int {\bfseries num\-Of\-Iterations}}\label{classCameraTransformOptimization_abd78313124b14d012b208794942d2052}
+
+\item 
+\hypertarget{classCameraTransformOptimization_a245be304c2a3c477fbedb7f467e76a92}{std\-::vector$<$ \hyperlink{classCameraMeasurePoint}{\-Measure\-Point} $>$ {\bfseries measure\-Points}}\label{classCameraTransformOptimization_a245be304c2a3c477fbedb7f467e76a92}
+
+\item 
+\hypertarget{classCameraTransformOptimization_ae07e112f39b9fa85b84055d9b859366d}{float {\bfseries error}}\label{classCameraTransformOptimization_ae07e112f39b9fa85b84055d9b859366d}
+
+\item 
+\hypertarget{classCameraTransformOptimization_aa250b60379325fa6a535e3defda4003f}{float {\bfseries last\-Error}}\label{classCameraTransformOptimization_aa250b60379325fa6a535e3defda4003f}
+
+\item 
+\hypertarget{classCameraTransformOptimization_a201614fd0ce051b2a407d8cc66efbf08}{float {\bfseries error\-Improvement}}\label{classCameraTransformOptimization_a201614fd0ce051b2a407d8cc66efbf08}
+
+\item 
+\hypertarget{classCameraTransformOptimization_a998dd4ef202d17047b05ca5b90ab5553}{float {\bfseries min\-Error}}\label{classCameraTransformOptimization_a998dd4ef202d17047b05ca5b90ab5553}
+
+\item 
+\hypertarget{classCameraTransformOptimization_a75230bc2bb1f6d7336ac6a3bf568a805}{int {\bfseries max\-Iterations}}\label{classCameraTransformOptimization_a75230bc2bb1f6d7336ac6a3bf568a805}
+
+\item 
+\hypertarget{classCameraTransformOptimization_a6f4d4dd70f728d94f6da1d18da5e309e}{\hyperlink{classCameraTransformOptimizationParameter}{\-Camera\-Transform\-Optimization\-Parameter} {\bfseries parameter}}\label{classCameraTransformOptimization_a6f4d4dd70f728d94f6da1d18da5e309e}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{\-Constructor \& \-Destructor \-Documentation}
+\hypertarget{classCameraTransformOptimization_a8c184b6dd5e2db624109d76ffb90c026}{\index{\-Camera\-Transform\-Optimization@{\-Camera\-Transform\-Optimization}!\-Camera\-Transform\-Optimization@{\-Camera\-Transform\-Optimization}}
+\index{\-Camera\-Transform\-Optimization@{\-Camera\-Transform\-Optimization}!CameraTransformOptimization@{\-Camera\-Transform\-Optimization}}
+\subsubsection[{\-Camera\-Transform\-Optimization}]{\setlength{\rightskip}{0pt plus 5cm}{\bf \-Camera\-Transform\-Optimization\-::\-Camera\-Transform\-Optimization} (
+\begin{DoxyParamCaption}
+\item[{{\bf \-Camera\-Transform\-Optimization\-Parameter}}]{parameter = {\ttfamily {\bf \-Camera\-Transform\-Optimization\-Parameter}()}}
+\end{DoxyParamCaption}
+)}}\label{classCameraTransformOptimization_a8c184b6dd5e2db624109d76ffb90c026}
+\-Parameterized constructor. \hypertarget{classCameraTransformOptimization_a1d34a5b00c8222fac7e5939f88f55e96}{\index{\-Camera\-Transform\-Optimization@{\-Camera\-Transform\-Optimization}!$\sim$\-Camera\-Transform\-Optimization@{$\sim$\-Camera\-Transform\-Optimization}}
+\index{$\sim$\-Camera\-Transform\-Optimization@{$\sim$\-Camera\-Transform\-Optimization}!CameraTransformOptimization@{\-Camera\-Transform\-Optimization}}
+\subsubsection[{$\sim$\-Camera\-Transform\-Optimization}]{\setlength{\rightskip}{0pt plus 5cm}{\bf \-Camera\-Transform\-Optimization\-::$\sim$\-Camera\-Transform\-Optimization} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}\label{classCameraTransformOptimization_a1d34a5b00c8222fac7e5939f88f55e96}
+\-Deconstructor. 
+
+\subsection{\-Member \-Function \-Documentation}
+\hypertarget{classCameraTransformOptimization_ac1ffbf2ddfc7e7de7639e870d0745957}{\index{\-Camera\-Transform\-Optimization@{\-Camera\-Transform\-Optimization}!add\-Measure\-Point@{add\-Measure\-Point}}
+\index{add\-Measure\-Point@{add\-Measure\-Point}!CameraTransformOptimization@{\-Camera\-Transform\-Optimization}}
+\subsubsection[{add\-Measure\-Point}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf \-Camera\-Transform\-Optimization\-::add\-Measure\-Point} (
+\begin{DoxyParamCaption}
+\item[{{\bf \-Measure\-Point}}]{new\-Point}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}\label{classCameraTransformOptimization_ac1ffbf2ddfc7e7de7639e870d0745957}
+\-Adds a new measure point. 
+
+\-Reimplemented in \hyperlink{classCompositeTransformOptimization_aff2a0c0afce22998d1a1128b1671d99c}{\-Composite\-Transform\-Optimization}.
+
+\hypertarget{classCameraTransformOptimization_ae23b52f59e2f4eb5e37eca8ba0e3fc1b}{\index{\-Camera\-Transform\-Optimization@{\-Camera\-Transform\-Optimization}!calculate\-Sqrt\-Dist\-Camera\-Head@{calculate\-Sqrt\-Dist\-Camera\-Head}}
+\index{calculate\-Sqrt\-Dist\-Camera\-Head@{calculate\-Sqrt\-Dist\-Camera\-Head}!CameraTransformOptimization@{\-Camera\-Transform\-Optimization}}
+\subsubsection[{calculate\-Sqrt\-Dist\-Camera\-Head}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf \-Camera\-Transform\-Optimization\-::calculate\-Sqrt\-Dist\-Camera\-Head} (
+\begin{DoxyParamCaption}
+\item[{tf\-::\-Transform}]{camera\-To\-Head, }
+\item[{float \&}]{error}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}\label{classCameraTransformOptimization_ae23b52f59e2f4eb5e37eca8ba0e3fc1b}
+\-Calculates the error between the point clouds in the first camera frame and the transformed points in the last robot frame. \hypertarget{classCameraTransformOptimization_abdd025826d3ece8861c07d91fa5cb98e}{\index{\-Camera\-Transform\-Optimization@{\-Camera\-Transform\-Optimization}!calculate\-Sqrt\-Dist\-From\-Marker@{calculate\-Sqrt\-Dist\-From\-Marker}}
+\index{calculate\-Sqrt\-Dist\-From\-Marker@{calculate\-Sqrt\-Dist\-From\-Marker}!CameraTransformOptimization@{\-Camera\-Transform\-Optimization}}
+\subsubsection[{calculate\-Sqrt\-Dist\-From\-Marker}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf \-Camera\-Transform\-Optimization\-::calculate\-Sqrt\-Dist\-From\-Marker} (
+\begin{DoxyParamCaption}
+\item[{{\bf \-Calibration\-State}}]{state, }
+\item[{tf\-::\-Vector3}]{marker\-Point, }
+\item[{float \&}]{error}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}\label{classCameraTransformOptimization_abdd025826d3ece8861c07d91fa5cb98e}
+\-Calculates the squared distance from the estimated marker position and the measured points given the current estimation for the transformation. \hypertarget{classCameraTransformOptimization_a53007c5c531dd86a5facf7cbc82f477e}{\index{\-Camera\-Transform\-Optimization@{\-Camera\-Transform\-Optimization}!clear\-Measure\-Points@{clear\-Measure\-Points}}
+\index{clear\-Measure\-Points@{clear\-Measure\-Points}!CameraTransformOptimization@{\-Camera\-Transform\-Optimization}}
+\subsubsection[{clear\-Measure\-Points}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf \-Camera\-Transform\-Optimization\-::clear\-Measure\-Points} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}\label{classCameraTransformOptimization_a53007c5c531dd86a5facf7cbc82f477e}
+\-Clears the list of measure points. 
+
+\-Reimplemented in \hyperlink{classCompositeTransformOptimization_a5313f4fff02e5d48a7007af68ea6f008}{\-Composite\-Transform\-Optimization}.
+
+\hypertarget{classCameraTransformOptimization_a913127f90c84a4e4505b057939280f89}{\index{\-Camera\-Transform\-Optimization@{\-Camera\-Transform\-Optimization}!get\-Avg\-R\-P@{get\-Avg\-R\-P}}
+\index{get\-Avg\-R\-P@{get\-Avg\-R\-P}!CameraTransformOptimization@{\-Camera\-Transform\-Optimization}}
+\subsubsection[{get\-Avg\-R\-P}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf \-Camera\-Transform\-Optimization\-::get\-Avg\-R\-P} (
+\begin{DoxyParamCaption}
+\item[{const {\bf \-Calibration\-State} \&}]{state, }
+\item[{double \&}]{r, }
+\item[{double \&}]{p}
+\end{DoxyParamCaption}
+)}}\label{classCameraTransformOptimization_a913127f90c84a4e4505b057939280f89}
+\-Calculates the average roll and pitch of the grond using the passed transformation. \hypertarget{classCameraTransformOptimization_a63da0977758e7a4b63f946ada33e7dd5}{\index{\-Camera\-Transform\-Optimization@{\-Camera\-Transform\-Optimization}!get\-Marker\-Estimate@{get\-Marker\-Estimate}}
+\index{get\-Marker\-Estimate@{get\-Marker\-Estimate}!CameraTransformOptimization@{\-Camera\-Transform\-Optimization}}
+\subsubsection[{get\-Marker\-Estimate}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf \-Camera\-Transform\-Optimization\-::get\-Marker\-Estimate} (
+\begin{DoxyParamCaption}
+\item[{const {\bf \-Calibration\-State} \&}]{camera\-To\-Head, }
+\item[{tf\-::\-Vector3 \&}]{position}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}\label{classCameraTransformOptimization_a63da0977758e7a4b63f946ada33e7dd5}
+\-Calculates an estimate for the marker position given a guess for the transformation. 
+
+\-Reimplemented in \hyperlink{classG2oTransformOptimization_a2b3606f70377e7736712c131fe48d1ae}{\-G2o\-Transform\-Optimization}.
+
+\hypertarget{classCameraTransformOptimization_a8a4a4a09325f4bae401bad62ec7e9f02}{\index{\-Camera\-Transform\-Optimization@{\-Camera\-Transform\-Optimization}!optimize\-Transform@{optimize\-Transform}}
+\index{optimize\-Transform@{optimize\-Transform}!CameraTransformOptimization@{\-Camera\-Transform\-Optimization}}
+\subsubsection[{optimize\-Transform}]{\setlength{\rightskip}{0pt plus 5cm}virtual void {\bf \-Camera\-Transform\-Optimization\-::optimize\-Transform} (
+\begin{DoxyParamCaption}
+\item[{{\bf \-Calibration\-State} \&}]{calibration\-State}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}pure virtual\mbox{]}}}}\label{classCameraTransformOptimization_a8a4a4a09325f4bae401bad62ec7e9f02}
+\-Optimizes the transform given the measured points, initial transformation, and all other transformations needed. 
+
+\-Implemented in \hyperlink{classCompositeTransformOptimization_aa77358fb8292c767bfbf029115ced9cf}{\-Composite\-Transform\-Optimization}, \hyperlink{classRandomRestartLocalOptimization_a6e5936d8717ed841becb50c1f04ee388}{\-Random\-Restart\-Local\-Optimization}, \hyperlink{classSimulatedAnnealingTransformOptimization_ab6690824306f9cd1f98f420a8d85e0f7}{\-Simulated\-Annealing\-Transform\-Optimization}, \hyperlink{classHillClimbingTransformOptimization_a4f7fb583e57929790420e1f28d97c383}{\-Hill\-Climbing\-Transform\-Optimization}, \hyperlink{classCalibrationDataSerialization_a7e7db9387843500002e908cb54a0b5ea}{\-Calibration\-Data\-Serialization}, \hyperlink{classG2oTransformOptimization_a8a644d4ab3d5cacd4cc56f716dfd648d}{\-G2o\-Transform\-Optimization}, and \hyperlink{classSvdTransformOptimization_afd4d0ed3de6c59535ede1f06134463e8}{\-Svd\-Transform\-Optimization}.
+
+\hypertarget{classCameraTransformOptimization_a2ac72c140004cc3b2259ef4d2438cafb}{\index{\-Camera\-Transform\-Optimization@{\-Camera\-Transform\-Optimization}!print\-Result@{print\-Result}}
+\index{print\-Result@{print\-Result}!CameraTransformOptimization@{\-Camera\-Transform\-Optimization}}
+\subsubsection[{print\-Result}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf \-Camera\-Transform\-Optimization\-::print\-Result} (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{pre, }
+\item[{const {\bf \-Calibration\-State} \&}]{camera\-To\-Head, }
+\item[{tf\-::\-Vector3}]{marker\-Position}
+\end{DoxyParamCaption}
+)}}\label{classCameraTransformOptimization_a2ac72c140004cc3b2259ef4d2438cafb}
+\-Prints the results of the optimization onto the screen. 
+
+\-The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/stefan/catkin\-\_\-ws/src/calibration/include/\-Camera\-Transform\-Optimization.\-h\item 
+/home/stefan/catkin\-\_\-ws/src/calibration/src/\-Camera\-Transform\-Optimization.\-cpp\end{DoxyCompactItemize}
