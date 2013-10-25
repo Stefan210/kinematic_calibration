@@ -9,8 +9,7 @@
 
 namespace kinematic_calibration {
 
-ModelLoader::ModelLoader() {
-	// TODO Auto-generated constructor stub
+ModelLoader::ModelLoader() : initialized(false) {
 
 }
 
@@ -21,11 +20,14 @@ ModelLoader::~ModelLoader() {
 void ModelLoader::initializeFromRos() {
 	loadUrdfFromRos();
 	loadKdlFromUrdf();
+	initialized = true;
 }
 
 void ModelLoader::initializeFromUrdf(string urdfXml) {
 	this->urdfXml = urdfXml;
 	urdfStringToModel();
+	loadKdlFromUrdf();
+	initialized = true;
 }
 
 bool ModelLoader::loadUrdfFromRos() {
@@ -47,8 +49,7 @@ bool ModelLoader::loadUrdfFromRos() {
 
 	this->urdfXml = result;
 
-	urdfStringToModel();
-	return loadKdlFromUrdf();
+	return urdfStringToModel();
 }
 
 bool ModelLoader::loadKdlFromUrdf() {
@@ -67,4 +68,13 @@ bool ModelLoader::urdfStringToModel() {
 	return true;
 }
 
+void kinematic_calibration::ModelLoader::getKdlTree(KDL::Tree kdlTree) {
+	if(!initialized) {
+		ROS_FATAL("Model was not initialized!");
+	}
+	kdlTree = this->kdlTree;
+}
+
 } /* namespace kinematic_calibration */
+
+

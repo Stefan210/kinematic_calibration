@@ -30,6 +30,7 @@ public:
 	void getTransformation(string from, string to, double offset);
 	void initializeFromRos();
 	void initializeFromUrdf(string urdfXml);
+	void getKdlTree(KDL::Tree kdlTree);
 
 protected:
 	bool loadUrdfFromRos();
@@ -40,6 +41,7 @@ private:
 	string urdfXml;
 	urdf::Model urdfModel;
 	KDL::Tree kdlTree;
+	bool initialized;
 };
 
 } /* namespace kinematic_calibration */
