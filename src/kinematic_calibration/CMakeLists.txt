@@ -157,12 +157,20 @@ catkin_package(
 # catkin_add_nosetests(test)
 
 
+### CheckerboardDetection
 add_library(checkerboardDetection src/CheckerboardDetection.cpp)
 target_link_libraries(checkerboardDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 add_executable(checkerboardDetectionMain src/CheckerboardDetectionMain.cpp)
 target_link_libraries(checkerboardDetectionMain checkerboardDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
-
 catkin_add_gtest(checkerboardDetectionTest test/CheckerboardDetectionTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
 target_link_libraries(checkerboardDetectionTest checkerboardDetection ${catkin_LIBRARIES})
+
+### KinematicChain
+add_library(kinematicChain src/KinematicChain.cpp) 
+target_link_libraries(kinematicChain ${catkin_LIBRARIES})
+
+### ModelLoader
+add_library(modelLoader src/ModelLoader.cpp) 
+target_link_libraries(modelLoader ${catkin_LIBRARIES})
