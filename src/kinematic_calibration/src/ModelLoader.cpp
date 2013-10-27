@@ -9,7 +9,8 @@
 
 namespace kinematic_calibration {
 
-ModelLoader::ModelLoader() : initialized(false) {
+ModelLoader::ModelLoader() :
+		initialized(false) {
 
 }
 
@@ -18,26 +19,28 @@ ModelLoader::~ModelLoader() {
 }
 
 bool ModelLoader::initializeFromRos() {
-	bool success = false;
-	success |= loadUrdfFromRos();
-	success |= loadKdlFromUrdf();
-	if(success) {
-		initialized = true;
-		return true;
-	}
-	return false;
+	bool success = true;
+	if (!loadUrdfFromRos())
+		return false;
+
+	if (!loadKdlFromUrdf())
+		return false;
+
+	initialized = true;
+	return true;
 }
 
 bool ModelLoader::initializeFromUrdf(string urdfXml) {
 	this->urdfXml = urdfXml;
-	bool success = false;
-	success |= urdfStringToModel();
-	success |= loadKdlFromUrdf();
-	if(success) {
-		initialized = true;
-		return true;
-	}
-	return false;
+
+	if (!urdfStringToModel())
+		return false;
+
+	if (!loadKdlFromUrdf())
+		return false;
+
+	initialized = true;
+	return true;
 }
 
 bool ModelLoader::loadUrdfFromRos() {
@@ -53,7 +56,7 @@ bool ModelLoader::loadUrdfFromRos() {
 	std::string result;
 
 	if (!nh.getParam(fullUrdfXmlName, result)) {
-		ROS_FATAL("Could not load the xml from parameter server.");
+		ROS_ERROR("Could not load the xml from parameter server.");
 		return false;
 	}
 
@@ -72,19 +75,18 @@ bool ModelLoader::loadKdlFromUrdf() {
 
 bool ModelLoader::urdfStringToModel() {
 	if (!this->urdfModel.initString(urdfXml)) {
-		ROS_FATAL("Could not initialize robot model");
+		ROS_ERROR("Could not initialize robot model");
 		return false;
 	}
 	return true;
 }
 
 void kinematic_calibration::ModelLoader::getKdlTree(KDL::Tree kdlTree) {
-	if(!initialized) {
-		ROS_FATAL("Model was not initialized!");
+	if (!initialized) {
+		ROS_ERROR("Model was not initialized!");
 	}
 	kdlTree = this->kdlTree;
 }
 
 } /* namespace kinematic_calibration */
-
 
