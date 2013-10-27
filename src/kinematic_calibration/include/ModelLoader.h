@@ -30,7 +30,7 @@ public:
 	void getTransformation(string from, string to, double offset);
 	bool initializeFromRos();
 	bool initializeFromUrdf(string urdfXml);
-	void getKdlTree(KDL::Tree kdlTree);
+	void getKdlTree(KDL::Tree& kdlTree);
 
 protected:
 	bool loadUrdfFromRos();
