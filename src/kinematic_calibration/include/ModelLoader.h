@@ -28,8 +28,8 @@ public:
 	ModelLoader();
 	virtual ~ModelLoader();
 	void getTransformation(string from, string to, double offset);
-	void initializeFromRos();
-	void initializeFromUrdf(string urdfXml);
+	bool initializeFromRos();
+	bool initializeFromUrdf(string urdfXml);
 	void getKdlTree(KDL::Tree kdlTree);
 
 protected:

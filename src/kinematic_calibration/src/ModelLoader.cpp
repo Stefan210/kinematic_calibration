@@ -17,17 +17,27 @@ ModelLoader::~ModelLoader() {
 	// TODO Auto-generated destructor stub
 }
 
-void ModelLoader::initializeFromRos() {
-	loadUrdfFromRos();
-	loadKdlFromUrdf();
-	initialized = true;
+bool ModelLoader::initializeFromRos() {
+	bool success = false;
+	success |= loadUrdfFromRos();
+	success |= loadKdlFromUrdf();
+	if(success) {
+		initialized = true;
+		return true;
+	}
+	return false;
 }
 
-void ModelLoader::initializeFromUrdf(string urdfXml) {
+bool ModelLoader::initializeFromUrdf(string urdfXml) {
 	this->urdfXml = urdfXml;
-	urdfStringToModel();
-	loadKdlFromUrdf();
-	initialized = true;
+	bool success = false;
+	success |= urdfStringToModel();
+	success |= loadKdlFromUrdf();
+	if(success) {
+		initialized = true;
+		return true;
+	}
+	return false;
 }
 
 bool ModelLoader::loadUrdfFromRos() {
