@@ -11,6 +11,7 @@
 #include <string>
 #include <kdl/kdl.hpp>
 #include <kdl/tree.hpp>
+#include <ros/ros.h>
 
 namespace kinematic_calibration {
 
@@ -21,6 +22,10 @@ class KinematicChain {
 public:
 	KinematicChain(const KDL::Tree& tree, std::string root, std::string tip);
 	virtual ~KinematicChain();
+
+	const KDL::Chain& getChain() const {
+		return chain;
+	}
 
 private:
 	KDL::Chain chain;
