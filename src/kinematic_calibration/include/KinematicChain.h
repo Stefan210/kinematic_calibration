@@ -12,6 +12,9 @@
 #include <kdl/kdl.hpp>
 #include <kdl/tree.hpp>
 #include <ros/ros.h>
+#include <string>
+
+using namespace std;
 
 namespace kinematic_calibration {
 
@@ -29,6 +32,8 @@ public:
 
 private:
 	KDL::Chain chain;
+	string root;
+	string tip;
 };
 
 } /* namespace kinematic_calibration */
