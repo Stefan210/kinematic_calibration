@@ -16,7 +16,7 @@ using namespace std;
 
 namespace kinematic_calibration {
 
-TEST(ModelLoaderTest, initializeFromUrdfTest) {
+TEST(ModelLoaderTest, initializeFromUrdfTest1) {
 	// arrange
 	ifstream file("test.urdf");
 	std::string urdfStr((std::istreambuf_iterator<char>(file)),
@@ -29,6 +29,19 @@ TEST(ModelLoaderTest, initializeFromUrdfTest) {
 
 	// assert
 	ASSERT_TRUE(success);
+}
+
+TEST(ModelLoaderTest, initializeFromUrdfTest2) {
+	// arrange
+	ModelLoader modelLoader;
+	std::string urdfStr("foo");
+
+	// act
+	bool success;
+	success = modelLoader.initializeFromUrdf(urdfStr);
+
+	// assert
+	ASSERT_FALSE(success);
 }
 
 } /* namespace kinematic_calibration */
