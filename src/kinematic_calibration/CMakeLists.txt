@@ -171,6 +171,9 @@ target_link_libraries(checkerboardDetectionTest checkerboardDetection ${catkin_L
 add_library(kinematicChain src/KinematicChain.cpp) 
 target_link_libraries(kinematicChain ${catkin_LIBRARIES})
 
+catkin_add_gtest(kinematicChainTest test/KinematicChainTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
+target_link_libraries(kinematicChainTest kinematicChain modelLoader ${catkin_LIBRARIES})
+
 ### ModelLoader
 add_library(modelLoader src/ModelLoader.cpp) 
 target_link_libraries(modelLoader ${catkin_LIBRARIES})
