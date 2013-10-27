@@ -4,7 +4,7 @@ project(kinematic_calibration)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED roscpp cv_bridge image_transport)
+find_package(catkin REQUIRED roscpp cv_bridge image_transport urdf orocos_kdl kdl_parser)
 find_package(OpenCV REQUIRED)
 
 ## System dependencies are found with CMake's conventions
@@ -174,3 +174,6 @@ target_link_libraries(kinematicChain ${catkin_LIBRARIES})
 ### ModelLoader
 add_library(modelLoader src/ModelLoader.cpp) 
 target_link_libraries(modelLoader ${catkin_LIBRARIES})
+
+catkin_add_gtest(modelLoaderTest test/ModelLoaderTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
+target_link_libraries(modelLoaderTest modelLoader ${catkin_LIBRARIES})
