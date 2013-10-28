@@ -23,7 +23,7 @@ KinematicChain::KinematicChain(const KDL::Tree& tree, std::string root,
 }
 
 KinematicChain::~KinematicChain() {
-	// TODO Auto-generated destructor stub
+
 }
 
 void KinematicChain::getRootToTip(const map<string, double>& joint_positions, KDL::Frame& out) {
