@@ -21,24 +21,57 @@ using namespace std;
 
 namespace kinematic_calibration {
 
-/*
+/**
  * Represents a kinematic chain.
  */
 class KinematicChain {
 public:
+	/**
+	 * Constructs a kinematic chain.
+	 * @param tree Tree which contains the chain.
+	 * @param root Root element name of the chain.
+	 * @param tip Tip element name of the chain.
+	 */
 	KinematicChain(const KDL::Tree& tree, std::string root, std::string tip);
 	virtual ~KinematicChain();
 
+	/**
+	 * Calculates the transform from the root to the tip of the frame.
+	 * @param joint_positions Contains the positions of the joints.
+	 * @param out Will contain the calculated transform.
+	 */
 	void getTranform(const map<string, double>& joint_positions, KDL::Frame& out);
 
+	/**
+	 * Calculates the transform from the root to the tip of the frame.
+	 * @param joint_positions Contains the positions of the joints.
+	 * @param joint_offsets Contains the joint offsets.
+	 * @param out Will contain the calculated transform.
+	 */
 	void getTranform(const map<string, double>& joint_positions,
 			const map<string, double>& joint_offsets, KDL::Frame& out);
 
+	/**
+	 * Calculates the transform from the root to the tip of the frame.
+	 * @param joint_positions Contains the positions of the joints.
+	 * @param out Will contain the calculated transform.
+	 */
 	void getTranform(const map<string, double>& joint_positions, tf::Transform& out);
 
+
+	/**
+	 * Calculates the transform from the root to the tip of the frame.
+	 * @param joint_positions Contains the positions of the joints.
+	 * @param joint_offsets Contains the joint offsets.
+	 * @param out Will contain the calculated transform.
+	 */
 	void getTranform(const map<string, double>& joint_positions,
 			const map<string, double>& joint_offsets, tf::Transform& out);
 
+	/**
+	 * Returns the chain.
+	 * @return Returns the chain.
+	 */
 	const KDL::Chain& getChain() const {
 		return chain;
 	}
