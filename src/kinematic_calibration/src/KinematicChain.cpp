@@ -26,7 +26,7 @@ KinematicChain::~KinematicChain() {
 	// TODO Auto-generated destructor stub
 }
 
-void KinematicChain::getTranform(const map<string, double>& joint_positions) {
+void KinematicChain::getTranform(const map<string, double>& joint_positions, KDL::Frame& out) {
 	KDL::Frame rootToTip = KDL::Frame::Identity();
 	for (unsigned int i = 0; i < chain.getNrOfSegments(); i++) {
 		KDL::Segment segment = chain.getSegment(
@@ -43,6 +43,8 @@ void KinematicChain::getTranform(const map<string, double>& joint_positions) {
 		std::cout << "segment name: " << segment.getName() << "joint name: "
 				<< segment.getJoint().getName() << "\n";
 	}
+	out = rootToTip;
+
 	cout << rootToTip.p.data[0] << " " << rootToTip.p.data[1] << " "
 			<< rootToTip.p.data[2] << endl;
 	double r, p, y;
@@ -51,7 +53,7 @@ void KinematicChain::getTranform(const map<string, double>& joint_positions) {
 }
 
 void KinematicChain::getTranform(const map<string, double>& joint_positions,
-		const map<string, double>& joint_offsets) {
+		const map<string, double>& joint_offsets, KDL::Frame& out) {
 	map<string, double> sum;
 
 	// iterate through all positions
@@ -67,7 +69,7 @@ void KinematicChain::getTranform(const map<string, double>& joint_positions,
 	}
 
 	// delegate call
-	getTranform(sum);
+	getTranform(sum, out);
 }
 
 void KinematicChain::getJointWithOffset(const KDL::Joint& old_joint,
@@ -86,6 +88,25 @@ void KinematicChain::getSegmentWithJointOffset(const KDL::Segment& old_segment,
 	// create the new segment object
 	new_segment = KDL::Segment(old_segment.getName(), new_joint,
 			old_segment.getFrameToTip(), old_segment.getInertia());
+}
+
+void KinematicChain::getTranform(const map<string, double>& joint_positions,
+		tf::Transform& out) {
+	KDL::Frame frame;
+	getTranform(joint_positions, frame);
+	kdlFrameToTfTransform(frame, out);
+}
+
+void KinematicChain::getTranform(const map<string, double>& joint_positions,
+		const map<string, double>& joint_offsets, tf::Transform& out) {
+	KDL::Frame frame;
+	getTranform(joint_positions, joint_offsets, frame);
+	kdlFrameToTfTransform(frame, out);
+}
+
+void KinematicChain::kdlFrameToTfTransform(const KDL::Frame& in,
+		tf::Transform& out) {
+	tf::transformKDLToTF(in, out);
 }
 
 } /* namespace kinematic_calibration */
