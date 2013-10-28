@@ -180,3 +180,7 @@ target_link_libraries(modelLoader ${catkin_LIBRARIES})
 
 catkin_add_gtest(modelLoaderTest test/ModelLoaderTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
 target_link_libraries(modelLoaderTest modelLoader ${catkin_LIBRARIES})
+
+### FrameImageConverter
+add_library(frameImageConverter src/FrameImageConverter.cpp)
+target_link_libraries(frameImageConverter ${catkin_LIBRARIES} ${OpenCV_LIBS})
