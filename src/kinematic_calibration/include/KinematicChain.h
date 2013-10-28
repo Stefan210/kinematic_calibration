@@ -13,6 +13,7 @@
 #include <kdl/tree.hpp>
 #include <ros/ros.h>
 #include <string>
+#include <map>
 
 using namespace std;
 
@@ -26,6 +27,10 @@ public:
 	KinematicChain(const KDL::Tree& tree, std::string root, std::string tip);
 	virtual ~KinematicChain();
 
+	void getTranform(const map<string, double>& joint_positions);
+	void getTranform(const map<string, double>& joint_positions,
+			const map<string, double>& joint_offsets);
+
 	const KDL::Chain& getChain() const {
 		return chain;
 	}
@@ -34,6 +39,10 @@ private:
 	KDL::Chain chain;
 	string root;
 	string tip;
+	void getJointWithOffset(const KDL::Joint& old_joint, double offset,
+			KDL::Joint& new_joint);
+	void getSegmentWithJointOffset(const KDL::Segment& old_segment,
+			double offset, KDL::Segment new_segment);
 };
 
 } /* namespace kinematic_calibration */
