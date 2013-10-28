@@ -45,7 +45,7 @@ TEST(KinematicChainTest, getTransformTest1) {
 	map<string, double> joint_positions;
 	joint_positions.insert(std::make_pair<string, double>("LKneePitch", 0.2));
 	KinematicChain kinematicChain(tree, "LHipPitch_link", "LKneePitch_link");
-	kinematicChain.getTranform(joint_positions, transform);
+	kinematicChain.getRootToTip(joint_positions, transform);
 	double r, p, y;
 	tf::Matrix3x3(transform.getRotation()).getRPY(r, p, y);
 

@@ -26,11 +26,10 @@ KinematicChain::~KinematicChain() {
 	// TODO Auto-generated destructor stub
 }
 
-void KinematicChain::getTranform(const map<string, double>& joint_positions, KDL::Frame& out) {
+void KinematicChain::getRootToTip(const map<string, double>& joint_positions, KDL::Frame& out) {
 	KDL::Frame rootToTip = KDL::Frame::Identity();
 	for (unsigned int i = 0; i < chain.getNrOfSegments(); i++) {
-		KDL::Segment segment = chain.getSegment(
-				chain.getNrOfSegments() - i - 1);
+		KDL::Segment segment = chain.getSegment(i);
 		KDL::Joint joint = segment.getJoint();
 
 		double position = 0.0;
@@ -39,7 +38,7 @@ void KinematicChain::getTranform(const map<string, double>& joint_positions, KDL
 		if (jnt != joint_positions.end()) {
 			position = jnt->second;
 		}
-		rootToTip = segment.pose(position) * rootToTip;
+		rootToTip = rootToTip * segment.pose(position);
 		std::cout << "segment name: " << segment.getName() << "joint name: "
 				<< segment.getJoint().getName() << "\n";
 	}
@@ -52,7 +51,7 @@ void KinematicChain::getTranform(const map<string, double>& joint_positions, KDL
 	cout << r << " " << p << " " << y << endl;
 }
 
-void KinematicChain::getTranform(const map<string, double>& joint_positions,
+void KinematicChain::getRootToTip(const map<string, double>& joint_positions,
 		const map<string, double>& joint_offsets, KDL::Frame& out) {
 	map<string, double> sum;
 
@@ -69,7 +68,7 @@ void KinematicChain::getTranform(const map<string, double>& joint_positions,
 	}
 
 	// delegate call
-	getTranform(sum, out);
+	getRootToTip(sum, out);
 }
 
 void KinematicChain::getJointWithOffset(const KDL::Joint& old_joint,
@@ -90,17 +89,17 @@ void KinematicChain::getSegmentWithJointOffset(const KDL::Segment& old_segment,
 			old_segment.getFrameToTip(), old_segment.getInertia());
 }
 
-void KinematicChain::getTranform(const map<string, double>& joint_positions,
+void KinematicChain::getRootToTip(const map<string, double>& joint_positions,
 		tf::Transform& out) {
 	KDL::Frame frame;
-	getTranform(joint_positions, frame);
+	getRootToTip(joint_positions, frame);
 	kdlFrameToTfTransform(frame, out);
 }
 
-void KinematicChain::getTranform(const map<string, double>& joint_positions,
+void KinematicChain::getRootToTip(const map<string, double>& joint_positions,
 		const map<string, double>& joint_offsets, tf::Transform& out) {
 	KDL::Frame frame;
-	getTranform(joint_positions, joint_offsets, frame);
+	getRootToTip(joint_positions, joint_offsets, frame);
 	kdlFrameToTfTransform(frame, out);
 }
 
