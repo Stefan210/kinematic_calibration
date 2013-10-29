@@ -10,20 +10,20 @@
 namespace kinematic_calibration {
 
 MeasurementData::MeasurementData(double x, double y,
-		map<string, double> jointStates) :
-		x(x), y(y), jointStates(jointStates) {
+		map<string, double> jointState) :
+		x(x), y(y), jointState(jointState) {
 }
 
 MeasurementData::~MeasurementData() {
 	// TODO Auto-generated destructor stub
 }
 
-const map<string, double>& MeasurementData::getJointStates() const {
-	return jointStates;
+const map<string, double>& MeasurementData::getJointState() const {
+	return jointState;
 }
 
-void MeasurementData::setJointStates(const map<string, double>& jointStates) {
-	this->jointStates = jointStates;
+void MeasurementData::setJointState(const map<string, double>& jointStates) {
+	this->jointState = jointStates;
 }
 
 double MeasurementData::getX() const {

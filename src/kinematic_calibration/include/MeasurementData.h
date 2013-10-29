@@ -25,7 +25,7 @@ public:
 	 * Default constructor.
 	 */
 	MeasurementData(double x = 0, double y = 0,
-			map<string, double> jointStates = map<string, double>());
+			map<string, double> jointState = map<string, double>());
 
 	/**
 	 * Deconstructor.
@@ -33,8 +33,8 @@ public:
 	virtual ~MeasurementData();
 
 
-	const map<string, double>& getJointStates() const;
-	void setJointStates(const map<string, double>& jointStates);
+	const map<string, double>& getJointState() const;
+	void setJointState(const map<string, double>& jointState);
 	double getX() const;
 	void setX(double x);
 	double getY() const;
@@ -52,9 +52,9 @@ private:
 	double y;
 
 	/**
-	 * Joint states.
+	 * Joint state.
 	 */
-	map<string, double> jointStates;
+	map<string, double> jointState;
 };
 
 } /* namespace kinematic_calibration */
