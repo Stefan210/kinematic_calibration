@@ -184,3 +184,7 @@ target_link_libraries(modelLoaderTest modelLoader ${catkin_LIBRARIES})
 ### FrameImageConverter
 add_library(frameImageConverter src/FrameImageConverter.cpp)
 target_link_libraries(frameImageConverter ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
+### MeasurementData
+add_library(measurementData src/MeasurementData.cpp)
+target_link_libraries(measurementData ${catkin_LIBRARIES})
