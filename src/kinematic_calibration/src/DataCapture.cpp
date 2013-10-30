@@ -21,7 +21,7 @@ DataCapture::~DataCapture() {
 
 void DataCapture::setHeadStiffness() {
 	trajectory_msgs::JointTrajectoryPoint point;
-	point.time_from_start.sec = 0.5;
+	point.time_from_start.sec = 1;
 	point.positions.push_back(1.0);
 	point.positions.push_back(1.0);
 
@@ -38,7 +38,7 @@ void DataCapture::setHeadStiffness() {
 
 void DataCapture::resetHeadStiffness() {
 	trajectory_msgs::JointTrajectoryPoint point;
-	point.time_from_start.sec = 0.5;
+	point.time_from_start.sec = 1;
 	point.positions.push_back(0.0);
 	point.positions.push_back(0.0);
 
