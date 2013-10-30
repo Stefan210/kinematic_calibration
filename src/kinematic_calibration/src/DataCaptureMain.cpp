@@ -13,4 +13,5 @@ int main(int argc, char** argv) {
 	ros::init(argc, argv, "dataCapture");
 	DataCapture dataCapture;
 	dataCapture.setHeadStiffness();
+	ros::spin();
 }

@@ -26,6 +26,7 @@ public:
 	virtual ~DataCapture();
 
 	void setHeadStiffness();
+	void resetHeadStiffness();
 
 
 private:
