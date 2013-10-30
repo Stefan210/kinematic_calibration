@@ -9,7 +9,8 @@
 
 using namespace kinematic_calibration;
 
-int main() {
+int main(int argc, char** argv) {
+	ros::init(argc, argv, "dataCapture");
 	DataCapture dataCapture;
 	dataCapture.setHeadStiffness();
 }
