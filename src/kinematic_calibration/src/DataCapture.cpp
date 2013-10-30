@@ -10,8 +10,9 @@
 namespace kinematic_calibration {
 
 DataCapture::DataCapture() : stiffnessClient(nh, "joint_stiffness_trajectory"){
-	// TODO Auto-generated constructor stub
-
+	ROS_INFO("Waiting for stiffness server...");
+	stiffnessClient.waitForServer();
+	ROS_INFO("Done.");
 }
 
 DataCapture::~DataCapture() {
