@@ -46,7 +46,8 @@ public:
 	 */
 	JointOffsetOptimization(vector<MeasurementData>& measurements,
 			KinematicChain& kinematicChain,
-			FrameImageConverter& frameImageConverter);
+			FrameImageConverter& frameImageConverter,
+			CalibrationState initialState = CalibrationState());
 
 	/**
 	 * Deconstructor.
@@ -74,6 +75,11 @@ protected:
 	 * Conversion of 3D transformation into 2D image coordinates.
 	 */
 	FrameImageConverter& frameImageConverter;
+
+	/**
+	 * Initial state for the optimization;
+	 */
+	CalibrationState initialState;
 };
 
 } /* namespace kinematic_calibration */
