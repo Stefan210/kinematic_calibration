@@ -1,0 +1,9 @@
+### some basic poses to load for pose_manager.py ###
+test1:
+  joint_names: ["HeadYaw", "HeadPitch"]
+  time_from_start: 1.5
+  positions: [0.0,0.0]
+test2:  
+  joint_names: ["HeadYaw", "HeadPitch"]
+  time_from_start: 1.5
+  positions: [0.063, 0.095] 
