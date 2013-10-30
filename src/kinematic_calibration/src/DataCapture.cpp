@@ -20,7 +20,7 @@ DataCapture::~DataCapture() {
 
 void DataCapture::setHeadStiffness() {
 	trajectory_msgs::JointTrajectoryPoint point;
-	point.time_from_start.sec = 0.5;
+	point.time_from_start.sec = 10;
 	point.positions.push_back(1.0);
 	point.positions.push_back(1.0);
 
@@ -28,6 +28,10 @@ void DataCapture::setHeadStiffness() {
 	goal.trajectory.joint_names.push_back("HeadYaw");
 	goal.trajectory.joint_names.push_back("HeadPitch");
 	goal.trajectory.points.push_back(point);
+
+	ROS_INFO("Setting head stiffness to 1.0 to head during the next 10 seconds.");
+	stiffnessClient.sendGoal(goal);
+	stiffnessClient.waitForResult();
 }
 
 } /* namespace kinematic_calibration */
