@@ -44,6 +44,10 @@ public:
 
 	void playLeftArmPoses();
 
+	void setHeadPose(double headYaw, double headPitch);
+
+	void findCheckerboard();
+
 private:
 	ros::NodeHandle nh;
 	image_transport::Subscriber sub;
@@ -52,6 +56,7 @@ private:
 	CheckerboardData checkerboardData;
 	bool checkerboardFound;
 	actionlib::SimpleActionClient<nao_msgs::JointTrajectoryAction> stiffnessClient;
+	actionlib::SimpleActionClient<nao_msgs::JointTrajectoryAction> trajectoryClient;
 	actionlib::SimpleActionClient<nao_msgs::BodyPoseAction> bodyPoseClient;
 	vector<string> headJointNames;
 	vector<string> leftArmJointNames;

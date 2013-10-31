@@ -14,14 +14,17 @@ using namespace nao_msgs;
 namespace kinematic_calibration {
 
 DataCapture::DataCapture() :
-		stiffnessClient(nh, "joint_stiffness_trajectory"), bodyPoseClient(nh,
-				"body_pose"), it(nh), checkerboardFound(false) {
-	ROS_INFO("Waiting for stiffness and pose server...");
+		stiffnessClient(nh, "joint_stiffness_trajectory"), trajectoryClient(nh,
+				"joint_trajectory"), bodyPoseClient(nh, "body_pose"), it(nh), checkerboardFound(
+				false) {
+	ROS_INFO("Waiting for stiffness, trajectory and pose server...");
 	stiffnessClient.waitForServer();
+	trajectoryClient.waitForServer();
 	bodyPoseClient.waitForServer();
 	ROS_INFO("Done.");
 
-	sub = it.subscribe("/nao_camera/image_raw", 1, &DataCapture::imageCallback, this);
+	sub = it.subscribe("/nao_camera/image_raw", 1, &DataCapture::imageCallback,
+			this);
 
 	// initialize list of head joint names
 	headJointNames.push_back("HeadYaw");
@@ -130,12 +133,51 @@ void DataCapture::playLeftArmPoses() {
 		ROS_INFO("Calling pose manager for executing pose %s...", buf);
 		bodyPoseClient.sendGoalAndWait(goal);
 		ROS_INFO("Done.");
+		//
+		ROS_INFO("Moving head in order to find the ckecherboard...");
+		findCheckerboard();
+		ROS_INFO("Checkerboard found at position %f %f", checkerboardData.x,
+				checkerboardData.y);
 	}
 	resetLArmStiffness();
 }
 
 void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 	checkerboardFound = checkerboardDetection.detect(msg, checkerboardData);
+}
+
+void DataCapture::findCheckerboard() {
+	// TODO: parameterize!!
+	double headYawMin = -0.5;
+	double headYawMax = 0.5;
+	double headPitchMin = -0.5;
+	double headPitchMax = 0.5;
+
+	setHeadStiffness();
+	while (!checkerboardFound) {
+		for (double headYaw = headYawMin; headYaw < headYawMax; headYaw +=
+				0.1) {
+			for (double headPitch = headPitchMin; headPitch < headPitchMax;
+					headPitch += 0.1) {
+				setHeadPose(headYaw, headPitch);
+			}
+		}
+	}
+	resetHeadStiffness();
+}
+
+void DataCapture::setHeadPose(double headYaw, double headPitch) {
+	trajectory_msgs::JointTrajectoryPoint point;
+	point.time_from_start.sec = 0.1;
+	point.positions.push_back(headYaw);
+	point.positions.push_back(headPitch);
+
+	JointTrajectoryGoal goal;
+	goal.trajectory.joint_names = headJointNames;
+	goal.trajectory.points.push_back(point);
+
+	trajectoryClient.sendGoal(goal);
+	trajectoryClient.waitForResult();
 }
 
 } /* namespace kinematic_calibration */
