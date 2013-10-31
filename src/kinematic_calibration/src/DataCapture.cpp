@@ -164,7 +164,7 @@ void DataCapture::findCheckerboard() {
 			for (double headPitch = headPitchMin; headPitch < headPitchMax;
 					headPitch += 0.1) {
 				setHeadPose(headYaw, headPitch);
-				ros::spinOnce();
+				ros::getGlobalCallbackQueue()->callAvailable();
 
 			}
 		}
