@@ -24,7 +24,8 @@ void detectFromRosMsg();
 
 int main(int argc, char** argv) {
 	ros::init(argc, argv, "checkerboardDetectionMain");
-	detectFromFile();
+	//detectFromFile();
+	detectFromRosMsg();
 	return 0;
 }
 
