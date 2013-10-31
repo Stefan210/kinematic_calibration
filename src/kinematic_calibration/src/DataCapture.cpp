@@ -18,7 +18,7 @@ DataCapture::DataCapture() :
 				"body_pose") {
 	ROS_INFO("Waiting for stiffness and pose server...");
 	stiffnessClient.waitForServer();
-	bodyPoseClient.waitForResult();
+	bodyPoseClient.waitForServer();
 	ROS_INFO("Done.");
 
 	// initialize list of head joint names
