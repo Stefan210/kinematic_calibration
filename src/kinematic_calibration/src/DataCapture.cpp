@@ -168,8 +168,8 @@ void DataCapture::findCheckerboard() {
 
 void DataCapture::setHeadPose(double headYaw, double headPitch) {
 	trajectory_msgs::JointTrajectoryPoint point;
-	point.time_from_start.sec = 0;
-	point.time_from_start.nsec = 100000;
+	point.time_from_start.sec = 1;
+	point.time_from_start.nsec = 0;
 	point.positions.push_back(headYaw);
 	point.positions.push_back(headPitch);
 
