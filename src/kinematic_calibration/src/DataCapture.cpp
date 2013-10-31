@@ -91,7 +91,7 @@ void DataCapture::setStiffness(const vector<string>& jointNames) {
 	}
 
 	nao_msgs::JointTrajectoryGoal goal;
-	goal.trajectory.joint_names = headJointNames;
+	goal.trajectory.joint_names = jointNames;
 	goal.trajectory.points.push_back(point);
 
 	nao_msgs::JointTrajectoryActionResultConstPtr result;
@@ -108,7 +108,7 @@ void DataCapture::resetStiffness(const vector<string>& jointNames) {
 	}
 
 	nao_msgs::JointTrajectoryGoal goal;
-	goal.trajectory.joint_names = headJointNames;
+	goal.trajectory.joint_names = jointNames;
 	goal.trajectory.points.push_back(point);
 
 	nao_msgs::JointTrajectoryActionResultConstPtr result;
