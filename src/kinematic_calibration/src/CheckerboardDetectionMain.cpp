@@ -32,14 +32,18 @@ int main(int argc, char** argv) {
 void imageCb(const sensor_msgs::ImageConstPtr& msg) {
 	CheckerboardDetection cbd;
 	CheckerboardData data;
-	cbd.detect(msg, data);
+	if (!cbd.detect(msg, data)) {
+		std::cout << "[main] could not detect the checkerboard.\n";
+	} else {
+		std::cout << "position " << data.x << " " << data.y << "\n";
+	}
 }
 
 void detectFromFile() {
 	cv::Mat image;
 	image = cv::imread("/home/stefan/catkin_ws/board_4x4.ppm");
 
-	if(image.empty()) {
+	if (image.empty()) {
 		std::cout << "image could not be loaded\n";
 		return;
 	} else {
@@ -49,7 +53,7 @@ void detectFromFile() {
 	CheckerboardDetection detection;
 	CheckerboardData data;
 
-	if(!detection.detect(image, data)) {
+	if (!detection.detect(image, data)) {
 		std::cout << "[main] could not detect the checkerboard.\n";
 	}
 
