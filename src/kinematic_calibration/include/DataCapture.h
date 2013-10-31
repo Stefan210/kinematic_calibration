@@ -19,6 +19,9 @@
 #include <nao_msgs/BodyPoseAction.h>
 #include <nao_msgs/BodyPoseGoal.h>
 #include <trajectory_msgs/JointTrajectory.h>
+#include <image_transport/image_transport.h>
+
+#include "../include/CheckerboardDetection.h"
 
 using namespace std;
 
@@ -43,6 +46,11 @@ public:
 
 private:
 	ros::NodeHandle nh;
+	image_transport::Subscriber sub;
+	image_transport::ImageTransport it;
+	CheckerboardDetection checkerboardDetection;
+	CheckerboardData checkerboardData;
+	bool checkerboardFound;
 	actionlib::SimpleActionClient<nao_msgs::JointTrajectoryAction> stiffnessClient;
 	actionlib::SimpleActionClient<nao_msgs::BodyPoseAction> bodyPoseClient;
 	vector<string> headJointNames;
@@ -50,6 +58,7 @@ private:
 	vector<string> rightArmJointNames;
 	void setStiffness(const vector<string>& jointNames);
 	void resetStiffness(const vector<string>& jointNames);
+	void imageCallback(const sensor_msgs::ImageConstPtr& msg);
 };
 
 } /* namespace kinematic_calibration */

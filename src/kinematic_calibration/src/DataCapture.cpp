@@ -15,11 +15,13 @@ namespace kinematic_calibration {
 
 DataCapture::DataCapture() :
 		stiffnessClient(nh, "joint_stiffness_trajectory"), bodyPoseClient(nh,
-				"body_pose") {
+				"body_pose"), it(nh), checkerboardFound(false) {
 	ROS_INFO("Waiting for stiffness and pose server...");
 	stiffnessClient.waitForServer();
 	bodyPoseClient.waitForServer();
 	ROS_INFO("Done.");
+
+	sub = it.subscribe("/nao_camera/image_raw", 1, &DataCapture::imageCallback, this);
 
 	// initialize list of head joint names
 	headJointNames.push_back("HeadYaw");
@@ -130,6 +132,10 @@ void DataCapture::playLeftArmPoses() {
 		ROS_INFO("Done.");
 	}
 	resetLArmStiffness();
+}
+
+void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
+	checkerboardFound = checkerboardDetection.detect(msg, checkerboardData);
 }
 
 } /* namespace kinematic_calibration */

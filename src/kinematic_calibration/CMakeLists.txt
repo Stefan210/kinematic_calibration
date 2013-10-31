@@ -196,7 +196,7 @@ target_link_libraries(jointOffsetOptimization kinematicChain frameImageConverter
 
 ### DataCapture
 add_library(dataCapture src/DataCapture.cpp)
-target_link_libraries(dataCapture ${catkin_LIBRARIES})
+target_link_libraries(dataCapture checkerboardDetection ${catkin_LIBRARIES})
 
 add_executable(dataCaptureMain src/DataCaptureMain.cpp)
 target_link_libraries(dataCaptureMain dataCapture ${catkin_LIBRARIES})
