@@ -136,14 +136,18 @@ void DataCapture::playLeftArmPoses() {
 		//
 		ROS_INFO("Moving head in order to find the ckecherboard...");
 		findCheckerboard();
-		ROS_INFO("Checkerboard found at position %f %f", checkerboardData.x,
-				checkerboardData.y);
 	}
 	resetLArmStiffness();
 }
 
 void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 	checkerboardFound = checkerboardDetection.detect(msg, checkerboardData);
+	if(checkerboardFound) {
+		ROS_INFO("Checkerboard found at position %f %f", checkerboardData.x,
+				checkerboardData.y);
+	} else {
+		ROS_INFO("No checkerboard found.");
+	}
 }
 
 void DataCapture::findCheckerboard() {
@@ -156,10 +160,12 @@ void DataCapture::findCheckerboard() {
 	setHeadStiffness();
 	while (!checkerboardFound) {
 		for (double headYaw = headYawMin; headYaw < headYawMax; headYaw +=
-				0.1) {
+				0.2) {
 			for (double headPitch = headPitchMin; headPitch < headPitchMax;
 					headPitch += 0.1) {
 				setHeadPose(headYaw, headPitch);
+				ros::spinOnce();
+
 			}
 		}
 	}
