@@ -17,14 +17,14 @@ DataCapture::DataCapture() :
 		stiffnessClient(nh, "joint_stiffness_trajectory"), trajectoryClient(nh,
 				"joint_trajectory"), bodyPoseClient(nh, "body_pose"), it(nh), checkerboardFound(
 				false) {
+	sub = it.subscribe("/nao_camera/image_raw", 1, &DataCapture::imageCallback,
+			this);
+
 	ROS_INFO("Waiting for stiffness, trajectory and pose server...");
 	stiffnessClient.waitForServer();
 	trajectoryClient.waitForServer();
 	bodyPoseClient.waitForServer();
 	ROS_INFO("Done.");
-
-	sub = it.subscribe("/nao_camera/image_raw", 1, &DataCapture::imageCallback,
-			this);
 
 	// initialize list of head joint names
 	headJointNames.push_back("HeadYaw");
@@ -164,8 +164,8 @@ void DataCapture::findCheckerboard() {
 			for (double headPitch = headPitchMin; headPitch < headPitchMax;
 					headPitch += 0.1) {
 				setHeadPose(headYaw, headPitch);
-				ros::getGlobalCallbackQueue()->callAvailable();
-
+				while(ros::getGlobalCallbackQueue()->isEmpty());
+				ros::spinOnce();
 			}
 		}
 	}
