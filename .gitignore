@@ -5,3 +5,4 @@ build
 install
 *EXTERNAL*
 src/g2o*
+src/nao_*
