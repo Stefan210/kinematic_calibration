@@ -48,51 +48,51 @@ DataCapture::DataCapture() :
 }
 
 DataCapture::~DataCapture() {
-	resetHeadStiffness();
+	disableHeadStiffness();
 }
 
-void DataCapture::setHeadStiffness() {
+void DataCapture::enableHeadStiffness() {
 	ROS_INFO("Setting head stiffness...");
-	setStiffness(headJointNames);
+	enableStiffness(headJointNames);
 	ROS_INFO("Done.");
 }
 
-void DataCapture::resetHeadStiffness() {
+void DataCapture::disableHeadStiffness() {
 	ROS_INFO("Resetting head stiffness...");
-	resetStiffness(headJointNames);
+	disableStiffness(headJointNames);
 	ROS_INFO("Done.");
 }
 
-void DataCapture::setLArmStiffness() {
+void DataCapture::enableLArmStiffness() {
 	ROS_INFO("Setting left arm stiffness...");
-	setStiffness(leftArmJointNames);
+	enableStiffness(leftArmJointNames);
 	ROS_INFO("Done.");
 }
 
-void DataCapture::resetLArmStiffness() {
+void DataCapture::disableLArmStiffness() {
 	ROS_INFO("Resetting left arm stiffness...");
-	resetStiffness(leftArmJointNames);
+	disableStiffness(leftArmJointNames);
 	ROS_INFO("Done.");
 }
 
-void DataCapture::setRArmStiffness() {
+void DataCapture::enableRArmStiffness() {
 	ROS_INFO("Setting right arm stiffness...");
-	setStiffness(rightArmJointNames);
+	enableStiffness(rightArmJointNames);
 	ROS_INFO("Done.");
 }
 
-void DataCapture::resetRArmStiffness() {
+void DataCapture::disableRArmStiffness() {
 	ROS_INFO("Resetting right arm stiffness...");
-	resetStiffness(rightArmJointNames);
+	disableStiffness(rightArmJointNames);
 	ROS_INFO("Done.");
 }
 
-void DataCapture::setStiffness(const vector<string>& jointNames) {
+void DataCapture::setStiffness(const vector<string>& jointNames, double stiffness) {
 	trajectory_msgs::JointTrajectoryPoint point;
 	point.time_from_start.sec = 1;
 
 	for (unsigned int i = 0; i < jointNames.size(); i++) {
-		point.positions.push_back(1.0);
+		point.positions.push_back(stiffness);
 	}
 
 	nao_msgs::JointTrajectoryGoal goal;
@@ -104,25 +104,16 @@ void DataCapture::setStiffness(const vector<string>& jointNames) {
 	stiffnessClient.waitForResult();
 }
 
-void DataCapture::resetStiffness(const vector<string>& jointNames) {
-	trajectory_msgs::JointTrajectoryPoint point;
-	point.time_from_start.sec = 1;
+void DataCapture::enableStiffness(const vector<string>& jointNames) {
+	setStiffness(jointNames, 1.0);
+}
 
-	for (unsigned int i = 0; i < jointNames.size(); i++) {
-		point.positions.push_back(0.1);
-	}
-
-	nao_msgs::JointTrajectoryGoal goal;
-	goal.trajectory.joint_names = jointNames;
-	goal.trajectory.points.push_back(point);
-
-	nao_msgs::JointTrajectoryActionResultConstPtr result;
-	stiffnessClient.sendGoal(goal);
-	stiffnessClient.waitForResult();
+void DataCapture::disableStiffness(const vector<string>& jointNames) {
+	setStiffness(jointNames, 0.01);
 }
 
 void DataCapture::playLeftArmPoses() {
-	setLArmStiffness();
+	enableLArmStiffness();
 	int numOfPoses;
 	for (int i = 1; i <= 26; i++) {
 		char buf[10];
@@ -137,7 +128,7 @@ void DataCapture::playLeftArmPoses() {
 		ROS_INFO("Moving head in order to find the ckecherboard...");
 		findCheckerboard();
 	}
-	resetLArmStiffness();
+	disableLArmStiffness();
 }
 
 void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
@@ -157,7 +148,7 @@ void DataCapture::findCheckerboard() {
 	double headPitchMin = -0.5;
 	double headPitchMax = 0.5;
 
-	setHeadStiffness();
+	enableHeadStiffness();
 	while (!checkerboardFound) {
 		for (double headYaw = headYawMin; headYaw < headYawMax; headYaw +=
 				0.2) {
@@ -169,7 +160,7 @@ void DataCapture::findCheckerboard() {
 			}
 		}
 	}
-	resetHeadStiffness();
+	disableHeadStiffness();
 }
 
 void DataCapture::setHeadPose(double headYaw, double headPitch) {

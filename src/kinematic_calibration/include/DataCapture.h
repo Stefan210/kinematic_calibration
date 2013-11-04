@@ -35,12 +35,12 @@ public:
 	DataCapture();
 	virtual ~DataCapture();
 
-	void setHeadStiffness();
-	void resetHeadStiffness();
-	void setLArmStiffness();
-	void resetLArmStiffness();
-	void setRArmStiffness();
-	void resetRArmStiffness();
+	void enableHeadStiffness();
+	void disableHeadStiffness();
+	void enableLArmStiffness();
+	void disableLArmStiffness();
+	void enableRArmStiffness();
+	void disableRArmStiffness();
 
 	void playLeftArmPoses();
 
@@ -61,8 +61,9 @@ private:
 	vector<string> headJointNames;
 	vector<string> leftArmJointNames;
 	vector<string> rightArmJointNames;
-	void setStiffness(const vector<string>& jointNames);
-	void resetStiffness(const vector<string>& jointNames);
+	void setStiffness(const vector<string>& jointNames, double stiffness);
+	void enableStiffness(const vector<string>& jointNames);
+	void disableStiffness(const vector<string>& jointNames);
 	void imageCallback(const sensor_msgs::ImageConstPtr& msg);
 };
 
