@@ -115,8 +115,8 @@ void DataCapture::disableStiffness(const vector<string>& jointNames) {
 
 void DataCapture::playLeftArmPoses() {
 	enableLArmStiffness();
-	int numOfPoses;
-	for (int i = 1; i <= 26; i++) {
+	int numOfPoses = 26; // TODO: parameterize!!
+	for (int i = 1; i <= numOfPoses; i++) {
 		char buf[10];
 		sprintf(buf, "larm%i", i);
 		string poseName(buf);
@@ -128,6 +128,7 @@ void DataCapture::playLeftArmPoses() {
 		//
 		ROS_INFO("Moving head in order to find the ckecherboard...");
 		findCheckerboard();
+
 	}
 	disableLArmStiffness();
 }
@@ -140,6 +141,18 @@ void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 	} else {
 		ROS_INFO("No checkerboard found.");
 	}
+}
+
+void DataCapture::findCheckerboard() {
+	// TODO: parameterize!!
+	double headYawMin = -0.5;
+	double headYawMax = 0.5;
+	double headPitchMin = -0.5;
+	double headPitchMax = 0.5;
+	checkerboardFound = false;
+	enableHeadStiffness();
+
+	disableHeadStiffness();
 }
 
 void DataCapture::setHeadPose(double headYaw, double headPitch, bool relative) {
