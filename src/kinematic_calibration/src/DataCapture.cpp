@@ -219,6 +219,8 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 		disableHeadStiffness();
 	}
 
+	ROS_INFO("Moving into region done!");
+
 }
 
 void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
