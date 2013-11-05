@@ -197,18 +197,22 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 		disableHeadStiffness();
 	}
 
+	ROS_INFO("Trying to move the head s.t. the checkerboard "
+			"position is within the rectangle (%f, %f) - (%f, %f)", xRegMin,
+			yRegMin, xRegMax, yRegMax);
+
 	bool isInRegionY = false;
 	while (!isInRegionY) {
 		ros::spinOnce();
 		enableHeadStiffness();
 		if (checkerboardData.y < yRegMin) {
 			double relPose = (yRegMin - checkerboardData.y) / 1000 + 0.05;
-			setHeadPose(0, relPose, true);
-			ROS_INFO("Moving to downwards (relPose = %f).", relPose);
+			setHeadPose(0, -relPose, true);
+			ROS_INFO("Moving to downwards (relPose = %f).", -relPose);
 		} else if (checkerboardData.y > yRegMax) {
 			double relPose = (yRegMax - checkerboardData.y) / 1000 - 0.05;
-			setHeadPose(0, relPose, true);
-			ROS_INFO("Moving to upwards (relPose = %f).", relPose);
+			setHeadPose(0, -relPose, true);
+			ROS_INFO("Moving to upwards (relPose = %f).", -relPose);
 		} else {
 			isInRegionY = true;
 		}
