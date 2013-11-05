@@ -126,7 +126,7 @@ void DataCapture::playLeftArmPoses() {
 		bodyPoseClient.sendGoalAndWait(goal);
 		ROS_INFO("Done.");
 		//
-		ROS_INFO("Moving head in order to find the ckecherboard...");
+		ROS_INFO("Moving head in order to find the checkerboard...");
 		findCheckerboard();
 		moveCheckerboardToImageRegion(CENTER);
 	}
