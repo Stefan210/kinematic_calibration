@@ -279,13 +279,13 @@ void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 void DataCapture::findCheckerboard() {
 	tf::StampedTransform wristToHeadYaw, wristToHeadPitch;
 	ros::Time now = ros::Time::now();
-	transformListener.waitForTransform("HeadYaw", "l_wrist", now,
+	transformListener.waitForTransform("HeadYaw_link", "l_wrist", now,
 			ros::Duration(1.0));
-	transformListener.waitForTransform("HeadPitch", "l_wrist", now,
+	transformListener.waitForTransform("HeadPitch_link", "l_wrist", now,
 			ros::Duration(1.0));
-	transformListener.lookupTransform("HeadYaw", "l_wrist", now,
+	transformListener.lookupTransform("HeadYaw_link", "l_wrist", now,
 			wristToHeadYaw);
-	transformListener.lookupTransform("HeadPitch", "l_wrist", now,
+	transformListener.lookupTransform("HeadPitch_link", "l_wrist", now,
 			wristToHeadPitch);
 
 	tf::Point headYawPoint = wristToHeadYaw * tf::Point(0.0, 0.0, 0.0);
