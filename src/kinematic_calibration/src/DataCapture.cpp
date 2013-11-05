@@ -141,7 +141,7 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 	int delta = 150; // TODO: parameterize!!
 
 	// set region rectangle
-	int xRegMin, xRegMax, yRegMin, yRegMax;
+	double xRegMin, xRegMax, yRegMin, yRegMax;
 	switch (region) {
 	case LEFT_TOP:
 		xRegMin = xMin;
