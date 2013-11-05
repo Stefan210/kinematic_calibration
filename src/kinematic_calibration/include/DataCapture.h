@@ -44,9 +44,19 @@ public:
 
 	void playLeftArmPoses();
 
-	void setHeadPose(double headYaw, double headPitch);
+	void setHeadPose(double headYaw, double headPitch, bool relative = false);
 
-	void findCheckerboard();
+	void findCheckerboard() {
+		// TODO: parameterize!!
+		double headYawMin = -0.5;
+		double headYawMax = 0.5;
+		double headPitchMin = -0.5;
+		double headPitchMax = 0.5;
+		checkerboardFound = false;
+		enableHeadStiffness();
+
+		disableHeadStiffness();
+	}
 
 private:
 	ros::NodeHandle nh;

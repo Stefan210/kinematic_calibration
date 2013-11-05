@@ -142,44 +142,16 @@ void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 	}
 }
 
-void DataCapture::findCheckerboard() {
-	// TODO: parameterize!!
-	double headYawMin = -0.5;
-	double headYawMax = 0.5;
-	double headPitchMin = -0.5;
-	double headPitchMax = 0.5;
-
-	checkerboardFound = false;
-
-	enableHeadStiffness();
-	for (double headYaw = headYawMin; headYaw <= headYawMax; headYaw += 0.5) {
-		if (checkerboardFound)
-			break;
-		for (double headPitch = headPitchMin; headPitch <= headPitchMax;
-				headPitch += 0.25) {
-			setHeadPose(headYaw, headPitch);
-			while (ros::getGlobalCallbackQueue()->isEmpty()) {
-				ROS_INFO("Waiting for image message...");
-			}
-			ros::spinOnce();
-			if (checkerboardFound)
-				break;
-		}
-	}
-	disableHeadStiffness();
-}
-
-void DataCapture::setHeadPose(double headYaw, double headPitch) {
+void DataCapture::setHeadPose(double headYaw, double headPitch, bool relative) {
 	trajectory_msgs::JointTrajectoryPoint point;
 	point.time_from_start.sec = 1;
 	point.time_from_start.nsec = 0;
 	point.positions.push_back(headYaw);
 	point.positions.push_back(headPitch);
-
 	JointTrajectoryGoal goal;
 	goal.trajectory.joint_names = headJointNames;
 	goal.trajectory.points.push_back(point);
-
+	goal.relative = relative;
 	trajectoryClient.sendGoal(goal);
 	trajectoryClient.waitForResult();
 }
