@@ -128,7 +128,7 @@ void DataCapture::playLeftArmPoses() {
 		//
 		ROS_INFO("Moving head in order to find the checkerboard...");
 		findCheckerboard();
-		moveCheckerboardToImageRegion(CENTER);
+		//moveCheckerboardToImageRegion(CENTER);
 	}
 	disableLArmStiffness();
 }
