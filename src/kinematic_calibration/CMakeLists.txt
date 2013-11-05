@@ -4,7 +4,7 @@ project(kinematic_calibration)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED roscpp cv_bridge image_transport urdf orocos_kdl kdl_parser tf tf_conversions nao_msgs actionlib)
+find_package(catkin REQUIRED roscpp cv_bridge image_transport urdf orocos_kdl kdl_parser tf tf_conversions nao_msgs actionlib image_geometry)
 find_package(OpenCV REQUIRED)
 
 ## System dependencies are found with CMake's conventions
@@ -196,7 +196,7 @@ target_link_libraries(jointOffsetOptimization kinematicChain frameImageConverter
 
 ### DataCapture
 add_library(dataCapture src/DataCapture.cpp)
-target_link_libraries(dataCapture checkerboardDetection ${catkin_LIBRARIES})
+target_link_libraries(dataCapture checkerboardDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 add_executable(dataCaptureMain src/DataCaptureMain.cpp)
-target_link_libraries(dataCaptureMain dataCapture ${catkin_LIBRARIES})
+target_link_libraries(dataCaptureMain dataCapture ${catkin_LIBRARIES} ${OpenCV_LIBS})
