@@ -147,17 +147,23 @@ void DataCapture::findCheckerboard() {
 	double headYawMax = 0.5;
 	double headPitchMin = -0.5;
 	double headPitchMax = 0.5;
+	
+	checkerboardFound = false;
 
 	enableHeadStiffness();
-	while (!checkerboardFound) {
-		for (double headYaw = headYawMin; headYaw < headYawMax; headYaw +=
-				0.2) {
-			for (double headPitch = headPitchMin; headPitch < headPitchMax;
-					headPitch += 0.1) {
-				setHeadPose(headYaw, headPitch);
-				while(ros::getGlobalCallbackQueue()->isEmpty());
-				ros::spinOnce();
+	for (double headYaw = headYawMin; headYaw < headYawMax; headYaw +=
+			0.5) {
+		if(checkerboardFound) 
+			break;
+		for (double headPitch = headPitchMin; headPitch < headPitchMax;
+				headPitch += 0.5) {
+			setHeadPose(headYaw, headPitch);
+			while(ros::getGlobalCallbackQueue()->isEmpty()) {
+			  ROS_INFO("Waiting for image message...");
 			}
+			ros::spinOnce();
+			if(checkerboardFound) 
+				break;
 		}
 	}
 	disableHeadStiffness();
