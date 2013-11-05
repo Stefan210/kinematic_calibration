@@ -248,15 +248,20 @@ void DataCapture::findCheckerboard() {
 		for (double headPitch = headPitchMin; headPitch <= headPitchMax;
 				headPitch += 0.25) {
 			setHeadPose(headYaw, headPitch);
-			while (ros::getGlobalCallbackQueue()->isEmpty()) {
-				ROS_INFO("Waiting for image message...");
-			}
-			ros::spinOnce();
+			updateCheckerboard();
 			if (checkerboardFound)
 				break;
 		}
 	}
 	disableHeadStiffness();
+}
+
+void DataCapture::updateCheckerboard() {
+	ros::getGlobalCallbackQueue()->clear();
+	while (ros::getGlobalCallbackQueue()->isEmpty()) {
+		ROS_INFO("Waiting for image message...");
+	}
+	ros::spinOnce();
 }
 
 void DataCapture::setHeadPose(double headYaw, double headPitch, bool relative) {

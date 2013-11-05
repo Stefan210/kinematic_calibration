@@ -70,6 +70,7 @@ private:
 	void enableStiffness(const vector<string>& jointNames);
 	void disableStiffness(const vector<string>& jointNames);
 	void imageCallback(const sensor_msgs::ImageConstPtr& msg);
+	void updateCheckerboard();
 };
 
 } /* namespace kinematic_calibration */
