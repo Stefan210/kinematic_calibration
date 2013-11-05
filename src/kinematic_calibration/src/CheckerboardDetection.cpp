@@ -54,10 +54,12 @@ bool kinematic_calibration::CheckerboardDetection::detect(
 	if (patternfound) {
 		cv::cornerSubPix(gray, corners, cv::Size(11, 11), cv::Size(-1, -1),
 				cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
+		cv::drawChessboardCorners(image, cv::Size(1, 1), corners, true);
 	} else {
 		std::cout << "No pattern found." << std::endl;
 		return false;
 	}
+	cv::imshow("test", image);
 
 	cv::Point2f position = corners[4];
 	out.x = position.x;
