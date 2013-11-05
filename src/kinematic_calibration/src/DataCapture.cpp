@@ -179,6 +179,10 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 	}
 
 	// move head into direction until the checkerboard is into the region
+	ROS_INFO("Trying to move the head s.t. the checkerboard "
+			"position is within the rectangle (%f, %f) - (%f, %f)", xRegMin,
+			yRegMin, xRegMax, yRegMax);
+
 	bool isInRegionX = false;
 	while (!isInRegionX) {
 		ros::spinOnce();
@@ -196,10 +200,6 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 		}
 		disableHeadStiffness();
 	}
-
-	ROS_INFO("Trying to move the head s.t. the checkerboard "
-			"position is within the rectangle (%f, %f) - (%f, %f)", xRegMin,
-			yRegMin, xRegMax, yRegMax);
 
 	bool isInRegionY = false;
 	while (!isInRegionY) {
