@@ -257,10 +257,12 @@ void DataCapture::findCheckerboard() {
 }
 
 void DataCapture::updateCheckerboard() {
-	while (ros::getGlobalCallbackQueue()->isEmpty()) {
+	ros::getGlobalCallbackQueue()->clear();
+	ros::getGlobalCallbackQueue()->callAvailable(ros::WallDuration(3.0));
+	/*while (ros::getGlobalCallbackQueue()->isEmpty()) {
 		ROS_INFO("Waiting for image message...");
 	}
-	ros::spinOnce();
+	ros::spinOnce();*/
 }
 
 void DataCapture::setHeadPose(double headYaw, double headPitch, bool relative) {
