@@ -188,11 +188,11 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 		ros::spinOnce();
 		enableHeadStiffness();
 		if (checkerboardData.x < xRegMin) {
-			double relPose = (xRegMin - checkerboardData.x) / 1000 + 0.05;
+            double relPose = (xRegMin - checkerboardData.x) / 800 + 0.05;
 			setHeadPose(relPose, 0, true);
 			ROS_INFO("Moving to the right (relPose = %f).", relPose);
 		} else if (checkerboardData.x > xRegMax) {
-			double relPose = (xRegMax - checkerboardData.x) / 1000 - 0.05;
+            double relPose = (xRegMax - checkerboardData.x) / 800 - 0.05;
 			setHeadPose(relPose, 0, true);
 			ROS_INFO("Moving to the left (relPose = %f).", relPose);
 		} else {
@@ -206,11 +206,11 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 		ros::spinOnce();
 		enableHeadStiffness();
 		if (checkerboardData.y < yRegMin) {
-			double relPose = (yRegMin - checkerboardData.y) / 1000 + 0.05;
+            double relPose = (yRegMin - checkerboardData.y) / 800 + 0.05;
 			setHeadPose(0, -relPose, true);
 			ROS_INFO("Moving to downwards (relPose = %f).", -relPose);
 		} else if (checkerboardData.y > yRegMax) {
-			double relPose = (yRegMax - checkerboardData.y) / 1000 - 0.05;
+            double relPose = (yRegMax - checkerboardData.y) / 800 - 0.05;
 			setHeadPose(0, -relPose, true);
 			ROS_INFO("Moving to upwards (relPose = %f).", -relPose);
 		} else {
@@ -235,10 +235,10 @@ void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 
 void DataCapture::findCheckerboard() {
 	// TODO: parameterize!!
-	double headYawMin = -0.5;
+    double headYawMin = 0; //-0.5;
 	double headYawMax = 0.5;
 	double headPitchMin = -0.5;
-	double headPitchMax = 0.5;
+    double headPitchMax = 0.2;
 	checkerboardFound = false;
 
 	enableHeadStiffness();
@@ -246,7 +246,7 @@ void DataCapture::findCheckerboard() {
 		if (checkerboardFound)
 			break;
 		for (double headPitch = headPitchMin; headPitch <= headPitchMax;
-				headPitch += 0.25) {
+                headPitch += 0.33) {
 			setHeadPose(headYaw, headPitch);
 			updateCheckerboard();
 			if (checkerboardFound)
@@ -257,7 +257,7 @@ void DataCapture::findCheckerboard() {
 }
 
 void DataCapture::updateCheckerboard() {
-    ros::Duration(0.1).sleep();
+    ros::Duration(0.3).sleep();
 	while (ros::getGlobalCallbackQueue()->isEmpty()) {
 		ROS_INFO("Waiting for image message...");
 	}
