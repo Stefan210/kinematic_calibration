@@ -258,7 +258,7 @@ void DataCapture::findCheckerboard() {
 
 void DataCapture::updateCheckerboard() {
 	ros::getGlobalCallbackQueue()->clear();
-	ros::getGlobalCallbackQueue()->callAvailable(ros::WallDuration(3.0));
+	ros::getGlobalCallbackQueue()->callAvailable(ros::WallDuration(0.1));
 	/*while (ros::getGlobalCallbackQueue()->isEmpty()) {
 		ROS_INFO("Waiting for image message...");
 	}
