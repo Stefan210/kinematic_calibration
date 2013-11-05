@@ -10,6 +10,9 @@
 
 #include <ros/ros.h>
 #include <ros/node_handle.h>
+#include <tf/tf.h>
+#include <tf/transform_listener.h>
+#include <cmath>
 #include <vector>
 #include <string>
 #include <trajectory_msgs/JointTrajectoryPoint.h>
@@ -69,6 +72,7 @@ private:
 	vector<string> leftArmJointNames;
 	vector<string> rightArmJointNames;
 	image_geometry::PinholeCameraModel cameraModel;
+	tf::TransformListener transformListener;
 	void setStiffness(const vector<string>& jointNames, double stiffness);
 	void enableStiffness(const vector<string>& jointNames);
 	void disableStiffness(const vector<string>& jointNames);
