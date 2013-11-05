@@ -188,7 +188,7 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 			setHeadPose(relPose, 0, true);
 			ROS_INFO("Moving to the right (relPose = %f).", relPose);
 		} else if (checkerboardData.x > xRegMax) {
-			double relPose = (xRegMax - checkerboardData.x) / 1000 + 0.05;
+			double relPose = (xRegMax - checkerboardData.x) / 1000 - 0.05;
 			setHeadPose(relPose, 0, true);
 			ROS_INFO("Moving to the left (relPose = %f).", relPose);
 		} else {
@@ -206,7 +206,7 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 			setHeadPose(0, relPose, true);
 			ROS_INFO("Moving to downwards (relPose = %f).", relPose);
 		} else if (checkerboardData.y > yRegMax) {
-			double relPose = (yRegMax - checkerboardData.y) / 1000 + 0.05;
+			double relPose = (yRegMax - checkerboardData.y) / 1000 - 0.05;
 			setHeadPose(0, relPose, true);
 			ROS_INFO("Moving to upwards (relPose = %f).", relPose);
 		} else {
