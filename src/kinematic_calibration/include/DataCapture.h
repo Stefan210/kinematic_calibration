@@ -32,6 +32,10 @@ namespace kinematic_calibration {
  */
 class DataCapture {
 public:
+	enum Region {
+		LEFT_TOP, LEFT_BOTTOM, RIGHT_TOP, RIGHT_BOTTOM, CENTER
+	};
+
 	DataCapture();
 	virtual ~DataCapture();
 
@@ -47,6 +51,7 @@ public:
 	void setHeadPose(double headYaw, double headPitch, bool relative = false);
 
 	void findCheckerboard();
+	void moveCheckerboardToImageRegion(Region region);
 
 private:
 	ros::NodeHandle nh;
