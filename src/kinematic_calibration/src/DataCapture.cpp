@@ -87,7 +87,8 @@ void DataCapture::disableRArmStiffness() {
 	ROS_INFO("Done.");
 }
 
-void DataCapture::setStiffness(const vector<string>& jointNames, double stiffness) {
+void DataCapture::setStiffness(const vector<string>& jointNames,
+		double stiffness) {
 	trajectory_msgs::JointTrajectoryPoint point;
 	point.time_from_start.sec = 1;
 
@@ -133,7 +134,7 @@ void DataCapture::playLeftArmPoses() {
 
 void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 	checkerboardFound = checkerboardDetection.detect(msg, checkerboardData);
-	if(checkerboardFound) {
+	if (checkerboardFound) {
 		ROS_INFO("Checkerboard found at position %f %f", checkerboardData.x,
 				checkerboardData.y);
 	} else {
@@ -147,22 +148,21 @@ void DataCapture::findCheckerboard() {
 	double headYawMax = 0.5;
 	double headPitchMin = -0.5;
 	double headPitchMax = 0.5;
-	
+
 	checkerboardFound = false;
 
 	enableHeadStiffness();
-	for (double headYaw = headYawMin; headYaw <= headYawMax; headYaw +=
-			0.25) {
-		if(checkerboardFound) 
+	for (double headYaw = headYawMin; headYaw <= headYawMax; headYaw += 0.5) {
+		if (checkerboardFound)
 			break;
 		for (double headPitch = headPitchMin; headPitch <= headPitchMax;
 				headPitch += 0.25) {
 			setHeadPose(headYaw, headPitch);
-			while(ros::getGlobalCallbackQueue()->isEmpty()) {
-			  ROS_INFO("Waiting for image message...");
+			while (ros::getGlobalCallbackQueue()->isEmpty()) {
+				ROS_INFO("Waiting for image message...");
 			}
 			ros::spinOnce();
-			if(checkerboardFound) 
+			if (checkerboardFound)
 				break;
 		}
 	}
