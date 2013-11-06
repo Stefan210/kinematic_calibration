@@ -11,8 +11,7 @@ namespace kinematic_calibration {
 
 JointOffsetOptimization::JointOffsetOptimization(
 		vector<MeasurementData>& measurements, KinematicChain& kinematicChain,
-		FrameImageConverter& frameImageConverter,
-		CalibrationState initialState) :
+		FrameImageConverter& frameImageConverter, CalibrationState initialState) :
 		measurements(measurements), kinematicChain(kinematicChain), frameImageConverter(
 				frameImageConverter), initialState(initialState) {
 
@@ -23,3 +22,4 @@ JointOffsetOptimization::~JointOffsetOptimization() {
 }
 
 } /* namespace kinematic_calibration */
+

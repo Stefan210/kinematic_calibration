@@ -4,7 +4,7 @@ project(kinematic_calibration)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED roscpp cv_bridge image_transport urdf orocos_kdl kdl_parser tf tf_conversions nao_msgs actionlib image_geometry)
+find_package(catkin REQUIRED roscpp cv_bridge image_transport urdf orocos_kdl kdl_parser tf tf_conversions nao_msgs actionlib image_geometry message_generation)
 find_package(OpenCV REQUIRED)
 
 ## System dependencies are found with CMake's conventions
@@ -41,11 +41,10 @@ find_package(OpenCV REQUIRED)
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+   FILES
+   measurementData.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -62,10 +61,13 @@ find_package(OpenCV REQUIRED)
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  sensor_msgs
+)
+
+
 
 ###################################
 ## catkin specific configuration ##
@@ -79,7 +81,7 @@ find_package(OpenCV REQUIRED)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES kinematic_calibration
-#  CATKIN_DEPENDS other_catkin_pkg
+  CATKIN_DEPENDS sensor_msgs message_runtime
 #  DEPENDS system_lib
 )
 

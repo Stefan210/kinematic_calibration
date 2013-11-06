@@ -48,8 +48,9 @@ SET(G2O_LIBS cholmod cxsparse -lg2o_cli -lg2o_core
 
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
-#   DEPENDENCIES
+#  DEPENDENCIES
 #   std_msgs
+#   sensor_msgs
 # )
 
 ###################################
