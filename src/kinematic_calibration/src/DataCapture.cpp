@@ -296,7 +296,7 @@ void DataCapture::findCheckerboard() {
 	double headPitchAngle = atan2((double) (headPitchPoint.getZ()),
 			sqrt(
 					pow((double) (headYawPoint.getX()), 2)
-							* pow((double) (headYawPoint.getY()), 2)));
+							+ pow((double) (headYawPoint.getY()), 2)));
 
 	ROS_INFO("Setting yaw to %f and pitch to %f.", headYawAngle, headPitchAngle);
 	enableHeadStiffness();
