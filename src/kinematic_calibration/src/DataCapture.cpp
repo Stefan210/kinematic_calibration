@@ -45,6 +45,8 @@ DataCapture::DataCapture() :
 	rightArmJointNames.push_back("RElbowRoll");
 	rightArmJointNames.push_back("RWristYaw");
 	rightArmJointNames.push_back("RHand");
+
+	updateCheckerboard();
 }
 
 DataCapture::~DataCapture() {
@@ -267,6 +269,7 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 }
 
 void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
+	cameraFrame = msg.get()->header.frame_id;
 	checkerboardFound = checkerboardDetection.detect(msg, checkerboardData);
 	if (checkerboardFound) {
 		ROS_INFO("Checkerboard found at position %f %f", checkerboardData.x,
@@ -277,28 +280,33 @@ void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 }
 
 void DataCapture::findCheckerboard() {
-	tf::StampedTransform wristToHeadYaw, wristToHeadPitch;
+	tf::StampedTransform wristToheadYaw, wristToheadPitch;
 	ros::Time now = ros::Time::now();
 	transformListener.waitForTransform("HeadYaw_link", "l_wrist", now,
 			ros::Duration(1.0));
 	transformListener.waitForTransform("HeadPitch_link", "l_wrist", now,
 			ros::Duration(1.0));
 	transformListener.lookupTransform("HeadYaw_link", "l_wrist", now,
-			wristToHeadYaw);
+			wristToheadYaw);
 	transformListener.lookupTransform("HeadPitch_link", "l_wrist", now,
-			wristToHeadPitch);
+			wristToheadPitch);
 
-	tf::Point headYawPoint = wristToHeadYaw * tf::Point(0.0, 0.0, 0.0);
+	tf::Point headYawPoint = wristToheadYaw * tf::Point(0.0, 0.0, 0.0);
 	double headYawAngle = atan2((double) (headYawPoint.getY()),
 			(double) (headYawPoint.getX()));
 
-	tf::Point headPitchPoint = wristToHeadPitch * tf::Point(0.0, 0.0, 0.0);
+	tf::Point headPitchPoint = wristToheadPitch * tf::Point(0.0, 0.0, 0.0);
 	double headPitchAngle = atan2((double) (headPitchPoint.getZ()),
 			sqrt(
-					pow((double) (headYawPoint.getX()), 2)
-							+ pow((double) (headYawPoint.getY()), 2)));
+					pow((double) (headPitchPoint.getX()), 2)
+							* pow((double) (headPitchPoint.getY()), 2)));
 
-	ROS_INFO("Setting yaw to %f and pitch to %f.", headYawAngle, headPitchAngle);
+	ROS_INFO("Setting yaw to %f and pitch to %f.", headYawAngle,
+			headPitchAngle);
+	//
+	tf::StampedTransform wristToCamera;
+
+
 	enableHeadStiffness();
 	setHeadPose(headYawAngle, headPitchAngle);
 	disableHeadStiffness();
