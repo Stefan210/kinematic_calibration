@@ -73,6 +73,7 @@ private:
 	vector<string> rightArmJointNames;
 	image_geometry::PinholeCameraModel cameraModel;
 	tf::TransformListener transformListener;
+	string cameraFrame;
 	void setStiffness(const vector<string>& jointNames, double stiffness);
 	void enableStiffness(const vector<string>& jointNames);
 	void disableStiffness(const vector<string>& jointNames);
