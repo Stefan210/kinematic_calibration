@@ -17,19 +17,25 @@ DataCapture::DataCapture() :
 		stiffnessClient(nh, "joint_stiffness_trajectory"), trajectoryClient(nh,
 				"joint_trajectory"), bodyPoseClient(nh, "body_pose"), it(nh), checkerboardFound(
 				false) {
-	camerainfoSub = nh.subscribe("/nao_camera/camera_info", 1, &DataCapture::camerainfoCallback, this);
-	ros::spinOnce();
+	camerainfoSub = nh.subscribe("/nao_camera/camera_info", 1,
+			&DataCapture::camerainfoCallback, this);
+	while (ros::getGlobalCallbackQueue()->isEmpty()) {
+		ROS_INFO("Waiting for camera info message...");
+		//ros::Duration(0.5).sleep();
+	}
+	ros::getGlobalCallbackQueue()->callAvailable();
 	camerainfoSub.shutdown();
-
-	imageSub = it.subscribe("/nao_camera/image_raw", 1, &DataCapture::imageCallback,
-			this);
-
-	ROS_INFO("Waiting for stiffness, trajectory and pose server...");
-	stiffnessClient.waitForServer();
-	trajectoryClient.waitForServer();
-	bodyPoseClient.waitForServer();
 	ROS_INFO("Done.");
 
+	imageSub = it.subscribe("/nao_camera/image_raw", 1,
+			&DataCapture::imageCallback, this);
+	/*
+	 ROS_INFO("Waiting for stiffness, trajectory and pose server...");
+	 stiffnessClient.waitForServer();
+	 trajectoryClient.waitForServer();
+	 bodyPoseClient.waitForServer();
+	 ROS_INFO("Done.");
+	 */
 	// initialize list of head joint names
 	headJointNames.push_back("HeadYaw");
 	headJointNames.push_back("HeadPitch");
@@ -286,13 +292,13 @@ void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 void DataCapture::findCheckerboard() {
 	tf::StampedTransform wristToheadYaw, wristToheadPitch;
 	ros::Time now = ros::Time::now();
-	transformListener.waitForTransform("HeadYaw_link", "l_wrist", now,
+	transformListener.waitForTransform("HeadYaw_link", "LWristYaw_link", now,
 			ros::Duration(1.0));
-	transformListener.waitForTransform("HeadPitch_link", "l_wrist", now,
+	transformListener.waitForTransform("HeadPitch_link", "LWristYaw_link", now,
 			ros::Duration(1.0));
-	transformListener.lookupTransform("HeadYaw_link", "l_wrist", now,
+	transformListener.lookupTransform("HeadYaw_link", "LWristYaw_link", now,
 			wristToheadYaw);
-	transformListener.lookupTransform("HeadPitch_link", "l_wrist", now,
+	transformListener.lookupTransform("HeadPitch_link", "LWristYaw_link", now,
 			wristToheadPitch);
 
 	tf::Point headYawPoint = wristToheadYaw * tf::Point(0.0, 0.0, 0.0);
@@ -304,12 +310,25 @@ void DataCapture::findCheckerboard() {
 			sqrt(
 					pow((double) (headPitchPoint.getX()), 2)
 							* pow((double) (headPitchPoint.getY()), 2)));
+	headPitchAngle += M_PI_4;
 
-	ROS_INFO("Setting yaw to %f and pitch to %f.", headYawAngle,
+	ROS_INFO("[1] Setting yaw to %f and pitch to %f.", headYawAngle,
+			headPitchAngle);
+
+	//
+	tf::StampedTransform cameraToWrist;
+	transformListener.lookupTransform("LWristYaw_link", cameraFrame, now,
+			cameraToWrist);
+	tf::Vector3 direction = cameraToWrist.getOrigin();
+	tf::Vector3 directionXY(direction.getX(), direction.getY(), 0);
+	tf::Vector3 directionXZ(direction.getX(), 0, direction.getZ());
+
+	headYawAngle = tf::Vector3(1, 0, 0).angle(directionXY);
+	headPitchAngle = tf::Vector3(1, 0, 0).angle(directionXZ);
+
+	ROS_INFO("[2] Setting yaw to %f and pitch to %f.", headYawAngle,
 			headPitchAngle);
 	//
-	tf::StampedTransform wristToCamera;
-
 
 	enableHeadStiffness();
 	setHeadPose(headYawAngle, headPitchAngle);
@@ -348,7 +367,7 @@ void DataCapture::camerainfoCallback(
  */
 
 void DataCapture::updateCheckerboard() {
-	ros::Duration(0.3).sleep();
+	//ros::Duration(0.3).sleep();
 	while (ros::getGlobalCallbackQueue()->isEmpty()) {
 		ROS_INFO("Waiting for image message...");
 	}
