@@ -14,6 +14,14 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs visualization_msgs
 #include_directories(${G2O_INCLUDE_DIR})
 #link_directories(${G2O_LIBRARY_DIR})
 
+SET(G2O_LIBS cholmod cxsparse -lg2o_cli -lg2o_core
+-lg2o_csparse_extension -lg2o_ext_freeglut_minimal -lg2o_incremental
+-lg2o_interactive -lg2o_interface -lg2o_opengl_helper -lg2o_parser
+-lg2o_simulator -lg2o_solver_cholmod -lg2o_solver_csparse
+-lg2o_solver_dense -lg2o_solver_pcg -lg2o_solver_slam2d_linear
+-lg2o_solver_structure_only -lg2o_stuff -lg2o_types_data -lg2o_types_icp
+-lg2o_types_sba -lg2o_types_sclam2d -lg2o_types_sim3 -lg2o_types_slam2d
+-lg2o_types_slam3d)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -144,12 +152,13 @@ add_library(G2oOptimization
 	
 target_link_libraries(G2oOptimization 
   ${catkin_LIBRARIES}
-  g2o_core core
-  csparse 
-  g2o_solver_csparse solver_csparse
-  g2o_csparse_extension csparse_extension
-  g2o_stuff stuff
-  solver_cholmod
+  ${G2O_LIBS}
+#  g2o_core core
+#  csparse 
+#  g2o_solver_csparse solver_csparse
+#  g2o_csparse_extension csparse_extension
+#  g2o_stuff stuff
+#  solver_cholmod
   )
 
 add_executable(CameraCalibration 
