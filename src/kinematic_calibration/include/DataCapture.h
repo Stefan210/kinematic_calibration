@@ -60,7 +60,7 @@ public:
 private:
 	ros::NodeHandle nh;
 	ros::Subscriber camerainfoSub;
-	image_transport::Subscriber sub;
+	image_transport::Subscriber imageSub;
 	image_transport::ImageTransport it;
 	CheckerboardDetection checkerboardDetection;
 	CheckerboardData checkerboardData;

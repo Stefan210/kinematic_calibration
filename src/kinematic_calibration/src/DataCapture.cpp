@@ -17,7 +17,11 @@ DataCapture::DataCapture() :
 		stiffnessClient(nh, "joint_stiffness_trajectory"), trajectoryClient(nh,
 				"joint_trajectory"), bodyPoseClient(nh, "body_pose"), it(nh), checkerboardFound(
 				false) {
-	sub = it.subscribe("/nao_camera/image_raw", 1, &DataCapture::imageCallback,
+	camerainfoSub = nh.subscribe("/nao_camera/camera_info", 1, &DataCapture::camerainfoCallback, this);
+	ros::spinOnce();
+	camerainfoSub.shutdown();
+
+	imageSub = it.subscribe("/nao_camera/image_raw", 1, &DataCapture::imageCallback,
 			this);
 
 	ROS_INFO("Waiting for stiffness, trajectory and pose server...");
@@ -310,6 +314,12 @@ void DataCapture::findCheckerboard() {
 	enableHeadStiffness();
 	setHeadPose(headYawAngle, headPitchAngle);
 	disableHeadStiffness();
+}
+
+void DataCapture::camerainfoCallback(
+		const sensor_msgs::CameraInfoConstPtr& msg) {
+	cameraModel.fromCameraInfo(msg);
+	ROS_INFO("Camera model set.");
 }
 
 /*
