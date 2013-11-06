@@ -202,3 +202,8 @@ target_link_libraries(dataCapture checkerboardDetection ${catkin_LIBRARIES} ${Op
 
 add_executable(dataCaptureMain src/DataCaptureMain.cpp)
 target_link_libraries(dataCaptureMain dataCapture ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
+
+### OptimizationNode
+add_executable(optimizationNode src/OptimizationNode.cpp)
+target_link_libraries(optimizationNode ${catkin_LIBRARIES})
