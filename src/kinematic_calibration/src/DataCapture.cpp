@@ -140,27 +140,32 @@ void DataCapture::playLeftArmPoses() {
 		//
 		ROS_INFO("Moving head in order to find the checkerboard...");
 		findCheckerboard();
-		ROS_INFO("Moving head to CENTER region...");
+        if(!checkerboardFound)
+            continue;
+
+        ROS_INFO("Moving head to CENTER region...");
 		moveCheckerboardToImageRegion(CENTER);
 
 		enableHeadStiffness();
 		ROS_INFO("Moving head to LEFT_TOP region...");
-		setHeadPose(-0.2, 0.1, true);
+        setHeadPose(-0.3, 0.15, true);
 		updateCheckerboard();
 		//moveCheckerboardToImageRegion(LEFT_TOP);
 		ROS_INFO("Moving head to LEFT_BOTTOM region...");
-		setHeadPose(0, -0.2, true);
+        setHeadPose(0, -0.3, true);
 		updateCheckerboard();
 		//moveCheckerboardToImageRegion(LEFT_BOTTOM);
 		ROS_INFO("Moving head to RIGHT_BOTTOM region...");
-		setHeadPose(0.4, 0, true);
+        setHeadPose(0.6, 0, true);
 		updateCheckerboard();
 		//moveCheckerboardToImageRegion(RIGHT_BOTTOM);
 		ROS_INFO("Moving head to RIGHT_TOP region...");
-		setHeadPose(0, 0.2, true);
+        setHeadPose(0, 0.3, true);
 		updateCheckerboard();
 		//moveCheckerboardToImageRegion(RIGHT_TOP);
-		disableHeadStiffness();
+        ROS_INFO("Monving back to CENTER region...");
+        setHeadPose(-0.3, -0.15, true);
+        disableHeadStiffness();
 	}
 	disableLArmStiffness();
 }
@@ -260,41 +265,38 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 			yRegMin, xRegMax, yRegMax);
 
 	bool isInRegionX = false;
-	while (!isInRegionX) {
+    bool isInRegionY = false;
+    enableHeadStiffness();
+    while (!isInRegionX || !isInRegionY) {
 		ros::spinOnce();
-		enableHeadStiffness();
+        double relX = 0, relY = 0;
+
 		if (checkerboardData.x < xRegMin) {
-			double relPose = (xRegMin - checkerboardData.x) / 800 + 0.05;
-			setHeadPose(relPose, 0, true);
-			ROS_INFO("Moving to the right (relPose = %f).", relPose);
+            relX = (xRegMin - checkerboardData.x) / 640 + 0.05;
+            ROS_INFO("Moving to the right (relPose = %f).", relX);
 		} else if (checkerboardData.x > xRegMax) {
-			double relPose = (xRegMax - checkerboardData.x) / 800 - 0.05;
-			setHeadPose(relPose, 0, true);
-			ROS_INFO("Moving to the left (relPose = %f).", relPose);
+            relX = (xRegMax - checkerboardData.x) / 640 - 0.05;
+            ROS_INFO("Moving to the left (relPose = %f).", relX);
 		} else {
 			isInRegionX = true;
 		}
-		disableHeadStiffness();
-	}
 
-	bool isInRegionY = false;
-	while (!isInRegionY) {
-		ros::spinOnce();
-		enableHeadStiffness();
 		if (checkerboardData.y < yRegMin) {
-			double relPose = (yRegMin - checkerboardData.y) / 800 + 0.05;
-			setHeadPose(0, -relPose, true);
-			ROS_INFO("Moving to downwards (relPose = %f).", -relPose);
+            relY = (yRegMin - checkerboardData.y) / 480 + 0.05;
+            ROS_INFO("Moving to downwards (relPose = %f).", -relY);
 		} else if (checkerboardData.y > yRegMax) {
-			double relPose = (yRegMax - checkerboardData.y) / 800 - 0.05;
-			setHeadPose(0, -relPose, true);
-			ROS_INFO("Moving to upwards (relPose = %f).", -relPose);
+            relY = (yRegMax - checkerboardData.y) / 480 - 0.05;
+            ROS_INFO("Moving to upwards (relPose = %f).", -relY);
 		} else {
 			isInRegionY = true;
-		}
-		disableHeadStiffness();
-	}
+        }
 
+        if(!isInRegionX || !isInRegionY) {
+            setHeadPose(relX, -relY, true);
+        }
+    }
+
+    disableHeadStiffness();
 	ROS_INFO("Moving into region done!");
 }
 
@@ -309,6 +311,7 @@ void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 	}
 }
 
+/*
 void DataCapture::findCheckerboard() {
 	ros::Time now = ros::Time::now();
 	tf::StampedTransform cameraToWrist;
@@ -326,8 +329,8 @@ void DataCapture::findCheckerboard() {
 			sqrt(
 					pow((double) (headPitchPoint.getX()), 2)
 							* pow((double) (headPitchPoint.getZ()), 2)));
-	//headPitchAngle += M_PI_4;
-	//headYawAngle +=  M_PI_2 + M_PI_4;
+    headPitchAngle = M_PI_2 + headPitchAngle;
+    headYawAngle =  M_PI_2 + headYawAngle;
 
 	ROS_INFO("[1] Setting yaw to %f and pitch to %f.", headYawAngle,
 			headPitchAngle);
@@ -336,6 +339,7 @@ void DataCapture::findCheckerboard() {
 	setHeadPose(headYawAngle, headPitchAngle);
 	disableHeadStiffness();
 }
+*/
 
 void DataCapture::camerainfoCallback(
 		const sensor_msgs::CameraInfoConstPtr& msg) {
@@ -343,14 +347,17 @@ void DataCapture::camerainfoCallback(
 	ROS_INFO("Camera model set.");
 }
 
-/*
+
  void DataCapture::findCheckerboard() {
  // TODO: parameterize!!
- double headYawMin = 0; //-0.5;
+ double headYawMin = -0.5;
  double headYawMax = 0.5;
  double headPitchMin = -0.5;
  double headPitchMax = 0.2;
+
  updateCheckerboard();
+ if(checkerboardFound)
+     return;
 
  enableHeadStiffness();
  for (double headYaw = headYawMin; headYaw <= headYawMax; headYaw += 0.4) {
@@ -366,10 +373,10 @@ void DataCapture::camerainfoCallback(
  }
  disableHeadStiffness();
  }
- */
+
 
 void DataCapture::updateCheckerboard() {
-	//ros::Duration(0.3).sleep();
+    ros::Duration(0.3).sleep();
 	while (ros::getGlobalCallbackQueue()->isEmpty()) {
 		ROS_INFO("Waiting for image message...");
 	}
