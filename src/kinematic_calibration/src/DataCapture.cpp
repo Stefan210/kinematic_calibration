@@ -271,7 +271,7 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 	bool isInRegionY = false;
 	enableHeadStiffness();
 	while (!isInRegionX || !isInRegionY) {
-		ros::spinOnce();
+		updateCheckerboard();
 		double relX = 0, relY = 0;
 
 		if (checkerboardData.x < xRegMin) {
