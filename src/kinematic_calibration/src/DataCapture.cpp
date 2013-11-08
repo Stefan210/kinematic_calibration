@@ -164,6 +164,8 @@ void DataCapture::playLeftArmPoses() {
 		// within the center region of the camera image
 		ROS_INFO("Moving head to CENTER region...");
 		moveCheckerboardToImageRegion(CENTER);
+		if (!checkerboardFound)
+			continue;
 
 		// move the head s.t. the checkerboard is
 		// within the corner regions and publish the data
@@ -405,26 +407,21 @@ void DataCapture::jointStatesCallback(
 
 void DataCapture::updateCheckerboard() {
 	receivedImage = false;
-	//ros::Duration(0.3).sleep();
-	ros::getGlobalCallbackQueue()->enable();
+	ros::Duration(0.3).sleep();
 	ROS_INFO("Waiting for image message...");
-	//ros::getGlobalCallbackQueue()->clear();
-	while (ros::getGlobalCallbackQueue()->isEmpty()) {
-		ros::Duration(0.3).sleep();
-	}
+	while (ros::getGlobalCallbackQueue()->isEmpty())
+		;
 	while (!receivedImage) {
 		ros::getGlobalCallbackQueue()->callAvailable();
 	}
-	ros::getGlobalCallbackQueue()->disable();
 }
 
 void DataCapture::updateJointStates() {
 	receivedJointStates = false;
-	//ros::Duration(0.3).sleep();
+	ros::Duration(0.3).sleep();
 	ROS_INFO("Waiting for joint state message...");
-	while (jointStatesQueue.isEmpty()) {
-		ros::Duration(0.3).sleep();
-	}
+	while (jointStatesQueue.isEmpty())
+		;
 	while (!receivedJointStates) {
 		jointStatesQueue.callAvailable();
 	}
