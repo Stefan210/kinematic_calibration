@@ -407,6 +407,7 @@ void DataCapture::updateCheckerboard() {
 	receivedImage = false;
 	ros::Duration(0.3).sleep();
 	ROS_INFO("Waiting for image message...");
+	ros::getGlobalCallbackQueue()->clear();
 	while (ros::getGlobalCallbackQueue()->isEmpty())
 		;
 	while (!receivedImage) {
