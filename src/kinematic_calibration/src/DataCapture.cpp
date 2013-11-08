@@ -16,7 +16,7 @@ namespace kinematic_calibration {
 DataCapture::DataCapture() :
 		stiffnessClient(nh, "joint_stiffness_trajectory"), trajectoryClient(nh,
 				"joint_trajectory"), bodyPoseClient(nh, "body_pose"), it(nh), checkerboardFound(
-				false), receivedJointStates(false) {
+				false), receivedJointStates(false), receivedImage(false) {
 	camerainfoSub = nh.subscribe("/nao_camera/camera_info", 1,
 			&DataCapture::camerainfoCallback, this);
 	while (ros::getGlobalCallbackQueue()->isEmpty()) {
@@ -304,6 +304,7 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 }
 
 void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
+	receivedImage = true;
 	cameraFrame = msg.get()->header.frame_id;
 	checkerboardFound = checkerboardDetection.detect(msg, checkerboardData);
 	if (checkerboardFound) {
@@ -383,12 +384,12 @@ void DataCapture::jointStatesCallback(
 }
 
 void DataCapture::updateCheckerboard() {
-	checkerboardFound = false;
+	receivedImage = false;
 	ros::Duration(0.1).sleep();
 	while (ros::getGlobalCallbackQueue()->isEmpty()) {
 		ROS_INFO("Waiting for image message...");
 	}
-	while (!checkerboardFound) {
+	while (!receivedImage) {
 		ros::spinOnce();
 	}
 }

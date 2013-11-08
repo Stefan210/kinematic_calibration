@@ -69,6 +69,7 @@ private:
 	CheckerboardData checkerboardData;
 	bool checkerboardFound;
 	bool receivedJointStates;
+	bool receivedImage;
 	actionlib::SimpleActionClient<nao_msgs::JointTrajectoryAction> stiffnessClient;
 	actionlib::SimpleActionClient<nao_msgs::JointTrajectoryAction> trajectoryClient;
 	actionlib::SimpleActionClient<nao_msgs::BodyPoseAction> bodyPoseClient;
