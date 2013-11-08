@@ -432,6 +432,7 @@ void DataCapture::setHeadPose(double headYaw, double headPitch, bool relative) {
 void DataCapture::publishMeasurement() {
 	updateCheckerboard();
 	if(!checkerboardFound) {
+		ROS_INFO("Not publishing data.");
 		return;
 	}
 	updateJointStates();
