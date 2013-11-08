@@ -36,13 +36,13 @@ void OptimizationNode::printResult() {
 }
 
 void OptimizationNode::measurementCb(const measurementDataConstPtr& msg) {
-	measurementData data = msg.get();
-	measurements.push_back(data);
+	const measurementData data = *msg;
+	measurements.push_back(measurementData(data));
 }
 
 } /* namespace kinematic_calibration */
 
-int main(int argc, const char** argv) {
+int main(int argc, char** argv) {
 	ros::init(argc, argv, "OptimizationNode");
 	return 0;
 }
