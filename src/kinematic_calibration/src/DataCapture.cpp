@@ -17,6 +17,8 @@ DataCapture::DataCapture() :
 		stiffnessClient(nh, "joint_stiffness_trajectory"), trajectoryClient(nh,
 				"joint_trajectory"), bodyPoseClient(nh, "body_pose"), it(nh), checkerboardFound(
 				false), receivedJointStates(false), receivedImage(false) {
+
+	// get camera information
 	camerainfoSub = nh.subscribe("/nao_camera/camera_info", 1,
 			&DataCapture::camerainfoCallback, this);
 	while (ros::getGlobalCallbackQueue()->isEmpty()) {
@@ -26,16 +28,23 @@ DataCapture::DataCapture() :
 	ros::getGlobalCallbackQueue()->callAvailable();
 	camerainfoSub.shutdown();
 	ROS_INFO("Done.");
-/*
+
+	// subscribe the joint states topic
+	ros::SubscribeOptions jointStatesOps = ros::SubscribeOptions::create<
+			sensor_msgs::JointState>("/joint_states", 1,
+			boost::bind(&DataCapture::jointStatesCallback, this, _1),
+			ros::VoidPtr(), &jointStatesQueue);
+	jointStateSub = nh.subscribe(jointStatesOps);
+
+	// subscribe the image topic
 	imageSub = it.subscribe("/nao_camera/image_raw", 1,
 			&DataCapture::imageCallback, this);
 
-	jointStateSub = nh.subscribe("/joint_states", 1,
-			&DataCapture::jointStatesCallback, this);
-*/
+	// advertise the measurement data topic
 	measurementPub = nh.advertise<measurementData>(
 			"/kinematic_calibration/measurement_data", 100);
 
+	// waiting for server
 	ROS_INFO("Waiting for stiffness, trajectory and pose server...");
 	stiffnessClient.waitForServer();
 	trajectoryClient.waitForServer();
@@ -384,35 +393,23 @@ void DataCapture::jointStatesCallback(
 }
 
 void DataCapture::updateCheckerboard() {
-	imageSub = it.subscribe("/nao_camera/image_raw", 1,
-			&DataCapture::imageCallback, this);
-
 	receivedImage = false;
-	ros::Duration(0, 100*1e6).sleep();
-	while (ros::getGlobalCallbackQueue()->isEmpty()) {
-		ROS_INFO("Waiting for image message...");
-	}
+	ros::Duration(0.3).sleep();
+	ROS_INFO("Waiting for image message...");
+	while (ros::getGlobalCallbackQueue()->isEmpty());
 	while (!receivedImage) {
 		ros::getGlobalCallbackQueue()->callAvailable();
 	}
-
-	imageSub.shutdown();
 }
 
 void DataCapture::updateJointStates() {
-	jointStateSub = nh.subscribe("/joint_states", 1,
-			&DataCapture::jointStatesCallback, this);
-
 	receivedJointStates = false;
-	ros::Duration(0, 100*1e6).sleep();
-	while (ros::getGlobalCallbackQueue()->isEmpty()) {
-		ROS_INFO("Waiting for joint state message...");
-	}
+	ros::Duration(0.3).sleep();
+	ROS_INFO("Waiting for joint state message...");
+	while (jointStatesQueue.isEmpty());
 	while (!receivedJointStates) {
-		ros::getGlobalCallbackQueue()->callAvailable();
+		jointStatesQueue.callAvailable();
 	}
-
-	jointStateSub.shutdown();
 }
 
 void DataCapture::setHeadPose(double headYaw, double headPitch, bool relative) {
@@ -431,7 +428,7 @@ void DataCapture::setHeadPose(double headYaw, double headPitch, bool relative) {
 
 void DataCapture::publishMeasurement() {
 	updateCheckerboard();
-	if(!checkerboardFound) {
+	if (!checkerboardFound) {
 		ROS_INFO("Not publishing data.");
 		return;
 	}

@@ -62,6 +62,7 @@ private:
 	ros::NodeHandle nh;
 	ros::Subscriber camerainfoSub;
 	ros::Subscriber jointStateSub;
+	ros::CallbackQueue jointStatesQueue;
 	image_transport::Subscriber imageSub;
 	image_transport::ImageTransport it;
 	ros::Publisher measurementPub;
