@@ -279,7 +279,7 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 
 	// move head into direction until the checkerboard is into the region
 	ROS_INFO("Trying to move the head s.t. the checkerboard "
-			"position is within the rectangle (%f, %f) - (%f, %f)", xRegMin,
+			"position is within the rectangle (%.2f, %.2f) - (%.2f, %.2f)", xRegMin,
 			yRegMin, xRegMax, yRegMax);
 
 	bool isInRegionX = false;
@@ -287,6 +287,11 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 	enableHeadStiffness();
 	while (!isInRegionX || !isInRegionY) {
 		updateCheckerboard();
+		if(!checkerboardFound) {
+			ROS_INFO("Checkerboard lost.");
+			break;
+		}
+
 		double relX = 0, relY = 0;
 
 		if (checkerboardData.x < xRegMin) {
