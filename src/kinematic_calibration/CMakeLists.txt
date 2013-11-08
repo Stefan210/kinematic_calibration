@@ -189,7 +189,7 @@ target_link_libraries(frameImageConverter ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 ### JointOffsetOptimization
 add_library(jointOffsetOptimization src/JointOffsetOptimization.cpp)
-target_link_libraries(jointOffsetOptimization kinematicChain frameImageConverter measurementData ${catkin_LIBRARIES})
+target_link_libraries(jointOffsetOptimization kinematicChain frameImageConverter ${catkin_LIBRARIES})
 
 
 ### DataCapture
