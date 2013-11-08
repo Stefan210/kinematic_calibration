@@ -140,7 +140,23 @@ void DataCapture::playLeftArmPoses() {
 		//
 		ROS_INFO("Moving head in order to find the checkerboard...");
 		findCheckerboard();
-		//moveCheckerboardToImageRegion(CENTER);
+        ROS_INFO("Moving head to CENTER region...");
+        moveCheckerboardToImageRegion(CENTER);
+
+        enableHeadStiffness();
+        ROS_INFO("Moving head to LEFT_TOP region...");
+        setHeadPose(-0.2, 0.1, true); updateCheckerboard();
+        //moveCheckerboardToImageRegion(LEFT_TOP);
+        ROS_INFO("Moving head to LEFT_BOTTOM region...");
+        setHeadPose(0, -0.2, true); updateCheckerboard();
+        //moveCheckerboardToImageRegion(LEFT_BOTTOM);
+        ROS_INFO("Moving head to RIGHT_BOTTOM region...");
+        setHeadPose(0.4, 0, true); updateCheckerboard();
+        //moveCheckerboardToImageRegion(RIGHT_BOTTOM);
+        ROS_INFO("Moving head to RIGHT_TOP region...");
+        setHeadPose(0, 0.2, true); updateCheckerboard();
+        //moveCheckerboardToImageRegion(RIGHT_TOP);
+        disableHeadStiffness();
 	}
 	disableLArmStiffness();
 }
@@ -288,7 +304,7 @@ void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 		ROS_INFO("No checkerboard found.");
 	}
 }
-
+/*
 void DataCapture::findCheckerboard() {
 	tf::StampedTransform wristToheadYaw, wristToheadPitch;
 	ros::Time now = ros::Time::now();
@@ -301,39 +317,41 @@ void DataCapture::findCheckerboard() {
 	transformListener.lookupTransform("HeadPitch_link", "LWristYaw_link", now,
 			wristToheadPitch);
 
-	tf::Point headYawPoint = wristToheadYaw * tf::Point(0.0, 0.0, 0.0);
+    tf::Point headYawPoint = wristToheadYaw * tf::Point(0.0, 0.0, 0.0);
 	double headYawAngle = atan2((double) (headYawPoint.getY()),
 			(double) (headYawPoint.getX()));
 
-	tf::Point headPitchPoint = wristToheadPitch * tf::Point(0.0, 0.0, 0.0);
+    tf::Point headPitchPoint = wristToheadPitch * tf::Point(0.0, 0.0, 0.0);
 	double headPitchAngle = atan2((double) (headPitchPoint.getZ()),
 			sqrt(
 					pow((double) (headPitchPoint.getX()), 2)
 							* pow((double) (headPitchPoint.getY()), 2)));
-	headPitchAngle += M_PI_4;
+    //headPitchAngle += M_PI_4;
+    //headYawAngle +=  M_PI_2 + M_PI_4;
 
 	ROS_INFO("[1] Setting yaw to %f and pitch to %f.", headYawAngle,
 			headPitchAngle);
 
-	//
+    //
 	tf::StampedTransform cameraToWrist;
 	transformListener.lookupTransform("LWristYaw_link", cameraFrame, now,
 			cameraToWrist);
-	tf::Vector3 direction = cameraToWrist.getOrigin();
-	tf::Vector3 directionXY(direction.getX(), direction.getY(), 0);
-	tf::Vector3 directionXZ(direction.getX(), 0, direction.getZ());
+    tf::Vector3 direction = cameraToWrist * tf::Point(0, 0, 0);
 
-	headYawAngle = tf::Vector3(1, 0, 0).angle(directionXY);
-	headPitchAngle = tf::Vector3(1, 0, 0).angle(directionXZ);
+    double x = direction.getX();
+    double y = direction.getY();
+    double z = direction.getZ();
+    headYawAngle = M_PI - acos(x / sqrt(x*x + y*y)) - M_PI_4;
+    headPitchAngle = M_PI_4 - acos(z / sqrt(x*x + z*z));
 
 	ROS_INFO("[2] Setting yaw to %f and pitch to %f.", headYawAngle,
 			headPitchAngle);
-	//
+    //
 
 	enableHeadStiffness();
 	setHeadPose(headYawAngle, headPitchAngle);
 	disableHeadStiffness();
-}
+}*/
 
 void DataCapture::camerainfoCallback(
 		const sensor_msgs::CameraInfoConstPtr& msg) {
@@ -341,22 +359,22 @@ void DataCapture::camerainfoCallback(
 	ROS_INFO("Camera model set.");
 }
 
-/*
+
  void DataCapture::findCheckerboard() {
  // TODO: parameterize!!
  double headYawMin = 0; //-0.5;
  double headYawMax = 0.5;
  double headPitchMin = -0.5;
  double headPitchMax = 0.2;
- checkerboardFound = false;
+ updateCheckerboard();
 
  enableHeadStiffness();
- for (double headYaw = headYawMin; headYaw <= headYawMax; headYaw += 0.5) {
+ for (double headYaw = headYawMin; headYaw <= headYawMax; headYaw += 0.4) {
  if (checkerboardFound)
  break;
  for (double headPitch = headPitchMin; headPitch <= headPitchMax;
  headPitch += 0.33) {
- setHeadPose(headYaw, headPitch);
+ setHeadPose(-headYaw, headPitch);
  updateCheckerboard();
  if (checkerboardFound)
  break;
@@ -364,7 +382,7 @@ void DataCapture::camerainfoCallback(
  }
  disableHeadStiffness();
  }
- */
+
 
 void DataCapture::updateCheckerboard() {
 	//ros::Duration(0.3).sleep();
