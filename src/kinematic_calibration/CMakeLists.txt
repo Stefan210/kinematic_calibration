@@ -187,10 +187,6 @@ target_link_libraries(modelLoaderTest modelLoader ${catkin_LIBRARIES})
 add_library(frameImageConverter src/FrameImageConverter.cpp)
 target_link_libraries(frameImageConverter ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
-### MeasurementData
-add_library(measurementData src/MeasurementData.cpp)
-target_link_libraries(measurementData ${catkin_LIBRARIES})
-
 ### JointOffsetOptimization
 add_library(jointOffsetOptimization src/JointOffsetOptimization.cpp)
 target_link_libraries(jointOffsetOptimization kinematicChain frameImageConverter measurementData ${catkin_LIBRARIES})
