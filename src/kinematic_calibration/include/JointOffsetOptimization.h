@@ -8,9 +8,9 @@
 #ifndef JOINTOFFSETOPTIMIZATION_H_
 #define JOINTOFFSETOPTIMIZATION_H_
 
-#include "../include/MeasurementData.h"
 #include "../include/KinematicChain.h"
 #include "../include/FrameImageConverter.h"
+#include <kinematic_calibration/measurementData.h>
 
 #include <vector>
 #include <map>
@@ -44,7 +44,7 @@ public:
 	/**
 	 * Constructor.
 	 */
-	JointOffsetOptimization(vector<MeasurementData>& measurements,
+	JointOffsetOptimization(vector<const measurementData>& measurements,
 			KinematicChain& kinematicChain,
 			FrameImageConverter& frameImageConverter,
 			CalibrationState initialState = CalibrationState());
@@ -64,7 +64,7 @@ protected:
 	/**
 	 * Measurements of joint state and marker position (2D).
 	 */
-	vector<MeasurementData>& measurements;
+	vector<const measurementData>& measurements;
 
 	/**
 	 * Kinematic chain for which the joint offsets should be converted.
