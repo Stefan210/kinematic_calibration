@@ -144,6 +144,7 @@ void DataCapture::playLeftArmPoses() {
 	enableLArmStiffness();
 	int numOfPoses = 26; // TODO: parameterize!!
 	for (int i = 1; i <= numOfPoses; i++) {
+		// execute next pose
 		char buf[10];
 		sprintf(buf, "larm%i", i);
 		string poseName(buf);
@@ -152,15 +153,20 @@ void DataCapture::playLeftArmPoses() {
 		ROS_INFO("Calling pose manager for executing pose %s...", buf);
 		bodyPoseClient.sendGoalAndWait(goal);
 		ROS_INFO("Done.");
-		//
+
+		// find the checkerboard
 		ROS_INFO("Moving head in order to find the checkerboard...");
 		findCheckerboard();
 		if (!checkerboardFound)
 			continue;
 
+		// move the head s.t. the checkerboard is
+		// within the center region of the camera image
 		ROS_INFO("Moving head to CENTER region...");
 		moveCheckerboardToImageRegion(CENTER);
 
+		// move the head s.t. the checkerboard is
+		// within the corner regions and publish the data
 		enableHeadStiffness();
 		ROS_INFO("Moving head to LEFT_TOP region...");
 		setHeadPose(-0.3, 0.15, true);
@@ -396,7 +402,8 @@ void DataCapture::updateCheckerboard() {
 	receivedImage = false;
 	ros::Duration(0.3).sleep();
 	ROS_INFO("Waiting for image message...");
-	while (ros::getGlobalCallbackQueue()->isEmpty());
+	while (ros::getGlobalCallbackQueue()->isEmpty())
+		;
 	while (!receivedImage) {
 		ros::getGlobalCallbackQueue()->callAvailable();
 	}
@@ -406,7 +413,8 @@ void DataCapture::updateJointStates() {
 	receivedJointStates = false;
 	ros::Duration(0.3).sleep();
 	ROS_INFO("Waiting for joint state message...");
-	while (jointStatesQueue.isEmpty());
+	while (jointStatesQueue.isEmpty())
+		;
 	while (!receivedJointStates) {
 		jointStatesQueue.callAvailable();
 	}
