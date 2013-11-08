@@ -26,13 +26,13 @@ DataCapture::DataCapture() :
 	ros::getGlobalCallbackQueue()->callAvailable();
 	camerainfoSub.shutdown();
 	ROS_INFO("Done.");
-
+/*
 	imageSub = it.subscribe("/nao_camera/image_raw", 1,
 			&DataCapture::imageCallback, this);
 
 	jointStateSub = nh.subscribe("/joint_states", 1,
 			&DataCapture::jointStatesCallback, this);
-
+*/
 	measurementPub = nh.advertise<measurementData>(
 			"/kinematic_calibration/measurement_data", 100);
 
@@ -384,25 +384,35 @@ void DataCapture::jointStatesCallback(
 }
 
 void DataCapture::updateCheckerboard() {
+	imageSub = it.subscribe("/nao_camera/image_raw", 1,
+			&DataCapture::imageCallback, this);
+
 	receivedImage = false;
 	ros::Duration(0.1).sleep();
 	while (ros::getGlobalCallbackQueue()->isEmpty()) {
 		ROS_INFO("Waiting for image message...");
 	}
 	while (!receivedImage) {
-		ros::spinOnce();
+		ros::getGlobalCallbackQueue()->callAvailable();
 	}
+
+	imageSub.shutdown();
 }
 
 void DataCapture::updateJointStates() {
+	jointStateSub = nh.subscribe("/joint_states", 1,
+			&DataCapture::jointStatesCallback, this);
+
 	receivedJointStates = false;
 	ros::Duration(0.1).sleep();
 	while (ros::getGlobalCallbackQueue()->isEmpty()) {
 		ROS_INFO("Waiting for joint state message...");
 	}
 	while (!receivedJointStates) {
-		ros::spinOnce();
+		ros::getGlobalCallbackQueue()->callAvailable();
 	}
+
+	jointStateSub.shutdown();
 }
 
 void DataCapture::setHeadPose(double headYaw, double headPitch, bool relative) {
@@ -426,6 +436,8 @@ void DataCapture::publishMeasurement() {
 	data.jointState = jointState;
 	data.cb_x = checkerboardData.x;
 	data.cb_y = checkerboardData.y;
+	ROS_INFO("Publishing measurement data...");
+	measurementPub.publish(data);
 }
 
 } /* namespace kinematic_calibration */
