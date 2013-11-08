@@ -431,6 +431,9 @@ void DataCapture::setHeadPose(double headYaw, double headPitch, bool relative) {
 
 void DataCapture::publishMeasurement() {
 	updateCheckerboard();
+	if(!checkerboardFound) {
+		return;
+	}
 	updateJointStates();
 	measurementData data;
 	data.jointState = jointState;
