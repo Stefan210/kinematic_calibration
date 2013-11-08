@@ -26,6 +26,7 @@
 #include <image_geometry/pinhole_camera_model.h>
 
 #include "../include/CheckerboardDetection.h"
+#include <kinematic_calibration/measurementData.h>
 
 using namespace std;
 
@@ -60,11 +61,14 @@ public:
 private:
 	ros::NodeHandle nh;
 	ros::Subscriber camerainfoSub;
+	ros::Subscriber jointStateSub;
 	image_transport::Subscriber imageSub;
 	image_transport::ImageTransport it;
+	ros::Publisher measurementPub;
 	CheckerboardDetection checkerboardDetection;
 	CheckerboardData checkerboardData;
 	bool checkerboardFound;
+	bool receivedJointStates;
 	actionlib::SimpleActionClient<nao_msgs::JointTrajectoryAction> stiffnessClient;
 	actionlib::SimpleActionClient<nao_msgs::JointTrajectoryAction> trajectoryClient;
 	actionlib::SimpleActionClient<nao_msgs::BodyPoseAction> bodyPoseClient;
@@ -74,12 +78,16 @@ private:
 	image_geometry::PinholeCameraModel cameraModel;
 	tf::TransformListener transformListener;
 	string cameraFrame;
+	sensor_msgs::JointState jointState;
 	void setStiffness(const vector<string>& jointNames, double stiffness);
 	void enableStiffness(const vector<string>& jointNames);
 	void disableStiffness(const vector<string>& jointNames);
 	void imageCallback(const sensor_msgs::ImageConstPtr& msg);
 	void camerainfoCallback(const sensor_msgs::CameraInfoConstPtr& msg);
+	void jointStatesCallback(const sensor_msgs::JointStateConstPtr& msg);
 	void updateCheckerboard();
+	void updateJointStates();
+	void publishMeasurement();
 };
 
 } /* namespace kinematic_calibration */
