@@ -51,7 +51,7 @@ void OptimizationNode::measurementCb(const measurementDataConstPtr& msg) {
 	} else {
 		// save data
 		measurements.push_back(measurementData(data));
-		ROS_INFO("Meausrement data received (#%d).", measurements.size() + 1);
+		ROS_INFO("Meausrement data received (#%ld).", measurements.size());
 	}
 }
 
@@ -59,5 +59,7 @@ void OptimizationNode::measurementCb(const measurementDataConstPtr& msg) {
 
 int main(int argc, char** argv) {
 	ros::init(argc, argv, "OptimizationNode");
+	kinematic_calibration::OptimizationNode node;
+	node.startLoop();
 	return 0;
 }
