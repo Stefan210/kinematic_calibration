@@ -44,6 +44,8 @@ private:
 
 	vector<measurementData> measurements;
 
+	bool collectingData;
+
 };
 
 } /* namespace kinematic_calibration */
