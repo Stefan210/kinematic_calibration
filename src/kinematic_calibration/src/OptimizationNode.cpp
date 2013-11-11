@@ -22,8 +22,11 @@ OptimizationNode::~OptimizationNode() {
 }
 
 void OptimizationNode::startLoop() {
+	ROS_INFO("Waiting for data...");
 	collectData();
+	ROS_INFO("Starting optimization...");
 	optimize();
+	ROS_INFO("Publishing results...");
 	printResult();
 }
 
@@ -48,6 +51,7 @@ void OptimizationNode::measurementCb(const measurementDataConstPtr& msg) {
 	} else {
 		// save data
 		measurements.push_back(measurementData(data));
+		ROS_INFO("Meausrement data received (#%d).", measurements.size() + 1);
 	}
 }
 
