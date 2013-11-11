@@ -32,7 +32,7 @@ public:
 	 * @param root Root element name of the chain.
 	 * @param tip Tip element name of the chain.
 	 */
-	KinematicChain(const KDL::Tree& tree, std::string root, std::string tip);
+	KinematicChain(const KDL::Tree& tree, std::string root, std::string tip, std::string name="");
 	virtual ~KinematicChain();
 
 	/**
@@ -76,10 +76,35 @@ public:
 		return chain;
 	}
 
+	/**
+	 * Returns the name.
+	 * @return Returns the name.
+	 */
+	const string& getName() const {
+		return name;
+	}
+
+	/**
+	 * Returns the root.
+	 * @return Returns the root.
+	 */
+	const string& getRoot() const {
+		return root;
+	}
+
+	/**
+	 * Returns the tip.
+	 * @return Returns the tip.
+	 */
+	const string& getTip() const {
+		return tip;
+	}
+
 private:
 	KDL::Chain chain;
 	string root;
 	string tip;
+	string name;
 	void getJointWithOffset(const KDL::Joint& old_joint, double offset,
 			KDL::Joint& new_joint);
 	void getSegmentWithJointOffset(const KDL::Segment& old_segment,
