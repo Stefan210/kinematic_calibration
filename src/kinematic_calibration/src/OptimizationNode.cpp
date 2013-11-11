@@ -51,7 +51,7 @@ void OptimizationNode::measurementCb(const measurementDataConstPtr& msg) {
 	} else {
 		// save data
 		measurements.push_back(measurementData(data));
-		ROS_INFO("Meausrement data received (#%ld).", measurements.size());
+		ROS_INFO("Measurement data received (#%ld).", measurements.size());
 	}
 }
 
