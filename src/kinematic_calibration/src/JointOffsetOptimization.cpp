@@ -10,7 +10,7 @@
 namespace kinematic_calibration {
 
 JointOffsetOptimization::JointOffsetOptimization(
-		vector<const measurementData>& measurements, KinematicChain& kinematicChain,
+		vector<measurementData>& measurements, KinematicChain& kinematicChain,
 		FrameImageConverter& frameImageConverter, KinematicCalibrationState initialState) :
 		measurements(measurements), kinematicChain(kinematicChain), frameImageConverter(
 				frameImageConverter), initialState(initialState) {

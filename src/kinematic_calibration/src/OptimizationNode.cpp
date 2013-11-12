@@ -15,8 +15,9 @@
 #include <sensor_msgs/JointState.h>
 #include <string>
 
-#include "../include/KinematicCalibrationState.h"
 #include "../include/FrameImageConverter.h"
+#include "../include/G2oJointOffsetOptimization.h"
+#include "../include/KinematicCalibrationState.h"
 #include "../include/KinematicChain.h"
 #include "../include/ModelLoader.h"
 
@@ -62,13 +63,17 @@ void OptimizationNode::optimize() {
 	nh.getParam("chain_name", name);
 	nh.getParam("chain_root", root);
 	nh.getParam("chain_tip", tip);
-	KinematicChain KinematicChain(tree, root, tip, name);
+	KinematicChain kinematicChain(tree, root, tip, name);
 
 	// instantiate the frame image converter
-	FrameImageConverter FrameImageConverter(cameraModel);
+	FrameImageConverter frameImageConverter(cameraModel);
 
 	// initial state
 	KinematicCalibrationState initialState;
+
+	// optimization instance
+	G2oJointOffsetOptimization optimization(measurements, kinematicChain,
+			frameImageConverter, initialState);
 
 }
 

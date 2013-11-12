@@ -37,7 +37,7 @@ int JointOffsetVertex::estimateDimension() const {
 }
 
 G2oJointOffsetOptimization::G2oJointOffsetOptimization(
-		vector<const measurementData>& measurements,
+		vector<measurementData>& measurements,
 		KinematicChain& kinematicChain,
 		FrameImageConverter& frameImageConverter, KinematicCalibrationState initialState) :
 		JointOffsetOptimization(measurements, kinematicChain,

@@ -29,7 +29,7 @@ public:
 	/**
 	 * Constructor.
 	 */
-	JointOffsetOptimization(vector<const measurementData>& measurements,
+	JointOffsetOptimization(vector<measurementData>& measurements,
 			KinematicChain& kinematicChain,
 			FrameImageConverter& frameImageConverter,
 			KinematicCalibrationState initialState = KinematicCalibrationState());
@@ -49,7 +49,7 @@ protected:
 	/**
 	 * Measurements of joint state and marker position (2D).
 	 */
-	vector<const measurementData>& measurements;
+	vector<measurementData>& measurements;
 
 	/**
 	 * Kinematic chain for which the joint offsets should be converted.
