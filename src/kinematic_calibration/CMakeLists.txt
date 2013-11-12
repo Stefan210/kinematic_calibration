@@ -196,11 +196,6 @@ target_link_libraries(modelLoaderTest modelLoader ${catkin_LIBRARIES})
 add_library(frameImageConverter src/FrameImageConverter.cpp)
 target_link_libraries(frameImageConverter ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
-### JointOffsetOptimization
-add_library(jointOffsetOptimization src/JointOffsetOptimization.cpp)
-target_link_libraries(jointOffsetOptimization kinematicChain frameImageConverter ${catkin_LIBRARIES})
-
-
 ### DataCapture
 add_library(dataCapture src/DataCapture.cpp)
 target_link_libraries(dataCapture checkerboardDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
@@ -211,6 +206,7 @@ target_link_libraries(dataCaptureMain dataCapture ${catkin_LIBRARIES} ${OpenCV_L
 
 ### OptimizationNode
 add_executable(optimizationNode 
+	src/KinematicCalibrationState.cpp
 	src/OptimizationNode.cpp 
 	src/JointOffsetOptimization.cpp
 	src/G2oJointOffsetOptimization.cpp

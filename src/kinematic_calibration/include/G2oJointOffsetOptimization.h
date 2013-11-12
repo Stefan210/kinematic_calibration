@@ -51,7 +51,7 @@ public:
 	G2oJointOffsetOptimization(vector<const measurementData>& measurements,
 			KinematicChain& kinematicChain,
 			FrameImageConverter& frameImageConverter,
-			CalibrationState initialState = CalibrationState());
+			KinematicCalibrationState initialState = KinematicCalibrationState());
 
 	/**
 	 * Deconstructor.
@@ -62,7 +62,7 @@ public:
 	 * Optimizes the joint offsets (and the marker transformation).
 	 * @param[out] optimizedState Contains the optimized calibration state.
 	 */
-	void optimize(CalibrationState& optimizedState);
+	void optimize(KinematicCalibrationState& optimizedState);
 };
 
 } /* namespace kinematic_calibration */

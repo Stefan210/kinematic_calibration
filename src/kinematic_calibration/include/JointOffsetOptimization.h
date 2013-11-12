@@ -8,33 +8,18 @@
 #ifndef JOINTOFFSETOPTIMIZATION_H_
 #define JOINTOFFSETOPTIMIZATION_H_
 
-#include "../include/KinematicChain.h"
-#include "../include/FrameImageConverter.h"
 #include <kinematic_calibration/measurementData.h>
-
+//#include <map>
+//#include <string>
 #include <vector>
-#include <map>
-#include <string>
+
+#include "../include/KinematicCalibrationState.h"
+#include "../include/KinematicChain.h"
+#include "FrameImageConverter.h"
 
 using namespace std;
 
 namespace kinematic_calibration {
-
-/**
- * Represents a calibration state.
- */
-class CalibrationState {
-public:
-	/**
-	 * Current joint offsets.
-	 */
-	map<string, double> jointOffsets;
-
-	/**
-	 * Estimation for the transformation from marker to end effector of the kinematic chain.
-	 */
-	tf::Transform markerTransformation;
-};
 
 /**
  * Abstract class for optimizing the joint offsets (and marker transformation).
@@ -47,7 +32,7 @@ public:
 	JointOffsetOptimization(vector<const measurementData>& measurements,
 			KinematicChain& kinematicChain,
 			FrameImageConverter& frameImageConverter,
-			CalibrationState initialState = CalibrationState());
+			KinematicCalibrationState initialState = KinematicCalibrationState());
 
 	/**
 	 * Deconstructor.
@@ -58,7 +43,7 @@ public:
 	 * Optimizes the joint offsets (and the marker transformation).
 	 * @param[out] optimizedState Contains the optimized calibration state.
 	 */
-	virtual void optimize(CalibrationState& optimizedState) = 0;
+	virtual void optimize(KinematicCalibrationState& optimizedState) = 0;
 
 protected:
 	/**
@@ -79,7 +64,7 @@ protected:
 	/**
 	 * Initial state for the optimization;
 	 */
-	CalibrationState initialState;
+	KinematicCalibrationState initialState;
 };
 
 } /* namespace kinematic_calibration */

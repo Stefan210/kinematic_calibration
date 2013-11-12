@@ -7,6 +7,19 @@
 
 #include "../include/OptimizationNode.h"
 
+#include <boost/smart_ptr/shared_ptr.hpp>
+#include <kdl/tree.hpp>
+#include <ros/console.h>
+#include <ros/init.h>
+#include <rosconsole/macros_generated.h>
+#include <sensor_msgs/JointState.h>
+#include <string>
+
+#include "../include/KinematicCalibrationState.h"
+#include "../include/FrameImageConverter.h"
+#include "../include/KinematicChain.h"
+#include "../include/ModelLoader.h"
+
 namespace kinematic_calibration {
 
 OptimizationNode::OptimizationNode() :
@@ -40,6 +53,23 @@ void OptimizationNode::collectData() {
 }
 
 void OptimizationNode::optimize() {
+	// instantiate the kinematic chain
+	ModelLoader modelLoader;
+	modelLoader.initializeFromRos();
+	KDL::Tree tree;
+	modelLoader.getKdlTree(tree);
+	string name, root, tip;
+	nh.getParam("chain_name", name);
+	nh.getParam("chain_root", root);
+	nh.getParam("chain_tip", tip);
+	KinematicChain KinematicChain(tree, root, tip, name);
+
+	// instantiate the frame image converter
+	FrameImageConverter FrameImageConverter(cameraModel);
+
+	// initial state
+	KinematicCalibrationState initialState;
+
 }
 
 void OptimizationNode::printResult() {
