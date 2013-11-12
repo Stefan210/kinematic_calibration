@@ -11,10 +11,11 @@
 #include <image_geometry/pinhole_camera_model.h>
 #include <kinematic_calibration/measurementData.h>
 #include <ros/node_handle.h>
-//#include <ros/ros.h>
 #include <ros/subscriber.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <vector>
+
+#include "KinematicCalibrationState.h"
 
 using namespace ros;
 using namespace std;
@@ -46,6 +47,7 @@ private:
 
 	vector<measurementData> measurements;
 	image_geometry::PinholeCameraModel cameraModel;
+	KinematicCalibrationState result;
 
 	bool collectingData;
 

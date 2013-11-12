@@ -74,7 +74,7 @@ void OptimizationNode::optimize() {
 	// optimization instance
 	G2oJointOffsetOptimization optimization(measurements, kinematicChain,
 			frameImageConverter, initialState);
-
+	optimization.optimize(result);
 }
 
 void OptimizationNode::printResult() {
