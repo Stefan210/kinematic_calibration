@@ -50,23 +50,10 @@ G2oJointOffsetOptimization::~G2oJointOffsetOptimization() {
 void G2oJointOffsetOptimization::optimize(CalibrationState& optimizedState) {
 	// instantiate the vertex for the joint offsets
 	vector<string> jointNames;
-	jointNames = getHeadJointNames();
-	if ("left_arm" == kinematicChain.getName()) {
-		jointNames.insert(jointNames.end(), getLeftArmJointNames().begin(),
-				getLeftArmJointNames().end());
-	} else {
-		ROS_FATAL("Unknown kinematic chain type!");
-	}
+	kinematicChain.getJointNames(jointNames);
 	JointOffsetVertex jointOffsetVertex(jointNames);
 
-	// instantiate the kinematic chain
-	ModelLoader modelLoader;
-	modelLoader.initializeFromRos();
-	KDL::Tree tree;
-	modelLoader.getKdlTree(tree);
-	string root = jointNames[jointNames.size() - 1];
-	string tip = jointNames[0];
-	KinematicChain KinematicChain(tree, root, tip);
+
 
 }
 
