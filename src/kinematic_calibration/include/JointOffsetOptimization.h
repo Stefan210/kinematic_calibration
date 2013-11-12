@@ -60,6 +60,26 @@ public:
 	 */
 	virtual void optimize(CalibrationState& optimizedState) = 0;
 
+	// TODO: move into own class
+	virtual vector<string> getLeftArmJointNames() {
+		vector<string> jointNames;
+		jointNames.push_back("LShoulderPitch");
+		jointNames.push_back("LShoulderRoll");
+		jointNames.push_back("LElbowYaw");
+		jointNames.push_back("LElbowRoll");
+		jointNames.push_back("LWristYaw");
+		jointNames.push_back("LHand");
+		return jointNames;
+	}
+
+	// TODO: move into own class
+	virtual vector<string> getHeadJointNames() {
+		vector<string> jointNames;
+		jointNames.push_back("HeadYaw");
+		jointNames.push_back("HeadPitch");
+		return jointNames;
+	}
+
 protected:
 	/**
 	 * Measurements of joint state and marker position (2D).

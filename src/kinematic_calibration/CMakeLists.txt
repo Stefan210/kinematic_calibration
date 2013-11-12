@@ -7,6 +7,15 @@ project(kinematic_calibration)
 find_package(catkin REQUIRED roscpp cv_bridge image_transport urdf orocos_kdl kdl_parser tf tf_conversions nao_msgs actionlib image_geometry message_generation)
 find_package(OpenCV REQUIRED)
 
+SET(G2O_LIBS cholmod cxsparse -lg2o_cli -lg2o_core
+-lg2o_csparse_extension -lg2o_ext_freeglut_minimal -lg2o_incremental
+-lg2o_interactive -lg2o_interface -lg2o_opengl_helper -lg2o_parser
+-lg2o_simulator -lg2o_solver_cholmod -lg2o_solver_csparse
+-lg2o_solver_dense -lg2o_solver_pcg -lg2o_solver_slam2d_linear
+-lg2o_solver_structure_only -lg2o_stuff -lg2o_types_data -lg2o_types_icp
+-lg2o_types_sba -lg2o_types_sclam2d -lg2o_types_sim3 -lg2o_types_slam2d
+-lg2o_types_slam3d)
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -79,7 +88,7 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+  INCLUDE_DIRS include
 #  LIBRARIES kinematic_calibration
   CATKIN_DEPENDS sensor_msgs message_runtime
 #  DEPENDS system_lib
@@ -201,5 +210,9 @@ target_link_libraries(dataCaptureMain dataCapture ${catkin_LIBRARIES} ${OpenCV_L
 
 
 ### OptimizationNode
-add_executable(optimizationNode src/OptimizationNode.cpp)
-target_link_libraries(optimizationNode ${catkin_LIBRARIES})
+add_executable(optimizationNode 
+	src/OptimizationNode.cpp 
+	src/JointOffsetOptimization.cpp
+	src/G2oJointOffsetOptimization.cpp
+	)
+target_link_libraries(optimizationNode ${catkin_LIBRARIES} ${G2O_LIBS})

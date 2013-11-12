@@ -22,4 +22,3 @@ JointOffsetOptimization::~JointOffsetOptimization() {
 }
 
 } /* namespace kinematic_calibration */
-
