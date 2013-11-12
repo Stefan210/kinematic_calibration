@@ -12,8 +12,8 @@ using namespace std;
 namespace kinematic_calibration {
 
 KinematicChain::KinematicChain(const KDL::Tree& tree, std::string root,
-		std::string tip) :
-		root(root), tip(tip) {
+		std::string tip, std::string name) :
+		root(root), tip(tip), name(name) {
 	if (!tree.getChain(root, tip, this->chain)) {
 		ROS_ERROR("Could not extract the chain!");
 	}
@@ -106,6 +106,16 @@ void KinematicChain::getRootToTip(const map<string, double>& joint_positions,
 void KinematicChain::kdlFrameToTfTransform(const KDL::Frame& in,
 		tf::Transform& out) {
 	tf::transformKDLToTF(in, out);
+}
+
+void KinematicChain::getJointNames(vector<string>& jointNames) {
+	jointNames.clear();
+	for (unsigned int i = 0; i < chain.getNrOfSegments(); i++) {
+		KDL::Segment segment = chain.getSegment(i);
+		KDL::Joint joint = segment.getJoint();
+		jointNames.push_back(joint.getName());
+		ROS_INFO("Added joint name %s", joint.getName().c_str());
+	}
 }
 
 } /* namespace kinematic_calibration */

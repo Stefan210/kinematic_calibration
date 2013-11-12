@@ -8,7 +8,7 @@
 #ifndef KINEMTAICCHAIN_H_
 #define KINEMTAICCHAIN_H_
 
-#include <string>
+//#include <string>
 #include <kdl/kdl.hpp>
 #include <kdl/tree.hpp>
 #include <ros/ros.h>
@@ -67,6 +67,12 @@ public:
 	 */
 	void getRootToTip(const map<string, double>& joint_positions,
 			const map<string, double>& joint_offsets, tf::Transform& out);
+
+	/**
+	 * Returns a list containing the names of all joints.
+	 * @param jointNames Returns a list containing the names of all joints.
+	 */
+	void getJointNames(vector<string>& jointNames);
 
 	/**
 	 * Returns the chain.
