@@ -53,6 +53,32 @@ TEST(KinematicChainTest, getTransformTest1) {
 	ASSERT_DOUBLE_EQ(0.2, p);
 }
 
+TEST(KinematicChainTest, getJointNamesTest) {
+	// arrange
+	ifstream file("test.urdf");
+	std::string urdfStr((std::istreambuf_iterator<char>(file)),
+			std::istreambuf_iterator<char>());
+	ModelLoader modelLoader;
+	modelLoader.initializeFromUrdf(urdfStr);
+	KDL::Tree tree;
+	modelLoader.getKdlTree(tree);
+	KinematicChain kinematicChain(tree, "CameraTop_frame", "l_gripper");
+	vector<string> jointNames;
+
+	// act
+	kinematicChain.getJointNames(jointNames);
+
+	// assert
+	ASSERT_TRUE(7 == jointNames.size());
+	ASSERT_TRUE(jointNames[0] == "HeadPitch");
+	ASSERT_TRUE(jointNames[1] == "HeadYaw");
+	ASSERT_TRUE(jointNames[2] == "LShoulderPitch");
+	ASSERT_TRUE(jointNames[3] == "LShoulderRoll");
+	ASSERT_TRUE(jointNames[4] == "LElbowYaw");
+	ASSERT_TRUE(jointNames[5] == "LElbowRoll");
+	ASSERT_TRUE(jointNames[6] == "LWristYaw");
+}
+
 } /* namespace kinematic_calibration */
 
 // Run all the tests that were declared with TEST()

@@ -19,14 +19,14 @@ KinematicChain::KinematicChain(const KDL::Tree& tree, std::string root,
 	}
 	ROS_INFO("Extracted kinematic chain with %u segments and %u joints.",
 			this->chain.getNrOfSegments(), this->chain.getNrOfJoints());
-
 }
 
 KinematicChain::~KinematicChain() {
 
 }
 
-void KinematicChain::getRootToTip(const map<string, double>& joint_positions, KDL::Frame& out) {
+void KinematicChain::getRootToTip(const map<string, double>& joint_positions,
+		KDL::Frame& out) {
 	KDL::Frame rootToTip = KDL::Frame::Identity();
 	for (unsigned int i = 0; i < chain.getNrOfSegments(); i++) {
 		KDL::Segment segment = chain.getSegment(i);
@@ -56,8 +56,9 @@ void KinematicChain::getRootToTip(const map<string, double>& joint_positions,
 	map<string, double> sum;
 
 	// iterate through all positions
-	for (map<string, double>::const_iterator outer_jnt_it = joint_positions.begin();
-			outer_jnt_it != joint_positions.end(); outer_jnt_it++) {
+	for (map<string, double>::const_iterator outer_jnt_it =
+			joint_positions.begin(); outer_jnt_it != joint_positions.end();
+			outer_jnt_it++) {
 		double position = outer_jnt_it->second;
 		// add (optional) joint offset
 		std::map<std::string, double>::const_iterator inner_jnt_it =
@@ -113,8 +114,10 @@ void KinematicChain::getJointNames(vector<string>& jointNames) {
 	for (unsigned int i = 0; i < chain.getNrOfSegments(); i++) {
 		KDL::Segment segment = chain.getSegment(i);
 		KDL::Joint joint = segment.getJoint();
-		jointNames.push_back(joint.getName());
-		ROS_INFO("Added joint name %s", joint.getName().c_str());
+		if (joint.getType() != KDL::Joint::None) {
+			jointNames.push_back(joint.getName());
+			ROS_INFO("Added joint name %s", joint.getName().c_str());
+		}
 	}
 }
 
