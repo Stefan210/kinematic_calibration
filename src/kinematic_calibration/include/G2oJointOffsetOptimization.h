@@ -8,12 +8,15 @@
 #ifndef G2OJOINTOFFSETOPTIMIZATION_H_
 #define G2OJOINTOFFSETOPTIMIZATION_H_
 
-#include "../include/JointOffsetOptimization.h"
-
-#include <g2o/types/slam3d/vertex_se3.h>
 #include <g2o/core/base_vertex.h>
-#include <g2o/core/optimizable_graph.h>
+#include <kinematic_calibration/measurementData.h>
+#include <iostream>
 #include <map>
+#include <string>
+#include <vector>
+
+#include "FrameImageConverter.h"
+#include "JointOffsetOptimization.h"
 
 namespace kinematic_calibration {
 

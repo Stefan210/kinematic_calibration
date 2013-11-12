@@ -215,4 +215,10 @@ add_executable(optimizationNode
 	src/JointOffsetOptimization.cpp
 	src/G2oJointOffsetOptimization.cpp
 	)
-target_link_libraries(optimizationNode ${catkin_LIBRARIES} ${G2O_LIBS})
+target_link_libraries(optimizationNode 
+	frameImageConverter
+	modelLoader
+	kinematicChain
+	${catkin_LIBRARIES} 
+	${G2O_LIBS}
+	)

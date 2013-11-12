@@ -7,6 +7,13 @@
 
 #include "../include/G2oJointOffsetOptimization.h"
 
+#include <kdl/tree.hpp>
+#include <ros/console.h>
+#include <rosconsole/macros_generated.h>
+
+#include "../include/KinematicChain.h"
+#include "../include/ModelLoader.h"
+
 namespace kinematic_calibration {
 
 void JointOffsetVertex::oplusImpl(const double* delta) {
@@ -51,6 +58,15 @@ void G2oJointOffsetOptimization::optimize(CalibrationState& optimizedState) {
 		ROS_FATAL("Unknown kinematic chain type!");
 	}
 	JointOffsetVertex jointOffsetVertex(jointNames);
+
+	// instantiate the kinematic chain
+	ModelLoader modelLoader;
+	modelLoader.initializeFromRos();
+	KDL::Tree tree;
+	modelLoader.getKdlTree(tree);
+	string root = jointNames[jointNames.size() - 1];
+	string tip = jointNames[0];
+	KinematicChain KinematicChain(tree, root, tip);
 
 }
 
