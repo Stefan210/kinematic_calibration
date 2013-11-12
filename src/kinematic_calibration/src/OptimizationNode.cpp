@@ -14,6 +14,8 @@ OptimizationNode::OptimizationNode() :
 	measurementSubsriber = nh.subscribe(
 			"/kinematic_calibration/measurement_data", 100,
 			&OptimizationNode::measurementCb, this);
+	cameraInfoSubscriber = nh.subscribe("/nao_camera/camera_info", 1,
+			&OptimizationNode::camerainfoCallback, this);
 
 }
 
@@ -53,6 +55,13 @@ void OptimizationNode::measurementCb(const measurementDataConstPtr& msg) {
 		measurements.push_back(measurementData(data));
 		ROS_INFO("Measurement data received (#%ld).", measurements.size());
 	}
+}
+
+void OptimizationNode::camerainfoCallback(
+		const sensor_msgs::CameraInfoConstPtr& msg) {
+	cameraModel.fromCameraInfo(msg);
+	ROS_INFO("Camera model set.");
+	cameraInfoSubscriber.shutdown();
 }
 
 } /* namespace kinematic_calibration */

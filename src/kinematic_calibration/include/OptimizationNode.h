@@ -8,12 +8,12 @@
 #ifndef OPTIMIZATIONNODE_H_
 #define OPTIMIZATIONNODE_H_
 
-#include <ros/ros.h>
-#include <ros/node_handle.h>
-#include <ros/subscriber.h>
-
+#include <image_geometry/pinhole_camera_model.h>
 #include <kinematic_calibration/measurementData.h>
-
+#include <ros/node_handle.h>
+//#include <ros/ros.h>
+#include <ros/subscriber.h>
+#include <sensor_msgs/CameraInfo.h>
 #include <vector>
 
 using namespace ros;
@@ -37,12 +37,15 @@ protected:
 	void printResult();
 
 	void measurementCb(const measurementDataConstPtr& msg);
+	void camerainfoCallback(const sensor_msgs::CameraInfoConstPtr& msg);
 
 private:
 	NodeHandle nh;
 	Subscriber measurementSubsriber;
+	Subscriber cameraInfoSubscriber;
 
 	vector<measurementData> measurements;
+	image_geometry::PinholeCameraModel cameraModel;
 
 	bool collectingData;
 
