@@ -120,7 +120,7 @@ void G2oJointOffsetOptimization::optimize(
 	optimizer.initializeOptimization();
 	optimizer.computeActiveErrors();
 	optimizer.setVerbose(true);
-	optimizer.optimize(1000);
+	optimizer.optimize(10000);
 
 	// get results
 	optimizedState.jointOffsets =
@@ -130,7 +130,7 @@ void G2oJointOffsetOptimization::optimize(
 }
 
 CheckerboardMeasurementEdge::CheckerboardMeasurementEdge(
-		const measurementData& measurement) :
+		measurementData measurement) :
 		measurement(measurement) {
 	for (int i = 0; i < measurement.jointState.name.size(); i++) {
 		jointPositions.insert(
@@ -168,6 +168,12 @@ void CheckerboardMeasurementEdge::computeError() {
 	// set error
 	this->_error[0] = measurement.cb_x - x;
 	this->_error[1] = measurement.cb_y - y;
+
+	//cout << "id: " << _id << " ";
+	//cout << "x error: " << this->_error[0] << " y error: " << this->_error[1]
+	//		<< " ";
+	//cout << "cb_x: " << measurement.cb_x << " cb_y: " << measurement.cb_y
+	//		<< "\n";
 }
 
 const FrameImageConverter* CheckerboardMeasurementEdge::getFrameImageConverter() const {

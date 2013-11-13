@@ -60,7 +60,7 @@ protected:
 class CheckerboardMeasurementEdge: public BaseBinaryEdge<2, measurementData,
 		MarkerTransformationVertex, JointOffsetVertex> {
 public:
-	CheckerboardMeasurementEdge(const measurementData& measurement);
+	CheckerboardMeasurementEdge(measurementData measurement);
 	virtual ~CheckerboardMeasurementEdge();
 
 	/**
@@ -94,7 +94,7 @@ private:
 	/**
 	 * Measurement data.
 	 */
-	const measurementData& measurement;
+	measurementData measurement;
 
 	/**
 	 * Joint positions (extracted of the measurement data).

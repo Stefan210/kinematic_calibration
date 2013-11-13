@@ -40,16 +40,14 @@ void KinematicChain::getRootToTip(const map<string, double>& joint_positions,
 			position = jnt->second;
 		}
 		rootToTip = rootToTip * segment.pose(position);
-		std::cout << "segment name: " << segment.getName() << "joint name: "
-				<< segment.getJoint().getName() << "\n";
 	}
 	out = rootToTip;
 
-	cout << rootToTip.p.data[0] << " " << rootToTip.p.data[1] << " "
-			<< rootToTip.p.data[2] << endl;
-	double r, p, y;
-	rootToTip.M.GetRPY(r, p, y);
-	cout << r << " " << p << " " << y << endl;
+	//cout << rootToTip.p.data[0] << " " << rootToTip.p.data[1] << " "
+	//		<< rootToTip.p.data[2] << endl;
+	//double r, p, y;
+	//rootToTip.M.GetRPY(r, p, y);
+	//cout << r << " " << p << " " << y << endl;
 }
 
 void KinematicChain::getRootToTip(const map<string, double>& joint_positions,
@@ -67,6 +65,7 @@ void KinematicChain::getRootToTip(const map<string, double>& joint_positions,
 		if (inner_jnt_it != joint_positions.end()) {
 			position += inner_jnt_it->second;
 		}
+		sum.insert(make_pair<string, double>(outer_jnt_it->first, position));
 	}
 
 	// delegate call
