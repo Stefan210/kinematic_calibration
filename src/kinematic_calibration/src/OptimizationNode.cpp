@@ -78,6 +78,20 @@ void OptimizationNode::optimize() {
 }
 
 void OptimizationNode::printResult() {
+	cout << "Optimized joint offsets:\n";
+	typedef std::map<string, double>::iterator it_type;
+	for (it_type iterator = result.jointOffsets.begin();
+			iterator != result.jointOffsets.end(); iterator++) {
+		cout << iterator->first << " : " << iterator->second << "\n";
+	}
+	cout << "Optimized transform form marker to end effector:\n";
+	cout << "(x, y, z) " << result.markerTransformation.getOrigin().x() << " "
+			<< result.markerTransformation.getOrigin().y() << " "
+			<< result.markerTransformation.getOrigin().z() << " ";
+	cout << "(q0, q1, q2, q3) " << result.markerTransformation.getRotation().x()
+			<< " " << result.markerTransformation.getRotation().y() << " "
+			<< result.markerTransformation.getRotation().z() << " "
+			<< result.markerTransformation.getRotation().w() << " ";
 }
 
 void OptimizationNode::measurementCb(const measurementDataConstPtr& msg) {
