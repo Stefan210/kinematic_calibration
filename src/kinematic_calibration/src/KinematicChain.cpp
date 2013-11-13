@@ -14,6 +14,7 @@ namespace kinematic_calibration {
 KinematicChain::KinematicChain(const KDL::Tree& tree, std::string root,
 		std::string tip, std::string name) :
 		root(root), tip(tip), name(name) {
+	ROS_INFO("Extracting chain from %s to %s...", root.c_str(), tip.c_str());
 	if (!tree.getChain(root, tip, this->chain)) {
 		ROS_ERROR("Could not extract the chain!");
 	}
