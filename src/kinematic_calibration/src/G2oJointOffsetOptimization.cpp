@@ -7,13 +7,24 @@
 
 #include "../include/G2oJointOffsetOptimization.h"
 
-#include "kinematic_calibration/measurementData.h"
+#include <tf/tf.h>
+#include <tf_conversions/tf_eigen.h>
 
+#include "kinematic_calibration/measurementData.h"
+#include "../include/JointOffsetOptimization.h"
 #include "../include/KinematicCalibrationState.h"
 #include "../include/KinematicChain.h"
 
-#include <tf/tf.h>
-#include <tf_conversions/tf_eigen.h>
+#include <g2o/core/sparse_optimizer.h>
+#include <g2o/core/block_solver.h>
+#include <g2o/core/factory.h>
+#include <g2o/core/optimization_algorithm_factory.h>
+#include <g2o/core/optimization_algorithm_gauss_newton.h>
+#include <g2o/core/optimization_algorithm_dogleg.h>
+#include <g2o/core/optimization_algorithm_levenberg.h>
+#include <g2o/solvers/dense/linear_solver_dense.h>
+#include <g2o/solvers/pcg/linear_solver_pcg.h>
+#include <g2o/solvers/dense/linear_solver_dense.h>
 
 namespace kinematic_calibration {
 
@@ -50,17 +61,56 @@ G2oJointOffsetOptimization::~G2oJointOffsetOptimization() {
 
 void G2oJointOffsetOptimization::optimize(
 		KinematicCalibrationState& optimizedState) {
+	typedef BlockSolver<BlockSolverTraits<-1, -1> > MyBlockSolver;
+	typedef LinearSolverDense<MyBlockSolver::PoseMatrixType> MyLinearSolver;
+	//typedef LinearSolverPCG<MyBlockSolver::PoseMatrixType> MyLinearSolver;
+
+	// allocating the optimizer
+	SparseOptimizer optimizer;
+
+	// create the linear solver
+	MyLinearSolver* linearSolver = new MyLinearSolver();
+	//linearSolver->setTolerance(1e-9);
+	//linearSolver->setVerbose(true);
+
+	// create the block solver on top of the linear solver
+	MyBlockSolver* blockSolver = new MyBlockSolver(linearSolver);
+	blockSolver->setLevenberg(true);
+
+	// create the algorithm to carry out the optimization
+//	OptimizationAlgorithmGaussNewton* algorithm = new OptimizationAlgorithmGaussNewton(blockSolver);
+	OptimizationAlgorithmLevenberg* algorithm =
+			new OptimizationAlgorithmLevenberg(blockSolver);
+	algorithm->setMaxTrialsAfterFailure(10000);
+//	algorithm->setUserLambdaInit(1/1000);
+
+	optimizer.setAlgorithm(algorithm);
+
+	int id = 0;
+
 	// instantiate the vertex for the joint offsets
 	vector<string> jointNames;
 	kinematicChain.getJointNames(jointNames);
 	JointOffsetVertex jointOffsetVertex(jointNames);
+	jointOffsetVertex.setId(++id);
+	optimizer.addVertex(&jointOffsetVertex);
+
 
 	// instantiate the vertex for the marker transformation
 	MarkerTransformationVertex markerTransformationVertex;
+	markerTransformationVertex.setId(++id);
+	optimizer.addVertex(&markerTransformationVertex);
 
 	// add edges
+	Eigen::Matrix2d info = Eigen::Matrix2d::Identity(2, 2);
 	for (int i = 0; i < measurements.size(); i++) {
-		// TODO
+		measurementData current = measurements[i];
+		CheckerboardMeasurementEdge edge(current);
+		edge.setId(++id);
+		edge.setInformation(info);
+		edge.vertices()[0] = &markerTransformationVertex;
+		edge.vertices()[1] = &jointOffsetVertex;
+		optimizer.addEdge(&edge);
 	}
 
 }

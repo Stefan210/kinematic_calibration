@@ -68,6 +68,13 @@ public:
 	 */
 	virtual void computeError();
 
+	virtual bool read(std::istream&) {
+		return false;
+	}
+	virtual bool write(std::ostream&) const {
+		return false;
+	}
+
 	const FrameImageConverter* getFrameImageConverter() const;
 	void setFrameImageConverter(FrameImageConverter* frameImageConverter);
 	const KinematicChain* getKinematicChain() const;
