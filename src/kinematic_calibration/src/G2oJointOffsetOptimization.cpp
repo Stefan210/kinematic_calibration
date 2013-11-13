@@ -113,6 +113,16 @@ void G2oJointOffsetOptimization::optimize(
 		optimizer.addEdge(&edge);
 	}
 
+	// optimize
+	optimizer.initializeOptimization();
+	optimizer.computeActiveErrors();
+	optimizer.setVerbose(true);
+	optimizer.optimize(1000);
+
+	// get results
+	optimizedState.jointOffsets = static_cast<map<string, double> >(jointOffsetVertex.estimate());
+	Eigen::Isometry3d eigenTransform = markerTransformationVertex.estimate();
+	tf::transformEigenToTF(eigenTransform, optimizedState.markerTransformation);
 }
 
 CheckerboardMeasurementEdge::CheckerboardMeasurementEdge(
