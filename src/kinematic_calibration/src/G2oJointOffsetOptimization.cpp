@@ -111,6 +111,8 @@ void G2oJointOffsetOptimization::optimize(
 		edge->setInformation(info);
 		edge->vertices()[0] = markerTransformationVertex;
 		edge->vertices()[1] = jointOffsetVertex;
+		edge->setFrameImageConverter(&frameImageConverter);
+		edge->setKinematicChain(&kinematicChain);
 		optimizer.addEdge(edge);
 	}
 
