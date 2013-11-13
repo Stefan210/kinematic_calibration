@@ -91,26 +91,27 @@ void G2oJointOffsetOptimization::optimize(
 	// instantiate the vertex for the joint offsets
 	vector<string> jointNames;
 	kinematicChain.getJointNames(jointNames);
-	JointOffsetVertex jointOffsetVertex(jointNames);
-	jointOffsetVertex.setId(++id);
-	optimizer.addVertex(&jointOffsetVertex);
-
+	JointOffsetVertex* jointOffsetVertex = new JointOffsetVertex(jointNames);
+	jointOffsetVertex->setId(++id);
+	optimizer.addVertex(jointOffsetVertex);
 
 	// instantiate the vertex for the marker transformation
-	MarkerTransformationVertex markerTransformationVertex;
-	markerTransformationVertex.setId(++id);
-	optimizer.addVertex(&markerTransformationVertex);
+	MarkerTransformationVertex* markerTransformationVertex =
+			new MarkerTransformationVertex();
+	markerTransformationVertex->setId(++id);
+	optimizer.addVertex(markerTransformationVertex);
 
 	// add edges
 	Eigen::Matrix2d info = Eigen::Matrix2d::Identity(2, 2);
 	for (int i = 0; i < measurements.size(); i++) {
 		measurementData current = measurements[i];
-		CheckerboardMeasurementEdge edge(current);
-		edge.setId(++id);
-		edge.setInformation(info);
-		edge.vertices()[0] = &markerTransformationVertex;
-		edge.vertices()[1] = &jointOffsetVertex;
-		optimizer.addEdge(&edge);
+		CheckerboardMeasurementEdge* edge = new CheckerboardMeasurementEdge(
+				current);
+		edge->setId(++id);
+		edge->setInformation(info);
+		edge->vertices()[0] = markerTransformationVertex;
+		edge->vertices()[1] = jointOffsetVertex;
+		optimizer.addEdge(edge);
 	}
 
 	// optimize
@@ -120,8 +121,9 @@ void G2oJointOffsetOptimization::optimize(
 	optimizer.optimize(1000);
 
 	// get results
-	optimizedState.jointOffsets = static_cast<map<string, double> >(jointOffsetVertex.estimate());
-	Eigen::Isometry3d eigenTransform = markerTransformationVertex.estimate();
+	optimizedState.jointOffsets =
+			static_cast<map<string, double> >(jointOffsetVertex->estimate());
+	Eigen::Isometry3d eigenTransform = markerTransformationVertex->estimate();
 	tf::transformEigenToTF(eigenTransform, optimizedState.markerTransformation);
 }
 
