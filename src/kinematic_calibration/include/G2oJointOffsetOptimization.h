@@ -27,14 +27,16 @@ namespace kinematic_calibration {
 
 typedef VertexSE3 MarkerTransformationVertex;
 
-class JointOffsetVertex: public g2o::BaseVertex<8, map<string, double> > {
+class JointOffsetVertex: public g2o::BaseVertex<7, map<string, double> > {
 public:
 	JointOffsetVertex() :
 			jointNames(vector<string>()) {
+		this->_dimension = jointNames.size();
 	}
 
 	JointOffsetVertex(const vector<string>& jointNames) :
 			jointNames(jointNames) {
+		this->_dimension = jointNames.size();
 	}
 
 	virtual ~JointOffsetVertex() {
@@ -43,6 +45,7 @@ public:
 	virtual void oplusImpl(const double*);
 	virtual void setToOriginImpl();
 	virtual int estimateDimension() const;
+	virtual int minimalEstimateDimension() const;
 	virtual bool read(std::istream&) {
 		return false;
 	}
@@ -51,6 +54,7 @@ public:
 	}
 	virtual void setJointNames(const vector<string>& jointNames) {
 		this->jointNames = jointNames;
+		this->_dimension = jointNames.size();
 	}
 
 protected:

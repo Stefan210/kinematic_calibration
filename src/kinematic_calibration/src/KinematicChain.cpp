@@ -61,7 +61,7 @@ void KinematicChain::getRootToTip(const map<string, double>& joint_positions,
 		double position = outer_jnt_it->second;
 		// add (optional) joint offset
 		std::map<std::string, double>::const_iterator inner_jnt_it =
-				joint_positions.find(outer_jnt_it->first);
+				joint_offsets.find(outer_jnt_it->first);
 		if (inner_jnt_it != joint_positions.end()) {
 			position += inner_jnt_it->second;
 		}

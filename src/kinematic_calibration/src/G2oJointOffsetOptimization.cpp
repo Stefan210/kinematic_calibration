@@ -33,7 +33,6 @@ void JointOffsetVertex::oplusImpl(const double* delta) {
 		string curName = jointNames[i];
 		this->_estimate[curName] += delta[i];
 	}
-
 }
 
 void JointOffsetVertex::setToOriginImpl() {
@@ -48,6 +47,9 @@ int JointOffsetVertex::estimateDimension() const {
 	return this->jointNames.size();
 }
 
+int JointOffsetVertex::minimalEstimateDimension() const {
+	return this->jointNames.size();
+}
 G2oJointOffsetOptimization::G2oJointOffsetOptimization(
 		vector<measurementData>& measurements, KinematicChain& kinematicChain,
 		FrameImageConverter& frameImageConverter,
@@ -162,8 +164,8 @@ void CheckerboardMeasurementEdge::computeError() {
 
 	// calculate estimated x and y
 	tf::Transform markerToCamera = endEffectorToCamera * markerToEndEffector;
-	double x, y;
-	this->frameImageConverter->project(markerToCamera, x, y);
+	double x, y; //TODO: transformation von vornherein andersrum!!
+	this->frameImageConverter->project(markerToCamera.inverse(), x, y);
 
 	// set error
 	this->_error[0] = measurement.cb_x - x;
