@@ -115,8 +115,10 @@ void G2oJointOffsetOptimization::optimize(
 		edge->vertices()[1] = jointOffsetVertex;
 		edge->setFrameImageConverter(&frameImageConverter);
 		edge->setKinematicChain(&kinematicChain);
+		edge->computeError();
 		optimizer.addEdge(edge);
 	}
+	//cout << "\n\n\n";
 
 	// optimize
 	optimizer.initializeOptimization();
@@ -152,30 +154,30 @@ void CheckerboardMeasurementEdge::computeError() {
 			static_cast<JointOffsetVertex*>(this->_vertices[1]);
 
 	// get transformation from end effector to camera
-	tf::Transform endEffectorToCamera;
+	tf::Transform cameraToEndEffector; // root = camera, tip = end effector, e.g. wrist
 	map<string, double> jointOffsets = jointOffsetVertex->estimate();
 	this->kinematicChain->getRootToTip(jointPositions, jointOffsets,
-			endEffectorToCamera);
+			cameraToEndEffector);
 
 	// get transformation from marker to end effector
 	Eigen::Isometry3d eigenTransform = markerTransformationVertex->estimate();
-	tf::Transform markerToEndEffector;
-	tf::transformEigenToTF(eigenTransform, markerToEndEffector);
+	tf::Transform endEffectorToMarker;
+	tf::transformEigenToTF(eigenTransform, endEffectorToMarker);
 
 	// calculate estimated x and y
-	tf::Transform markerToCamera = endEffectorToCamera * markerToEndEffector;
-	double x, y; //TODO: transformation von vornherein andersrum!!
-	this->frameImageConverter->project(markerToCamera.inverse(), x, y);
+	tf::Transform cameraToMarker = endEffectorToMarker * cameraToEndEffector;
+	double x, y;
+	this->frameImageConverter->project(cameraToMarker, x, y);
 
 	// set error
 	this->_error[0] = measurement.cb_x - x;
 	this->_error[1] = measurement.cb_y - y;
-
-	//cout << "id: " << _id << " ";
-	//cout << "x error: " << this->_error[0] << " y error: " << this->_error[1]
-	//		<< " ";
-	//cout << "cb_x: " << measurement.cb_x << " cb_y: " << measurement.cb_y
-	//		<< "\n";
+	/*
+	cout << "id: " << _id << " ";
+	cout << "x error: " << this->_error[0] << " y error: " << this->_error[1]
+			<< " ";
+	cout << "cb_x: " << measurement.cb_x << " cb_y: " << measurement.cb_y
+			<< "\n";*/
 }
 
 const FrameImageConverter* CheckerboardMeasurementEdge::getFrameImageConverter() const {
