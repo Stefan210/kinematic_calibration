@@ -196,6 +196,9 @@ target_link_libraries(modelLoaderTest modelLoader ${catkin_LIBRARIES})
 add_library(frameImageConverter src/FrameImageConverter.cpp)
 target_link_libraries(frameImageConverter ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
+add_executable(frameImageConverterMain src/FrameImageConverterMain.cpp)
+target_link_libraries(frameImageConverterMain frameImageConverter modelLoader kinematicChain ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
 ### DataCapture
 add_library(dataCapture src/DataCapture.cpp)
 target_link_libraries(dataCapture checkerboardDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
