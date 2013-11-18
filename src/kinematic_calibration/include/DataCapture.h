@@ -46,17 +46,19 @@ public:
 
 	void enableHeadStiffness();
 	void disableHeadStiffness();
-	void enableLArmStiffness();
-	void disableLArmStiffness();
-	void enableRArmStiffness();
-	void disableRArmStiffness();
+	void enableChainStiffness();
+	void disableChainStiffness();
 
-	void playLeftArmPoses();
+	void playChainPoses();
 
 	void setHeadPose(double headYaw, double headPitch, bool relative = false);
 
 	void findCheckerboard();
 	void moveCheckerboardToImageRegion(Region region);
+
+protected:
+	virtual const vector<string>& getJointNames() = 0;
+	virtual const string getPosePrefix() = 0;
 
 private:
 	ros::NodeHandle nh;
@@ -75,8 +77,6 @@ private:
 	actionlib::SimpleActionClient<nao_msgs::JointTrajectoryAction> trajectoryClient;
 	actionlib::SimpleActionClient<nao_msgs::BodyPoseAction> bodyPoseClient;
 	vector<string> headJointNames;
-	vector<string> leftArmJointNames;
-	vector<string> rightArmJointNames;
 	image_geometry::PinholeCameraModel cameraModel;
 	tf::TransformListener transformListener;
 	string cameraFrame;
@@ -90,6 +90,32 @@ private:
 	void updateCheckerboard();
 	void updateJointStates();
 	void publishMeasurement();
+};
+
+class LeftArmDataCapture : public DataCapture {
+public:
+	LeftArmDataCapture();
+	virtual ~LeftArmDataCapture();
+
+protected:
+	virtual const vector<string>& getJointNames();
+	virtual const string getPosePrefix();
+
+private:
+	vector<string> jointNames;
+};
+
+class RightArmDataCapture : public DataCapture {
+public:
+	RightArmDataCapture();
+	virtual ~RightArmDataCapture();
+
+protected:
+	virtual const vector<string>& getJointNames();
+	virtual const string getPosePrefix();
+
+private:
+	vector<string> jointNames;
 };
 
 } /* namespace kinematic_calibration */

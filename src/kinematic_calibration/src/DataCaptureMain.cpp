@@ -11,8 +11,7 @@ using namespace kinematic_calibration;
 
 int main(int argc, char** argv) {
 	ros::init(argc, argv, "dataCapture");
-	DataCapture dataCapture;
-	dataCapture.findCheckerboard();
-	//dataCapture.playLeftArmPoses();
+	LeftArmDataCapture dataCapture;
+	dataCapture.playChainPoses();
 	ros::spin();
 }

@@ -55,22 +55,6 @@ DataCapture::DataCapture() :
 	headJointNames.push_back("HeadYaw");
 	headJointNames.push_back("HeadPitch");
 
-	// initialize list of left arm joint names
-	leftArmJointNames.push_back("LShoulderPitch");
-	leftArmJointNames.push_back("LShoulderRoll");
-	leftArmJointNames.push_back("LElbowYaw");
-	leftArmJointNames.push_back("LElbowRoll");
-	leftArmJointNames.push_back("LWristYaw");
-	leftArmJointNames.push_back("LHand");
-
-	// initialize list of right arm joint names
-	rightArmJointNames.push_back("RShoulderPitch");
-	rightArmJointNames.push_back("RShoulderRoll");
-	rightArmJointNames.push_back("RElbowYaw");
-	rightArmJointNames.push_back("RElbowRoll");
-	rightArmJointNames.push_back("RWristYaw");
-	rightArmJointNames.push_back("RHand");
-
 	updateCheckerboard();
 }
 
@@ -90,27 +74,15 @@ void DataCapture::disableHeadStiffness() {
 	ROS_INFO("Done.");
 }
 
-void DataCapture::enableLArmStiffness() {
-	ROS_INFO("Setting left arm stiffness...");
-	enableStiffness(leftArmJointNames);
+void DataCapture::enableChainStiffness() {
+	ROS_INFO("Setting chain stiffness...");
+	enableStiffness(getJointNames());
 	ROS_INFO("Done.");
 }
 
-void DataCapture::disableLArmStiffness() {
-	ROS_INFO("Resetting left arm stiffness...");
-	disableStiffness(leftArmJointNames);
-	ROS_INFO("Done.");
-}
-
-void DataCapture::enableRArmStiffness() {
-	ROS_INFO("Setting right arm stiffness...");
-	enableStiffness(rightArmJointNames);
-	ROS_INFO("Done.");
-}
-
-void DataCapture::disableRArmStiffness() {
-	ROS_INFO("Resetting right arm stiffness...");
-	disableStiffness(rightArmJointNames);
+void DataCapture::disableChainStiffness() {
+	ROS_INFO("Resetting chain stiffness...");
+	disableStiffness(getJointNames());
 	ROS_INFO("Done.");
 }
 
@@ -140,13 +112,14 @@ void DataCapture::disableStiffness(const vector<string>& jointNames) {
 	setStiffness(jointNames, 0.01);
 }
 
-void DataCapture::playLeftArmPoses() {
-	enableLArmStiffness();
+void DataCapture::playChainPoses() {
+	enableChainStiffness();
 	int numOfPoses = 26; // TODO: parameterize!!
+	const string& prefix = getPosePrefix();
 	for (int i = 1; i <= numOfPoses; i++) {
 		// execute next pose
 		char buf[10];
-		sprintf(buf, "larm%i", i);
+		sprintf(buf, "%s%i", prefix.c_str(), i);
 		string poseName(buf);
 		BodyPoseGoal goal;
 		goal.pose_name = poseName;
@@ -187,7 +160,7 @@ void DataCapture::playLeftArmPoses() {
 		publishMeasurement();
 		disableHeadStiffness();
 	}
-	disableLArmStiffness();
+	disableChainStiffness();
 }
 
 /*
@@ -281,15 +254,15 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 
 	// move head into direction until the checkerboard is into the region
 	ROS_INFO("Trying to move the head s.t. the checkerboard "
-			"position is within the rectangle (%.2f, %.2f) - (%.2f, %.2f)", xRegMin,
-			yRegMin, xRegMax, yRegMax);
+			"position is within the rectangle (%.2f, %.2f) - (%.2f, %.2f)",
+			xRegMin, yRegMin, xRegMax, yRegMax);
 
 	bool isInRegionX = false;
 	bool isInRegionY = false;
 	enableHeadStiffness();
 	while (!isInRegionX || !isInRegionY) {
 		updateCheckerboard();
-		if(!checkerboardFound) {
+		if (!checkerboardFound) {
 			ROS_INFO("Checkerboard lost.");
 			break;
 		}
@@ -456,4 +429,45 @@ void DataCapture::publishMeasurement() {
 	measurementPub.publish(data);
 }
 
+LeftArmDataCapture::LeftArmDataCapture() {
+	jointNames.push_back("LShoulderPitch");
+	jointNames.push_back("LShoulderRoll");
+	jointNames.push_back("LElbowYaw");
+	jointNames.push_back("LElbowRoll");
+	jointNames.push_back("LWristYaw");
+	jointNames.push_back("LHand");
+}
+
+LeftArmDataCapture::~LeftArmDataCapture() {
+}
+
+const vector<string>& LeftArmDataCapture::getJointNames() {
+	return jointNames;
+}
+
+const string LeftArmDataCapture::getPosePrefix() {
+	return "larm";
+}
+
+RightArmDataCapture::RightArmDataCapture() {
+	jointNames.push_back("RShoulderPitch");
+	jointNames.push_back("RShoulderRoll");
+	jointNames.push_back("RElbowYaw");
+	jointNames.push_back("RElbowRoll");
+	jointNames.push_back("RWristYaw");
+	jointNames.push_back("RHand");
+}
+
+RightArmDataCapture::~RightArmDataCapture() {
+}
+
+const vector<string>& RightArmDataCapture::getJointNames() {
+	return jointNames;
+}
+
+const string RightArmDataCapture::getPosePrefix() {
+	return "rarm";
+}
+
 } /* namespace kinematic_calibration */
+
