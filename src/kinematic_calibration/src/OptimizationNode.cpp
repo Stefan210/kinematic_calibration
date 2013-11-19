@@ -26,7 +26,7 @@ namespace kinematic_calibration {
 OptimizationNode::OptimizationNode() :
 		collectingData(false) {
 	measurementSubsriber = nh.subscribe(
-			"/kinematic_calibration/measurement_data", 100,
+			"/kinematic_calibration/measurement_data", 1000,
 			&OptimizationNode::measurementCb, this);
 	cameraInfoSubscriber = nh.subscribe("/nao_camera/camera_info", 1,
 			&OptimizationNode::camerainfoCallback, this);
