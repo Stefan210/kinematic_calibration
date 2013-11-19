@@ -1,5 +1,6 @@
 import sys
 import yaml
+from itertools import repeat
 
 from sensor_msgs.msg import JointState
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
@@ -28,6 +29,28 @@ class JointStatesToPose():
             self.poses[self.prefix + str(i)] = pose
             i = i+1
         #print self.poses
+        
+    def filterPoses(self, minDist):
+        print "before: %i" % len(self.poses)
+        i = 1
+        newPoses = dict()
+        lastPositions = list(repeat(-10, len(self.poseJoints)))
+        for name, pose in self.poses.items():
+            curPositions = pose['positions']
+            deltaList = [abs(a - b) for a, b in zip(lastPositions, curPositions)]
+            maxDelta = max(deltaList)
+            print maxDelta
+            print minDist
+            if maxDelta >= minDist:
+                pose = dict()
+                pose['joint_names'] = self.poseJoints
+                pose['time_from_start'] = 1.0
+                pose['positions'] = curPositions
+                newPoses[self.prefix + str(i)] = pose
+                i = i+1
+                lastPositions = curPositions
+        self.poses = newPoses
+        print "after: %i" % len(self.poses)
     
     def loadFromYamlFile(self, filename):
         f = open(filename, "r")
@@ -65,5 +88,6 @@ if __name__ == '__main__':
     converter = JointStatesToPose("larm", ['LShoulderPitch', 'LShoulderRoll', 'LElbowYaw', 'LElbowRoll', 'LWristYaw', 'LHand']);
     #converter = JointStatesToPose("rarm", ['RShoulderPitch', 'RShoulderRoll', 'RElbowYaw', 'RElbowRoll', 'RWristYaw', 'RHand']);
     converter.loadFromYamlFile(sys.argv[1])
+    converter.filterPoses(0.1)
     converter.saveToYamlFile(sys.argv[2])
     exit(0)
