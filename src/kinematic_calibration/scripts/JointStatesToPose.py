@@ -72,6 +72,6 @@ if __name__ == '__main__':
     converter = JointStatesToPose("larm", ['LShoulderPitch', 'LShoulderRoll', 'LElbowYaw', 'LElbowRoll', 'LWristYaw', 'LHand']);
     #converter = JointStatesToPose("rarm", ['RShoulderPitch', 'RShoulderRoll', 'RElbowYaw', 'RElbowRoll', 'RWristYaw', 'RHand']);
     converter.loadFromYamlFile(sys.argv[1])
-    converter.jointStatesToPose(0.1)
+    converter.jointStatesToPose(sys.argv[3])
     converter.saveToYamlFile(sys.argv[2])
     exit(0)
