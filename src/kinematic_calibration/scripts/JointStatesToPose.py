@@ -59,7 +59,6 @@ class JointStatesToPose():
             #print jointState
             self.jointStates.append(jointState)
         f.close()
-        self.jointStatesToPose()
         
     def saveToYamlFile(self, filename):
         f = open(filename, "w")
@@ -72,6 +71,7 @@ if __name__ == '__main__':
     #converter = JointStatesToPose("chain", ['HeadYaw', 'HeadPitch', 'RHand']);
     converter = JointStatesToPose("larm", ['LShoulderPitch', 'LShoulderRoll', 'LElbowYaw', 'LElbowRoll', 'LWristYaw', 'LHand']);
     #converter = JointStatesToPose("rarm", ['RShoulderPitch', 'RShoulderRoll', 'RElbowYaw', 'RElbowRoll', 'RWristYaw', 'RHand']);
-    converter.loadFromYamlFile(sys.argv[1], 0.1)
+    converter.loadFromYamlFile(sys.argv[1])
+    converter.jointStatesToPose(float(sys.argv[3]))
     converter.saveToYamlFile(sys.argv[2])
     exit(0)
