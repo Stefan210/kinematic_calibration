@@ -310,35 +310,32 @@ void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 	}
 }
 
-/*
- void DataCapture::findCheckerboard() {
- ros::Time now = ros::Time::now();
- tf::StampedTransform cameraToWrist;
- transformListener.waitForTransform("LWristYaw_link", cameraFrame, now,
- ros::Duration(1.0));
- transformListener.lookupTransform("LWristYaw_link", cameraFrame, now,
- cameraToWrist);
+void DataCapture::findCheckerboard() {
+	ros::Time now = ros::Time::now();
+	tf::StampedTransform cameraToWrist;
+	transformListener.waitForTransform("l_gripper", cameraFrame, now,
+			ros::Duration(1.0));
+	transformListener.lookupTransform("l_gripper", cameraFrame, now,
+			cameraToWrist);
 
- tf::Point headYawPoint = cameraToWrist * tf::Point(0.0, 0.0, 0.0);
- double headYawAngle = atan2((double) (headYawPoint.getX()),
- (double) (headYawPoint.getZ()));
+	tf::Point headYawPoint = cameraToWrist * tf::Point(0.0, 0.0, 0.0);
+	double x = (double) headYawPoint.getX();
+	double y = (double) headYawPoint.getY();
+	double z = (double) headYawPoint.getZ();
+	double headYawAngle = acos(x / sqrt(x*x + y*y));
 
- tf::Point headPitchPoint = cameraToWrist * tf::Point(0.0, 0.0, 0.0);
- double headPitchAngle = atan2((double) (headPitchPoint.getY()),
- sqrt(
- pow((double) (headPitchPoint.getX()), 2)
- * pow((double) (headPitchPoint.getZ()), 2)));
- headPitchAngle = M_PI_2 + headPitchAngle;
- headYawAngle =  M_PI_2 + headYawAngle;
+	//tf::Point headPitchPoint = cameraToWrist * tf::Point(0.0, 0.0, 0.0);
+	double headPitchAngle = acos(x / sqrt(x*x + z*z));
+	//headPitchAngle = M_PI_2 + headPitchAngle;
+	//headYawAngle = M_PI_2 + headYawAngle;
 
- ROS_INFO("[1] Setting yaw to %f and pitch to %f.", headYawAngle,
- headPitchAngle);
+	ROS_INFO("Setting yaw to %f and pitch to %f.", headYawAngle,
+			headPitchAngle);
 
- enableHeadStiffness();
- setHeadPose(headYawAngle, headPitchAngle);
- disableHeadStiffness();
- }
- */
+	enableHeadStiffness();
+	setHeadPose(headYawAngle, headPitchAngle);
+	disableHeadStiffness();
+}
 
 void DataCapture::camerainfoCallback(
 		const sensor_msgs::CameraInfoConstPtr& msg) {
@@ -346,32 +343,33 @@ void DataCapture::camerainfoCallback(
 	ROS_INFO("Camera model set.");
 }
 
-void DataCapture::findCheckerboard() {
-	// TODO: parameterize!!
-	double headYawMin = -0.5;
-	double headYawMax = 0.5;
-	double headPitchMin = -0.5;
-	double headPitchMax = 0.2;
+/*
+ void DataCapture::findCheckerboard() {
+ // TODO: parameterize!!
+ double headYawMin = -0.5;
+ double headYawMax = 0.5;
+ double headPitchMin = -0.5;
+ double headPitchMax = 0.2;
 
-	updateCheckerboard();
-	if (checkerboardFound)
-		return;
+ updateCheckerboard();
+ if (checkerboardFound)
+ return;
 
-	enableHeadStiffness();
-	for (double headYaw = headYawMin; headYaw <= headYawMax; headYaw += 0.4) {
-		if (checkerboardFound)
-			break;
-		for (double headPitch = headPitchMin; headPitch <= headPitchMax;
-				headPitch += 0.33) {
-			setHeadPose(-headYaw, headPitch);
-			updateCheckerboard();
-			if (checkerboardFound)
-				break;
-		}
-	}
-	disableHeadStiffness();
-}
-
+ enableHeadStiffness();
+ for (double headYaw = headYawMin; headYaw <= headYawMax; headYaw += 0.4) {
+ if (checkerboardFound)
+ break;
+ for (double headPitch = headPitchMin; headPitch <= headPitchMax;
+ headPitch += 0.33) {
+ setHeadPose(-headYaw, headPitch);
+ updateCheckerboard();
+ if (checkerboardFound)
+ break;
+ }
+ }
+ disableHeadStiffness();
+ }
+ */
 void DataCapture::jointStatesCallback(
 		const sensor_msgs::JointStateConstPtr& msg) {
 	receivedJointStates = true;
