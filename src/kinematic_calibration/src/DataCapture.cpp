@@ -114,7 +114,7 @@ void DataCapture::disableStiffness(const vector<string>& jointNames) {
 
 void DataCapture::playChainPoses() {
 	enableChainStiffness();
-	int numOfPoses = 26; // TODO: parameterize!!
+    int numOfPoses = 260; // TODO: parameterize!!
 	const string& prefix = getPosePrefix();
 	for (int i = 1; i <= numOfPoses; i++) {
 		// execute next pose
@@ -127,7 +127,7 @@ void DataCapture::playChainPoses() {
 		bodyPoseClient.sendGoalAndWait(goal);
 		ROS_INFO("Done.");
 
-		// find the checkerboard
+        // find the checkerboard
 		ROS_INFO("Moving head in order to find the checkerboard...");
 		findCheckerboard();
 		if (!checkerboardFound)
@@ -310,24 +310,36 @@ void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 	}
 }
 
+/*
 void DataCapture::findCheckerboard() {
 	ros::Time now = ros::Time::now();
-	tf::StampedTransform cameraToWrist;
+    tf::StampedTransform cameraToWrist, headPitchToWrist, headYawToWrist;
 	transformListener.waitForTransform("l_gripper", cameraFrame, now,
 			ros::Duration(1.0));
 	transformListener.lookupTransform("l_gripper", cameraFrame, now,
 			cameraToWrist);
+    transformListener.waitForTransform("l_gripper", "HeadPitch_link", now,
+            ros::Duration(1.0));
+    transformListener.lookupTransform("l_gripper", "HeadPitch_link", now,
+            headPitchToWrist);
+    transformListener.waitForTransform("l_gripper", "HeadYaw_link", now,
+            ros::Duration(1.0));
+    transformListener.lookupTransform("l_gripper", "HeadYaw_link", now,
+            headYawToWrist);
 
-	tf::Point headYawPoint = cameraToWrist * tf::Point(0.0, 0.0, 0.0);
+    tf::Point headYawPoint = headYawToWrist * tf::Point(0.0, 0.0, 0.0);
 	double x = (double) headYawPoint.getX();
 	double y = (double) headYawPoint.getY();
 	double z = (double) headYawPoint.getZ();
 	double headYawAngle = acos(x / sqrt(x*x + y*y));
 
-	//tf::Point headPitchPoint = cameraToWrist * tf::Point(0.0, 0.0, 0.0);
+    tf::Point headPitchPoint = headPitchToWrist * tf::Point(0.0, 0.0, 0.0);
+    x = (double) headPitchPoint.getX();
+    y = (double) headPitchPoint.getY();
+    z = (double) headPitchPoint.getZ();
 	double headPitchAngle = acos(x / sqrt(x*x + z*z));
-	//headPitchAngle = M_PI_2 + headPitchAngle;
-	//headYawAngle = M_PI_2 + headYawAngle;
+    headPitchAngle = -(M_PI - headPitchAngle);
+    headYawAngle = (M_PI - headYawAngle);
 
 	ROS_INFO("Setting yaw to %f and pitch to %f.", headYawAngle,
 			headPitchAngle);
@@ -336,6 +348,7 @@ void DataCapture::findCheckerboard() {
 	setHeadPose(headYawAngle, headPitchAngle);
 	disableHeadStiffness();
 }
+*/
 
 void DataCapture::camerainfoCallback(
 		const sensor_msgs::CameraInfoConstPtr& msg) {
@@ -343,33 +356,33 @@ void DataCapture::camerainfoCallback(
 	ROS_INFO("Camera model set.");
 }
 
-/*
+
  void DataCapture::findCheckerboard() {
- // TODO: parameterize!!
- double headYawMin = -0.5;
- double headYawMax = 0.5;
- double headPitchMin = -0.5;
- double headPitchMax = 0.2;
+    // TODO: parameterize!!
+    double headYawMin = -0.5;
+    double headYawMax = 0.5;
+    double headPitchMin = -0.5;
+    double headPitchMax = 0.2;
 
- updateCheckerboard();
- if (checkerboardFound)
- return;
+    updateCheckerboard();
+    if (checkerboardFound)
+        return;
 
- enableHeadStiffness();
- for (double headYaw = headYawMin; headYaw <= headYawMax; headYaw += 0.4) {
- if (checkerboardFound)
- break;
- for (double headPitch = headPitchMin; headPitch <= headPitchMax;
- headPitch += 0.33) {
- setHeadPose(-headYaw, headPitch);
- updateCheckerboard();
- if (checkerboardFound)
- break;
+    enableHeadStiffness();
+    for (double headYaw = headYawMin; headYaw <= headYawMax; headYaw += 0.4) {
+        if (checkerboardFound)
+            break;
+        for (double headPitch = headPitchMin; headPitch <= headPitchMax;
+                headPitch += 0.33) {
+            setHeadPose(-headYaw, headPitch);
+            updateCheckerboard();
+            if (checkerboardFound)
+                break;
+        }
+    }
+    disableHeadStiffness();
  }
- }
- disableHeadStiffness();
- }
- */
+
 void DataCapture::jointStatesCallback(
 		const sensor_msgs::JointStateConstPtr& msg) {
 	receivedJointStates = true;
