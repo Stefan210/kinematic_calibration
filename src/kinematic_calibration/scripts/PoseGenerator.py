@@ -23,7 +23,7 @@ class PoseGenerator():
                 anz = min([anz, 3.0])
                 valRange = linspace(minpos, maxpos, anz)
                 valRange = list(OrderedDict.fromkeys(valRange))
-                valRange = [ '%.3f' % elem for elem in valRange ]
+                valRange = [ float('%.3f' % elem) for elem in valRange ]
                 
                 print name 
                 print valRange
