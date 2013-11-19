@@ -14,8 +14,9 @@ class JointStatesToPose():
         self.poseJoints = poseJoints
         self.poses = dict()
         
-    def jointStatesToPose(self):
+    def jointStatesToPose(self, minDist = 0.0):
         i = 1
+        lastPositions = list(repeat(-10, len(self.poseJoints)))
         for jointState in self.jointStates:
             pose = dict()
             pose['joint_names'] = list()
@@ -25,32 +26,16 @@ class JointStatesToPose():
                 if name in self.poseJoints:
                     pose['joint_names'].append(name)
                     pose['positions'].append(pos)
-                
-            self.poses[self.prefix + str(i)] = pose
-            i = i+1
-        #print self.poses
-        
-    def filterPoses(self, minDist):
-        print "before: %i" % len(self.poses)
-        i = 1
-        newPoses = dict()
-        lastPositions = list(repeat(-10, len(self.poseJoints)))
-        for name, pose in self.poses.items():
+                    
             curPositions = pose['positions']
             deltaList = [abs(a - b) for a, b in zip(lastPositions, curPositions)]
             maxDelta = max(deltaList)
-            print maxDelta
-            print minDist
+            
             if maxDelta >= minDist:
-                pose = dict()
-                pose['joint_names'] = self.poseJoints
-                pose['time_from_start'] = 1.0
-                pose['positions'] = curPositions
-                newPoses[self.prefix + str(i)] = pose
-                i = i+1
                 lastPositions = curPositions
-        self.poses = newPoses
-        print "after: %i" % len(self.poses)
+                self.poses[self.prefix + str(i)] = pose
+                i = i+1
+        #print self.poses
     
     def loadFromYamlFile(self, filename):
         f = open(filename, "r")
@@ -87,7 +72,6 @@ if __name__ == '__main__':
     #converter = JointStatesToPose("chain", ['HeadYaw', 'HeadPitch', 'RHand']);
     converter = JointStatesToPose("larm", ['LShoulderPitch', 'LShoulderRoll', 'LElbowYaw', 'LElbowRoll', 'LWristYaw', 'LHand']);
     #converter = JointStatesToPose("rarm", ['RShoulderPitch', 'RShoulderRoll', 'RElbowYaw', 'RElbowRoll', 'RWristYaw', 'RHand']);
-    converter.loadFromYamlFile(sys.argv[1])
-    converter.filterPoses(0.1)
+    converter.loadFromYamlFile(sys.argv[1], 0.1)
     converter.saveToYamlFile(sys.argv[2])
     exit(0)
