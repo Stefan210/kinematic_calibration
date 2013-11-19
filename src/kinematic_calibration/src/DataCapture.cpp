@@ -264,8 +264,10 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 
 	bool isInRegionX = false;
 	bool isInRegionY = false;
+	double lastX = -1, lastY = -1;
 	enableHeadStiffness();
 	while (!isInRegionX || !isInRegionY) {
+		// get current checkerboard position
 		updateCheckerboard();
 		if (!checkerboardFound) {
 			ROS_INFO("Checkerboard lost.");
@@ -274,6 +276,7 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 
 		double relX = 0, relY = 0;
 
+		// check x
 		if (checkerboardData.x < xRegMin) {
 			relX = (xRegMin - checkerboardData.x) / 640 + 0.05;
 			ROS_INFO("Moving to the right (relPose = %f).", relX);
@@ -284,6 +287,7 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 			isInRegionX = true;
 		}
 
+		// check y
 		if (checkerboardData.y < yRegMin) {
 			relY = (yRegMin - checkerboardData.y) / 480 + 0.05;
 			ROS_INFO("Moving to downwards (relPose = %f).", -relY);
@@ -294,9 +298,20 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 			isInRegionY = true;
 		}
 
+		// if the position did not change, we are close to the region and can stop
+		if (fabs(lastX - checkerboardData.x) < 1
+				&& fabs(lastY - checkerboardData.y) < 1) {
+			break;
+		}
+
+		// change the head position if not in region
 		if (!isInRegionX || !isInRegionY) {
 			setHeadPose(relX, -relY, true);
 		}
+
+		// save last position
+		lastX = checkerboardData.x;
+		lastY = checkerboardData.y;
 	}
 
 	disableHeadStiffness();
