@@ -1,980 +1,980 @@
-larm001b:
-  joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, -2.08, -1.27, -1.1, 0.374]
-  time_from_start: 1.0
-larm001c:
-  joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, -2.08, -1.27, -1.1, 0.374]
-  time_from_start: 1.0
-larm001a:
+larm001:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
   positions: [0.2, -0.31, -2.08, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm002:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, -2.08, -1.27, 0.32, 0.374]
+  positions: [0.2, -0.31, -2.08, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm003:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, -2.08, -1.27, 1.74, 0.374]
+  positions: [0.2, -0.31, -2.08, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm004:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, -2.08, -0.665, -1.1, 0.374]
+  positions: [0.2, -0.31, -2.08, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm005:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, -2.08, -0.665, 0.32, 0.374]
+  positions: [0.2, -0.31, -2.08, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm006:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, -2.08, -0.665, 1.74, 0.374]
+  positions: [0.2, -0.31, -2.08, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm007:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, -2.08, -0.06, -1.1, 0.374]
+  positions: [0.2, -0.31, -2.08, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm008:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, -2.08, -0.06, 0.32, 0.374]
+  positions: [0.2, -0.31, -2.08, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm009:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, -2.08, -0.06, 1.74, 0.374]
+  positions: [0.2, -0.31, -2.08, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm010:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, -0.575, -1.27, -1.1, 0.374]
+  positions: [0.2, -0.31, -2.08, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm011:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, -0.575, -1.27, 0.32, 0.374]
+  positions: [0.2, -0.31, -2.08, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm012:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, -0.575, -1.27, 1.74, 0.374]
+  positions: [0.2, -0.31, -0.575, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm013:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, -0.575, -0.665, -1.1, 0.374]
+  positions: [0.2, -0.31, -0.575, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm014:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, -0.575, -0.665, 0.32, 0.374]
+  positions: [0.2, -0.31, -0.575, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm015:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, -0.575, -0.665, 1.74, 0.374]
+  positions: [0.2, -0.31, -0.575, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm016:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, -0.575, -0.06, -1.1, 0.374]
+  positions: [0.2, -0.31, -0.575, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm017:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, -0.575, -0.06, 0.32, 0.374]
+  positions: [0.2, -0.31, -0.575, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm018:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, -0.575, -0.06, 1.74, 0.374]
+  positions: [0.2, -0.31, -0.575, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm019:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, 0.93, -1.27, -1.1, 0.374]
+  positions: [0.2, -0.31, -0.575, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm020:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, 0.93, -1.27, 0.32, 0.374]
+  positions: [0.2, -0.31, -0.575, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm021:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, 0.93, -1.27, 1.74, 0.374]
+  positions: [0.2, -0.31, 0.93, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm022:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, 0.93, -0.665, -1.1, 0.374]
+  positions: [0.2, -0.31, 0.93, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm023:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, 0.93, -0.665, 0.32, 0.374]
+  positions: [0.2, -0.31, 0.93, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm024:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, 0.93, -0.665, 1.74, 0.374]
+  positions: [0.2, -0.31, 0.93, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm025:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, 0.93, -0.06, -1.1, 0.374]
+  positions: [0.2, -0.31, 0.93, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm026:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, 0.93, -0.06, 0.32, 0.374]
+  positions: [0.2, -0.31, 0.93, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm027:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, -0.31, 0.93, -0.06, 1.74, 0.374]
+  positions: [0.2, -0.31, 0.93, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm028:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, -2.08, -1.27, -1.1, 0.374]
+  positions: [0.2, -0.31, 0.93, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm029:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, -2.08, -1.27, 0.32, 0.374]
+  positions: [0.2, -0.31, 0.93, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm030:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, -2.08, -1.27, 1.74, 0.374]
+  positions: [0.2, 0.285, -2.08, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm031:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, -2.08, -0.665, -1.1, 0.374]
+  positions: [0.2, 0.285, -2.08, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm032:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, -2.08, -0.665, 0.32, 0.374]
+  positions: [0.2, 0.285, -2.08, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm033:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, -2.08, -0.665, 1.74, 0.374]
+  positions: [0.2, 0.285, -2.08, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm034:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, -2.08, -0.06, -1.1, 0.374]
+  positions: [0.2, 0.285, -2.08, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm035:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, -2.08, -0.06, 0.32, 0.374]
+  positions: [0.2, 0.285, -2.08, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm036:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, -2.08, -0.06, 1.74, 0.374]
+  positions: [0.2, 0.285, -2.08, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm037:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, -0.575, -1.27, -1.1, 0.374]
+  positions: [0.2, 0.285, -2.08, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm038:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, -0.575, -1.27, 0.32, 0.374]
+  positions: [0.2, 0.285, -2.08, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm039:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, -0.575, -1.27, 1.74, 0.374]
+  positions: [0.2, 0.285, -0.575, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm040:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, -0.575, -0.665, -1.1, 0.374]
+  positions: [0.2, 0.285, -0.575, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm041:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, -0.575, -0.665, 0.32, 0.374]
+  positions: [0.2, 0.285, -0.575, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm042:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, -0.575, -0.665, 1.74, 0.374]
+  positions: [0.2, 0.285, -0.575, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm043:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, -0.575, -0.06, -1.1, 0.374]
+  positions: [0.2, 0.285, -0.575, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm044:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, -0.575, -0.06, 0.32, 0.374]
+  positions: [0.2, 0.285, -0.575, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm045:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, -0.575, -0.06, 1.74, 0.374]
+  positions: [0.2, 0.285, -0.575, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm046:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, 0.93, -1.27, -1.1, 0.374]
+  positions: [0.2, 0.285, -0.575, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm047:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, 0.93, -1.27, 0.32, 0.374]
+  positions: [0.2, 0.285, -0.575, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm048:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, 0.93, -1.27, 1.74, 0.374]
+  positions: [0.2, 0.285, 0.93, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm049:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, 0.93, -0.665, -1.1, 0.374]
+  positions: [0.2, 0.285, 0.93, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm050:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, 0.93, -0.665, 0.32, 0.374]
+  positions: [0.2, 0.285, 0.93, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm051:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, 0.93, -0.665, 1.74, 0.374]
+  positions: [0.2, 0.285, 0.93, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm052:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, 0.93, -0.06, -1.1, 0.374]
+  positions: [0.2, 0.285, 0.93, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm053:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, 0.93, -0.06, 0.32, 0.374]
+  positions: [0.2, 0.285, 0.93, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm054:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.285, 0.93, -0.06, 1.74, 0.374]
+  positions: [0.2, 0.285, 0.93, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm055:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, -2.08, -1.27, -1.1, 0.374]
+  positions: [0.2, 0.285, 0.93, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm056:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, -2.08, -1.27, 0.32, 0.374]
+  positions: [0.2, 0.285, 0.93, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm057:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, -2.08, -1.27, 1.74, 0.374]
+  positions: [0.2, 0.88, -2.08, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm058:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, -2.08, -0.665, -1.1, 0.374]
+  positions: [0.2, 0.88, -2.08, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm059:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, -2.08, -0.665, 0.32, 0.374]
+  positions: [0.2, 0.88, -2.08, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm060:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, -2.08, -0.665, 1.74, 0.374]
+  positions: [0.2, 0.88, -2.08, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm061:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, -2.08, -0.06, -1.1, 0.374]
+  positions: [0.2, 0.88, -2.08, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm062:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, -2.08, -0.06, 0.32, 0.374]
+  positions: [0.2, 0.88, -2.08, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm063:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, -2.08, -0.06, 1.74, 0.374]
+  positions: [0.2, 0.88, -2.08, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm064:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, -0.575, -1.27, -1.1, 0.374]
+  positions: [0.2, 0.88, -2.08, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm065:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, -0.575, -1.27, 0.32, 0.374]
+  positions: [0.2, 0.88, -2.08, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm066:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, -0.575, -1.27, 1.74, 0.374]
+  positions: [0.2, 0.88, -0.575, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm067:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, -0.575, -0.665, -1.1, 0.374]
+  positions: [0.2, 0.88, -0.575, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm068:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, -0.575, -0.665, 0.32, 0.374]
+  positions: [0.2, 0.88, -0.575, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm069:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, -0.575, -0.665, 1.74, 0.374]
+  positions: [0.2, 0.88, -0.575, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm070:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, -0.575, -0.06, -1.1, 0.374]
+  positions: [0.2, 0.88, -0.575, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm071:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, -0.575, -0.06, 0.32, 0.374]
+  positions: [0.2, 0.88, -0.575, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm072:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, -0.575, -0.06, 1.74, 0.374]
+  positions: [0.2, 0.88, -0.575, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm073:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, 0.93, -1.27, -1.1, 0.374]
+  positions: [0.2, 0.88, -0.575, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm074:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, 0.93, -1.27, 0.32, 0.374]
+  positions: [0.2, 0.88, -0.575, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm075:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, 0.93, -1.27, 1.74, 0.374]
+  positions: [0.2, 0.88, 0.93, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm076:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, 0.93, -0.665, -1.1, 0.374]
+  positions: [0.2, 0.88, 0.93, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm077:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, 0.93, -0.665, 0.32, 0.374]
+  positions: [0.2, 0.88, 0.93, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm078:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, 0.93, -0.665, 1.74, 0.374]
+  positions: [0.2, 0.88, 0.93, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm079:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, 0.93, -0.06, -1.1, 0.374]
+  positions: [0.2, 0.88, 0.93, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm080:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, 0.93, -0.06, 0.32, 0.374]
+  positions: [0.2, 0.88, 0.93, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm081:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.2, 0.88, 0.93, -0.06, 1.74, 0.374]
+  positions: [0.2, 0.88, 0.93, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm082:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, -2.08, -1.27, -1.1, 0.374]
+  positions: [0.2, 0.88, 0.93, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm083:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, -2.08, -1.27, 0.32, 0.374]
+  positions: [0.2, 0.88, 0.93, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm084:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, -2.08, -1.27, 1.74, 0.374]
+  positions: [0.255, -0.31, -2.08, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm085:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, -2.08, -0.665, -1.1, 0.374]
+  positions: [0.255, -0.31, -2.08, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm086:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, -2.08, -0.665, 0.32, 0.374]
+  positions: [0.255, -0.31, -2.08, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm087:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, -2.08, -0.665, 1.74, 0.374]
+  positions: [0.255, -0.31, -2.08, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm088:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, -2.08, -0.06, -1.1, 0.374]
+  positions: [0.255, -0.31, -2.08, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm089:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, -2.08, -0.06, 0.32, 0.374]
+  positions: [0.255, -0.31, -2.08, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm090:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, -2.08, -0.06, 1.74, 0.374]
+  positions: [0.255, -0.31, -2.08, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm091:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, -0.575, -1.27, -1.1, 0.374]
+  positions: [0.255, -0.31, -2.08, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm092:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, -0.575, -1.27, 0.32, 0.374]
+  positions: [0.255, -0.31, -2.08, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm093:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, -0.575, -1.27, 1.74, 0.374]
+  positions: [0.255, -0.31, -0.575, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm094:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, -0.575, -0.665, -1.1, 0.374]
+  positions: [0.255, -0.31, -0.575, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm095:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, -0.575, -0.665, 0.32, 0.374]
+  positions: [0.255, -0.31, -0.575, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm096:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, -0.575, -0.665, 1.74, 0.374]
+  positions: [0.255, -0.31, -0.575, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm097:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, -0.575, -0.06, -1.1, 0.374]
+  positions: [0.255, -0.31, -0.575, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm098:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, -0.575, -0.06, 0.32, 0.374]
+  positions: [0.255, -0.31, -0.575, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm099:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, -0.575, -0.06, 1.74, 0.374]
+  positions: [0.255, -0.31, -0.575, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm100:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, 0.93, -1.27, -1.1, 0.374]
+  positions: [0.255, -0.31, -0.575, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm101:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, 0.93, -1.27, 0.32, 0.374]
+  positions: [0.255, -0.31, -0.575, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm102:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, 0.93, -1.27, 1.74, 0.374]
+  positions: [0.255, -0.31, 0.93, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm103:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, 0.93, -0.665, -1.1, 0.374]
+  positions: [0.255, -0.31, 0.93, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm104:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, 0.93, -0.665, 0.32, 0.374]
+  positions: [0.255, -0.31, 0.93, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm105:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, 0.93, -0.665, 1.74, 0.374]
+  positions: [0.255, -0.31, 0.93, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm106:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, 0.93, -0.06, -1.1, 0.374]
+  positions: [0.255, -0.31, 0.93, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm107:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, 0.93, -0.06, 0.32, 0.374]
+  positions: [0.255, -0.31, 0.93, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm108:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, -0.31, 0.93, -0.06, 1.74, 0.374]
+  positions: [0.255, -0.31, 0.93, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm109:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, -2.08, -1.27, -1.1, 0.374]
+  positions: [0.255, -0.31, 0.93, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm110:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, -2.08, -1.27, 0.32, 0.374]
+  positions: [0.255, -0.31, 0.93, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm111:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, -2.08, -1.27, 1.74, 0.374]
+  positions: [0.255, 0.285, -2.08, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm112:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, -2.08, -0.665, -1.1, 0.374]
+  positions: [0.255, 0.285, -2.08, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm113:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, -2.08, -0.665, 0.32, 0.374]
+  positions: [0.255, 0.285, -2.08, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm114:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, -2.08, -0.665, 1.74, 0.374]
+  positions: [0.255, 0.285, -2.08, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm115:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, -2.08, -0.06, -1.1, 0.374]
+  positions: [0.255, 0.285, -2.08, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm116:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, -2.08, -0.06, 0.32, 0.374]
+  positions: [0.255, 0.285, -2.08, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm117:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, -2.08, -0.06, 1.74, 0.374]
+  positions: [0.255, 0.285, -2.08, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm118:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, -0.575, -1.27, -1.1, 0.374]
+  positions: [0.255, 0.285, -2.08, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm119:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, -0.575, -1.27, 0.32, 0.374]
+  positions: [0.255, 0.285, -2.08, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm120:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, -0.575, -1.27, 1.74, 0.374]
+  positions: [0.255, 0.285, -0.575, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm121:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, -0.575, -0.665, -1.1, 0.374]
+  positions: [0.255, 0.285, -0.575, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm122:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, -0.575, -0.665, 0.32, 0.374]
+  positions: [0.255, 0.285, -0.575, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm123:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, -0.575, -0.665, 1.74, 0.374]
+  positions: [0.255, 0.285, -0.575, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm124:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, -0.575, -0.06, -1.1, 0.374]
+  positions: [0.255, 0.285, -0.575, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm125:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, -0.575, -0.06, 0.32, 0.374]
+  positions: [0.255, 0.285, -0.575, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm126:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, -0.575, -0.06, 1.74, 0.374]
+  positions: [0.255, 0.285, -0.575, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm127:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, 0.93, -1.27, -1.1, 0.374]
+  positions: [0.255, 0.285, -0.575, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm128:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, 0.93, -1.27, 0.32, 0.374]
+  positions: [0.255, 0.285, -0.575, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm129:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, 0.93, -1.27, 1.74, 0.374]
+  positions: [0.255, 0.285, 0.93, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm130:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, 0.93, -0.665, -1.1, 0.374]
+  positions: [0.255, 0.285, 0.93, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm131:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, 0.93, -0.665, 0.32, 0.374]
+  positions: [0.255, 0.285, 0.93, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm132:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, 0.93, -0.665, 1.74, 0.374]
+  positions: [0.255, 0.285, 0.93, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm133:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, 0.93, -0.06, -1.1, 0.374]
+  positions: [0.255, 0.285, 0.93, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm134:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, 0.93, -0.06, 0.32, 0.374]
+  positions: [0.255, 0.285, 0.93, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm135:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.285, 0.93, -0.06, 1.74, 0.374]
+  positions: [0.255, 0.285, 0.93, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm136:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, -2.08, -1.27, -1.1, 0.374]
+  positions: [0.255, 0.285, 0.93, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm137:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, -2.08, -1.27, 0.32, 0.374]
+  positions: [0.255, 0.285, 0.93, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm138:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, -2.08, -1.27, 1.74, 0.374]
+  positions: [0.255, 0.88, -2.08, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm139:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, -2.08, -0.665, -1.1, 0.374]
+  positions: [0.255, 0.88, -2.08, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm140:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, -2.08, -0.665, 0.32, 0.374]
+  positions: [0.255, 0.88, -2.08, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm141:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, -2.08, -0.665, 1.74, 0.374]
+  positions: [0.255, 0.88, -2.08, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm142:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, -2.08, -0.06, -1.1, 0.374]
+  positions: [0.255, 0.88, -2.08, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm143:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, -2.08, -0.06, 0.32, 0.374]
+  positions: [0.255, 0.88, -2.08, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm144:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, -2.08, -0.06, 1.74, 0.374]
+  positions: [0.255, 0.88, -2.08, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm145:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, -0.575, -1.27, -1.1, 0.374]
+  positions: [0.255, 0.88, -2.08, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm146:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, -0.575, -1.27, 0.32, 0.374]
+  positions: [0.255, 0.88, -2.08, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm147:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, -0.575, -1.27, 1.74, 0.374]
+  positions: [0.255, 0.88, -0.575, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm148:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, -0.575, -0.665, -1.1, 0.374]
+  positions: [0.255, 0.88, -0.575, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm149:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, -0.575, -0.665, 0.32, 0.374]
+  positions: [0.255, 0.88, -0.575, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm150:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, -0.575, -0.665, 1.74, 0.374]
+  positions: [0.255, 0.88, -0.575, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm151:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, -0.575, -0.06, -1.1, 0.374]
+  positions: [0.255, 0.88, -0.575, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm152:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, -0.575, -0.06, 0.32, 0.374]
+  positions: [0.255, 0.88, -0.575, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm153:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, -0.575, -0.06, 1.74, 0.374]
+  positions: [0.255, 0.88, -0.575, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm154:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, 0.93, -1.27, -1.1, 0.374]
+  positions: [0.255, 0.88, -0.575, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm155:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, 0.93, -1.27, 0.32, 0.374]
+  positions: [0.255, 0.88, -0.575, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm156:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, 0.93, -1.27, 1.74, 0.374]
+  positions: [0.255, 0.88, 0.93, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm157:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, 0.93, -0.665, -1.1, 0.374]
+  positions: [0.255, 0.88, 0.93, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm158:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, 0.93, -0.665, 0.32, 0.374]
+  positions: [0.255, 0.88, 0.93, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm159:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, 0.93, -0.665, 1.74, 0.374]
+  positions: [0.255, 0.88, 0.93, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm160:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, 0.93, -0.06, -1.1, 0.374]
+  positions: [0.255, 0.88, 0.93, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm161:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, 0.93, -0.06, 0.32, 0.374]
+  positions: [0.255, 0.88, 0.93, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm162:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.255, 0.88, 0.93, -0.06, 1.74, 0.374]
+  positions: [0.255, 0.88, 0.93, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm163:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, -2.08, -1.27, -1.1, 0.374]
+  positions: [0.255, 0.88, 0.93, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm164:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, -2.08, -1.27, 0.32, 0.374]
+  positions: [0.255, 0.88, 0.93, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm165:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, -2.08, -1.27, 1.74, 0.374]
+  positions: [0.31, -0.31, -2.08, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm166:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, -2.08, -0.665, -1.1, 0.374]
+  positions: [0.31, -0.31, -2.08, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm167:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, -2.08, -0.665, 0.32, 0.374]
+  positions: [0.31, -0.31, -2.08, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm168:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, -2.08, -0.665, 1.74, 0.374]
+  positions: [0.31, -0.31, -2.08, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm169:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, -2.08, -0.06, -1.1, 0.374]
+  positions: [0.31, -0.31, -2.08, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm170:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, -2.08, -0.06, 0.32, 0.374]
+  positions: [0.31, -0.31, -2.08, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm171:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, -2.08, -0.06, 1.74, 0.374]
+  positions: [0.31, -0.31, -2.08, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm172:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, -0.575, -1.27, -1.1, 0.374]
+  positions: [0.31, -0.31, -2.08, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm173:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, -0.575, -1.27, 0.32, 0.374]
+  positions: [0.31, -0.31, -2.08, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm174:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, -0.575, -1.27, 1.74, 0.374]
+  positions: [0.31, -0.31, -0.575, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm175:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, -0.575, -0.665, -1.1, 0.374]
+  positions: [0.31, -0.31, -0.575, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm176:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, -0.575, -0.665, 0.32, 0.374]
+  positions: [0.31, -0.31, -0.575, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm177:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, -0.575, -0.665, 1.74, 0.374]
+  positions: [0.31, -0.31, -0.575, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm178:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, -0.575, -0.06, -1.1, 0.374]
+  positions: [0.31, -0.31, -0.575, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm179:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, -0.575, -0.06, 0.32, 0.374]
+  positions: [0.31, -0.31, -0.575, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm180:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, -0.575, -0.06, 1.74, 0.374]
+  positions: [0.31, -0.31, -0.575, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm181:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, 0.93, -1.27, -1.1, 0.374]
+  positions: [0.31, -0.31, -0.575, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm182:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, 0.93, -1.27, 0.32, 0.374]
+  positions: [0.31, -0.31, -0.575, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm183:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, 0.93, -1.27, 1.74, 0.374]
+  positions: [0.31, -0.31, 0.93, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm184:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, 0.93, -0.665, -1.1, 0.374]
+  positions: [0.31, -0.31, 0.93, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm185:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, 0.93, -0.665, 0.32, 0.374]
+  positions: [0.31, -0.31, 0.93, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm186:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, 0.93, -0.665, 1.74, 0.374]
+  positions: [0.31, -0.31, 0.93, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm187:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, 0.93, -0.06, -1.1, 0.374]
+  positions: [0.31, -0.31, 0.93, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm188:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, 0.93, -0.06, 0.32, 0.374]
+  positions: [0.31, -0.31, 0.93, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm189:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, -0.31, 0.93, -0.06, 1.74, 0.374]
+  positions: [0.31, -0.31, 0.93, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm190:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, -2.08, -1.27, -1.1, 0.374]
+  positions: [0.31, -0.31, 0.93, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm191:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, -2.08, -1.27, 0.32, 0.374]
+  positions: [0.31, -0.31, 0.93, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm192:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, -2.08, -1.27, 1.74, 0.374]
+  positions: [0.31, 0.285, -2.08, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm193:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, -2.08, -0.665, -1.1, 0.374]
+  positions: [0.31, 0.285, -2.08, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm194:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, -2.08, -0.665, 0.32, 0.374]
+  positions: [0.31, 0.285, -2.08, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm195:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, -2.08, -0.665, 1.74, 0.374]
+  positions: [0.31, 0.285, -2.08, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm196:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, -2.08, -0.06, -1.1, 0.374]
+  positions: [0.31, 0.285, -2.08, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm197:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, -2.08, -0.06, 0.32, 0.374]
+  positions: [0.31, 0.285, -2.08, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm198:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, -2.08, -0.06, 1.74, 0.374]
+  positions: [0.31, 0.285, -2.08, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm199:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, -0.575, -1.27, -1.1, 0.374]
+  positions: [0.31, 0.285, -2.08, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm200:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, -0.575, -1.27, 0.32, 0.374]
+  positions: [0.31, 0.285, -2.08, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm201:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, -0.575, -1.27, 1.74, 0.374]
+  positions: [0.31, 0.285, -0.575, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm202:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, -0.575, -0.665, -1.1, 0.374]
+  positions: [0.31, 0.285, -0.575, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm203:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, -0.575, -0.665, 0.32, 0.374]
+  positions: [0.31, 0.285, -0.575, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm204:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, -0.575, -0.665, 1.74, 0.374]
+  positions: [0.31, 0.285, -0.575, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm205:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, -0.575, -0.06, -1.1, 0.374]
+  positions: [0.31, 0.285, -0.575, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm206:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, -0.575, -0.06, 0.32, 0.374]
+  positions: [0.31, 0.285, -0.575, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm207:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, -0.575, -0.06, 1.74, 0.374]
+  positions: [0.31, 0.285, -0.575, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm208:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, 0.93, -1.27, -1.1, 0.374]
+  positions: [0.31, 0.285, -0.575, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm209:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, 0.93, -1.27, 0.32, 0.374]
+  positions: [0.31, 0.285, -0.575, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm210:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, 0.93, -1.27, 1.74, 0.374]
+  positions: [0.31, 0.285, 0.93, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm211:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, 0.93, -0.665, -1.1, 0.374]
+  positions: [0.31, 0.285, 0.93, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm212:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, 0.93, -0.665, 0.32, 0.374]
+  positions: [0.31, 0.285, 0.93, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm213:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, 0.93, -0.665, 1.74, 0.374]
+  positions: [0.31, 0.285, 0.93, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm214:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, 0.93, -0.06, -1.1, 0.374]
+  positions: [0.31, 0.285, 0.93, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm215:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, 0.93, -0.06, 0.32, 0.374]
+  positions: [0.31, 0.285, 0.93, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm216:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.285, 0.93, -0.06, 1.74, 0.374]
+  positions: [0.31, 0.285, 0.93, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm217:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, -2.08, -1.27, -1.1, 0.374]
+  positions: [0.31, 0.285, 0.93, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm218:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, -2.08, -1.27, 0.32, 0.374]
+  positions: [0.31, 0.285, 0.93, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm219:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, -2.08, -1.27, 1.74, 0.374]
+  positions: [0.31, 0.88, -2.08, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm220:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, -2.08, -0.665, -1.1, 0.374]
+  positions: [0.31, 0.88, -2.08, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm221:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, -2.08, -0.665, 0.32, 0.374]
+  positions: [0.31, 0.88, -2.08, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm222:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, -2.08, -0.665, 1.74, 0.374]
+  positions: [0.31, 0.88, -2.08, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm223:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, -2.08, -0.06, -1.1, 0.374]
+  positions: [0.31, 0.88, -2.08, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm224:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, -2.08, -0.06, 0.32, 0.374]
+  positions: [0.31, 0.88, -2.08, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm225:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, -2.08, -0.06, 1.74, 0.374]
+  positions: [0.31, 0.88, -2.08, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm226:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, -0.575, -1.27, -1.1, 0.374]
+  positions: [0.31, 0.88, -2.08, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm227:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, -0.575, -1.27, 0.32, 0.374]
+  positions: [0.31, 0.88, -2.08, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm228:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, -0.575, -1.27, 1.74, 0.374]
+  positions: [0.31, 0.88, -0.575, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm229:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, -0.575, -0.665, -1.1, 0.374]
+  positions: [0.31, 0.88, -0.575, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm230:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, -0.575, -0.665, 0.32, 0.374]
+  positions: [0.31, 0.88, -0.575, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm231:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, -0.575, -0.665, 1.74, 0.374]
+  positions: [0.31, 0.88, -0.575, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm232:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, -0.575, -0.06, -1.1, 0.374]
+  positions: [0.31, 0.88, -0.575, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm233:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, -0.575, -0.06, 0.32, 0.374]
+  positions: [0.31, 0.88, -0.575, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm234:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, -0.575, -0.06, 1.74, 0.374]
+  positions: [0.31, 0.88, -0.575, -0.06, -1.1, 0.374]
   time_from_start: 1.0
 larm235:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, 0.93, -1.27, -1.1, 0.374]
+  positions: [0.31, 0.88, -0.575, -0.06, 0.32, 0.374]
   time_from_start: 1.0
 larm236:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, 0.93, -1.27, 0.32, 0.374]
+  positions: [0.31, 0.88, -0.575, -0.06, 1.74, 0.374]
   time_from_start: 1.0
 larm237:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, 0.93, -1.27, 1.74, 0.374]
+  positions: [0.31, 0.88, 0.93, -1.27, -1.1, 0.374]
   time_from_start: 1.0
 larm238:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, 0.93, -0.665, -1.1, 0.374]
+  positions: [0.31, 0.88, 0.93, -1.27, 0.32, 0.374]
   time_from_start: 1.0
 larm239:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, 0.93, -0.665, 0.32, 0.374]
+  positions: [0.31, 0.88, 0.93, -1.27, 1.74, 0.374]
   time_from_start: 1.0
 larm240:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, 0.93, -0.665, 1.74, 0.374]
+  positions: [0.31, 0.88, 0.93, -0.665, -1.1, 0.374]
   time_from_start: 1.0
 larm241:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, 0.93, -0.06, -1.1, 0.374]
+  positions: [0.31, 0.88, 0.93, -0.665, 0.32, 0.374]
   time_from_start: 1.0
 larm242:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
-  positions: [0.31, 0.88, 0.93, -0.06, 0.32, 0.374]
+  positions: [0.31, 0.88, 0.93, -0.665, 1.74, 0.374]
   time_from_start: 1.0
 larm243:
+  joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
+  positions: [0.31, 0.88, 0.93, -0.06, -1.1, 0.374]
+  time_from_start: 1.0
+larm244:
+  joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
+  positions: [0.31, 0.88, 0.93, -0.06, 0.32, 0.374]
+  time_from_start: 1.0
+larm245:
   joint_names: [LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, LHand]
   positions: [0.31, 0.88, 0.93, -0.06, 1.74, 0.374]
   time_from_start: 1.0
