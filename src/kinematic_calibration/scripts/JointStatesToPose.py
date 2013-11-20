@@ -33,7 +33,7 @@ class JointStatesToPose():
             
             if maxDelta >= minDist:
                 lastPositions = curPositions
-                self.poses[self.prefix + str(i)] = pose
+                self.poses[self.prefix + str('%03d' %i)] = pose
                 i = i+1
         #print self.poses
     

@@ -39,7 +39,7 @@ class PoseGenerator():
                 pose['joint_names'] = list(self.jointNames)
                 pose['time_from_start'] = 1.0
                 pose['positions'] = list(pos)
-                jointPoses[self.prefix + str(i)] = pose
+                jointPoses[self.prefix + str('%03d' %i)] = pose
                 i = i+1
                 
             f = open(self.filename, "w")
