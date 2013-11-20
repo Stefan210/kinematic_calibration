@@ -165,6 +165,7 @@ void CheckerboardMeasurementEdge::computeError() {
 	tf::transformEigenToTF(eigenTransform, endEffectorToMarker);
 
 	// calculate estimated x and y
+	endEffectorToMarker.setRotation(tf::Quaternion::getIdentity());
 	tf::Transform cameraToMarker = endEffectorToMarker * cameraToEndEffector;
 	double x, y;
 	this->frameImageConverter->project(cameraToMarker, x, y);
@@ -173,11 +174,11 @@ void CheckerboardMeasurementEdge::computeError() {
 	this->_error[0] = measurement.cb_x - x;
 	this->_error[1] = measurement.cb_y - y;
 	/*
-	cout << "id: " << _id << " ";
-	cout << "x error: " << this->_error[0] << " y error: " << this->_error[1]
-			<< " ";
-	cout << "cb_x: " << measurement.cb_x << " cb_y: " << measurement.cb_y
-			<< "\n";*/
+	 cout << "id: " << _id << " ";
+	 cout << "x error: " << this->_error[0] << " y error: " << this->_error[1]
+	 << " ";
+	 cout << "cb_x: " << measurement.cb_x << " cb_y: " << measurement.cb_y
+	 << "\n";*/
 }
 
 const FrameImageConverter* CheckerboardMeasurementEdge::getFrameImageConverter() const {
