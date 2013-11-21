@@ -475,7 +475,7 @@ void DataCapture::publishMeasurement() {
 vector<double> DataCapture::generateRandomPositions(
 		const vector<string>& joints) {
 	// TODO: parameterize!
-	double low = -0.05, high = 0.05;
+	double low = -0.10, high = 0.10;
 	vector<double> positions;
 	const vector<string>& jointNames = this->getJointNames();
 	for (int i = 0; i < jointNames.size(); i++) {
@@ -483,7 +483,9 @@ vector<double> DataCapture::generateRandomPositions(
 				+ static_cast<double>(rand())
 						/ (static_cast<double>(RAND_MAX / (high - low)));
 		positions.push_back(randomValue);
+		cout << jointNames[i] << ": "  << randomValue << ", ";
 	}
+	cout << "\n";
 	return positions;
 }
 
