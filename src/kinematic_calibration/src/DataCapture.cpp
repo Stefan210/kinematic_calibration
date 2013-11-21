@@ -476,11 +476,11 @@ void DataCapture::updateCheckerboardRobust() {
 		x.push_back(checkerboardData.x);
 		y.push_back(checkerboardData.y);
 
-		bool cbNotFound = false;
+		bool cbNotFound = true;
 		bool cbFound = true;
 		double xError = 0, yError = 0;
 		for(int i = 0; i < 3; i++) {
-			cbNotFound = cbNotFound || !found[i];
+			cbNotFound = cbNotFound && !found[i];
 			cbFound = cbFound && found[i];
 			xError += fabs(x[0] - x[i]);
 			yError += fabs(y[0] - y[i]);
