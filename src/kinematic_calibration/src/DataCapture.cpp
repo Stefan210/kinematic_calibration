@@ -151,22 +151,26 @@ void DataCapture::playChainPoses() {
 
 		// move the head s.t. the checkerboard is
 		// within the corner regions and publish the data
+		publishMeasurement();
 		enableHeadStiffness();
 		ROS_INFO("Moving head to LEFT_TOP region...");
-		setHeadPose(-0.3, 0.15, true);
+		setHeadPose(-0.3, 0.15, true, getJointNames(),
+				generateRandomPositions(getJointNames()));
 		publishMeasurement();
 		ROS_INFO("Moving head to LEFT_BOTTOM region...");
-		setHeadPose(0, -0.3, true);
+		setHeadPose(0, -0.3, true, getJointNames(),
+				generateRandomPositions(getJointNames()));
 		publishMeasurement();
 		ROS_INFO("Moving head to RIGHT_BOTTOM region...");
-		setHeadPose(0.6, 0, true);
+		setHeadPose(0.6, 0, true, getJointNames(),
+				generateRandomPositions(getJointNames()));
 		publishMeasurement();
 		ROS_INFO("Moving head to RIGHT_TOP region...");
-		setHeadPose(0, 0.3, true);
+		setHeadPose(0, 0.3, true, getJointNames(),
+				generateRandomPositions(getJointNames()));
 		publishMeasurement();
 		ROS_INFO("Monving back to CENTER region...");
 		setHeadPose(-0.3, -0.15, true);
-		publishMeasurement();
 		disableHeadStiffness();
 	}
 	disableChainStiffness();
@@ -445,8 +449,8 @@ void DataCapture::setHeadPose(double headYaw, double headPitch, bool relative,
 			additionalPositions.end());
 	JointTrajectoryGoal goal;
 	goal.trajectory.joint_names = headJointNames;
-	goal.trajectory.joint_names.insert(goal.trajectory.joint_names.end(), additionalJoints.begin(),
-			additionalJoints.end());
+	goal.trajectory.joint_names.insert(goal.trajectory.joint_names.end(),
+			additionalJoints.begin(), additionalJoints.end());
 	goal.trajectory.points.push_back(point);
 	goal.relative = relative;
 	trajectoryClient.sendGoal(goal);
@@ -466,6 +470,21 @@ void DataCapture::publishMeasurement() {
 	data.cb_y = checkerboardData.y;
 	ROS_INFO("Publishing measurement data...");
 	measurementPub.publish(data);
+}
+
+vector<double> DataCapture::generateRandomPositions(
+		const vector<string>& joints) {
+	// TODO: parameterize!
+	double low = -0.05, high = 0.05;
+	vector<double> positions;
+	const vector<string>& jointNames = this->getJointNames();
+	for (int i = 0; i < jointNames.size(); i++) {
+		double randomValue = low
+				+ static_cast<double>(rand())
+						/ (static_cast<double>(RAND_MAX / (high - low)));
+		positions.push_back(randomValue);
+	}
+	return positions;
 }
 
 LeftArmDataCapture::LeftArmDataCapture() {

@@ -92,6 +92,7 @@ private:
 	void updateCheckerboard();
 	void updateJointStates();
 	void publishMeasurement();
+	vector<double> generateRandomPositions(const vector<string>& joints);
 };
 
 class LeftArmDataCapture: public DataCapture {
