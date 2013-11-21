@@ -1,6 +1,5 @@
 import sys
 import yaml
-from sympy.printing.str import sstr
 
 
 class PoseReindexer():
