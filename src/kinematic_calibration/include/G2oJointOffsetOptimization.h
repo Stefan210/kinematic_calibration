@@ -27,18 +27,31 @@ namespace kinematic_calibration {
 
 typedef VertexSE3 MarkerTransformationVertex;
 
+/**
+ * Class that represents the vertex for the joint offsets.
+ */
 class JointOffsetVertex: public g2o::BaseVertex<7, map<string, double> > {
 public:
+	/**
+	 * Default constructor.
+	 */
 	JointOffsetVertex() :
 			jointNames(vector<string>()) {
 		this->_dimension = jointNames.size();
 	}
 
+	/**
+	 * Constructor.
+	 * @param jointNames Names of the joints which offsets should be optimized.
+	 */
 	JointOffsetVertex(const vector<string>& jointNames) :
 			jointNames(jointNames) {
 		this->_dimension = jointNames.size();
 	}
 
+	/**
+	 * Deconstructor.
+	 */
 	virtual ~JointOffsetVertex() {
 	}
 
@@ -61,10 +74,21 @@ protected:
 	vector<string> jointNames;
 };
 
+/**
+ * Class representing an edge between the transformation for the marker and the joint offsets.
+ */
 class CheckerboardMeasurementEdge: public BaseBinaryEdge<2, measurementData,
 		MarkerTransformationVertex, JointOffsetVertex> {
 public:
+	/**
+	 * Constructur.
+	 * @param measurement Measurement represented by the edge.
+	 */
 	CheckerboardMeasurementEdge(measurementData measurement);
+
+	/**
+	 * Deconstructor.
+	 */
 	virtual ~CheckerboardMeasurementEdge();
 
 	/**
@@ -79,9 +103,28 @@ public:
 		return false;
 	}
 
+	/**
+	 * Returns the frame image converter.
+	 * @return the frame image converter
+	 */
 	const FrameImageConverter* getFrameImageConverter() const;
+
+	/**
+	 * Sets the frame image converter.
+	 * @param frameImageConverter the frame image converter
+	 */
 	void setFrameImageConverter(FrameImageConverter* frameImageConverter);
+
+	/**
+	 * Returns the kinematic chain.
+	 * @return the kinematic chain
+	 */
 	const KinematicChain* getKinematicChain() const;
+
+	/**
+	 * Sets the kinematic chain.
+	 * @param kinematicChain the kinematic chain
+	 */
 	void setKinematicChain(KinematicChain* kinematicChain);
 
 private:
@@ -106,6 +149,9 @@ private:
 	map<string, double> jointPositions;
 };
 
+/**
+ * Class that optizes the joint offsets using g2o.
+ */
 class G2oJointOffsetOptimization: public JointOffsetOptimization {
 public:
 	/**
