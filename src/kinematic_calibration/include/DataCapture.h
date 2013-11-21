@@ -51,7 +51,9 @@ public:
 
 	void playChainPoses();
 
-	void setHeadPose(double headYaw, double headPitch, bool relative = false);
+	void setHeadPose(double headYaw, double headPitch, bool relative = false,
+			vector<string> additionalJoints = vector<string>(),
+			vector<double> additionalPositions = vector<double>());
 
 	void findCheckerboard();
 	void moveCheckerboardToImageRegion(Region region);
@@ -92,7 +94,7 @@ private:
 	void publishMeasurement();
 };
 
-class LeftArmDataCapture : public DataCapture {
+class LeftArmDataCapture: public DataCapture {
 public:
 	LeftArmDataCapture();
 	virtual ~LeftArmDataCapture();
@@ -105,7 +107,7 @@ private:
 	vector<string> jointNames;
 };
 
-class RightArmDataCapture : public DataCapture {
+class RightArmDataCapture: public DataCapture {
 public:
 	RightArmDataCapture();
 	virtual ~RightArmDataCapture();

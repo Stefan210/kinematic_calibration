@@ -8,6 +8,7 @@
 #include "../include/DataCapture.h"
 
 #include <cstdio>
+#include <ctime>
 
 using namespace nao_msgs;
 
@@ -56,6 +57,9 @@ DataCapture::DataCapture() :
 	headJointNames.push_back("HeadPitch");
 
 	updateCheckerboard();
+
+	// initialize seed
+	srand(static_cast<unsigned>(time(0)));
 }
 
 DataCapture::~DataCapture() {
@@ -430,14 +434,19 @@ void DataCapture::updateJointStates() {
 	}
 }
 
-void DataCapture::setHeadPose(double headYaw, double headPitch, bool relative) {
+void DataCapture::setHeadPose(double headYaw, double headPitch, bool relative,
+		vector<string> additionalJoints, vector<double> additionalPositions) {
 	trajectory_msgs::JointTrajectoryPoint point;
 	point.time_from_start.sec = 1;
 	point.time_from_start.nsec = 0;
 	point.positions.push_back(headYaw);
 	point.positions.push_back(headPitch);
+	point.positions.insert(point.positions.end(), additionalPositions.begin(),
+			additionalPositions.end());
 	JointTrajectoryGoal goal;
 	goal.trajectory.joint_names = headJointNames;
+	goal.trajectory.joint_names.insert(goal.trajectory.joint_names.end(), additionalJoints.begin(),
+			additionalJoints.end());
 	goal.trajectory.points.push_back(point);
 	goal.relative = relative;
 	trajectoryClient.sendGoal(goal);
