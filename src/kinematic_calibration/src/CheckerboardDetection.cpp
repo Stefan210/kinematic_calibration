@@ -20,7 +20,7 @@ CheckerboardDetection::~CheckerboardDetection() {
 	// TODO Auto-generated destructor stub
 }
 
-bool kinematic_calibration::CheckerboardDetection::detect(
+bool CheckerboardDetection::detect(
 		const sensor_msgs::ImageConstPtr& in_msg, CheckerboardData& out) {
 	cv_bridge::CvImageConstPtr cv_ptr;
 
@@ -35,7 +35,7 @@ bool kinematic_calibration::CheckerboardDetection::detect(
 	return detect(cv_ptr->image, out);
 }
 
-bool kinematic_calibration::CheckerboardDetection::detect(
+bool CheckerboardDetection::detect(
 		const cv::Mat& image, CheckerboardData& out) {
 
 
