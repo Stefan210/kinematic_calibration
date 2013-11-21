@@ -15,9 +15,10 @@ using namespace nao_msgs;
 namespace kinematic_calibration {
 
 DataCapture::DataCapture() :
-		stiffnessClient(nh, "joint_stiffness_trajectory"), trajectoryClient(nh,
-				"joint_trajectory"), bodyPoseClient(nh, "body_pose"), it(nh), checkerboardFound(
-				false), receivedJointStates(false), receivedImage(false) {
+		nhPrivate("~"), stiffnessClient(nh, "joint_stiffness_trajectory"), trajectoryClient(
+				nh, "joint_trajectory"), bodyPoseClient(nh, "body_pose"), it(
+				nh), checkerboardFound(false), receivedJointStates(false), receivedImage(
+				false) {
 
 	// get camera information
 	camerainfoSub = nh.subscribe("/nao_camera/camera_info", 1,
@@ -118,8 +119,8 @@ void DataCapture::disableStiffness(const vector<string>& jointNames) {
 
 void DataCapture::playChainPoses() {
 	int start, end;
-	nh.getParam("start_pose_num", start);
-	nh.getParam("end_pose_num", end);
+	nhPrivate.getParam("params/start_pose_num", start);
+	nhPrivate.getParam("params/end_pose_num", end);
 	enableChainStiffness();
 	const string& prefix = getPosePrefix();
 	for (int i = start; i <= end; i++) {

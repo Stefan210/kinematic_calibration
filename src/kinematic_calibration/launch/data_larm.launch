@@ -1,7 +1,7 @@
 
 <launch>
   <node pkg="kinematic_calibration" type="dataCaptureMain" name="DataCapture" output="screen" >
-    <rosparam file="$(find kinematic_calibration)/config/params.yaml" command="load" />
+    <rosparam file="$(find kinematic_calibration)/config/params.yaml" command="load" ns="params" />
   </node>
   <node pkg="nao_remote" type="pose_manager.py" name="pose_manager">
     <rosparam file="$(find kinematic_calibration)/config/poses_larm.yaml" command="load" ns="poses" />

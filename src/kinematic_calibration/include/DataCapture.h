@@ -64,6 +64,7 @@ protected:
 
 private:
 	ros::NodeHandle nh;
+	ros::NodeHandle nhPrivate;
 	ros::Subscriber camerainfoSub;
 	ros::Subscriber jointStateSub;
 	ros::CallbackQueue jointStatesQueue;
