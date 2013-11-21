@@ -25,6 +25,7 @@
 #include <g2o/solvers/dense/linear_solver_dense.h>
 #include <g2o/solvers/pcg/linear_solver_pcg.h>
 #include <g2o/solvers/dense/linear_solver_dense.h>
+#include <g2o/core/robust_kernel_impl.h>
 
 namespace kinematic_calibration {
 
@@ -109,6 +110,8 @@ void G2oJointOffsetOptimization::optimize(
 		measurementData current = measurements[i];
 		CheckerboardMeasurementEdge* edge = new CheckerboardMeasurementEdge(
 				current);
+		RobustKernel* rk = new RobustKernelCauchy();
+		edge->setRobustKernel(rk);
 		edge->setId(++id);
 		edge->setInformation(info);
 		edge->vertices()[0] = markerTransformationVertex;
