@@ -119,7 +119,7 @@ void DataCapture::playChainPoses() {
 	for (int i = 1; i <= numOfPoses; i++) {
 		// execute next pose
 		char buf[10];
-		sprintf(buf, "%s%i", prefix.c_str(), i);
+		sprintf(buf, "%s%03i", prefix.c_str(), i);
 		string poseName(buf);
 		BodyPoseGoal goal;
 		goal.pose_name = poseName;
