@@ -91,6 +91,8 @@ private:
 	void camerainfoCallback(const sensor_msgs::CameraInfoConstPtr& msg);
 	void jointStatesCallback(const sensor_msgs::JointStateConstPtr& msg);
 	void updateCheckerboard();
+	void updateCheckerboardOnce();
+	void updateCheckerboardRobust();
 	void updateJointStates();
 	void publishMeasurement();
 	vector<double> generateRandomPositions(const vector<string>& joints);

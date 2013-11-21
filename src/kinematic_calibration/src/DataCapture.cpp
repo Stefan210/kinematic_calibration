@@ -7,8 +7,32 @@
 
 #include "../include/DataCapture.h"
 
+#include <actionlib/client/simple_client_goal_state.h>
+#include <boost/bind/arg.hpp>
+#include <boost/bind/bind.hpp>
+#include <boost/bind/placeholders.hpp>
+#include <boost/smart_ptr/shared_ptr.hpp>
+#include <image_transport/subscriber.h>
+#include <nao_msgs/JointTrajectoryGoal.h>
+#include <ros/callback_queue.h>
+#include <ros/console.h>
+#include <ros/duration.h>
+#include <ros/forwards.h>
+#include <ros/init.h>
+#include <ros/publisher.h>
+#include <ros/subscribe_options.h>
+#include <ros/subscriber.h>
+#include <rosconsole/macros_generated.h>
+#include <sensor_msgs/CameraInfo.h>
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/JointState.h>
+#include <std_msgs/Header.h>
+#include <unistd.h>
 #include <cstdio>
+#include <cstdlib>
 #include <ctime>
+#include <iostream>
+#include <cmath>
 
 using namespace nao_msgs;
 
@@ -420,8 +444,12 @@ void DataCapture::jointStatesCallback(
 }
 
 void DataCapture::updateCheckerboard() {
+	updateCheckerboardRobust();
+}
+
+void DataCapture::updateCheckerboardOnce() {
 	receivedImage = false;
-	usleep(0.5 * 1000 * 1000);
+	usleep(0.3 * 1000 * 1000);
 	ROS_INFO("Waiting for image message...");
 	while (ros::getGlobalCallbackQueue()->isEmpty())
 		;
@@ -430,9 +458,44 @@ void DataCapture::updateCheckerboard() {
 	}
 }
 
+void DataCapture::updateCheckerboardRobust() {
+	bool unstable = true;
+	vector<bool> found;
+	vector<double> x;
+	vector<double> y;
+	while(unstable) {
+		while(found.size() >= 3) {
+			found.erase(found.begin());
+			x.erase(x.begin());
+			y.erase(y.begin());
+		}
+
+		// update and save data
+		updateCheckerboardOnce();
+		found.push_back(checkerboardFound);
+		x.push_back(checkerboardData.x);
+		y.push_back(checkerboardData.y);
+
+		bool cbNotFound = false;
+		bool cbFound = true;
+		double xError = 0, yError = 0;
+		for(int i = 0; i < 3; i++) {
+			cbNotFound = cbNotFound || found[i];
+			cbFound = cbFound && found[i];
+			xError += fabs(x[0] - x[i]);
+			yError += fabs(y[0] - y[i]);
+		}
+		if(cbNotFound == false) {
+			unstable = false;
+		} else if(cbFound && xError < 3 && yError < 3) {
+			unstable = false;
+		}
+	}
+}
+
 void DataCapture::updateJointStates() {
 	receivedJointStates = false;
-	usleep(0.5 * 1000 * 1000);
+	usleep(0.3 * 1000 * 1000);
 	ROS_INFO("Waiting for joint state message...");
 	while (jointStatesQueue.isEmpty())
 		;
