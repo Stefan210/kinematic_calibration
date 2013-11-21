@@ -485,7 +485,7 @@ void DataCapture::updateCheckerboardRobust() {
 			xError += fabs(x[0] - x[i]);
 			yError += fabs(y[0] - y[i]);
 		}
-		if(cbNotFound == false) {
+		if(cbNotFound == true) {
 			unstable = false;
 		} else if(cbFound && xError < 3 && yError < 3) {
 			unstable = false;
