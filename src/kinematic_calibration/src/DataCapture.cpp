@@ -117,10 +117,12 @@ void DataCapture::disableStiffness(const vector<string>& jointNames) {
 }
 
 void DataCapture::playChainPoses() {
+	int start, end;
+	nh.getParam("start_pose_num", start);
+	nh.getParam("end_pose_num", end);
 	enableChainStiffness();
-	int numOfPoses = 260; // TODO: parameterize!!
 	const string& prefix = getPosePrefix();
-	for (int i = 1; i <= numOfPoses; i++) {
+	for (int i = start; i <= end; i++) {
 		// execute next pose
 		char buf[10];
 		sprintf(buf, "%s%03i", prefix.c_str(), i);
@@ -483,7 +485,7 @@ vector<double> DataCapture::generateRandomPositions(
 				+ static_cast<double>(rand())
 						/ (static_cast<double>(RAND_MAX / (high - low)));
 		positions.push_back(randomValue);
-		cout << jointNames[i] << ": "  << randomValue << ", ";
+		cout << jointNames[i] << ": " << randomValue << ", ";
 	}
 	cout << "\n";
 	return positions;
