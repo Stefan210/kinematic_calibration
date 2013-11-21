@@ -9,13 +9,16 @@
 #define OPTIMIZATIONNODE_H_
 
 #include <image_geometry/pinhole_camera_model.h>
+#include <kdl/tree.hpp>
 #include <kinematic_calibration/measurementData.h>
 #include <ros/node_handle.h>
 #include <ros/subscriber.h>
 #include <sensor_msgs/CameraInfo.h>
+#include <string>
 #include <vector>
 
 #include "KinematicCalibrationState.h"
+#include "ModelLoader.h"
 
 using namespace ros;
 using namespace std;
@@ -37,6 +40,8 @@ protected:
 	void optimize();
 	void printResult();
 
+	void printPoints();
+
 	void measurementCb(const measurementDataConstPtr& msg);
 	void camerainfoCallback(const sensor_msgs::CameraInfoConstPtr& msg);
 
@@ -48,6 +53,9 @@ private:
 	vector<measurementData> measurements;
 	image_geometry::PinholeCameraModel cameraModel;
 	KinematicCalibrationState result;
+	ModelLoader modelLoader;
+	KDL::Tree kdlTree;
+	string chainName, chainRoot, chainTip;
 
 	bool collectingData;
 

@@ -31,6 +31,12 @@ OptimizationNode::OptimizationNode() :
 	cameraInfoSubscriber = nh.subscribe("/nao_camera/camera_info", 1,
 			&OptimizationNode::camerainfoCallback, this);
 
+	// instantiate the model loader
+	modelLoader.initializeFromRos();
+	modelLoader.getKdlTree(kdlTree);
+	nh.getParam("chain_name", chainName);
+	nh.getParam("chain_root", chainRoot);
+	nh.getParam("chain_tip", chainTip);
 }
 
 OptimizationNode::~OptimizationNode() {
@@ -43,6 +49,7 @@ void OptimizationNode::startLoop() {
 	ROS_INFO("Starting optimization...");
 	optimize();
 	ROS_INFO("Publishing results...");
+	printPoints();
 	printResult();
 }
 
@@ -55,15 +62,7 @@ void OptimizationNode::collectData() {
 
 void OptimizationNode::optimize() {
 	// instantiate the kinematic chain
-	ModelLoader modelLoader;
-	modelLoader.initializeFromRos();
-	KDL::Tree tree;
-	modelLoader.getKdlTree(tree);
-	string name, root, tip;
-	nh.getParam("chain_name", name);
-	nh.getParam("chain_root", root);
-	nh.getParam("chain_tip", tip);
-	KinematicChain kinematicChain(tree, root, tip, name);
+	KinematicChain kinematicChain(kdlTree, chainRoot, chainTip, chainName);
 
 	// instantiate the frame image converter
 	FrameImageConverter frameImageConverter(cameraModel);
@@ -92,6 +91,48 @@ void OptimizationNode::printResult() {
 			<< " " << result.markerTransformation.getRotation().y() << " "
 			<< result.markerTransformation.getRotation().z() << " "
 			<< result.markerTransformation.getRotation().w() << " ";
+}
+
+void OptimizationNode::printPoints() {
+	// instantiate the kinematic chain
+	KinematicChain kinematicChain(kdlTree, chainRoot, chainTip, chainName);
+
+	// instantiate the frame image converter
+	FrameImageConverter frameImageConverter(cameraModel);
+
+	// print out the measured position and the transformed position
+	for (int i = 0; i < measurements.size(); i++) {
+		measurementData current = measurements[i];
+		cout << i << "measured(x, y): " << current.cb_x << ", " << current.cb_y;
+
+		// get transformation from end effector to camera
+		map<string, double> jointPositions;
+		for (int i = 0; i < current.jointState.name.size(); i++) {
+			jointPositions.insert(
+					make_pair<string, double>(current.jointState.name[i],
+							current.jointState.position[i]));
+		}
+
+		tf::Transform cameraToEndEffector; // root = camera, tip = end effector, e.g. wrist
+		map<string, double> jointOffsets = result.jointOffsets;
+		kinematicChain.getRootToTip(jointPositions, jointOffsets,
+				cameraToEndEffector);
+
+		// get transformation from marker to end effector
+		tf::Transform endEffectorToMarker = result.markerTransformation;
+
+		// calculate estimated x and y
+		endEffectorToMarker.setRotation(tf::Quaternion::getIdentity());
+		tf::Transform cameraToMarker = endEffectorToMarker
+				* cameraToEndEffector;
+		double x, y;
+		frameImageConverter.project(cameraToMarker, x, y);
+
+		cout << "\toptimized(x, y): " << x << ", " << y;
+		cout << "\tdifference(x, y): " << (current.cb_x - x) << ", "
+				<< (current.cb_y - y);
+		cout << "\n";
+	}
 }
 
 void OptimizationNode::measurementCb(const measurementDataConstPtr& msg) {
