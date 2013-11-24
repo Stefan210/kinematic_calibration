@@ -38,7 +38,7 @@ public:
 
 private:
 	urdf::Model model;
-	const map<string, double> offsets;
+	map<string, double> offsets;
 	string prefix;
 };
 
