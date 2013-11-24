@@ -7,4 +7,3 @@ install
 src/g2o*
 src/nao_*
 src/humanoid_msgs
-include
