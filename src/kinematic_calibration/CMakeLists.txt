@@ -221,3 +221,8 @@ target_link_libraries(optimizationNode
 	${catkin_LIBRARIES} 
 	${G2O_LIBS}
 	)
+	
+	
+### JointUpdate
+add_library(jointUpdate src/JointUpdate.cpp)
+target_link_libraries(jointUpdate modelLoader ${catkin_LIBRARIES})
