@@ -14,5 +14,6 @@ int main(int argc, char** argv) {
 	LeftArmDataCapture dataCapture;
     //dataCapture.findCheckerboard();
     dataCapture.playChainPoses();
-	ros::spin();
+    dataCapture.publishEmptyMeasurement();
+    //ros::spin();
 }

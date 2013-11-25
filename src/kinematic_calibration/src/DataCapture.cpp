@@ -543,6 +543,13 @@ void DataCapture::publishMeasurement() {
 	measurementPub.publish(data);
 }
 
+void DataCapture::publishEmptyMeasurement() {
+    measurementData data;
+    data.jointState = sensor_msgs::JointState();
+    data.cb_x = -1;
+    data.cb_y = -1;
+}
+
 vector<double> DataCapture::generateRandomPositions(
 		const vector<string>& joints) {
 	// TODO: parameterize!
