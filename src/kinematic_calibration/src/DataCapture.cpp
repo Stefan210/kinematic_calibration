@@ -544,10 +544,12 @@ void DataCapture::publishMeasurement() {
 }
 
 void DataCapture::publishEmptyMeasurement() {
-    measurementData data;
+    measurementData data; cout << "111";
     data.jointState = sensor_msgs::JointState();
-    data.cb_x = -1;
+    data.cb_x = -1; cout << "222";
     data.cb_y = -1;
+    ROS_INFO("Publishing empty measurement data...");
+    measurementPub.publish(data);
 }
 
 vector<double> DataCapture::generateRandomPositions(
