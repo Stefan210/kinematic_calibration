@@ -205,6 +205,7 @@ void DataCapture::playChainPoses() {
 		publishMeasurement();
 		ROS_INFO("Monving back to CENTER region...");
 		setHeadPose(-0.3, -0.15, true);
+        publishMeasurement();
 		disableHeadStiffness();
 	}
 	disableChainStiffness();
