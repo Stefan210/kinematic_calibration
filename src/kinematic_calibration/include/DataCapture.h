@@ -96,6 +96,8 @@ private:
 	void updateJointStates();
 	void publishMeasurement();
 	vector<double> generateRandomPositions(const vector<string>& joints);
+    double headYawMin, headYawMax, headYawStep;
+    double headPitchMin, headPitchMax, headPitchStep;
 };
 
 class LeftArmDataCapture: public DataCapture {

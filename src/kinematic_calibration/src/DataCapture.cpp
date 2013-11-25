@@ -43,6 +43,13 @@ DataCapture::DataCapture() :
 				nh, "joint_trajectory"), bodyPoseClient(nh, "body_pose"), it(
 				nh), checkerboardFound(false), receivedJointStates(false), receivedImage(
 				false) {
+    // get parameters
+    nhPrivate.getParam("params/headYaw_min", headYawMin);
+    nhPrivate.getParam("params/headYaw_max", headYawMax);
+    nhPrivate.getParam("params/headYaw_step", headYawStep);
+    nhPrivate.getParam("params/headPitch_min", headPitchMin);
+    nhPrivate.getParam("params/headPitch_max", headPitchMax);
+    nhPrivate.getParam("params/headPitch_step", headPitchStep);
 
 	// get camera information
 	camerainfoSub = nh.subscribe("/nao_camera/camera_info", 1,
@@ -412,22 +419,16 @@ void DataCapture::camerainfoCallback(
 }
 
 void DataCapture::findCheckerboard() {
-	// TODO: parameterize!!
-	double headYawMin = -0.5;
-	double headYawMax = 0.5;
-	double headPitchMin = -0.5;
-	double headPitchMax = 0.2;
-
 	updateCheckerboard();
 	if (checkerboardFound)
 		return;
 
 	enableHeadStiffness();
-	for (double headYaw = headYawMin; headYaw <= headYawMax; headYaw += 0.4) {
+    for (double headYaw = headYawMin; headYaw <= headYawMax; headYaw += headYawStep) {
 		if (checkerboardFound)
 			break;
 		for (double headPitch = headPitchMin; headPitch <= headPitchMax;
-				headPitch += 0.33) {
+                headPitch += headPitchStep) {
 			setHeadPose(-headYaw, headPitch);
 			updateCheckerboard();
 			if (checkerboardFound)
