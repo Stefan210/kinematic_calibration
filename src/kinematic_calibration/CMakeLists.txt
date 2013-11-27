@@ -228,3 +228,6 @@ target_link_libraries(optimizationNode
 ### JointUpdate
 add_library(jointUpdate src/JointUpdate.cpp)
 target_link_libraries(jointUpdate modelLoader ${catkin_LIBRARIES})
+
+add_executable(jointUpdateNode src/JointUpdateNode.cpp)
+target_link_libraries(jointUpdateNode jointUpdate ${catkin_LIBRARIES})
