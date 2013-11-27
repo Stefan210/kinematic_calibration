@@ -31,6 +31,7 @@ public:
 	bool initializeFromRos();
 	bool initializeFromUrdf(string urdfXml);
 	void getKdlTree(KDL::Tree& kdlTree);
+	void getUrdfModel(urdf::Model& model);
 
 protected:
 	bool loadUrdfFromRos();
