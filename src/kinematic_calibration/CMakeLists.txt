@@ -53,6 +53,7 @@ SET(G2O_LIBS cholmod cxsparse -lg2o_cli -lg2o_core
 add_message_files(
    FILES
    measurementData.msg
+   calibrationResult.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -74,6 +75,7 @@ generate_messages(
   DEPENDENCIES
   std_msgs
   sensor_msgs
+  geometry_msgs
 )
 
 
