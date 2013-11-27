@@ -1,6 +1,6 @@
 
 <launch>
-  <rosparam file="$(find kinematic_calibration)/config/params_larm.yaml" command="load"/>
+  <rosparam file="$(find kinematic_calibration)/config/params_larm_general.yaml" command="load"/>
   <node pkg="kinematic_calibration" type="dataCaptureMain" name="DataCapture" output="screen" >
     <rosparam file="$(find kinematic_calibration)/config/params_larm_capturing.yaml" command="load" ns="params" />
   </node>
