@@ -103,7 +103,8 @@ void OptimizationNode::printPoints() {
 	// print out the measured position and the transformed position
 	for (int i = 0; i < measurements.size(); i++) {
 		measurementData current = measurements[i];
-		cout << i << "measured(x, y): " << current.cb_x << ", " << current.cb_y;
+		cout << i << " measured(x, y): " << current.cb_x << ", "
+				<< current.cb_y;
 
 		// get transformation from end effector to camera
 		map<string, double> jointPositions;
@@ -128,8 +129,8 @@ void OptimizationNode::printPoints() {
 		double x, y;
 		frameImageConverter.project(cameraToMarker, x, y);
 
-		cout << "\toptimized(x, y): " << x << ", " << y;
-		cout << "\tdifference(x, y): " << (current.cb_x - x) << ", "
+		cout << "\toptimized(x,y): " << x << ", " << y;
+		cout << "\tdifference(x,y): " << (current.cb_x - x) << ", "
 				<< (current.cb_y - y);
 		cout << "\n";
 	}
