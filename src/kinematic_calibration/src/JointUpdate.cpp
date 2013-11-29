@@ -58,11 +58,11 @@ void JointUpdate::writeCalibrationData(const string& filename) {
 		double r, p, y;
 		joint.parent_to_joint_origin_transform.rotation.getRPY(r, p, y);
 		string name = joint.name;
-		cout << "<property name=\"" << prefix << "_" << name << "_r"
+		file << "<property name=\"" << prefix << "_" << name << "_r"
 				<< "\" value=\"" << r << "\" />";
-		cout << "<property name=\"" << prefix << "_" << name << "_p"
+		file << "<property name=\"" << prefix << "_" << name << "_p"
 				<< "\" value=\"" << p << "\" />";
-		cout << "<property name=\"" << prefix << "_" << name << "_y"
+		file << "<property name=\"" << prefix << "_" << name << "_y"
 				<< "\" value=\"" << y << "\" />";
 	}
 	file << "</robot>\n";

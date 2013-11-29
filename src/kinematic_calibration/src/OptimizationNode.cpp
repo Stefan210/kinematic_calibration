@@ -149,8 +149,10 @@ void OptimizationNode::measurementCb(const measurementDataConstPtr& msg) {
 
 void OptimizationNode::camerainfoCallback(
 		const sensor_msgs::CameraInfoConstPtr& msg) {
-	cameraModel.fromCameraInfo(msg);
-	ROS_INFO("Camera model set.");
+	if (cameraModel.fromCameraInfo(msg))
+		ROS_INFO("Camera model set.");
+	else
+		ROS_FATAL("Camera model could not be set!");
 	cameraInfoSubscriber.shutdown();
 }
 

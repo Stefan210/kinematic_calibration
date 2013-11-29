@@ -1,0 +1,440 @@
+larm001:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.4049339294433594, -0.6963939666748047, -0.007627964019775391, 0.9525721073150635,
+    0.2086658477783203, -0.3744000196456909]
+  time_from_start: 1.0
+larm002:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.36658406257629395, -0.9034841060638428, 0.04912996292114258, 0.9525721073150635,
+    0.2086658477783203, -0.3744000196456909]
+  time_from_start: 1.0
+larm003:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.36658406257629395, -1.1136419773101807, 0.05526590347290039, 0.9525721073150635,
+    0.2086658477783203, -0.3744000196456909]
+  time_from_start: 1.0
+larm004:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.08739614486694336, -1.14125394821167, 0.27002596855163574, 0.9525721073150635,
+    0.2086658477783203, -0.3744000196456909]
+  time_from_start: 1.0
+larm005:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.11355804651975632, -1.1366519927978516, 0.25621986389160156, 0.9525721073150635,
+    0.2086658477783203, -0.3744000196456909]
+  time_from_start: 1.0
+larm006:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.27922987937927246, -1.1305160522460938, 0.21173405647277832, 1.1642640829086304,
+    0.2086658477783203, -0.3744000196456909]
+  time_from_start: 1.0
+larm007:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.23934602737426758, -1.1366519927978516, -0.0367741584777832, 1.3468101024627686,
+    0.2086658477783203, -0.3744000196456909]
+  time_from_start: 1.0
+larm008:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.23934602737426758, -1.138185977935791, -0.23772811889648438, 1.3468101024627686,
+    0.2086658477783203, -0.3744000196456909]
+  time_from_start: 1.0
+larm009:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.23934602737426758, -1.138185977935791, -0.4463520050048828, 1.3468101024627686,
+    0.2086658477783203, -0.3744000196456909]
+  time_from_start: 1.0
+larm010:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.23934602737426758, -1.1335840225219727, -0.4662940502166748, 1.348344087600708,
+    0.4126880168914795, -0.3744000196456909]
+  time_from_start: 1.0
+larm011:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.23934602737426758, -1.135118007659912, -0.46476006507873535, 1.348344087600708,
+    0.6458559036254883, -0.3744000196456909]
+  time_from_start: 1.0
+larm012:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.23934602737426758, -1.1335840225219727, -0.4662940502166748, 1.348344087600708,
+    0.8544800281524658, -0.3744000196456909]
+  time_from_start: 1.0
+larm013:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.23934602737426758, -1.135118007659912, -0.4724299907684326, 1.3468101024627686,
+    0.6427879333496094, -0.3744000196456909]
+  time_from_start: 1.0
+larm014:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.23934602737426758, -1.135118007659912, -0.4724299907684326, 1.3468101024627686,
+    0.42649388313293457, -0.3744000196456909]
+  time_from_start: 1.0
+larm015:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.23934602737426758, -1.135118007659912, -0.4724299907684326, 1.3468101024627686,
+    0.18872404098510742, -0.3744000196456909]
+  time_from_start: 1.0
+larm016:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.23934602737426758, -1.135118007659912, -0.46782803535461426, 1.3468101024627686,
+    0.42035794258117676, -0.3744000196456909]
+  time_from_start: 1.0
+larm017:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.23781204223632812, -0.9218921661376953, -0.46169209480285645, 1.3468101024627686,
+    0.581428050994873, -0.37400001287460327]
+  time_from_start: 1.0
+larm018:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.024585962295532227, -0.7684919834136963, -0.41567206382751465, 1.3468101024627686,
+    0.581428050994873, -0.3744000196456909]
+  time_from_start: 1.0
+larm019:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.23781204223632812, -0.7669579982757568, -0.35277795791625977, 1.3468101024627686,
+    0.581428050994873, -0.3744000196456909]
+  time_from_start: 1.0
+larm020:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.44336795806884766, -0.7669579982757568, -0.35277795791625977, 1.3468101024627686,
+    0.5798940658569336, -0.3744000196456909]
+  time_from_start: 1.0
+larm021:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.5584180355072021, -0.7715599536895752, -0.3773219585418701, 1.1366519927978516,
+    0.581428050994873, -0.3744000196456909]
+  time_from_start: 1.0
+larm022:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.5584180355072021, -0.7746281623840332, -0.3819241523742676, 0.9280281066894531,
+    0.5798940658569336, -0.3744000196456909]
+  time_from_start: 1.0
+larm023:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.5584180355072021, -0.780764102935791, -0.3819241523742676, 0.7194039821624756,
+    0.5798940658569336, -0.3744000196456909]
+  time_from_start: 1.0
+larm024:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.524669885635376, -0.7792301177978516, -0.39266204833984375, 0.9249601364135742,
+    0.581428050994873, -0.37400001287460327]
+  time_from_start: 1.0
+larm025:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.5154659748077393, -0.7700259685516357, -0.39879798889160156, 1.1458560228347778,
+    0.581428050994873, -0.3744000196456909]
+  time_from_start: 1.0
+larm026:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.5154659748077393, -0.7715599536895752, -0.6089560985565186, 1.3176640272140503,
+    0.581428050994873, -0.3744000196456909]
+  time_from_start: 1.0
+larm027:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.5108640193939209, -0.7884340286254883, -0.8099100589752197, 1.29312002658844,
+    0.581428050994873, -0.3744000196456909]
+  time_from_start: 1.0
+larm028:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.5108640193939209, -0.7945699691772461, -0.8820080757141113, 1.084496021270752,
+    0.5829620361328125, -0.3744000196456909]
+  time_from_start: 1.0
+larm029:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.5093300342559814, -0.7991721630096436, -0.9188239574432373, 0.877406120300293,
+    0.581428050994873, -0.3744000196456909]
+  time_from_start: 1.0
+larm030:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.5108640193939209, -0.8037741184234619, -0.9387660026550293, 0.687190055847168,
+    0.7961878776550293, -0.3744000196456909]
+  time_from_start: 1.0
+larm031:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.5108640193939209, -0.8037741184234619, -0.9280281066894531, 0.6902580261230469,
+    1.0063457489013672, -0.3744000196456909]
+  time_from_start: 1.0
+larm032:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.26695799827575684, -0.309826135635376, -0.8344540596008301, 0.9080860614776611,
+    1.0149701118469239, -0.3744000196456909]
+  time_from_start: 1.0
+larm033:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.26695799827575684, -0.3313021659851074, -0.8237161636352539, 0.6994619369506836,
+    1.0149701118469239, -0.3744000196456909]
+  time_from_start: 1.0
+larm034:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.26695799827575684, -0.3190300464630127, -0.8605320453643799, 0.55373215675354,
+    0.8140161514282227, -0.3744000196456909]
+  time_from_start: 1.0
+larm035:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.26695799827575684, -0.3190300464630127, -0.8451919555664062, 0.55373215675354,
+    0.811060523986816, -0.3744000196456909]
+  time_from_start: 1.0
+larm036:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.260822057723999, -0.33437013626098633, -0.4494199752807617, 0.5752079486846924,
+    0.6422079086303711, -0.3744000196456909]
+  time_from_start: 1.0
+larm037:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.25928807258605957, -0.33437013626098633, -0.6012859344482422, 0.5752079486846924,
+    0.6335840225219727, -0.3744000196456909]
+  time_from_start: 1.0
+larm038:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.04146003723144531, -0.3328361511230469, -0.5920820236206055, 0.5752079486846924,
+    0.6151759624481201, -0.3744000196456909]
+  time_from_start: 1.0
+larm039:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.15949392318725586, -0.3328361511230469, -0.5598680973052979, 0.5752079486846924,
+    0.6136419773101807, -0.3744000196456909]
+  time_from_start: 1.0
+larm040:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.1809699535369873, -0.3328361511230469, -0.4754979610443115, 0.5752079486846924,
+    0.8314700126647949, -0.3744000196456909]
+  time_from_start: 1.0
+larm041:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.17943596839904785, -0.32056403160095215, 0.16571402549743652, 0.5583341121673584,
+    0.5553500652313232, -0.3744000196456909]
+  time_from_start: 1.0
+larm042:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.17943596839904785, -0.11807609349489212, 0.1534419059753418, 0.5583341121673584,
+    0.42035794258117676, -0.3744000196456909]
+  time_from_start: 1.0
+larm043:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.18557214736938477, -0.015298128128051758, 0.10895586013793945, 0.760822057723999,
+    0.38814401626586914, -0.3744000196456909]
+  time_from_start: 1.0
+larm044:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.18557214736938477, -0.038308143615722656, 0.08901405334472656, 0.5460619926452637,
+    0.3896780014038086, -0.3744000196456909]
+  time_from_start: 1.0
+larm045:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.18557214736938477, -0.0367741584777832, 0.08901405334472656, 0.34357404708862305,
+    0.3896780014038086, -0.3744000196456909]
+  time_from_start: 1.0
+larm046:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.18557214736938477, -0.0367741584777832, 0.08748006820678711, 0.1318819522857666,
+    0.39121198654174805, -0.3744000196456909]
+  time_from_start: 1.0
+larm047:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.1840381622314453, -0.04137611389160156, -0.11654210090637207, 0.056715965270996094,
+    0.3866100311279297, -0.3744000196456909]
+  time_from_start: 1.0
+larm048:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.16256213188171387, -0.03984212875366211, -0.2929520606994629, 0.056715965270996094,
+    0.1825878620147705, -0.3744000196456909]
+  time_from_start: 1.0
+larm049:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.16256213188171387, -0.038308143615722656, -0.2730100154876709, 0.056715965270996094,
+    0.42035794258117676, -0.3744000196456909]
+  time_from_start: 1.0
+larm050:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.16256213188171387, -0.0367741584777832, -0.269942045211792, 0.05824995040893555,
+    0.6504578590393066, -0.3744000196456909]
+  time_from_start: 1.0
+larm051:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.16256213188171387, -0.029103994369506836, -0.26840806007385254, 0.05824995040893555,
+    0.8866939544677734, -0.3744000196456909]
+  time_from_start: 1.0
+larm052:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.17636799812316895, 0.010779857635498047, 0.7777800559997559, 0.2852821350097656,
+    -0.13648414611816406, -0.3744000196456909]
+  time_from_start: 1.0
+larm053:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.17636799812316895, 0.010779857635498047, 0.6719338893890381, 0.5031099319458008,
+    -0.13648414611816406, -0.3744000196456909]
+  time_from_start: 1.0
+larm054:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.17636799812316895, 0.010779857635498047, 0.5706899166107178, 0.7055981159210205,
+    -0.13648414611816406, -0.3744000196456909]
+  time_from_start: 1.0
+larm055:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.024585962295532227, 0.18872404098510742, 0.5139319896697998, 0.6933259963989258,
+    -0.13341593742370605, -0.3744000196456909]
+  time_from_start: 1.0
+larm056:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.18710613250732422, 0.1825878620147705, 0.5062620639801025, 0.6948599815368652,
+    -0.13341593742370605, -0.3744000196456909]
+  time_from_start: 1.0
+larm057:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.39573001861572266, 0.1795198917388916, 0.5001258850097656, 0.6933259963989258,
+    -0.13648414611816406, -0.3744000196456909]
+  time_from_start: 1.0
+larm058:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.43254613876342773, 0.15497589111328125, 0.5216019153594971, 0.49083805084228516,
+    -0.13801813125610352, -0.3744000196456909]
+  time_from_start: 1.0
+larm059:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.22238802909851074, 0.13503408432006836, 0.5338740348815918, 0.3159620761871338,
+    -0.13955211639404297, -0.3744000196456909]
+  time_from_start: 1.0
+larm060:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.02143406867980957, 0.13503408432006836, 0.5338740348815918, 0.31749606132507324,
+    -0.13955211639404297, -0.3744000196456909]
+  time_from_start: 1.0
+larm061:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.24233007431030273, 0.1365680694580078, 0.5108640193939209, 0.3159620761871338,
+    -0.14262008666992188, -0.3744000196456909]
+  time_from_start: 1.0
+larm062:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.28067994117736816, 0.14117002487182617, 0.5722239017486572, 0.5230519771575928,
+    -0.14415407180786133, -0.3744000196456909]
+  time_from_start: 1.0
+larm063:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.269942045211792, 0.14423799514770508, 0.5737578868865967, 0.6488399505615234,
+    0.07060599327087402, -0.3744000196456909]
+  time_from_start: 1.0
+larm064:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.269942045211792, 0.14270401000976562, 0.5921659469604492, 0.6488399505615234,
+    0.28229808807373047, -0.3744000196456909]
+  time_from_start: 1.0
+larm065:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.059783935546875, 0.1304318904876709, 0.5921659469604492, 0.647305965423584,
+    0.4326300621032715, -0.3744000196456909]
+  time_from_start: 1.0
+larm066:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.269942045211792, 0.12122797966003418, 0.5308060646057129, 0.63043212890625,
+    0.4326300621032715, -0.3744000196456909]
+  time_from_start: 1.0
+larm067:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.47089600563049316, 0.11969398707151413, 0.5139319896697998, 0.6288981437683105,
+    0.42649388313293457, -0.3744000196456909]
+  time_from_start: 1.0
+larm068:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.5721399784088135, 0.1733839511871338, 0.5630199909210205, 0.7178699970245361,
+    -0.18557214736938477, -0.36959999799728394]
+  time_from_start: 1.0
+larm069:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.31749606132507324, 0.3141592741012573, 0.6642639636993408, 0.6963939666748047,
+    -0.18250393867492676, -0.3700000047683716]
+  time_from_start: 1.0
+larm070:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.06592011451721191, 0.3141592741012573, 0.6642639636993408, 0.6963939666748047,
+    -0.18250393867492676, -0.3700000047683716]
+  time_from_start: 1.0
+larm071:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.19485998153686523, 0.3141592741012573, 0.6627299785614014, 0.6963939666748047,
+    -0.18250393867492676, -0.3700000047683716]
+  time_from_start: 1.0
+larm072:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.4449019432067871, 0.28229808807373047, 0.714885950088501, 0.6963939666748047,
+    -0.18557214736938477, -0.3700000047683716]
+  time_from_start: 1.0
+larm073:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [0.18872404098510742, 0.12582993507385254, 0.581428050994873, 0.6963939666748047,
+    -0.18710613250732422, -0.36959999799728394]
+  time_from_start: 1.0
+larm074:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.06131792068481445, 0.1304318904876709, 0.714885950088501, 0.7378120422363281,
+    -0.17636799812316895, -0.36959999799728394]
+  time_from_start: 1.0
+larm075:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.07972598075866699, 0.14730596542358398, 0.9695301055908203, 0.7362780570983887,
+    -0.17636799812316895, -0.36959999799728394]
+  time_from_start: 1.0
+larm076:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.10120201110839844, 0.14730596542358398, 1.2211060523986816, 0.7362780570983887,
+    -0.1748340129852295, -0.36959999799728394]
+  time_from_start: 1.0
+larm077:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.09199810028076172, 0.15190792083740234, 1.2487177848815918, 0.7362780570983887,
+    -0.4540219306945801, -0.3700000047683716]
+  time_from_start: 1.0
+larm078:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.09199810028076172, 0.15190792083740234, 1.2533202171325684, 0.7362780570983887,
+    -0.704064130783081, -0.3700000047683716]
+  time_from_start: 1.0
+larm079:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.10120201110839844, 0.14730596542358398, 1.2533202171325684, 0.7362780570983887,
+    -0.9587080478668213, -0.36959999799728394]
+  time_from_start: 1.0
+larm080:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.1058039665222168, 0.14730596542358398, 1.2533202171325684, 0.7362780570983887,
+    -1.2087500095367432, -0.3700000047683716]
+  time_from_start: 1.0
+larm081:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.11654210090637207, 0.13196587562561035, 1.0017437934875488, 0.7347440719604492,
+    -1.1857401132583618, -0.3700000047683716]
+  time_from_start: 1.0
+larm082:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.08432793617248535, 0.3141592741012573, 1.2548542022705078, 0.7347440719604492,
+    -1.1903420686721802, -0.3700000047683716]
+  time_from_start: 1.0
+larm083:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.1318819522857666, 0.3141592741012573, 1.5171680450439453, 0.7255401611328125,
+    -1.1903420686721802, -0.3700000047683716]
+  time_from_start: 1.0
+larm084:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.1318819522857666, 0.3141592741012573, 1.7840838432312012, 0.724006175994873,
+    -1.1903420686721802, -0.36959999799728394]
+  time_from_start: 1.0
+larm085:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.13034796714782715, 0.3141592741012573, 1.909872055053711, 0.46476006507873535,
+    -1.1918760538101196, -0.36959999799728394]
+  time_from_start: 1.0
+larm086:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.11961007118225098, 0.3141592741012573, 1.9114060401916504, 0.19324207305908203,
+    -1.1888080835342407, -0.3700000047683716]
+  time_from_start: 1.0
+larm087:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.06745409965515137, 0.3141592741012573, 1.8914642333984375, 0.03490658476948738,
+    -1.440384030342102, -0.3700000047683716]
+  time_from_start: 1.0
+larm088:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, RHand]
+  positions: [-0.32056403160095215, 0.3141592741012573, 1.8914642333984375, 0.03490658476948738,
+    -1.4710640907287598, -0.3700000047683716]
+  time_from_start: 1.0

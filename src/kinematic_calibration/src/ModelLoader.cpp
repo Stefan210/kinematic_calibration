@@ -83,11 +83,18 @@ bool ModelLoader::urdfStringToModel() {
 	return true;
 }
 
-void kinematic_calibration::ModelLoader::getKdlTree(KDL::Tree& kdlTree) {
+void ModelLoader::getKdlTree(KDL::Tree& kdlTree) {
 	if (!initialized) {
 		ROS_ERROR("Model was not initialized!");
 	}
 	kdlTree = this->kdlTree;
+}
+
+void ModelLoader::getUrdfModel(urdf::Model& model) {
+	if (!initialized) {
+		ROS_ERROR("Model was not initialized!");
+	}
+	model = this->urdfModel;
 }
 
 } /* namespace kinematic_calibration */

@@ -53,6 +53,7 @@ SET(G2O_LIBS cholmod cxsparse -lg2o_cli -lg2o_core
 add_message_files(
    FILES
    measurementData.msg
+   calibrationResult.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -74,6 +75,7 @@ generate_messages(
   DEPENDENCIES
   std_msgs
   sensor_msgs
+  geometry_msgs
 )
 
 
@@ -226,3 +228,6 @@ target_link_libraries(optimizationNode
 ### JointUpdate
 add_library(jointUpdate src/JointUpdate.cpp)
 target_link_libraries(jointUpdate modelLoader ${catkin_LIBRARIES})
+
+add_executable(jointUpdateNode src/JointUpdateNode.cpp)
+target_link_libraries(jointUpdateNode jointUpdate ${catkin_LIBRARIES})
