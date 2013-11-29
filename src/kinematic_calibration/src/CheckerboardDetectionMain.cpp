@@ -29,14 +29,28 @@ int main(int argc, char** argv) {
 	return 0;
 }
 
+image_transport::Publisher pub;
+
 void imageCb(const sensor_msgs::ImageConstPtr& msg) {
 	CheckerboardDetection cbd;
 	CheckerboardData data;
 	if (!cbd.detect(msg, data)) {
 		std::cout << "[main] could not detect the checkerboard.\n";
-	} else {
-		std::cout << "position " << data.x << " " << data.y << "\n";
+		return;
 	}
+	std::cout << "position " << data.x << " " << data.y << "\n";
+
+	cv::Mat image;
+	cv_bridge::CvImagePtr input_bridge;
+	input_bridge = cv_bridge::toCvCopy(msg,
+			sensor_msgs::image_encodings::BGR8);
+	image = input_bridge->image;
+
+	std::vector<cv::Point2f> corners;
+	corners.push_back(cv::Point2f(data.x, data.y));
+	cv::drawChessboardCorners(image, cv::Size(1, 1), corners, true);
+
+	pub.publish(input_bridge->toImageMsg());
 }
 
 void detectFromFile() {
@@ -73,6 +87,7 @@ void detectFromRosMsg() {
 	image_transport::ImageTransport it(nh);
 
 	sub = it.subscribe("/nao_camera/image_raw", 1, imageCb);
+	pub = it.advertise("/checkerboard/image_out", 1);
 	ros::spin();
 }
 
