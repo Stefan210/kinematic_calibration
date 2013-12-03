@@ -43,13 +43,13 @@ DataCapture::DataCapture() :
 				nh, "joint_trajectory"), bodyPoseClient(nh, "body_pose"), it(
 				nh), checkerboardFound(false), receivedJointStates(false), receivedImage(
 				false) {
-    // get parameters
-    nhPrivate.getParam("params/headYaw_min", headYawMin);
-    nhPrivate.getParam("params/headYaw_max", headYawMax);
-    nhPrivate.getParam("params/headYaw_step", headYawStep);
-    nhPrivate.getParam("params/headPitch_min", headPitchMin);
-    nhPrivate.getParam("params/headPitch_max", headPitchMax);
-    nhPrivate.getParam("params/headPitch_step", headPitchStep);
+	// get parameters
+	nhPrivate.getParam("params/headYaw_min", headYawMin);
+	nhPrivate.getParam("params/headYaw_max", headYawMax);
+	nhPrivate.getParam("params/headYaw_step", headYawStep);
+	nhPrivate.getParam("params/headPitch_min", headPitchMin);
+	nhPrivate.getParam("params/headPitch_max", headPitchMax);
+	nhPrivate.getParam("params/headPitch_step", headPitchStep);
 
 	// get camera information
 	camerainfoSub = nh.subscribe("/nao_camera/camera_info", 1,
@@ -205,7 +205,7 @@ void DataCapture::playChainPoses() {
 		publishMeasurement();
 		ROS_INFO("Monving back to CENTER region...");
 		setHeadPose(-0.3, -0.15, true);
-        publishMeasurement();
+		publishMeasurement();
 		disableHeadStiffness();
 	}
 	disableChainStiffness();
@@ -425,11 +425,12 @@ void DataCapture::findCheckerboard() {
 		return;
 
 	enableHeadStiffness();
-    for (double headYaw = headYawMin; headYaw <= headYawMax; headYaw += headYawStep) {
+	for (double headYaw = headYawMin; headYaw <= headYawMax; headYaw +=
+			headYawStep) {
 		if (checkerboardFound)
 			break;
 		for (double headPitch = headPitchMin; headPitch <= headPitchMax;
-                headPitch += headPitchStep) {
+				headPitch += headPitchStep) {
 			setHeadPose(-headYaw, headPitch);
 			updateCheckerboard();
 			if (checkerboardFound)
@@ -465,8 +466,8 @@ void DataCapture::updateCheckerboardRobust() {
 	vector<bool> found;
 	vector<double> x;
 	vector<double> y;
-	while(unstable) {
-		while(found.size() >= 3) {
+	while (unstable) {
+		while (found.size() >= 3) {
 			found.erase(found.begin());
 			x.erase(x.begin());
 			y.erase(y.begin());
@@ -478,35 +479,72 @@ void DataCapture::updateCheckerboardRobust() {
 		x.push_back(checkerboardData.x);
 		y.push_back(checkerboardData.y);
 
-		if(found.size() < 3)
+		if (found.size() < 3)
 			continue;
 
 		bool cbNotFound = true;
 		bool cbFound = true;
 		double xError = 0, yError = 0;
-		for(int i = 0; i < found.size(); i++) {
+		for (int i = 0; i < found.size(); i++) {
 			cbNotFound = cbNotFound && !found[i];
 			cbFound = cbFound && found[i];
 			xError += fabs(x[0] - x[i]);
 			yError += fabs(y[0] - y[i]);
 		}
-		if(cbNotFound == true) {
+		if (cbNotFound == true) {
 			unstable = false;
-		} else if(cbFound && xError < 3 && yError < 3) {
+		} else if (cbFound && xError < 3 && yError < 3) {
 			unstable = false;
 		}
 	}
 }
 
 void DataCapture::updateJointStates() {
+	updateJointStatesRobust();
+}
+
+void DataCapture::updateJointStatesOnce() {
 	receivedJointStates = false;
-	usleep(0.3 * 1000 * 1000);
+	usleep(0.1 * 1000 * 1000);
 	ROS_INFO("Waiting for joint state message...");
 	while (jointStatesQueue.isEmpty())
 		;
 	while (!receivedJointStates) {
 		jointStatesQueue.callAvailable();
 	}
+}
+
+void DataCapture::updateJointStatesRobust() {
+	vector<vector<double> > jointPositions;
+	bool unstable = true;
+	while (unstable) {
+		unstable = false;
+
+		while (jointPositions.size() >= 3) {
+			jointPositions.erase(jointPositions.begin());
+		}
+
+		// update and save data
+		updateJointStatesOnce();
+		jointPositions.push_back(this->jointState.position);
+
+		if (jointPositions.size() < 3)
+			continue;
+		// check whether the positions changed
+		vector<double> delta(this->jointState.position.size(), 0.0);
+		// loop through the last saved joint states
+		for (int i = 0; i < jointPositions.size(); i++) {
+			vector<double> current = jointPositions[i];
+			// loop through all joint state positions
+			for (int j = 0; j < current.size(); j++) {
+				delta[j] += fabs(jointPositions[0][j] - current[j]);
+				if (delta[j] > 0.1)
+					unstable = true;
+			}
+		}
+	}
+
+	this->jointState.position;
 }
 
 void DataCapture::setHeadPose(double headYaw, double headPitch, bool relative,
@@ -544,12 +582,14 @@ void DataCapture::publishMeasurement() {
 }
 
 void DataCapture::publishEmptyMeasurement() {
-    measurementData data; cout << "111";
-    data.jointState = sensor_msgs::JointState();
-    data.cb_x = -1; cout << "222";
-    data.cb_y = -1;
-    ROS_INFO("Publishing empty measurement data...");
-    measurementPub.publish(data);
+	measurementData data;
+	cout << "111";
+	data.jointState = sensor_msgs::JointState();
+	data.cb_x = -1;
+	cout << "222";
+	data.cb_y = -1;
+	ROS_INFO("Publishing empty measurement data...");
+	measurementPub.publish(data);
 }
 
 vector<double> DataCapture::generateRandomPositions(

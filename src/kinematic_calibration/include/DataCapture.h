@@ -95,6 +95,8 @@ private:
 	void updateCheckerboardOnce();
 	void updateCheckerboardRobust();
 	void updateJointStates();
+	void updateJointStatesOnce();
+	void updateJointStatesRobust();
 	void publishMeasurement();
 	vector<double> generateRandomPositions(const vector<string>& joints);
     double headYawMin, headYawMax, headYawStep;
