@@ -518,8 +518,6 @@ void DataCapture::updateJointStatesRobust() {
 	vector<vector<double> > jointPositions;
 	bool unstable = true;
 	while (unstable) {
-		unstable = false;
-
 		while (jointPositions.size() >= 3) {
 			jointPositions.erase(jointPositions.begin());
 		}
@@ -538,10 +536,16 @@ void DataCapture::updateJointStatesRobust() {
 			// loop through all joint state positions
 			for (int j = 0; j < current.size(); j++) {
 				delta[j] += fabs(jointPositions[0][j] - current[j]);
-				if (delta[j] > 0.1)
-					unstable = true;
 			}
 		}
+
+		// check deltas
+		double deltaSum;
+		for(int i = 0; i < delta.size(); i++) {
+			deltaSum = delta[i];
+		}
+		if(deltaSum < 0.1)
+			unstable = false;
 	}
 
 	this->jointState.position;
