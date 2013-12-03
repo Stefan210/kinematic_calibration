@@ -539,13 +539,12 @@ void DataCapture::updateJointStatesRobust() {
 			}
 		}
 
-		// check deltas
-		double deltaSum;
+        // check deltas
+        unstable = false;
 		for(int i = 0; i < delta.size(); i++) {
-			deltaSum += delta[i];
-		}
-		if(deltaSum < 0.1)
-			unstable = false;
+            if(delta[i] > 0.01)
+                unstable = true;
+        }
 	}
 
 	this->jointState.position;
