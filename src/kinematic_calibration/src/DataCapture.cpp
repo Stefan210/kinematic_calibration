@@ -542,7 +542,7 @@ void DataCapture::updateJointStatesRobust() {
 		// check deltas
 		double deltaSum;
 		for(int i = 0; i < delta.size(); i++) {
-			deltaSum = delta[i];
+			deltaSum += delta[i];
 		}
 		if(deltaSum < 0.1)
 			unstable = false;
