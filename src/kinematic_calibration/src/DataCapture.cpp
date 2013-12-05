@@ -362,6 +362,10 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 }
 
 void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
+	if(msg->header.stamp < this->time) {
+		ROS_INFO("Skipping too old Image message.");
+		return;
+	}
 	receivedImage = true;
 	cameraFrame = msg.get()->header.frame_id;
 	checkerboardFound = checkerboardDetection.detect(msg, checkerboardData);
@@ -442,11 +446,16 @@ void DataCapture::findCheckerboard() {
 
 void DataCapture::jointStatesCallback(
 		const sensor_msgs::JointStateConstPtr& msg) {
+	if(msg->header.stamp < this->time) {
+		ROS_INFO("Skipping too old JointState message.");
+		return;
+	}
 	receivedJointStates = true;
 	jointState = *msg;
 }
 
 void DataCapture::updateCheckerboard() {
+	this->time = ros::Time::now();
 	updateCheckerboardRobust();
 }
 
@@ -500,6 +509,7 @@ void DataCapture::updateCheckerboardRobust() {
 }
 
 void DataCapture::updateJointStates() {
+	this->time = ros::Time::now();
 	updateJointStatesRobust();
 }
 
