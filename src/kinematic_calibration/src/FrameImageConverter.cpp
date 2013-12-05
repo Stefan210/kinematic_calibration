@@ -20,12 +20,15 @@ FrameImageConverter::~FrameImageConverter() {
 
 void FrameImageConverter::project(const tf::Transform& transform, double& x,
 		double& y) {
-    tf::Point pt = transform.getOrigin();
-    cv::Point3d pt_cv(pt.x(), pt.y(), pt.z());
-    cv::Point2d uv;
-    uv = cameraModel.project3dToPixel(pt_cv);
-    x = uv.x;
-    y = uv.y;
+	tf::Point pt = transform.getOrigin();
+	cv::Point3d pt_cv(pt.x(), pt.y(), pt.z());
+	cv::Point2d uv, uv_rect;
+	uv_rect = cameraModel.project3dToPixel(pt_cv);
+	uv = cameraModel.unrectifyPoint(uv_rect);
+	x = uv.x;
+	y = uv.y;
+	//std::cout << "rectified: " << uv_rect.x << ", " << uv_rect.y
+	//		<< "\tunrectified: " << x << ", " << y << "\n";
 }
 
 } /* namespace kinematic_calibration */
