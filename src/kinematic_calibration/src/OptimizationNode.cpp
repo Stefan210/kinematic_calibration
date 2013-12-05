@@ -83,6 +83,7 @@ void OptimizationNode::printResult() {
 			iterator != result.jointOffsets.end(); iterator++) {
 		cout << iterator->first << " : " << iterator->second << "\n";
 	}
+
 	cout << "Optimized transform form marker to end effector:\n";
 	cout << "(x, y, z) " << result.markerTransformation.getOrigin().x() << " "
 			<< result.markerTransformation.getOrigin().y() << " "
@@ -90,7 +91,16 @@ void OptimizationNode::printResult() {
 	cout << "(q0, q1, q2, q3) " << result.markerTransformation.getRotation().x()
 			<< " " << result.markerTransformation.getRotation().y() << " "
 			<< result.markerTransformation.getRotation().z() << " "
-			<< result.markerTransformation.getRotation().w() << " ";
+			<< result.markerTransformation.getRotation().w() << "\n";
+
+	cout << "Optimized transform form camera to head:\n";
+	cout << "(x, y, z) " << result.cameraToHeadTransformation.getOrigin().x() << " "
+			<< result.cameraToHeadTransformation.getOrigin().y() << " "
+			<< result.cameraToHeadTransformation.getOrigin().z() << " ";
+	cout << "(q0, q1, q2, q3) " << result.cameraToHeadTransformation.getRotation().x()
+			<< " " << result.cameraToHeadTransformation.getRotation().y() << " "
+			<< result.cameraToHeadTransformation.getRotation().z() << " "
+			<< result.cameraToHeadTransformation.getRotation().w() << "\n";
 }
 
 void OptimizationNode::printPoints() {
@@ -121,10 +131,13 @@ void OptimizationNode::printPoints() {
 		// get transformation from marker to end effector
 		tf::Transform endEffectorToMarker = result.markerTransformation;
 
+		// get transformation from camera to head
+		tf::Transform cameraToHead = result.cameraToHeadTransformation;
+
 		// calculate estimated x and y
 		endEffectorToMarker.setRotation(tf::Quaternion::getIdentity());
 		tf::Transform cameraToMarker = endEffectorToMarker
-				* cameraToEndEffector;
+				* cameraToEndEffector * cameraToHead;
 		//tf::Transform cameraToMarker =  cameraToEndEffector * endEffectorToMarker;
 		double x, y;
 		frameImageConverter.project(cameraToMarker.inverse(), x, y);

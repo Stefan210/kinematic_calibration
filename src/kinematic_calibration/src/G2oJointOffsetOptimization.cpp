@@ -27,6 +27,8 @@
 #include <g2o/solvers/dense/linear_solver_dense.h>
 #include <g2o/core/robust_kernel_impl.h>
 
+#include <time.h>
+
 namespace kinematic_calibration {
 
 void JointOffsetVertex::oplusImpl(const double* delta) {
@@ -94,16 +96,20 @@ void G2oJointOffsetOptimization::optimize(
 	jointOffsetVertex->setId(++id);
 	optimizer.addVertex(jointOffsetVertex);
 
-
-
 	// instantiate the vertex for the marker transformation
 	MarkerTransformationVertex* markerTransformationVertex =
 			new MarkerTransformationVertex();
 	markerTransformationVertex->setId(++id);
 	optimizer.addVertex(markerTransformationVertex);
 
+	// instantiate the vertex for the marker transformation
+	TransformationVertex* cameraToHeadTransformationVertex =
+			new TransformationVertex();
+	cameraToHeadTransformationVertex->setId(++id);
+	optimizer.addVertex(cameraToHeadTransformationVertex);
+
 	// add edges
-	Eigen::Matrix2d info = Eigen::Matrix2d::Identity(2, 2);
+	Eigen::Matrix3d info = Eigen::Matrix3d::Identity(3, 3);
 	for (int i = 0; i < measurements.size(); i++) {
 		measurementData current = measurements[i];
 		CheckerboardMeasurementEdge* edge = new CheckerboardMeasurementEdge(
@@ -112,6 +118,7 @@ void G2oJointOffsetOptimization::optimize(
 		edge->setInformation(info);
 		edge->vertices()[0] = markerTransformationVertex;
 		edge->vertices()[1] = jointOffsetVertex;
+		edge->vertices()[2] = cameraToHeadTransformationVertex;
 		edge->setFrameImageConverter(&frameImageConverter);
 		edge->setKinematicChain(&kinematicChain);
 		edge->computeError();
@@ -119,8 +126,9 @@ void G2oJointOffsetOptimization::optimize(
 	}
 
 	// optimize
+	ROS_INFO("Starting optimization...");
 	optimizer.initializeOptimization();
-	optimizer.computeActiveErrors();
+	//optimizer.computeActiveErrors();
 	optimizer.setVerbose(true);
 	optimizer.optimize(100000);
 
@@ -129,11 +137,15 @@ void G2oJointOffsetOptimization::optimize(
 			static_cast<map<string, double> >(jointOffsetVertex->estimate());
 	Eigen::Isometry3d eigenTransform = markerTransformationVertex->estimate();
 	tf::transformEigenToTF(eigenTransform, optimizedState.markerTransformation);
+	eigenTransform = cameraToHeadTransformationVertex->estimate();
+	tf::transformEigenToTF(eigenTransform,
+			optimizedState.cameraToHeadTransformation);
 }
 
 CheckerboardMeasurementEdge::CheckerboardMeasurementEdge(
 		measurementData measurement) :
 		measurement(measurement) {
+	resize(3);
 	for (int i = 0; i < measurement.jointState.name.size(); i++) {
 		jointPositions.insert(
 				make_pair<string, double>(measurement.jointState.name[i],
@@ -150,6 +162,8 @@ void CheckerboardMeasurementEdge::computeError() {
 			static_cast<MarkerTransformationVertex*>(this->_vertices[0]);
 	JointOffsetVertex* jointOffsetVertex =
 			static_cast<JointOffsetVertex*>(this->_vertices[1]);
+	TransformationVertex* cameraToHeadTransformationVertex =
+			static_cast<TransformationVertex*>(this->_vertices[2]);
 
 	// get transformation from end effector to camera
 	tf::Transform cameraToEndEffector; // root = camera, tip = end effector, e.g. wrist
@@ -162,9 +176,17 @@ void CheckerboardMeasurementEdge::computeError() {
 	tf::Transform endEffectorToMarker;
 	tf::transformEigenToTF(eigenTransform, endEffectorToMarker);
 
+	// get transformation from camera to head
+	eigenTransform = cameraToHeadTransformationVertex->estimate();
+	tf::Transform cameraToHead;
+	tf::transformEigenToTF(eigenTransform, cameraToHead);
+	//cout << cameraToHead.getOrigin().x() << " " << cameraToHead.getOrigin().y()
+	//		<< " " << cameraToHead.getOrigin().z() << " " << endl;
+//cout << ".";
+	//usleep(100);
 	// calculate estimated x and y
 	endEffectorToMarker.setRotation(tf::Quaternion::getIdentity());
-	tf::Transform cameraToMarker = endEffectorToMarker * cameraToEndEffector;
+	tf::Transform cameraToMarker = endEffectorToMarker * cameraToEndEffector * cameraToHead;
 	double x, y;
 	this->frameImageConverter->project(cameraToMarker.inverse(), x, y);
 
@@ -173,13 +195,13 @@ void CheckerboardMeasurementEdge::computeError() {
 	this->_error[1] = measurement.cb_y - y;
 
 	/*cout << "id: " << _id << " ";
-	cout << "cameraToEndEffector(x,y,z): " << cameraToEndEffector.getOrigin().getX() << ", "
-			<< cameraToEndEffector.getOrigin().getY() << ", " << cameraToEndEffector.getOrigin().getZ()
-			<< " ";
-	cout << "x error: " << this->_error[0] << " y error: " << this->_error[1]
+	 cout << "cameraToEndEffector(x,y,z): " << cameraToEndEffector.getOrigin().getX() << ", "
+	 << cameraToEndEffector.getOrigin().getY() << ", " << cameraToEndEffector.getOrigin().getZ()
 	 << " ";
-	cout << "cb_x: " << measurement.cb_x << " cb_y: " << measurement.cb_y;
-	cout << "\n";*/
+	 cout << "x error: " << this->_error[0] << " y error: " << this->_error[1]
+	 << " ";
+	 cout << "cb_x: " << measurement.cb_x << " cb_y: " << measurement.cb_y;
+	 cout << "\n";*/
 }
 
 const FrameImageConverter* CheckerboardMeasurementEdge::getFrameImageConverter() const {

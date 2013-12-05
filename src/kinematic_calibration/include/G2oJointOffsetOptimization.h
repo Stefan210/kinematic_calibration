@@ -8,7 +8,7 @@
 #ifndef G2OJOINTOFFSETOPTIMIZATION_H_
 #define G2OJOINTOFFSETOPTIMIZATION_H_
 
-#include <g2o/core/base_binary_edge.h>
+#include <g2o/core/base_multi_edge.h>
 #include <g2o/core/base_vertex.h>
 #include <g2o/types/slam3d/vertex_se3.h>
 #include <kinematic_calibration/measurementData.h>
@@ -26,6 +26,7 @@ using namespace g2o;
 namespace kinematic_calibration {
 
 typedef VertexSE3 MarkerTransformationVertex;
+typedef VertexSE3 TransformationVertex;
 
 /**
  * Class that represents the vertex for the joint offsets.
@@ -77,8 +78,7 @@ protected:
 /**
  * Class representing an edge between the transformation for the marker and the joint offsets.
  */
-class CheckerboardMeasurementEdge: public BaseBinaryEdge<2, measurementData,
-		MarkerTransformationVertex, JointOffsetVertex> {
+class CheckerboardMeasurementEdge: public BaseMultiEdge<3, measurementData> {
 public:
 	/**
 	 * Constructur.

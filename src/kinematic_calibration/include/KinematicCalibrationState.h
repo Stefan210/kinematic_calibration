@@ -32,7 +32,8 @@ public:
 	 * @param markerTransformation initial marker transformation
 	 */
 	KinematicCalibrationState(map<string, double>& jointOffsets,
-			tf::Transform& markerTransformation);
+			tf::Transform& markerTransformation,
+			tf::Transform& cameraToHeadTransformation);
 
 	/**
 	 * Deconstructor.
@@ -48,6 +49,12 @@ public:
 	 * Estimation for the transformation from marker to end effector of the kinematic chain.
 	 */
 	tf::Transform markerTransformation;
+
+	/**
+	 * Estimation for the transformation from camera to head.
+	 */
+	tf::Transform cameraToHeadTransformation;
+
 };
 
 } /* namespace kinematic_calibration */

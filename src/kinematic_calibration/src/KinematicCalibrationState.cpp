@@ -11,12 +11,14 @@ namespace kinematic_calibration {
 
 KinematicCalibrationState::KinematicCalibrationState() :
 		jointOffsets(map<string, double>()), markerTransformation(
-				tf::Transform()) {
+				tf::Transform()), cameraToHeadTransformation(tf::Transform()) {
 }
 
-KinematicCalibrationState::KinematicCalibrationState(map<string, double>& jointOffsets,
-		tf::Transform& markerTransformation) :
-		jointOffsets(jointOffsets), markerTransformation(markerTransformation) {
+KinematicCalibrationState::KinematicCalibrationState(
+		map<string, double>& jointOffsets, tf::Transform& markerTransformation,
+		tf::Transform& cameraToHeadTransformation) :
+		jointOffsets(jointOffsets), markerTransformation(markerTransformation), cameraToHeadTransformation(
+				cameraToHeadTransformation) {
 }
 
 KinematicCalibrationState::~KinematicCalibrationState() {
