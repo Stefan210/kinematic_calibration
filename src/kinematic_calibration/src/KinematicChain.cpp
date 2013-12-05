@@ -7,7 +7,23 @@
 
 #include "../include/KinematicChain.h"
 
+#include <kdl/chain.hpp>
+#include <kdl/chainfksolver.hpp>
+#include <kdl/chainfksolverpos_recursive.hpp>
+#include <kdl/frames.hpp>
+#include <kdl/frames_io.hpp>
+#include <kdl/jntarray.hpp>
+#include <kdl/joint.hpp>
+#include <kdl/segment.hpp>
+#include <ros/console.h>
+#include <rosconsole/macros_generated.h>
+#include <cstdio>
+#include <iostream>
+#include <utility>
+#include <vector>
+
 using namespace std;
+using namespace KDL;
 
 namespace kinematic_calibration {
 
@@ -39,15 +55,11 @@ void KinematicChain::getRootToTip(const map<string, double>& joint_positions,
 		if (jnt != joint_positions.end()) {
 			position = jnt->second;
 		}
+		// Note: Frame F_A_C = F_A_B * F_B_C;
+		// (see http://www.orocos.org/kdl/usermanual/geometric-primitives#toc20)
 		rootToTip = rootToTip * segment.pose(position);
 	}
-	out = rootToTip;
-
-	//cout << rootToTip.p.data[0] << " " << rootToTip.p.data[1] << " "
-	//		<< rootToTip.p.data[2] << endl;
-	//double r, p, y;
-	//rootToTip.M.GetRPY(r, p, y);
-	//cout << r << " " << p << " " << y << endl;
+	out = rootToTip.Inverse();
 }
 
 void KinematicChain::getRootToTip(const map<string, double>& joint_positions,
@@ -60,10 +72,8 @@ void KinematicChain::getRootToTip(const map<string, double>& joint_positions,
 			outer_jnt_it++) {
 		double position = outer_jnt_it->second;
 		// add (optional) joint offset
-		std::map<std::string, double>::const_iterator inner_jnt_it =
-				joint_offsets.find(outer_jnt_it->first);
-		if (inner_jnt_it != joint_positions.end()) {
-			position += inner_jnt_it->second;
+		if(joint_offsets.count(outer_jnt_it->first)) {
+			position += joint_offsets.find(outer_jnt_it->first)->second;
 		}
 		sum.insert(make_pair<string, double>(outer_jnt_it->first, position));
 	}
@@ -117,6 +127,8 @@ void KinematicChain::getJointNames(vector<string>& jointNames) {
 		if (joint.getType() != KDL::Joint::None) {
 			jointNames.push_back(joint.getName());
 			ROS_INFO("Added joint name %s", joint.getName().c_str());
+		} else {
+			ROS_INFO("Fixed joint %s", joint.getName().c_str());
 		}
 	}
 }

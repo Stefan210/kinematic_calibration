@@ -65,16 +65,14 @@ G2oJointOffsetOptimization::~G2oJointOffsetOptimization() {
 void G2oJointOffsetOptimization::optimize(
 		KinematicCalibrationState& optimizedState) {
 	typedef BlockSolver<BlockSolverTraits<-1, -1> > MyBlockSolver;
-	typedef LinearSolverDense<MyBlockSolver::PoseMatrixType> MyLinearSolver;
-	//typedef LinearSolverPCG<MyBlockSolver::PoseMatrixType> MyLinearSolver;
+	//typedef LinearSolverDense<MyBlockSolver::PoseMatrixType> MyLinearSolver;
+	typedef LinearSolverPCG<MyBlockSolver::PoseMatrixType> MyLinearSolver;
 
 	// allocating the optimizer
 	SparseOptimizer optimizer;
 
 	// create the linear solver
 	MyLinearSolver* linearSolver = new MyLinearSolver();
-	//linearSolver->setTolerance(1e-9);
-	//linearSolver->setVerbose(true);
 
 	// create the block solver on top of the linear solver
 	MyBlockSolver* blockSolver = new MyBlockSolver(linearSolver);
@@ -84,8 +82,6 @@ void G2oJointOffsetOptimization::optimize(
 //	OptimizationAlgorithmGaussNewton* algorithm = new OptimizationAlgorithmGaussNewton(blockSolver);
 	OptimizationAlgorithmLevenberg* algorithm =
 			new OptimizationAlgorithmLevenberg(blockSolver);
-	algorithm->setMaxTrialsAfterFailure(10000);
-//	algorithm->setUserLambdaInit(1/1000);
 
 	optimizer.setAlgorithm(algorithm);
 
@@ -97,6 +93,8 @@ void G2oJointOffsetOptimization::optimize(
 	JointOffsetVertex* jointOffsetVertex = new JointOffsetVertex(jointNames);
 	jointOffsetVertex->setId(++id);
 	optimizer.addVertex(jointOffsetVertex);
+
+
 
 	// instantiate the vertex for the marker transformation
 	MarkerTransformationVertex* markerTransformationVertex =
@@ -110,8 +108,6 @@ void G2oJointOffsetOptimization::optimize(
 		measurementData current = measurements[i];
 		CheckerboardMeasurementEdge* edge = new CheckerboardMeasurementEdge(
 				current);
-		RobustKernel* rk = new RobustKernelCauchy();
-		edge->setRobustKernel(rk);
 		edge->setId(++id);
 		edge->setInformation(info);
 		edge->vertices()[0] = markerTransformationVertex;
@@ -121,13 +117,12 @@ void G2oJointOffsetOptimization::optimize(
 		edge->computeError();
 		optimizer.addEdge(edge);
 	}
-	//cout << "\n\n\n";
 
 	// optimize
 	optimizer.initializeOptimization();
 	optimizer.computeActiveErrors();
 	optimizer.setVerbose(true);
-	optimizer.optimize(10000);
+	optimizer.optimize(100000);
 
 	// get results
 	optimizedState.jointOffsets =
@@ -171,17 +166,20 @@ void CheckerboardMeasurementEdge::computeError() {
 	endEffectorToMarker.setRotation(tf::Quaternion::getIdentity());
 	tf::Transform cameraToMarker = endEffectorToMarker * cameraToEndEffector;
 	double x, y;
-	this->frameImageConverter->project(cameraToMarker, x, y);
+	this->frameImageConverter->project(cameraToMarker.inverse(), x, y);
 
 	// set error
 	this->_error[0] = measurement.cb_x - x;
 	this->_error[1] = measurement.cb_y - y;
-	/*
-	 cout << "id: " << _id << " ";
-	 cout << "x error: " << this->_error[0] << " y error: " << this->_error[1]
+
+	/*cout << "id: " << _id << " ";
+	cout << "cameraToEndEffector(x,y,z): " << cameraToEndEffector.getOrigin().getX() << ", "
+			<< cameraToEndEffector.getOrigin().getY() << ", " << cameraToEndEffector.getOrigin().getZ()
+			<< " ";
+	cout << "x error: " << this->_error[0] << " y error: " << this->_error[1]
 	 << " ";
-	 cout << "cb_x: " << measurement.cb_x << " cb_y: " << measurement.cb_y
-	 << "\n";*/
+	cout << "cb_x: " << measurement.cb_x << " cb_y: " << measurement.cb_y;
+	cout << "\n";*/
 }
 
 const FrameImageConverter* CheckerboardMeasurementEdge::getFrameImageConverter() const {

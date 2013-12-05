@@ -103,8 +103,7 @@ void OptimizationNode::printPoints() {
 	// print out the measured position and the transformed position
 	for (int i = 0; i < measurements.size(); i++) {
 		measurementData current = measurements[i];
-		cout << i << " measured(x, y): " << current.cb_x << ", "
-				<< current.cb_y;
+		cout << i << " measured(x,y): " << current.cb_x << "  " << current.cb_y;
 
 		// get transformation from end effector to camera
 		map<string, double> jointPositions;
@@ -126,12 +125,19 @@ void OptimizationNode::printPoints() {
 		endEffectorToMarker.setRotation(tf::Quaternion::getIdentity());
 		tf::Transform cameraToMarker = endEffectorToMarker
 				* cameraToEndEffector;
+		//tf::Transform cameraToMarker =  cameraToEndEffector * endEffectorToMarker;
 		double x, y;
-		frameImageConverter.project(cameraToMarker, x, y);
+		frameImageConverter.project(cameraToMarker.inverse(), x, y);
 
-		cout << "\toptimized(x,y): " << x << ", " << y;
-		cout << "\tdifference(x,y): " << (current.cb_x - x) << ", "
+		// calculate distance between camera and marker
+		tf::Vector3 origin = cameraToMarker.getOrigin();
+		double dist = origin.length();
+
+		cout << "\toptimized(x,y): " << x << " " << y;
+		cout << "\tdifference(x,y): " << (current.cb_x - x) << " "
 				<< (current.cb_y - y);
+		cout << "\tsum: " << (fabs(current.cb_x - x) + fabs(current.cb_y - y));
+		cout << "\tdist: " << dist;
 		cout << "\n";
 	}
 }
