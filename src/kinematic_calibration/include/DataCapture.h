@@ -85,7 +85,7 @@ private:
 	tf::TransformListener transformListener;
 	string cameraFrame;
 	sensor_msgs::JointState jointState;
-	ros::Time time;
+	ros::Time curTime;
 	void setStiffness(const vector<string>& jointNames, double stiffness);
 	void enableStiffness(const vector<string>& jointNames);
 	void disableStiffness(const vector<string>& jointNames);
