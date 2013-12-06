@@ -108,9 +108,9 @@ void OptimizationNode::printResult() {
 
 	cout << "Optimized camera intrinsics:\n";
 	cout << "(fx,fy) " << result.cameraK[K_FX_IDX] << " "
-			<< result.cameraK[K_FY_IDX];
+			<< result.cameraK[K_FY_IDX] << " ";
 	cout << "(cx,cy) " << result.cameraK[K_CX_IDX] << " "
-			<< result.cameraK[K_CY_IDX];
+			<< result.cameraK[K_CY_IDX] << "\n";
 }
 
 void OptimizationNode::printPoints() {
