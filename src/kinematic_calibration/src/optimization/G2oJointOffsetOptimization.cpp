@@ -14,6 +14,7 @@
 #include "../../include/optimization/JointOffsetOptimization.h"
 #include "../../include/optimization/KinematicCalibrationState.h"
 #include "../../include/common/KinematicChain.h"
+#include "../../include/optimization/CameraIntrinsicsVertex.h"
 
 #include <g2o/core/sparse_optimizer.h>
 #include <g2o/core/block_solver.h>
@@ -108,6 +109,10 @@ void G2oJointOffsetOptimization::optimize(
 	cameraToHeadTransformationVertex->setId(++id);
 	optimizer.addVertex(cameraToHeadTransformationVertex);
 
+	// instantiate the vertex for the camera intrinsics
+	CameraIntrinsicsVertex* cameraIntrinsicsVertex = new CameraIntrinsicsVertex(
+			frameImageConverter.getCameraModel().cameraInfo());
+
 	// add edges
 	Eigen::Matrix3d info = Eigen::Matrix3d::Identity(3, 3);
 	for (int i = 0; i < measurements.size(); i++) {
@@ -186,7 +191,8 @@ void CheckerboardMeasurementEdge::computeError() {
 	//usleep(100);
 	// calculate estimated x and y
 	endEffectorToMarker.setRotation(tf::Quaternion::getIdentity());
-	tf::Transform cameraToMarker = endEffectorToMarker * cameraToEndEffector * cameraToHead;
+	tf::Transform cameraToMarker = endEffectorToMarker * cameraToEndEffector
+			* cameraToHead;
 	double x, y;
 	this->frameImageConverter->project(cameraToMarker.inverse(), x, y);
 
