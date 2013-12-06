@@ -5,7 +5,10 @@
  *      Author: stefan
  */
 
-#include "../include/ModelLoader.h"
+#include "../../include/common/ModelLoader.h"
+
+#include <ros/node_handle.h>
+#include <map>
 
 namespace kinematic_calibration {
 

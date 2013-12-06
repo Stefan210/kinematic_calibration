@@ -5,22 +5,17 @@
  *      Author: stefan
  */
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
 #include <kinematic_calibration/calibrationResult.h>
 #include <ros/init.h>
 #include <ros/node_handle.h>
 #include <ros/subscriber.h>
 #include <urdf/model.h>
-#include <iostream>
 #include <map>
 #include <string>
-#include <utility>
 #include <vector>
 
-#include "../include/JointUpdate.h"
-#include "../include/ModelLoader.h"
+#include "../../include/common/ModelLoader.h"
+#include "../../include/result_publishing/JointUpdate.h"
 
 using namespace kinematic_calibration;
 using namespace ros;

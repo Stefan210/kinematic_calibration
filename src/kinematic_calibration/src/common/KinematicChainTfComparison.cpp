@@ -1,4 +1,4 @@
-#include "../include/KinematicChainTfComparison.h"
+#include "../../include/common/KinematicChainTfComparison.h"
 
 #include <ros/duration.h>
 #include <ros/init.h>

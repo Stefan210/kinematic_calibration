@@ -17,9 +17,9 @@
 #include <string>
 #include <vector>
 
-#include "FrameImageConverter.h"
-#include "JointOffsetOptimization.h"
-#include "KinematicCalibrationState.h"
+#include "../../include/common/FrameImageConverter.h"
+#include "../../include/optimization/JointOffsetOptimization.h"
+#include "../../include/optimization/KinematicCalibrationState.h"
 
 using namespace g2o;
 

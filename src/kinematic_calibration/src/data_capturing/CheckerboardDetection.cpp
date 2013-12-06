@@ -5,7 +5,14 @@
  *      Author: stefan
  */
 
-#include "../include/CheckerboardDetection.h"
+#include "../../include/data_capturing/CheckerboardDetection.h"
+
+#include <boost/smart_ptr/shared_ptr.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/types_c.h>
+#include <sensor_msgs/Image.h>
+#include <iostream>
+#include <vector>
 
 namespace kinematic_calibration {
 

@@ -5,13 +5,15 @@
  *      Author: stefan
  */
 
-#include "../include/JointUpdate.h"
+#include "../../include/result_publishing/JointUpdate.h"
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <urdf_model/pose.h>
 #include <iostream>
 #include <utility>
 #include <fstream>
+#include <iostream>
+#include <utility>
 
 namespace kinematic_calibration {
 

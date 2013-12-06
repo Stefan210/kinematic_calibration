@@ -5,7 +5,11 @@
  *      Author: stefan
  */
 
-#include "../include/FrameImageConverter.h"
+#include "../../include/common/FrameImageConverter.h"
+
+#include <opencv2/core/core.hpp>
+#include <tf/LinearMath/Transform.h>
+#include <tf/transform_datatypes.h>
 
 namespace kinematic_calibration {
 

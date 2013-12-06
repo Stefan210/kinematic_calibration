@@ -5,20 +5,14 @@
  *      Author: stefan
  */
 
-#include "../include/KinematicChain.h"
+#include "../../include/common/KinematicChain.h"
 
 #include <kdl/chain.hpp>
-#include <kdl/chainfksolver.hpp>
-#include <kdl/chainfksolverpos_recursive.hpp>
 #include <kdl/frames.hpp>
-#include <kdl/frames_io.hpp>
-#include <kdl/jntarray.hpp>
 #include <kdl/joint.hpp>
 #include <kdl/segment.hpp>
 #include <ros/console.h>
 #include <rosconsole/macros_generated.h>
-#include <cstdio>
-#include <iostream>
 #include <utility>
 #include <vector>
 

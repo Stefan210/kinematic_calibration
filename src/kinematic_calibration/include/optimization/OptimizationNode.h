@@ -17,8 +17,8 @@
 #include <string>
 #include <vector>
 
-#include "KinematicCalibrationState.h"
-#include "ModelLoader.h"
+#include "../../include/optimization/KinematicCalibrationState.h"
+#include "../../include/common/ModelLoader.h"
 
 using namespace ros;
 using namespace std;

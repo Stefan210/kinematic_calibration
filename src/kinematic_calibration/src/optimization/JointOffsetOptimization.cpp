@@ -5,7 +5,7 @@
  *      Author: stefan
  */
 
-#include "../include/JointOffsetOptimization.h"
+#include "../../include/optimization/JointOffsetOptimization.h"
 
 namespace kinematic_calibration {
 

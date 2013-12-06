@@ -5,7 +5,7 @@
  *      Author: stefan
  */
 
-#include "../include/DataCapture.h"
+#include "../../include/data_capturing/DataCapture.h"
 
 #include <actionlib/client/simple_client_goal_state.h>
 #include <boost/bind/arg.hpp>

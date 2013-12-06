@@ -25,7 +25,7 @@
 #include <image_transport/image_transport.h>
 #include <image_geometry/pinhole_camera_model.h>
 
-#include "../include/CheckerboardDetection.h"
+#include "../../include/data_capturing/CheckerboardDetection.h"
 #include <kinematic_calibration/measurementData.h>
 
 using namespace std;

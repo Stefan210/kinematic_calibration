@@ -5,12 +5,10 @@
  *      Author: stefan
  */
 
-#include <cv_bridge/cv_bridge.h>
-#include <image_geometry/pinhole_camera_model.h>
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <image_geometry/pinhole_camera_model.h>
-#include <image_transport/camera_subscriber.h>
+//#include <image_transport/camera_subscriber.h>
 #include <image_transport/image_transport.h>
 #include <image_transport/publisher.h>
 #include <image_transport/subscriber.h>
@@ -33,9 +31,9 @@
 #include <utility>
 #include <vector>
 
-#include "../include/FrameImageConverter.h"
-#include "../include/KinematicChain.h"
-#include "../include/ModelLoader.h"
+#include "../../include/common/FrameImageConverter.h"
+#include "../../include/common/KinematicChain.h"
+#include "../../include/common/ModelLoader.h"
 
 using namespace kinematic_calibration;
 using namespace std;

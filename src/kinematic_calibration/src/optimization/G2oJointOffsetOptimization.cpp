@@ -5,15 +5,15 @@
  *      Author: stefan
  */
 
-#include "../include/G2oJointOffsetOptimization.h"
+#include "../../include/optimization/G2oJointOffsetOptimization.h"
 
 #include <tf/tf.h>
 #include <tf_conversions/tf_eigen.h>
 
 #include "kinematic_calibration/measurementData.h"
-#include "../include/JointOffsetOptimization.h"
-#include "../include/KinematicCalibrationState.h"
-#include "../include/KinematicChain.h"
+#include "../../include/optimization/JointOffsetOptimization.h"
+#include "../../include/optimization/KinematicCalibrationState.h"
+#include "../../include/common/KinematicChain.h"
 
 #include <g2o/core/sparse_optimizer.h>
 #include <g2o/core/block_solver.h>

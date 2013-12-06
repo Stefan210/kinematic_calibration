@@ -5,11 +5,13 @@
  *      Author: stefan
  */
 
+#include <ros/console.h>
 #include <ros/init.h>
 #include <ros/node_handle.h>
-#include <string>
+#include <rosconsole/macros_generated.h>
+#include <cstdlib>
 
-#include "../include/DataCapture.h"
+#include "../../include/data_capturing/DataCapture.h"
 
 using namespace kinematic_calibration;
 

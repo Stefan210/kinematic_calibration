@@ -171,53 +171,53 @@ catkin_package(
 
 
 ### CheckerboardDetection
-add_library(checkerboardDetection src/CheckerboardDetection.cpp)
+add_library(checkerboardDetection src/data_capturing/CheckerboardDetection.cpp)
 target_link_libraries(checkerboardDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
-add_executable(checkerboardDetectionMain src/CheckerboardDetectionMain.cpp)
+add_executable(checkerboardDetectionMain src/data_capturing/CheckerboardDetectionMain.cpp)
 target_link_libraries(checkerboardDetectionMain checkerboardDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 catkin_add_gtest(checkerboardDetectionTest test/CheckerboardDetectionTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
 target_link_libraries(checkerboardDetectionTest checkerboardDetection ${catkin_LIBRARIES})
 
 ### KinematicChain
-add_library(kinematicChain src/KinematicChain.cpp) 
+add_library(kinematicChain src/common/KinematicChain.cpp) 
 target_link_libraries(kinematicChain ${catkin_LIBRARIES})
 
-add_executable(kinematicChainTfComparison src/KinematicChainTfComparison.cpp)
+add_executable(kinematicChainTfComparison src/common/KinematicChainTfComparison.cpp)
 target_link_libraries(kinematicChainTfComparison kinematicChain modelLoader ${catkin_LIBRARIES})
 
 catkin_add_gtest(kinematicChainTest test/KinematicChainTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
 target_link_libraries(kinematicChainTest kinematicChain modelLoader ${catkin_LIBRARIES})
 
 ### ModelLoader
-add_library(modelLoader src/ModelLoader.cpp) 
+add_library(modelLoader src/common/ModelLoader.cpp) 
 target_link_libraries(modelLoader ${catkin_LIBRARIES})
 
 catkin_add_gtest(modelLoaderTest test/ModelLoaderTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
 target_link_libraries(modelLoaderTest modelLoader ${catkin_LIBRARIES})
 
 ### FrameImageConverter
-add_library(frameImageConverter src/FrameImageConverter.cpp)
+add_library(frameImageConverter src/common/FrameImageConverter.cpp)
 target_link_libraries(frameImageConverter ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
-add_executable(frameImageConverterMain src/FrameImageConverterMain.cpp)
+add_executable(frameImageConverterMain src/common/FrameImageConverterMain.cpp)
 target_link_libraries(frameImageConverterMain frameImageConverter modelLoader kinematicChain ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 ### DataCapture
-add_library(dataCapture src/DataCapture.cpp)
+add_library(dataCapture src/data_capturing/DataCapture.cpp)
 target_link_libraries(dataCapture checkerboardDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
-add_executable(dataCaptureMain src/DataCaptureMain.cpp)
+add_executable(dataCaptureMain src/data_capturing/DataCaptureMain.cpp)
 target_link_libraries(dataCaptureMain dataCapture ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 
 ### OptimizationNode
 add_executable(optimizationNode 
-	src/KinematicCalibrationState.cpp
-	src/OptimizationNode.cpp 
-	src/JointOffsetOptimization.cpp
-	src/G2oJointOffsetOptimization.cpp
+	src/optimization/KinematicCalibrationState.cpp
+	src/optimization/OptimizationNode.cpp 
+	src/optimization/JointOffsetOptimization.cpp
+	src/optimization/G2oJointOffsetOptimization.cpp
 	)
 target_link_libraries(optimizationNode 
 	frameImageConverter
@@ -229,8 +229,8 @@ target_link_libraries(optimizationNode
 	
 	
 ### JointUpdate
-add_library(jointUpdate src/JointUpdate.cpp)
+add_library(jointUpdate src/result_publishing/JointUpdate.cpp)
 target_link_libraries(jointUpdate modelLoader ${catkin_LIBRARIES})
 
-add_executable(jointUpdateNode src/JointUpdateNode.cpp)
+add_executable(jointUpdateNode src/result_publishing/JointUpdateNode.cpp)
 target_link_libraries(jointUpdateNode jointUpdate ${catkin_LIBRARIES})

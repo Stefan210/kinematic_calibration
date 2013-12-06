@@ -5,15 +5,23 @@
  *      Author: stefan
  */
 
-#include "../include/CheckerboardDetection.h"
-
-#include <ros/ros.h>
-#include <ros/node_handle.h>
+#include <boost/smart_ptr/shared_ptr.hpp>
+#include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
-
+#include <image_transport/publisher.h>
+#include <image_transport/subscriber.h>
+#include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <ros/init.h>
+#include <ros/node_handle.h>
+//#include <ros/ros.h>
+#include <sensor_msgs/image_encodings.h>
+#include <sensor_msgs/Image.h>
 #include <iostream>
+#include <vector>
+
+#include "../../include/data_capturing/CheckerboardDetection.h"
 
 using namespace kinematic_calibration;
 using namespace std;

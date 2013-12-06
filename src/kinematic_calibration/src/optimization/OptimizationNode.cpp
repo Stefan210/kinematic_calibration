@@ -5,21 +5,24 @@
  *      Author: stefan
  */
 
-#include "../include/OptimizationNode.h"
+#include "../../include/optimization/OptimizationNode.h"
 
 #include <boost/smart_ptr/shared_ptr.hpp>
-#include <kdl/tree.hpp>
 #include <ros/console.h>
 #include <ros/init.h>
 #include <rosconsole/macros_generated.h>
 #include <sensor_msgs/JointState.h>
-#include <string>
+#include <tf/LinearMath/Quaternion.h>
+#include <tf/LinearMath/Transform.h>
+#include <tf/LinearMath/Vector3.h>
+#include <cmath>
+#include <iostream>
+#include <map>
+#include <utility>
 
-#include "../include/FrameImageConverter.h"
-#include "../include/G2oJointOffsetOptimization.h"
-#include "../include/KinematicCalibrationState.h"
-#include "../include/KinematicChain.h"
-#include "../include/ModelLoader.h"
+#include "../../include/common/FrameImageConverter.h"
+#include "../../include/common/KinematicChain.h"
+#include "../../include/optimization/G2oJointOffsetOptimization.h"
 
 namespace kinematic_calibration {
 

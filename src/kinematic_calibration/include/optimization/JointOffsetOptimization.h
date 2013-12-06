@@ -13,9 +13,9 @@
 //#include <string>
 #include <vector>
 
-#include "../include/KinematicCalibrationState.h"
-#include "../include/KinematicChain.h"
-#include "FrameImageConverter.h"
+#include "../../include/optimization/KinematicCalibrationState.h"
+#include "../../include/common/KinematicChain.h"
+#include "../../include/common/FrameImageConverter.h"
 
 using namespace std;
 

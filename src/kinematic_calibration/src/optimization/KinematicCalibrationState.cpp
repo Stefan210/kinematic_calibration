@@ -5,7 +5,9 @@
  *      Author: stefan
  */
 
-#include "../include/KinematicCalibrationState.h"
+#include "../../include/optimization/KinematicCalibrationState.h"
+
+#include <tf/LinearMath/Transform.h>
 
 namespace kinematic_calibration {
 
