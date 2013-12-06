@@ -39,6 +39,22 @@ public:
 	 */
 	void project(const tf::Transform& transform, double& x, double& y);
 
+	/**
+	 * Return the camera model.
+	 * @return Camera model to be used.
+	 */
+	const image_geometry::PinholeCameraModel& getCameraModel() const {
+		return cameraModel;
+	}
+
+	/**
+	 * Set the camera model.
+	 * @param cameraModel Camera model to be used.
+	 */
+	void setCameraModel(const image_geometry::PinholeCameraModel& cameraModel) {
+		this->cameraModel = cameraModel;
+	}
+
 private:
 	image_geometry::PinholeCameraModel cameraModel;
 };
