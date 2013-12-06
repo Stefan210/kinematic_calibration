@@ -8,9 +8,12 @@
 #ifndef CALIBRATIONSTATE_H_
 #define CALIBRATIONSTATE_H_
 
-#include <tf/tf.h>
+#include <tf/LinearMath/Transform.h>
+//#include <tf/tf.h>
 #include <map>
 #include <string>
+
+#include "../../include/optimization/CameraIntrinsicsVertex.h"
 
 using namespace std;
 
@@ -54,6 +57,11 @@ public:
 	 * Estimation for the transformation from camera to head.
 	 */
 	tf::Transform cameraToHeadTransformation;
+
+	/**
+	 * Estimation for the camera intrinsics matrix K (fx, fy, cx, cy).
+	 */
+	CameraIntrinsicsType cameraK;
 
 };
 

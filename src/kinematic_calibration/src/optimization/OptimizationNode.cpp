@@ -97,23 +97,30 @@ void OptimizationNode::printResult() {
 			<< result.markerTransformation.getRotation().w() << "\n";
 
 	cout << "Optimized transform form camera to head:\n";
-	cout << "(x, y, z) " << result.cameraToHeadTransformation.getOrigin().x() << " "
-			<< result.cameraToHeadTransformation.getOrigin().y() << " "
+	cout << "(x, y, z) " << result.cameraToHeadTransformation.getOrigin().x()
+			<< " " << result.cameraToHeadTransformation.getOrigin().y() << " "
 			<< result.cameraToHeadTransformation.getOrigin().z() << " ";
-	cout << "(q0, q1, q2, q3) " << result.cameraToHeadTransformation.getRotation().x()
-			<< " " << result.cameraToHeadTransformation.getRotation().y() << " "
+	cout << "(q0, q1, q2, q3) "
+			<< result.cameraToHeadTransformation.getRotation().x() << " "
+			<< result.cameraToHeadTransformation.getRotation().y() << " "
 			<< result.cameraToHeadTransformation.getRotation().z() << " "
 			<< result.cameraToHeadTransformation.getRotation().w() << "\n";
+
+	cout << "Optimized camera intrinsics:\n";
+	cout << "(fx,fy) " << result.cameraK[K_FX_IDX] << " "
+			<< result.cameraK[K_FY_IDX];
+	cout << "(cx,cy) " << result.cameraK[K_CX_IDX] << " "
+			<< result.cameraK[K_CY_IDX];
 }
 
 void OptimizationNode::printPoints() {
-	// instantiate the kinematic chain
+// instantiate the kinematic chain
 	KinematicChain kinematicChain(kdlTree, chainRoot, chainTip, chainName);
 
-	// instantiate the frame image converter
+// instantiate the frame image converter
 	FrameImageConverter frameImageConverter(cameraModel);
 
-	// print out the measured position and the transformed position
+// print out the measured position and the transformed position
 	for (int i = 0; i < measurements.size(); i++) {
 		measurementData current = measurements[i];
 		cout << i << " measured(x,y): " << current.cb_x << "  " << current.cb_y;
@@ -137,11 +144,16 @@ void OptimizationNode::printPoints() {
 		// get transformation from camera to head
 		tf::Transform cameraToHead = result.cameraToHeadTransformation;
 
+		// get estimated camera intrinsics
+		sensor_msgs::CameraInfo cameraInfo =
+				frameImageConverter.getCameraModel().cameraInfo();
+		cameraInfo.K = result.cameraK;
+		frameImageConverter.getCameraModel().fromCameraInfo(cameraInfo);
+
 		// calculate estimated x and y
 		endEffectorToMarker.setRotation(tf::Quaternion::getIdentity());
-		tf::Transform cameraToMarker = endEffectorToMarker
-				* cameraToEndEffector * cameraToHead;
-		//tf::Transform cameraToMarker =  cameraToEndEffector * endEffectorToMarker;
+		tf::Transform cameraToMarker = endEffectorToMarker * cameraToEndEffector
+				* cameraToHead;
 		double x, y;
 		frameImageConverter.project(cameraToMarker.inverse(), x, y);
 

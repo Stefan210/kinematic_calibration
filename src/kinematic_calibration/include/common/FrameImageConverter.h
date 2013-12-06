@@ -43,7 +43,7 @@ public:
 	 * Return the camera model.
 	 * @return Camera model to be used.
 	 */
-	const image_geometry::PinholeCameraModel& getCameraModel() const {
+	image_geometry::PinholeCameraModel& getCameraModel() {
 		return cameraModel;
 	}
 

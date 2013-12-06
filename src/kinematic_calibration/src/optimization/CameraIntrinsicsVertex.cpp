@@ -7,11 +7,6 @@
 
 #include "../../include/optimization/CameraIntrinsicsVertex.h"
 
-#define K_FX_IDX 0
-#define K_FY_IDX 4
-#define K_CX_IDX 2
-#define K_CY_IDX 5
-
 namespace kinematic_calibration {
 
 CameraIntrinsicsVertex::CameraIntrinsicsVertex(

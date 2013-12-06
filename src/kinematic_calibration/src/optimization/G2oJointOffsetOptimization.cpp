@@ -112,6 +112,10 @@ void G2oJointOffsetOptimization::optimize(
 	// instantiate the vertex for the camera intrinsics
 	CameraIntrinsicsVertex* cameraIntrinsicsVertex = new CameraIntrinsicsVertex(
 			frameImageConverter.getCameraModel().cameraInfo());
+	cameraIntrinsicsVertex->setId(++id);
+	cameraIntrinsicsVertex->setToOrigin();
+	//cameraIntrinsicsVertex->setFixed(true);
+	optimizer.addVertex(cameraIntrinsicsVertex);
 
 	// add edges
 	Eigen::Matrix3d info = Eigen::Matrix3d::Identity(3, 3);
@@ -124,6 +128,7 @@ void G2oJointOffsetOptimization::optimize(
 		edge->vertices()[0] = markerTransformationVertex;
 		edge->vertices()[1] = jointOffsetVertex;
 		edge->vertices()[2] = cameraToHeadTransformationVertex;
+		edge->vertices()[3] = cameraIntrinsicsVertex;
 		edge->setFrameImageConverter(&frameImageConverter);
 		edge->setKinematicChain(&kinematicChain);
 		edge->computeError();
@@ -133,7 +138,7 @@ void G2oJointOffsetOptimization::optimize(
 	// optimize
 	ROS_INFO("Starting optimization...");
 	optimizer.initializeOptimization();
-	//optimizer.computeActiveErrors();
+	optimizer.computeActiveErrors();
 	optimizer.setVerbose(true);
 	optimizer.optimize(100000);
 
@@ -145,12 +150,13 @@ void G2oJointOffsetOptimization::optimize(
 	eigenTransform = cameraToHeadTransformationVertex->estimate();
 	tf::transformEigenToTF(eigenTransform,
 			optimizedState.cameraToHeadTransformation);
+	optimizedState.cameraK = cameraIntrinsicsVertex->estimate();
 }
 
 CheckerboardMeasurementEdge::CheckerboardMeasurementEdge(
 		measurementData measurement) :
 		measurement(measurement) {
-	resize(3);
+	resize(4);
 	for (int i = 0; i < measurement.jointState.name.size(); i++) {
 		jointPositions.insert(
 				make_pair<string, double>(measurement.jointState.name[i],
@@ -169,6 +175,8 @@ void CheckerboardMeasurementEdge::computeError() {
 			static_cast<JointOffsetVertex*>(this->_vertices[1]);
 	TransformationVertex* cameraToHeadTransformationVertex =
 			static_cast<TransformationVertex*>(this->_vertices[2]);
+	CameraIntrinsicsVertex* cameraIntrinsicsVertex =
+			static_cast<CameraIntrinsicsVertex*>(this->_vertices[3]);
 
 	// get transformation from end effector to camera
 	tf::Transform cameraToEndEffector; // root = camera, tip = end effector, e.g. wrist
@@ -185,10 +193,12 @@ void CheckerboardMeasurementEdge::computeError() {
 	eigenTransform = cameraToHeadTransformationVertex->estimate();
 	tf::Transform cameraToHead;
 	tf::transformEigenToTF(eigenTransform, cameraToHead);
-	//cout << cameraToHead.getOrigin().x() << " " << cameraToHead.getOrigin().y()
-	//		<< " " << cameraToHead.getOrigin().z() << " " << endl;
-//cout << ".";
-	//usleep(100);
+
+	// get estimated camera intrinsics
+	sensor_msgs::CameraInfo cameraInfo = this->frameImageConverter->getCameraModel().cameraInfo();
+	cameraInfo.K = cameraIntrinsicsVertex->estimate();
+	this->frameImageConverter->getCameraModel().fromCameraInfo(cameraInfo);
+
 	// calculate estimated x and y
 	endEffectorToMarker.setRotation(tf::Quaternion::getIdentity());
 	tf::Transform cameraToMarker = endEffectorToMarker * cameraToEndEffector
