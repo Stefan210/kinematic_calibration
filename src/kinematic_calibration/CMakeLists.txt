@@ -218,6 +218,7 @@ add_executable(optimizationNode
 	src/optimization/OptimizationNode.cpp 
 	src/optimization/JointOffsetOptimization.cpp
 	src/optimization/G2oJointOffsetOptimization.cpp
+	src/optimization/CameraIntrinsicsVertex.cpp
 	)
 target_link_libraries(optimizationNode 
 	frameImageConverter
