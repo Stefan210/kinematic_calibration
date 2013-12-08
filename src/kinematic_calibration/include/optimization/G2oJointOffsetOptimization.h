@@ -42,6 +42,14 @@ public:
 					KinematicCalibrationState());
 
 	/**
+	 * Constructor.
+	 */
+	G2oJointOffsetOptimization(vector<measurementData>& measurements,
+			vector<KinematicChain> kinematicChains,
+			FrameImageConverter& frameImageConverter,
+			KinematicCalibrationState initialState = KinematicCalibrationState());
+
+	/**
 	 * Deconstructor.
 	 */
 	virtual ~G2oJointOffsetOptimization();

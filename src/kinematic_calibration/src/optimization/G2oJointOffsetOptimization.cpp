@@ -45,6 +45,15 @@ G2oJointOffsetOptimization::G2oJointOffsetOptimization(
 				frameImageConverter, initialState) {
 }
 
+G2oJointOffsetOptimization::G2oJointOffsetOptimization(
+		vector<measurementData>& measurements,
+		vector<KinematicChain> kinematicChains,
+		FrameImageConverter& frameImageConverter,
+		KinematicCalibrationState initialState) :
+		JointOffsetOptimization(measurements, kinematicChains,
+				frameImageConverter, initialState) {
+}
+
 G2oJointOffsetOptimization::~G2oJointOffsetOptimization() {
 }
 
@@ -134,7 +143,8 @@ void G2oJointOffsetOptimization::optimize(
 		edge->vertices()[2] = cameraToHeadTransformationVertex;
 		edge->vertices()[3] = cameraIntrinsicsVertex;
 		edge->setFrameImageConverter(&frameImageConverter);
-		edge->setKinematicChain(&kinematicChainsMap.find(current.chain_name)->second); //TODO
+		edge->setKinematicChain(
+				&kinematicChainsMap.find(current.chain_name)->second); //TODO
 		edge->computeError();
 		optimizer.addEdge(edge);
 	}
