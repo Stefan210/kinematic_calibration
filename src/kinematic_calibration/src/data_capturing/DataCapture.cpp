@@ -590,6 +590,7 @@ void DataCapture::publishMeasurement() {
 	data.jointState = jointState;
 	data.cb_x = checkerboardData.x;
 	data.cb_y = checkerboardData.y;
+	nh.getParam("chain_name", data.chain_name);
 	ROS_INFO("Publishing measurement data...");
 	measurementPub.publish(data);
 }
