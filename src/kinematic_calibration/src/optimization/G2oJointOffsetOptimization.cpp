@@ -31,6 +31,9 @@
 #include <g2o/core/robust_kernel_impl.h>
 
 #include <time.h>
+#include <map>
+
+using namespace std;
 
 namespace kinematic_calibration {
 
@@ -82,11 +85,20 @@ void G2oJointOffsetOptimization::optimize(
 	jointOffsetVertex->setId(++id);
 	optimizer.addVertex(jointOffsetVertex);
 
-	// instantiate the vertex for the marker transformation
-	MarkerTransformationVertex* markerTransformationVertex =
-			new MarkerTransformationVertex();
-	markerTransformationVertex->setId(++id);
-	optimizer.addVertex(markerTransformationVertex);
+	// instantiate the vertices for the marker transformations
+	map<string, MarkerTransformationVertex*> markerTransformationVertices;
+	map<string, KinematicChain> kinematicChainsMap;
+	for (int i = 0; i < kinematicChains.size(); i++) {
+		MarkerTransformationVertex* markerTransformationVertex =
+				new MarkerTransformationVertex();
+		markerTransformationVertex->setId(++id);
+		optimizer.addVertex(markerTransformationVertex);
+		KinematicChain currentChain = kinematicChains[i];
+		markerTransformationVertices.insert(
+				make_pair(currentChain.getName(), markerTransformationVertex));
+		kinematicChainsMap.insert(
+				make_pair(currentChain.getName(), currentChain));
+	}
 
 	// instantiate the vertex for the marker transformation
 	TransformationVertex* cameraToHeadTransformationVertex =
@@ -106,16 +118,23 @@ void G2oJointOffsetOptimization::optimize(
 	Eigen::Matrix3d info = Eigen::Matrix3d::Identity(3, 3);
 	for (int i = 0; i < measurements.size(); i++) {
 		measurementData current = measurements[i];
+		if (markerTransformationVertices.count(current.chain_name) == 0
+				|| kinematicChainsMap.count(current.chain_name) == 0) {
+			ROS_ERROR("Measurement for unknown kinematic chain: %s",
+					current.chain_name.c_str());
+			continue;
+		}
+
 		CheckerboardMeasurementEdge* edge = new CheckerboardMeasurementEdge(
 				current);
 		edge->setId(++id);
 		edge->setInformation(info);
-		edge->vertices()[0] = markerTransformationVertex;
+		edge->vertices()[0] = markerTransformationVertices[current.chain_name];
 		edge->vertices()[1] = jointOffsetVertex;
 		edge->vertices()[2] = cameraToHeadTransformationVertex;
 		edge->vertices()[3] = cameraIntrinsicsVertex;
 		edge->setFrameImageConverter(&frameImageConverter);
-		edge->setKinematicChain(&kinematicChains[0]); //TODO
+		edge->setKinematicChain(&kinematicChainsMap.find(current.chain_name)->second); //TODO
 		edge->computeError();
 		optimizer.addEdge(edge);
 	}
@@ -130,9 +149,10 @@ void G2oJointOffsetOptimization::optimize(
 	// get results
 	optimizedState.jointOffsets =
 			static_cast<map<string, double> >(jointOffsetVertex->estimate());
-	Eigen::Isometry3d eigenTransform = markerTransformationVertex->estimate();
-	tf::transformEigenToTF(eigenTransform, optimizedState.markerTransformation);
-	eigenTransform = cameraToHeadTransformationVertex->estimate();
+	//Eigen::Isometry3d eigenTransform = markerTransformationVertex->estimate();
+	//tf::transformEigenToTF(eigenTransform, optimizedState.markerTransformation);
+	Eigen::Isometry3d eigenTransform =
+			cameraToHeadTransformationVertex->estimate();
 	tf::transformEigenToTF(eigenTransform,
 			optimizedState.cameraToHeadTransformation);
 	optimizedState.cameraK = cameraIntrinsicsVertex->estimate();
