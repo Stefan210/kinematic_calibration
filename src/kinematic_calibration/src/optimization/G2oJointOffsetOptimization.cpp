@@ -72,7 +72,12 @@ void G2oJointOffsetOptimization::optimize(
 
 	// instantiate the vertex for the joint offsets
 	vector<string> jointNames;
-	kinematicChain.getJointNames(jointNames);
+	for (int i = 0; i < kinematicChains.size(); i++) {
+		vector<string> currentNames;
+		kinematicChains[i].getJointNames(currentNames);
+		jointNames.insert(jointNames.end(), currentNames.begin(),
+				currentNames.end());
+	}
 	JointOffsetVertex* jointOffsetVertex = new JointOffsetVertex(jointNames);
 	jointOffsetVertex->setId(++id);
 	optimizer.addVertex(jointOffsetVertex);
@@ -110,7 +115,7 @@ void G2oJointOffsetOptimization::optimize(
 		edge->vertices()[2] = cameraToHeadTransformationVertex;
 		edge->vertices()[3] = cameraIntrinsicsVertex;
 		edge->setFrameImageConverter(&frameImageConverter);
-		edge->setKinematicChain(&kinematicChain);
+		edge->setKinematicChain(&kinematicChains[0]); //TODO
 		edge->computeError();
 		optimizer.addEdge(edge);
 	}

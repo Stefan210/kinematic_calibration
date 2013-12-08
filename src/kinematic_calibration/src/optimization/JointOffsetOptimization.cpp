@@ -10,11 +10,23 @@
 namespace kinematic_calibration {
 
 JointOffsetOptimization::JointOffsetOptimization(
-		vector<measurementData>& measurements, KinematicChain& kinematicChain,
-		FrameImageConverter& frameImageConverter, KinematicCalibrationState initialState) :
-		measurements(measurements), kinematicChain(kinematicChain), frameImageConverter(
-				frameImageConverter), initialState(initialState) {
+		vector<measurementData>& measurements, KinematicChain kinematicChain,
+		FrameImageConverter& frameImageConverter,
+		KinematicCalibrationState initialState) :
+		measurements(measurements), frameImageConverter(frameImageConverter), initialState(
+				initialState) {
+	vector<KinematicChain> kinematicChains;
+	kinematicChains.push_back(kinematicChain);
+	this->kinematicChains = kinematicChains;
+}
 
+kinematic_calibration::JointOffsetOptimization::JointOffsetOptimization(
+		vector<measurementData>& measurements,
+		vector<KinematicChain> kinematicChains,
+		FrameImageConverter& frameImageConverter,
+		KinematicCalibrationState initialState) :
+		measurements(measurements), kinematicChains(kinematicChains), frameImageConverter(
+				frameImageConverter), initialState(initialState) {
 }
 
 JointOffsetOptimization::~JointOffsetOptimization() {
@@ -22,3 +34,4 @@ JointOffsetOptimization::~JointOffsetOptimization() {
 }
 
 } /* namespace kinematic_calibration */
+

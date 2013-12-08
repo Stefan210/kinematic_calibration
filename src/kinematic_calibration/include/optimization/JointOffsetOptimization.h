@@ -30,7 +30,15 @@ public:
 	 * Constructor.
 	 */
 	JointOffsetOptimization(vector<measurementData>& measurements,
-			KinematicChain& kinematicChain,
+			KinematicChain kinematicChain,
+			FrameImageConverter& frameImageConverter,
+			KinematicCalibrationState initialState = KinematicCalibrationState());
+
+	/**
+	 * Constructor.
+	 */
+	JointOffsetOptimization(vector<measurementData>& measurements,
+			vector<KinematicChain> kinematicChains,
 			FrameImageConverter& frameImageConverter,
 			KinematicCalibrationState initialState = KinematicCalibrationState());
 
@@ -52,9 +60,9 @@ protected:
 	vector<measurementData>& measurements;
 
 	/**
-	 * Kinematic chain for which the joint offsets should be converted.
+	 * Kinematic chains for which the joint offsets should be optimized.
 	 */
-	KinematicChain& kinematicChain;
+	vector<KinematicChain> kinematicChains;
 
 	/**
 	 * Conversion of 3D transformation into 2D image coordinates.
