@@ -220,6 +220,7 @@ add_executable(optimizationNode
 	src/optimization/G2oJointOffsetOptimization.cpp
 	src/optimization/CameraIntrinsicsVertex.cpp
 	src/optimization/JointOffsetVertex.cpp
+	src/optimization/CheckerboardMeasurementEdge.cpp
 	)
 target_link_libraries(optimizationNode 
 	frameImageConverter

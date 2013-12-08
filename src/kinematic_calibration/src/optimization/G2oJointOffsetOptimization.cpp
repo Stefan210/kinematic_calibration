@@ -16,6 +16,7 @@
 #include "../../include/common/KinematicChain.h"
 #include "../../include/optimization/CameraIntrinsicsVertex.h"
 #include "../../include/optimization/JointOffsetVertex.h"
+#include "../../include/optimization/CheckerboardMeasurementEdge.h"
 
 #include <g2o/core/sparse_optimizer.h>
 #include <g2o/core/block_solver.h>
@@ -32,7 +33,6 @@
 #include <time.h>
 
 namespace kinematic_calibration {
-
 
 G2oJointOffsetOptimization::G2oJointOffsetOptimization(
 		vector<measurementData>& measurements, KinematicChain& kinematicChain,
@@ -131,91 +131,6 @@ void G2oJointOffsetOptimization::optimize(
 	tf::transformEigenToTF(eigenTransform,
 			optimizedState.cameraToHeadTransformation);
 	optimizedState.cameraK = cameraIntrinsicsVertex->estimate();
-}
-
-CheckerboardMeasurementEdge::CheckerboardMeasurementEdge(
-		measurementData measurement) :
-		measurement(measurement) {
-	resize(4);
-	for (int i = 0; i < measurement.jointState.name.size(); i++) {
-		jointPositions.insert(
-				make_pair<string, double>(measurement.jointState.name[i],
-						measurement.jointState.position[i]));
-	}
-}
-
-CheckerboardMeasurementEdge::~CheckerboardMeasurementEdge() {
-}
-
-void CheckerboardMeasurementEdge::computeError() {
-	// get the pointers to the vertices
-	MarkerTransformationVertex* markerTransformationVertex =
-			static_cast<MarkerTransformationVertex*>(this->_vertices[0]);
-	JointOffsetVertex* jointOffsetVertex =
-			static_cast<JointOffsetVertex*>(this->_vertices[1]);
-	TransformationVertex* cameraToHeadTransformationVertex =
-			static_cast<TransformationVertex*>(this->_vertices[2]);
-	CameraIntrinsicsVertex* cameraIntrinsicsVertex =
-			static_cast<CameraIntrinsicsVertex*>(this->_vertices[3]);
-
-	// get transformation from end effector to camera
-	tf::Transform cameraToEndEffector; // root = camera, tip = end effector, e.g. wrist
-	map<string, double> jointOffsets = jointOffsetVertex->estimate();
-	this->kinematicChain->getRootToTip(jointPositions, jointOffsets,
-			cameraToEndEffector);
-
-	// get transformation from marker to end effector
-	Eigen::Isometry3d eigenTransform = markerTransformationVertex->estimate();
-	tf::Transform endEffectorToMarker;
-	tf::transformEigenToTF(eigenTransform, endEffectorToMarker);
-
-	// get transformation from camera to head
-	eigenTransform = cameraToHeadTransformationVertex->estimate();
-	tf::Transform cameraToHead;
-	tf::transformEigenToTF(eigenTransform, cameraToHead);
-
-	// get estimated camera intrinsics
-	sensor_msgs::CameraInfo cameraInfo = this->frameImageConverter->getCameraModel().cameraInfo();
-	cameraInfo.K = cameraIntrinsicsVertex->estimate();
-	this->frameImageConverter->getCameraModel().fromCameraInfo(cameraInfo);
-
-	// calculate estimated x and y
-	endEffectorToMarker.setRotation(tf::Quaternion::getIdentity());
-	tf::Transform cameraToMarker = endEffectorToMarker * cameraToEndEffector
-			* cameraToHead;
-	double x, y;
-	this->frameImageConverter->project(cameraToMarker.inverse(), x, y);
-
-	// set error
-	this->_error[0] = measurement.cb_x - x;
-	this->_error[1] = measurement.cb_y - y;
-
-	/*cout << "id: " << _id << " ";
-	 cout << "cameraToEndEffector(x,y,z): " << cameraToEndEffector.getOrigin().getX() << ", "
-	 << cameraToEndEffector.getOrigin().getY() << ", " << cameraToEndEffector.getOrigin().getZ()
-	 << " ";
-	 cout << "x error: " << this->_error[0] << " y error: " << this->_error[1]
-	 << " ";
-	 cout << "cb_x: " << measurement.cb_x << " cb_y: " << measurement.cb_y;
-	 cout << "\n";*/
-}
-
-const FrameImageConverter* CheckerboardMeasurementEdge::getFrameImageConverter() const {
-	return frameImageConverter;
-}
-
-void CheckerboardMeasurementEdge::setFrameImageConverter(
-		FrameImageConverter* frameImageConverter) {
-	this->frameImageConverter = frameImageConverter;
-}
-
-const KinematicChain* CheckerboardMeasurementEdge::getKinematicChain() const {
-	return kinematicChain;
-}
-
-void CheckerboardMeasurementEdge::setKinematicChain(
-		KinematicChain* kinematicChain) {
-	this->kinematicChain = kinematicChain;
 }
 
 } /* namespace kinematic_calibration */
