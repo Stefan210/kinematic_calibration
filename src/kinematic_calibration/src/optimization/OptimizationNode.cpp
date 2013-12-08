@@ -37,9 +37,6 @@ OptimizationNode::OptimizationNode() :
 	// instantiate the model loader
 	modelLoader.initializeFromRos();
 	modelLoader.getKdlTree(kdlTree);
-	nh.getParam("chain_name", chainName);
-	nh.getParam("chain_root", chainRoot);
-	nh.getParam("chain_tip", chainTip);
 }
 
 OptimizationNode::~OptimizationNode() {
@@ -64,9 +61,6 @@ void OptimizationNode::collectData() {
 }
 
 void OptimizationNode::optimize() {
-	// instantiate the kinematic chain
-	KinematicChain kinematicChain(kdlTree, chainRoot, chainTip, chainName);
-
 	// instantiate the frame image converter
 	FrameImageConverter frameImageConverter(cameraModel);
 
@@ -74,7 +68,7 @@ void OptimizationNode::optimize() {
 	KinematicCalibrationState initialState;
 
 	// optimization instance
-	G2oJointOffsetOptimization optimization(measurements, kinematicChain,
+	G2oJointOffsetOptimization optimization(measurements, kinematicChains,
 			frameImageConverter, initialState);
 	optimization.optimize(result);
 }
@@ -176,9 +170,21 @@ void OptimizationNode::measurementCb(const measurementDataConstPtr& msg) {
 		// stop collecting data as soon as an empty message is received
 		collectingData = false;
 	} else {
+		// check if the measurement contains to a new chain
+		if(data.chain_name != chainName) {
+			// get the parameters
+			nh.getParam("chain_name", chainName);
+			nh.getParam("chain_root", chainRoot);
+			nh.getParam("chain_tip", chainTip);
+			// instantiate the kinematic chain
+			KinematicChain kinematicChain(kdlTree, chainRoot, chainTip, chainName);
+			this->kinematicChains.push_back(kinematicChain);
+			ROS_INFO("Receive data for chain %s.", chainName.c_str());
+		}
 		// save data
 		measurements.push_back(measurementData(data));
 		ROS_INFO("Measurement data received (#%ld).", measurements.size());
+
 	}
 }
 

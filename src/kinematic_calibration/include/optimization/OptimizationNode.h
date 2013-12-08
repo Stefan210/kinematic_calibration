@@ -17,8 +17,9 @@
 #include <string>
 #include <vector>
 
-#include "../../include/optimization/KinematicCalibrationState.h"
-#include "../../include/common/ModelLoader.h"
+#include "../common/KinematicChain.h"
+#include "../common/ModelLoader.h"
+#include "KinematicCalibrationState.h"
 
 using namespace ros;
 using namespace std;
@@ -56,6 +57,7 @@ private:
 	ModelLoader modelLoader;
 	KDL::Tree kdlTree;
 	string chainName, chainRoot, chainTip;
+	vector<KinematicChain> kinematicChains;
 
 	bool collectingData;
 
