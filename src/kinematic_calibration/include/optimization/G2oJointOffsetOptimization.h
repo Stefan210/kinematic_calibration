@@ -29,53 +29,6 @@ typedef VertexSE3 MarkerTransformationVertex;
 typedef VertexSE3 TransformationVertex;
 
 /**
- * Class that represents the vertex for the joint offsets.
- */
-class JointOffsetVertex: public g2o::BaseVertex<7, map<string, double> > {
-public:
-	/**
-	 * Default constructor.
-	 */
-	JointOffsetVertex() :
-			jointNames(vector<string>()) {
-		this->_dimension = jointNames.size();
-	}
-
-	/**
-	 * Constructor.
-	 * @param jointNames Names of the joints which offsets should be optimized.
-	 */
-	JointOffsetVertex(const vector<string>& jointNames) :
-			jointNames(jointNames) {
-		this->_dimension = jointNames.size();
-	}
-
-	/**
-	 * Deconstructor.
-	 */
-	virtual ~JointOffsetVertex() {
-	}
-
-	virtual void oplusImpl(const double*);
-	virtual void setToOriginImpl();
-	virtual int estimateDimension() const;
-	virtual int minimalEstimateDimension() const;
-	virtual bool read(std::istream&) {
-		return false;
-	}
-	virtual bool write(std::ostream&) const {
-		return false;
-	}
-	virtual void setJointNames(const vector<string>& jointNames) {
-		this->jointNames = jointNames;
-		this->_dimension = jointNames.size();
-	}
-
-protected:
-	vector<string> jointNames;
-};
-
-/**
  * Class representing an edge between the transformation for the marker and the joint offsets.
  */
 class CheckerboardMeasurementEdge: public BaseMultiEdge<3, measurementData> {

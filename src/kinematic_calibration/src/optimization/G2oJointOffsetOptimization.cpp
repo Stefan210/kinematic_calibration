@@ -15,6 +15,7 @@
 #include "../../include/optimization/KinematicCalibrationState.h"
 #include "../../include/common/KinematicChain.h"
 #include "../../include/optimization/CameraIntrinsicsVertex.h"
+#include "../../include/optimization/JointOffsetVertex.h"
 
 #include <g2o/core/sparse_optimizer.h>
 #include <g2o/core/block_solver.h>
@@ -32,28 +33,7 @@
 
 namespace kinematic_calibration {
 
-void JointOffsetVertex::oplusImpl(const double* delta) {
-	for (int i = 0; i < jointNames.size(); i++) {
-		string curName = jointNames[i];
-		this->_estimate[curName] += delta[i];
-	}
-}
 
-void JointOffsetVertex::setToOriginImpl() {
-	// set initial offsets to 0
-	for (int i = 0; i < jointNames.size(); i++) {
-		string curName = jointNames[i];
-		this->_estimate[curName] = 0;
-	}
-}
-
-int JointOffsetVertex::estimateDimension() const {
-	return this->jointNames.size();
-}
-
-int JointOffsetVertex::minimalEstimateDimension() const {
-	return this->jointNames.size();
-}
 G2oJointOffsetOptimization::G2oJointOffsetOptimization(
 		vector<measurementData>& measurements, KinematicChain& kinematicChain,
 		FrameImageConverter& frameImageConverter,
