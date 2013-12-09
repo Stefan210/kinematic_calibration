@@ -20,7 +20,7 @@ JointOffsetOptimization::JointOffsetOptimization(
 	this->kinematicChains = kinematicChains;
 }
 
-kinematic_calibration::JointOffsetOptimization::JointOffsetOptimization(
+JointOffsetOptimization::JointOffsetOptimization(
 		vector<measurementData>& measurements,
 		vector<KinematicChain> kinematicChains,
 		FrameImageConverter& frameImageConverter,

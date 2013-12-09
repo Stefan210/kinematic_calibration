@@ -87,10 +87,16 @@ void G2oJointOffsetOptimization::optimize(
 	for (int i = 0; i < kinematicChains.size(); i++) {
 		vector<string> currentNames;
 		kinematicChains[i].getJointNames(currentNames);
-		jointNames.insert(jointNames.end(), currentNames.begin(),
-				currentNames.end());
+		// add joint names if not already contained
+		for (int j = 0; j < currentNames.size(); j++) {
+			if (find(jointNames.begin(), jointNames.end(), currentNames[j])
+					== jointNames.end()) {
+				jointNames.push_back(currentNames[j]);
+			}
+		}
 	}
 	JointOffsetVertex* jointOffsetVertex = new JointOffsetVertex(jointNames);
+	//JointOffsetVertex* jointOffsetVertex = JointOffsetVertex::getInstance(jointNames.size());
 	jointOffsetVertex->setId(++id);
 	optimizer.addVertex(jointOffsetVertex);
 
@@ -144,7 +150,7 @@ void G2oJointOffsetOptimization::optimize(
 		edge->vertices()[3] = cameraIntrinsicsVertex;
 		edge->setFrameImageConverter(&frameImageConverter);
 		edge->setKinematicChain(
-				&kinematicChainsMap.find(current.chain_name)->second); //TODO
+				&kinematicChainsMap.find(current.chain_name)->second);
 		edge->computeError();
 		optimizer.addEdge(edge);
 	}
@@ -161,6 +167,14 @@ void G2oJointOffsetOptimization::optimize(
 			static_cast<map<string, double> >(jointOffsetVertex->estimate());
 	//Eigen::Isometry3d eigenTransform = markerTransformationVertex->estimate();
 	//tf::transformEigenToTF(eigenTransform, optimizedState.markerTransformation);
+	for (map<string, MarkerTransformationVertex*>::iterator it =
+			markerTransformationVertices.begin();
+			it != markerTransformationVertices.end(); it++) {
+		Eigen::Isometry3d eigenTransform = it->second->estimate();
+		tf::Transform tfTransform;
+		tf::transformEigenToTF(eigenTransform, tfTransform);
+		optimizedState.markerTransformations[it->first] = tfTransform;
+	}
 	Eigen::Isometry3d eigenTransform =
 			cameraToHeadTransformationVertex->estimate();
 	tf::transformEigenToTF(eigenTransform,

@@ -38,6 +38,12 @@ CheckerboardMeasurementEdge::~CheckerboardMeasurementEdge() {
 }
 
 void CheckerboardMeasurementEdge::computeError() {
+	// check if components are initialized
+	if(NULL == kinematicChain || NULL == frameImageConverter) {
+		ROS_FATAL("Uninitialized components!");
+		return;
+	}
+
 	// get the pointers to the vertices
 	VertexSE3* markerTransformationVertex =
 			static_cast<VertexSE3*>(this->_vertices[0]);

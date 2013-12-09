@@ -81,14 +81,21 @@ void OptimizationNode::printResult() {
 		cout << iterator->first << " : " << iterator->second << "\n";
 	}
 
-	cout << "Optimized transform form marker to end effector:\n";
-	cout << "(x, y, z) " << result.markerTransformation.getOrigin().x() << " "
-			<< result.markerTransformation.getOrigin().y() << " "
-			<< result.markerTransformation.getOrigin().z() << " ";
-	cout << "(q0, q1, q2, q3) " << result.markerTransformation.getRotation().x()
-			<< " " << result.markerTransformation.getRotation().y() << " "
-			<< result.markerTransformation.getRotation().z() << " "
-			<< result.markerTransformation.getRotation().w() << "\n";
+	for (std::map<string, tf::Transform>::iterator iterator =
+			result.markerTransformations.begin();
+			iterator != result.markerTransformations.end(); iterator++) {
+		tf::Transform transform = iterator->second;
+		string name = iterator->first;
+		cout << "Optimized transform form marker to end effector for chain "
+				<< name << ":\n";
+		cout << "(x, y, z) " << transform.getOrigin().x() << " "
+				<< transform.getOrigin().y() << " " << transform.getOrigin().z()
+				<< " ";
+		cout << "(q0, q1, q2, q3) " << transform.getRotation().x() << " "
+				<< transform.getRotation().y() << " "
+				<< transform.getRotation().z() << " "
+				<< transform.getRotation().w() << "\n";
+	}
 
 	cout << "Optimized transform form camera to head:\n";
 	cout << "(x, y, z) " << result.cameraToHeadTransformation.getOrigin().x()
@@ -108,13 +115,10 @@ void OptimizationNode::printResult() {
 }
 
 void OptimizationNode::printPoints() {
-// instantiate the kinematic chain
-	KinematicChain kinematicChain(kdlTree, chainRoot, chainTip, chainName);
-
-// instantiate the frame image converter
+	// instantiate the frame image converter
 	FrameImageConverter frameImageConverter(cameraModel);
 
-// print out the measured position and the transformed position
+	// print out the measured position and the transformed position
 	for (int i = 0; i < measurements.size(); i++) {
 		measurementData current = measurements[i];
 		cout << i << " measured(x,y): " << current.cb_x << "  " << current.cb_y;
@@ -129,11 +133,16 @@ void OptimizationNode::printPoints() {
 
 		tf::Transform cameraToEndEffector; // root = camera, tip = end effector, e.g. wrist
 		map<string, double> jointOffsets = result.jointOffsets;
-		kinematicChain.getRootToTip(jointPositions, jointOffsets,
-				cameraToEndEffector);
+		for (int j = 0; j < this->kinematicChains.size(); j++) {
+			if (kinematicChains[j].getName() == current.chain_name) {
+				this->kinematicChains[j].getRootToTip(jointPositions,
+						jointOffsets, cameraToEndEffector);
+			}
+		}
 
 		// get transformation from marker to end effector
-		tf::Transform endEffectorToMarker = result.markerTransformation;
+		tf::Transform endEffectorToMarker =
+				result.markerTransformations[current.chain_name];
 
 		// get transformation from camera to head
 		tf::Transform cameraToHead = result.cameraToHeadTransformation;
@@ -166,18 +175,24 @@ void OptimizationNode::printPoints() {
 
 void OptimizationNode::measurementCb(const measurementDataConstPtr& msg) {
 	const measurementData data = *msg;
+	static int numChains = 0;
 	if (data.jointState.name.empty()) {
-		// stop collecting data as soon as an empty message is received
-		collectingData = false;
+		numChains++;
+		// TODO: Remove "hack"!
+		if (numChains >= 2) {
+			// stop collecting data as soon as an empty message is received
+			collectingData = false;
+		}
 	} else {
 		// check if the measurement contains to a new chain
-		if(data.chain_name != chainName) {
+		if (data.chain_name != chainName) {
 			// get the parameters
 			nh.getParam("chain_name", chainName);
 			nh.getParam("chain_root", chainRoot);
 			nh.getParam("chain_tip", chainTip);
 			// instantiate the kinematic chain
-			KinematicChain kinematicChain(kdlTree, chainRoot, chainTip, chainName);
+			KinematicChain kinematicChain(kdlTree, chainRoot, chainTip,
+					chainName);
 			this->kinematicChains.push_back(kinematicChain);
 			ROS_INFO("Receive data for chain %s.", chainName.c_str());
 		}
