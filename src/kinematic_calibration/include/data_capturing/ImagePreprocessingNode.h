@@ -27,6 +27,7 @@ public:
 
 protected:
 	void imageCb(const sensor_msgs::ImageConstPtr& msg);
+	unsigned char crop(int value) const;
 
 private:
 	ros::NodeHandle nh;
