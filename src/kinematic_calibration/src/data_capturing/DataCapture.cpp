@@ -50,6 +50,7 @@ DataCapture::DataCapture() :
 	nhPrivate.getParam("params/headPitch_min", headPitchMin);
 	nhPrivate.getParam("params/headPitch_max", headPitchMax);
 	nhPrivate.getParam("params/headPitch_step", headPitchStep);
+	nhPrivate.getParam("params/image_opic", imageTopic);
 
 	// get camera information
 	camerainfoSub = nh.subscribe("/nao_camera/camera_info", 1,
@@ -70,7 +71,7 @@ DataCapture::DataCapture() :
 	jointStateSub = nh.subscribe(jointStatesOps);
 
 	// subscribe the image topic
-	imageSub = it.subscribe("/nao_camera/image_raw", 1,
+	imageSub = it.subscribe(imageTopic, 1,
 			&DataCapture::imageCallback, this);
 
 	// advertise the measurement data topic

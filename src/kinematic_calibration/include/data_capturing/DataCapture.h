@@ -86,6 +86,7 @@ private:
 	string cameraFrame;
 	sensor_msgs::JointState jointState;
 	ros::Time curTime;
+	string imageTopic;
 	void setStiffness(const vector<string>& jointNames, double stiffness);
 	void enableStiffness(const vector<string>& jointNames);
 	void disableStiffness(const vector<string>& jointNames);
