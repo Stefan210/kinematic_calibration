@@ -26,14 +26,25 @@ using namespace std;
 
 namespace kinematic_calibration {
 
-/*
- *
+/**
+ * Node for collecting data and executing the optimization.
  */
 class OptimizationNode {
 public:
+	/**
+	 * Constructor.
+	 */
 	OptimizationNode();
+
+	/**
+	 * Deconstructor.
+	 */
 	virtual ~OptimizationNode();
 
+	/**
+	 * Starts listening for measurement data
+	 * and executing the optimization process.
+	 */
 	void startLoop();
 
 protected:

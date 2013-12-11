@@ -23,12 +23,19 @@ public:
 	double x, y;
 };
 
-/*
+/**
  * Class for detecting the position of a 2x2 checker board.
  */
 class CheckerboardDetection {
 public:
+	/**
+	 * Constructor.
+	 */
 	CheckerboardDetection();
+
+	/**
+	 * Deconstructor.
+	 */
 	virtual ~CheckerboardDetection();
 
 	/**

@@ -20,17 +20,45 @@ using namespace std;
 
 namespace kinematic_calibration {
 
-/*
- *
+/**
+ * Helper class to load the model and convert it.
  */
 class ModelLoader {
 public:
+	/**
+	 * Constructor.
+	 */
 	ModelLoader();
+
+	/**
+	 * Deconstructor.
+	 */
 	virtual ~ModelLoader();
-	void getTransformation(string from, string to, double offset);
+
+
+	/**
+	 * Initializes the model by loading the xml string
+	 * from the ROS parameter server.
+	 */
 	bool initializeFromRos();
+
+	/**
+	 * Initializes the model by using the passed xml string.
+	 * @param[in] urdfXml xml string containing the URDF model.
+	 * @return true if successful, otherwise false
+	 */
 	bool initializeFromUrdf(string urdfXml);
+
+	/**
+	 * Returns the model as KDL tree.
+	 * @param[out] kdlTree the model as KDL tree.
+	 */
 	void getKdlTree(KDL::Tree& kdlTree);
+
+	/**
+	 * Returns the model as URDF model.
+	 * @param[out] model the model as URDF model.
+	 */
 	void getUrdfModel(urdf::Model& model);
 
 protected:

@@ -56,6 +56,9 @@ public:
 	}
 
 private:
+	/**
+	 * Camera model to be used.
+	 */
 	image_geometry::PinholeCameraModel cameraModel;
 };
 

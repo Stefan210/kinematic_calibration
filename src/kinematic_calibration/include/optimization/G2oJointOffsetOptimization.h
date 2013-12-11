@@ -28,7 +28,7 @@ typedef VertexSE3 MarkerTransformationVertex;
 typedef VertexSE3 TransformationVertex;
 
 /**
- * Class that optizes the joint offsets using g2o.
+ * Class that optimizes the joint offsets using g2o.
  */
 class G2oJointOffsetOptimization: public JointOffsetOptimization {
 public:

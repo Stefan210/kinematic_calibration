@@ -23,8 +23,8 @@ namespace kinematic_calibration {
 
 typedef boost::array<double, 9> CameraIntrinsicsType;
 
-/*
- *
+/**
+ * Vertex representing the camera parameters.
  */
 class CameraIntrinsicsVertex: public BaseVertex<4, CameraIntrinsicsType> {
 public:
