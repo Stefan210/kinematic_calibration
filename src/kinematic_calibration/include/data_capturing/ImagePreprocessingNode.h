@@ -14,6 +14,9 @@
 #include <opencv2/core/core.hpp>
 #include <ros/node_handle.h>
 #include <sensor_msgs/Image.h>
+#include <string>
+
+using namespace std;
 
 namespace kinematic_calibration {
 
@@ -30,10 +33,11 @@ protected:
 	unsigned char crop(int value) const;
 
 private:
-	ros::NodeHandle nh;
+	ros::NodeHandle nh, nhPrivate;
 	image_transport::Subscriber sub;
 	image_transport::ImageTransport it;
 	image_transport::Publisher pub;
+	string inTopic, outTopic;
 	bool differenceInitialized;
 	cv::Mat difference;
 

@@ -18,10 +18,11 @@ using namespace std;
 namespace kinematic_calibration {
 
 ImagePreprocessingNode::ImagePreprocessingNode() :
-		it(nh), differenceInitialized(false) {
-	sub = it.subscribe("/nao_camera/image_raw", 1,
-			&ImagePreprocessingNode::imageCb, this);
-	pub = it.advertise("/nao_camera/image_processed", 1);
+		it(nh), differenceInitialized(false), nhPrivate("~") {
+	nhPrivate.getParam("in_topic", inTopic);
+	nhPrivate.getParam("out_topic", outTopic);
+	sub = it.subscribe(inTopic, 1, &ImagePreprocessingNode::imageCb, this);
+	pub = it.advertise(outTopic, 1);
 }
 
 ImagePreprocessingNode::~ImagePreprocessingNode() {
@@ -65,15 +66,15 @@ void ImagePreprocessingNode::imageCb(const sensor_msgs::ImageConstPtr& msg) {
 	differenceMat = difference.clone();
 	for (int i = 0; i < rows; i++) {
 		for (int j = 0; j < cols; j++) {
-			 int b = input_bridge->image.ptr<uchar>(i)[3 * j + 0];
-			 int g = input_bridge->image.ptr<uchar>(i)[3 * j + 1];
-			 int r = input_bridge->image.ptr<uchar>(i)[3 * j + 2];
-			 int bdiff = differenceMat.ptr<uchar>(i)[3 * j + 0];
-			 int gdiff = differenceMat.ptr<uchar>(i)[3 * j + 1];
-			 int rdiff = differenceMat.ptr<uchar>(i)[3 * j + 2];
-			 input_bridge->image.ptr<uchar>(i)[3 * j + 0] = crop(b + bdiff);
-			 input_bridge->image.ptr<uchar>(i)[3 * j + 1] = crop(g + gdiff);
-			 input_bridge->image.ptr<uchar>(i)[3 * j + 2] = crop(r + rdiff);
+			int b = input_bridge->image.ptr<uchar>(i)[3 * j + 0];
+			int g = input_bridge->image.ptr<uchar>(i)[3 * j + 1];
+			int r = input_bridge->image.ptr<uchar>(i)[3 * j + 2];
+			int bdiff = differenceMat.ptr<uchar>(i)[3 * j + 0];
+			int gdiff = differenceMat.ptr<uchar>(i)[3 * j + 1];
+			int rdiff = differenceMat.ptr<uchar>(i)[3 * j + 2];
+			input_bridge->image.ptr<uchar>(i)[3 * j + 0] = crop(b + bdiff);
+			input_bridge->image.ptr<uchar>(i)[3 * j + 1] = crop(g + gdiff);
+			input_bridge->image.ptr<uchar>(i)[3 * j + 2] = crop(r + rdiff);
 		}
 	}
 
