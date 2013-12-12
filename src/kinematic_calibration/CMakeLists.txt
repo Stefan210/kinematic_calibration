@@ -16,6 +16,18 @@ SET(G2O_LIBS cholmod cxsparse -lg2o_cli -lg2o_core
 -lg2o_types_sba -lg2o_types_sclam2d -lg2o_types_sim3 -lg2o_types_slam2d
 -lg2o_types_slam3d)
 
+# Tell CMake where to find "FindNAOqi.cmake"
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+find_package(NAOqi QUIET COMPONENTS
+    alcommon
+    #alproxies
+    alerror
+    alvalue
+    )
+
+find_package(Boost QUIET COMPONENTS program_options signals)
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -239,3 +251,25 @@ target_link_libraries(jointUpdate modelLoader ${catkin_LIBRARIES})
 
 add_executable(jointUpdateNode src/result_publishing/JointUpdateNode.cpp)
 target_link_libraries(jointUpdateNode jointUpdate ${catkin_LIBRARIES})
+
+### Temperature
+if( ${NAOqi_FOUND} ) 
+    message(STATUS "NAOqi C++ SDK found; C++ nodes will be built")
+    include_directories(
+        ${catkin_INCLUDE_DIRS}
+        ${Boost_INCLUDE_DIRS}
+        ${NAOqi_INCLUDE_DIRS})
+
+    add_executable(temperatureNode src/data_capturing/TemperatureNode.cpp)
+    target_link_libraries(temperatureNode
+        ${catkin_LIBRARIES}
+        ${NAOqi_LIBRARIES}
+        ${Boost_LIBRARIES}
+	)
+    add_dependencies(temperatureNode ${catkin_EXPORTED_TARGETS})
+
+#    install(TARGETS temperatureNode
+#        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION} )
+else()
+    message(STATUS "Cannot find NAOqi C++ sdk; C++ nodes will NOT be built")
+endif()
