@@ -219,7 +219,10 @@ add_executable(frameImageConverterMain src/common/FrameImageConverterMain.cpp)
 target_link_libraries(frameImageConverterMain frameImageConverter modelLoader kinematicChain ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 ### DataCapture
-add_library(dataCapture src/data_capturing/DataCapture.cpp)
+add_library(dataCapture 
+	src/data_capturing/DataCapture.cpp
+	src/data_capturing/PauseManager.cpp
+	)
 target_link_libraries(dataCapture checkerboardDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 add_executable(dataCaptureMain src/data_capturing/DataCaptureMain.cpp)
