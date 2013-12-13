@@ -39,9 +39,9 @@ TemperatureNode::TemperatureNode(boost::shared_ptr<AL::ALBroker> broker,
 	functionName("temperatureCallback", getName(), "");
 	BIND_METHOD(TemperatureNode::temperatureCallback);
 
-	serviceClientPause = nh.serviceClient<kinematic_calibration::CmdPauseService>(
+	serviceClientPause = nh.serviceClient<CmdPauseService>(
 			"/kinematic_calibration/data_capture/pause");
-	serviceClientResume = nh.serviceClient<kinematic_calibration::CmdPauseService>(
+	serviceClientResume = nh.serviceClient<CmdPauseService>(
 			"/kinematic_calibration/data_capture/resume");
 }
 
