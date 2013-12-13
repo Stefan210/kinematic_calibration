@@ -25,14 +25,14 @@ PauseManager::~PauseManager() {
 bool PauseManager::pauseCb(CmdPauseService::Request& req,
 		CmdPauseService::Response& res) {
 	this->pauseReasons.insert(req.reason);
-	ROS_INFO("Pause requested for reason %s.", req.reason);
+	ROS_INFO("Pause requested for reason %s.", req.reason.c_str());
 	return true;
 }
 
 bool PauseManager::resumeCb(CmdPauseService::Request& req,
 		CmdPauseService::Response& res) {
 	this->pauseReasons.erase(req.reason);
-	ROS_INFO("Resume requested for reason %s.", req.reason);
+	ROS_INFO("Resume requested for reason %s.", req.reason.c_str());
 	return true;
 }
 
