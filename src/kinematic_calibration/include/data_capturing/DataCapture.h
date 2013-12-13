@@ -8,25 +8,34 @@
 #ifndef DATACAPTURE_H_
 #define DATACAPTURE_H_
 
-#include <ros/ros.h>
-#include <ros/node_handle.h>
-#include <tf/tf.h>
-#include <tf/transform_listener.h>
-#include <cmath>
-#include <vector>
-#include <string>
-#include <trajectory_msgs/JointTrajectoryPoint.h>
 #include <actionlib/client/simple_action_client.h>
-#include <nao_msgs/JointTrajectoryAction.h>
-#include <nao_msgs/JointTrajectoryActionResult.h>
+#include <image_geometry/pinhole_camera_model.h>
+#include <image_transport/image_transport.h>
+#include <image_transport/subscriber.h>
+#include <kinematic_calibration/measurementData.h>
 #include <nao_msgs/BodyPoseAction.h>
 #include <nao_msgs/BodyPoseGoal.h>
+#include <nao_msgs/JointTrajectoryAction.h>
+#include <nao_msgs/JointTrajectoryActionResult.h>
+#include <ros/callback_queue.h>
+#include <ros/node_handle.h>
+#include <ros/publisher.h>
+#include <ros/ros.h>
+#include <ros/subscriber.h>
+#include <ros/time.h>
+#include <sensor_msgs/CameraInfo.h>
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/JointState.h>
+//#include <tf/tf.h>
+#include <tf/transform_listener.h>
 #include <trajectory_msgs/JointTrajectory.h>
-#include <image_transport/image_transport.h>
-#include <image_geometry/pinhole_camera_model.h>
+#include <trajectory_msgs/JointTrajectoryPoint.h>
+#include <cmath>
+#include <string>
+#include <vector>
 
-#include "../../include/data_capturing/CheckerboardDetection.h"
-#include <kinematic_calibration/measurementData.h>
+#include "CheckerboardDetection.h"
+#include "PauseManager.h"
 
 using namespace std;
 
@@ -74,6 +83,7 @@ private:
 	ros::Publisher measurementPub;
 	CheckerboardDetection checkerboardDetection;
 	CheckerboardData checkerboardData;
+	PauseManager pauseManager;
 	bool checkerboardFound;
 	bool receivedJointStates;
 	bool receivedImage;

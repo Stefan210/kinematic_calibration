@@ -156,6 +156,10 @@ void DataCapture::playChainPoses() {
 	enableChainStiffness();
 	const string& prefix = getPosePrefix();
 	for (int i = start; i <= end; i++) {
+		// check for pause requests:
+		// call blocks if pause requested
+		pauseManager.pauseIfRequested();
+
 		// execute next pose
 		char buf[10];
 		sprintf(buf, "%s%03i", prefix.c_str(), i);
