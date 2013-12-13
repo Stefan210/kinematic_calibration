@@ -23,6 +23,8 @@
 #include <iostream>
 #include <string>
 
+#include <kinematic_calibration/CmdPauseService.h>
+
 namespace kinematic_calibration {
 
 TemperatureNode::TemperatureNode(boost::shared_ptr<AL::ALBroker> broker,
@@ -32,8 +34,15 @@ TemperatureNode::TemperatureNode(boost::shared_ptr<AL::ALBroker> broker,
 		ROS_ERROR("Error!");
 		throw std::exception();
 	}
+	setModuleDescription("");
 
+	functionName("temperatureCallback", getName(), "");
 	BIND_METHOD(TemperatureNode::temperatureCallback);
+
+	serviceClientPause = nh.serviceClient<kinematic_calibration::CmdPauseService>(
+			"/kinematic_calibration/data_capture/pause");
+	serviceClientResume = nh.serviceClient<kinematic_calibration::CmdPauseService>(
+			"/kinematic_calibration/data_capture/resume");
 }
 
 TemperatureNode::~TemperatureNode() {
@@ -41,19 +50,32 @@ TemperatureNode::~TemperatureNode() {
 }
 
 void TemperatureNode::run() {
-// TODO
-
 	string eventName = "HotJointDetected";
 	string callbackModule = "TemperatureNode";
 	string callbackMessage = "TemperatureNode";
 	string callbackMethod = "temperatureCallback";
 	this->m_memoryProxy->subscribeToMicroEvent(eventName, callbackModule,
 			callbackMessage, callbackMethod);
+	while (1) {
+		usleep(100 * 1000);
+	}
 }
 
 void TemperatureNode::temperatureCallback(const string& key,
 		const ALValue& value, const ALValue& message) {
-	// TODO
+	// send pause command
+	kinematic_calibration::CmdPauseService pause;
+	pause.request.reason = string("temperature");
+	serviceClientPause.call(pause.request, pause.response);
+
+	// sleep for a while
+	// TODO: parameterize!
+	usleep(60 * 1e6);
+
+	// send resume command
+	kinematic_calibration::CmdPauseService resume;
+	resume.request.reason = string("temperature");
+	serviceClientResume.call(resume.request, resume.response);
 }
 
 bool TemperatureNode::connectProxy() {
@@ -80,10 +102,10 @@ using namespace kinematic_calibration;
 bool connectNaoQi();
 void parse_command_line(int argc, char ** argv);
 
-std::string m_pip;
-std::string m_ip;
-int m_port;
-int m_pport;
+std::string m_pip("127.0.0.01");
+std::string m_ip("0.0.0.0");
+int m_port = 16712;
+int m_pport = 9559;
 std::string m_brokerName;
 boost::shared_ptr<AL::ALBroker> m_broker;
 
@@ -140,10 +162,10 @@ bool connectNaoQi() {
 
 int main(int argc, char** argv) {
 	ros::init(argc, argv, "TemperatureNode");
-// TODO
 	m_brokerName = "TemperatureNodeBroker";
 	parse_command_line(argc, argv);
 	connectNaoQi();
 	TemperatureNode node(m_broker, m_brokerName);
+	node.run();
 	return 0;
 }

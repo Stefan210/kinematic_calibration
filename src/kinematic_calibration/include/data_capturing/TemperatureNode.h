@@ -36,12 +36,15 @@ public:
 	void run();
 
 protected:
-
 	boost::shared_ptr<AL::ALBroker> m_broker;
 	boost::shared_ptr<AL::ALMemoryProxy> m_memoryProxy;
 
 private:
 	ALMemoryProxy memoryProxy;
+
+	NodeHandle nh;
+	ServiceClient serviceClientPause;
+	ServiceClient serviceClientResume;
 };
 
 } /* namespace kinematic_calibration */
