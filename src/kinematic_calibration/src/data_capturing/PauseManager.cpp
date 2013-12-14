@@ -10,9 +10,15 @@
 namespace kinematic_calibration {
 
 PauseManager::PauseManager() {
+	// set callback queue
+	nh.setCallbackQueue(&this->callbackQueue);
+
+	// advertise pause service
 	pauseService = nh.advertiseService(
 			string("/kinematic_calibration/data_capture/pause"),
 			&PauseManager::pauseCb, this);
+
+	// advertise resume service
 	resumeService = nh.advertiseService(
 			string("kinematic_calibration/data_capture/resume"),
 			&PauseManager::resumeCb, this);
@@ -37,9 +43,13 @@ bool PauseManager::resumeCb(CmdPauseService::Request& req,
 }
 
 void PauseManager::pauseIfRequested() {
+	// check for incoming requests
+	this->callbackQueue.callAvailable();
+
+	// pause until resume requested.
 	while(!this->pauseReasons.empty()) {
 		usleep(0.1 * 1e-6);
-		ros::spinOnce();
+		this->callbackQueue.callAvailable();
 	}
 }
 

@@ -9,6 +9,7 @@
 #define PAUSEMANAGER_H_
 
 #include <kinematic_calibration/CmdPauseService.h>
+#include <ros/callback_queue.h>
 #include <ros/node_handle.h>
 #include <ros/service_server.h>
 #include <set>
@@ -46,6 +47,7 @@ protected:
 
 private:
 	NodeHandle nh;
+	CallbackQueue callbackQueue;
 	ServiceServer pauseService;
 	ServiceServer resumeService;
 	set<string> pauseReasons;
