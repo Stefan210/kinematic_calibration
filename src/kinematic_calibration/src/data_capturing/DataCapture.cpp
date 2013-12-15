@@ -158,7 +158,12 @@ void DataCapture::playChainPoses() {
 	for (int i = start; i <= end; i++) {
 		// check for pause requests:
 		// call blocks if pause requested
-		pauseManager.pauseIfRequested();
+		if(pauseManager.pauseRequested()) {
+			disableChainStiffness();
+			pauseManager.pauseIfRequested();
+			enableChainStiffness();
+		}
+
 
 		// execute next pose
 		char buf[10];
