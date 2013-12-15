@@ -41,6 +41,12 @@ public:
 	 */
 	void pauseIfRequested();
 
+	/**
+	 * Checks whether pause is requested
+	 * @return true if pause is requested, false otherwise
+	 */
+	bool pauseRequested();
+
 protected:
 	bool pauseCb(CmdPauseService::Request& req, CmdPauseService::Response& res);
 	bool resumeCb(CmdPauseService::Request& req, CmdPauseService::Response& res);

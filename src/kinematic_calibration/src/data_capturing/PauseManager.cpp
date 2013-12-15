@@ -42,14 +42,16 @@ bool PauseManager::resumeCb(CmdPauseService::Request& req,
 	return true;
 }
 
-void PauseManager::pauseIfRequested() {
+bool PauseManager::pauseRequested() {
 	// check for incoming requests
 	this->callbackQueue.callAvailable();
+	return this->pauseReasons.empty();
+}
 
+void PauseManager::pauseIfRequested() {
 	// pause until resume requested.
-	while(!this->pauseReasons.empty()) {
+	while(pauseRequested()) {
 		usleep(0.1 * 1e-6);
-		this->callbackQueue.callAvailable();
 	}
 }
 
