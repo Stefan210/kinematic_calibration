@@ -13,6 +13,8 @@
 #include <map>
 #include <string>
 #include <vector>
+#include "gtest/gtest_prod.h"
+
 
 using namespace std;
 
@@ -24,22 +26,24 @@ namespace kinematic_calibration {
 class JointUpdate {
 
 public:
-	JointUpdate(urdf::Model model, string prefix);
+	JointUpdate(urdf::Model model);
 	virtual ~JointUpdate();
-
-	void setOffsets(map<string, double> offsets);
-
-	void getModifiedJoints(vector<urdf::Joint>& joints);
-
-	void writeCalibrationData(const string& filename);
 
 	void writeCalibrationData(const map<string, double> offsets,
 			const string& filename);
 
+	FRIEND_TEST(JointUpdateTest, writeCalibrationDataTest1);
+
+protected:
+	void setOffsets(map<string, double> offsets);
+	void getModifiedJoints(vector<urdf::Joint>& joints);
+	void writeCalibrationData(const string& filename);
+	void readOldCalibrationData(const string& filename);
+
 private:
 	urdf::Model model;
 	map<string, double> offsets;
-	string prefix;
+	map<string, double> calibrationParameters;
 };
 
 } /* namespace kinematic_calibration */
