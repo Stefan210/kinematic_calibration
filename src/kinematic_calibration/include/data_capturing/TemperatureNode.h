@@ -48,6 +48,7 @@ private:
 	string hotJointFoundTopic;
 
 	NodeHandle nh;
+	NodeHandle nhPrivate;
 	Publisher pub;
 };
 

@@ -26,13 +26,15 @@ namespace kinematic_calibration {
 
 TemperatureNode::TemperatureNode(boost::shared_ptr<AL::ALBroker> broker,
 		const std::string& name) :
-		AL::ALModule(broker, name), m_broker(broker) {
+		AL::ALModule(broker, name), m_broker(broker), nhPrivate("~") {
 	if (!connectProxy()) {
 		ROS_ERROR("Error!");
 		throw std::exception();
 	}
 
+	if(!nhPrivate.getParam("hotjoint_topic", hotJointFoundTopic)) {
 	hotJointFoundTopic = "nao_temperature/hot_joint_found";
+	}
 	pub = nh.advertise<std_msgs::Bool>(hotJointFoundTopic, 1);
 
 	dataNamesList.push_back(

@@ -50,7 +50,7 @@ DataCapture::DataCapture() :
 	nhPrivate.getParam("params/headPitch_min", headPitchMin);
 	nhPrivate.getParam("params/headPitch_max", headPitchMax);
 	nhPrivate.getParam("params/headPitch_step", headPitchStep);
-	nhPrivate.getParam("params/image_opic", imageTopic);
+	nhPrivate.getParam("params/image_topic", imageTopic);
 
 	// get camera information
 	camerainfoSub = nh.subscribe("/nao_camera/camera_info", 1,

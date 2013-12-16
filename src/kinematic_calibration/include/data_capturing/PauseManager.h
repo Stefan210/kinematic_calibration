@@ -56,10 +56,12 @@ protected:
 
 private:
 	NodeHandle nh;
+	NodeHandle nhPrivate;
 	CallbackQueue callbackQueue;
 	ServiceServer pauseService;
 	ServiceServer resumeService;
 	Subscriber temperatureSubscriber;
+	string hotJointTopic;
 	set<string> pauseReasons;
 };
 

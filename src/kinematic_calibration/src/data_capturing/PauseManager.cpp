@@ -14,7 +14,7 @@
 
 namespace kinematic_calibration {
 
-PauseManager::PauseManager() {
+PauseManager::PauseManager() : nhPrivate("~") {
 	// set callback queue
 	nh.setCallbackQueue(&this->callbackQueue);
 
@@ -27,6 +27,11 @@ PauseManager::PauseManager() {
 	resumeService = nh.advertiseService(
 			string("kinematic_calibration/data_capture/resume"),
 			&PauseManager::resumeCb, this);
+
+	// get the topic name for publishing
+	if(!nhPrivate.getParam("hotjoint_topic", hotJointTopic)) {
+		hotJointTopic = "/nao_temperature/hot_joint_fount";
+	}
 
 	// subsscribe to temperature topic
 	string hotJointFoundTopic = "nao_temperature/hot_joint_found";
