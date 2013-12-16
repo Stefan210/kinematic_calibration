@@ -41,17 +41,14 @@ protected:
 	boost::shared_ptr<AL::ALBroker> m_broker;
 	boost::shared_ptr<AL::ALMemoryProxy> m_memoryProxy;
 	boost::shared_ptr<AL::ALMotionProxy> m_motionProxy;
-	void sendPauseRequest();
-	void sendResumeRequest();
+	void publishHotSensorFound(bool found);
 
 private:
-	//ALMemoryProxy memoryProxy;
-	//ALMotionProxy motionProxy;
 	vector<string> dataNamesList;
+	string hotJointFoundTopic;
 
 	NodeHandle nh;
-	ServiceClient serviceClientPause;
-	ServiceClient serviceClientResume;
+	Publisher pub;
 };
 
 } /* namespace kinematic_calibration */

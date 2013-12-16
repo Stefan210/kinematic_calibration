@@ -7,6 +7,11 @@
 
 #include "../../include/data_capturing/PauseManager.h"
 
+#include <kinematic_calibration/CmdPauseServiceRequest.h>
+#include <ros/console.h>
+#include <rosconsole/macros_generated.h>
+#include <unistd.h>
+
 namespace kinematic_calibration {
 
 PauseManager::PauseManager() {
@@ -22,6 +27,10 @@ PauseManager::PauseManager() {
 	resumeService = nh.advertiseService(
 			string("kinematic_calibration/data_capture/resume"),
 			&PauseManager::resumeCb, this);
+
+	// subsscribe to temperature topic
+	string hotJointFoundTopic = "nao_temperature/hot_joint_found";
+	temperatureSubscriber = nh.subscribe(hotJointFoundTopic, 1, &PauseManager::temperatureCb, this);
 }
 
 PauseManager::~PauseManager() {
@@ -40,6 +49,16 @@ bool PauseManager::resumeCb(CmdPauseService::Request& req,
 	this->pauseReasons.erase(req.reason);
 	ROS_INFO("Resume requested for reason %s.", req.reason.c_str());
 	return true;
+}
+
+void PauseManager::temperatureCb(std_msgs::BoolConstPtr msg) {
+	if(msg->data) { // hot joint was detected
+		ROS_INFO("Hot joint was detected.");
+		this->pauseReasons.insert("temperature");
+	} else { // all joints' temperatures are ok
+		ROS_INFO("All joints' temperatures are ok.");
+		this->pauseReasons.erase("temperature");
+	}
 }
 
 bool PauseManager::pauseRequested() {

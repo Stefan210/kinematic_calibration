@@ -12,6 +12,8 @@
 #include <ros/callback_queue.h>
 #include <ros/node_handle.h>
 #include <ros/service_server.h>
+#include <ros/subscriber.h>
+#include <std_msgs/Bool.h>
 #include <set>
 #include <string>
 
@@ -50,12 +52,14 @@ public:
 protected:
 	bool pauseCb(CmdPauseService::Request& req, CmdPauseService::Response& res);
 	bool resumeCb(CmdPauseService::Request& req, CmdPauseService::Response& res);
+	void temperatureCb(std_msgs::BoolConstPtr msg);
 
 private:
 	NodeHandle nh;
 	CallbackQueue callbackQueue;
 	ServiceServer pauseService;
 	ServiceServer resumeService;
+	Subscriber temperatureSubscriber;
 	set<string> pauseReasons;
 };
 

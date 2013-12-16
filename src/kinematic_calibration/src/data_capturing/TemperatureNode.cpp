@@ -7,23 +7,20 @@
 
 #include "../../include/data_capturing/TemperatureNode.h"
 
-#include <alcommon/albroker.h>
 #include <alerror/alerror.h>
-#include <alvalue/alvalue.h>
-#include <alcommon/almodule.h>
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/value_semantic.hpp>
 #include <boost/program_options/variables_map.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
 #include <ros/console.h>
 #include <ros/init.h>
+#include <ros/publisher.h>
 #include <rosconsole/macros_generated.h>
+#include <std_msgs/Bool.h>
+#include <unistd.h>
 #include <clocale>
 #include <iostream>
-#include <string>
-
-#include <kinematic_calibration/CmdPauseService.h>
+#include <vector>
 
 namespace kinematic_calibration {
 
@@ -35,10 +32,8 @@ TemperatureNode::TemperatureNode(boost::shared_ptr<AL::ALBroker> broker,
 		throw std::exception();
 	}
 
-	serviceClientPause = nh.serviceClient<CmdPauseService>(
-			"/kinematic_calibration/data_capture/pause");
-	serviceClientResume = nh.serviceClient<CmdPauseService>(
-			"/kinematic_calibration/data_capture/resume");
+	hotJointFoundTopic = "nao_temperature/hot_joint_found";
+	pub = nh.advertise<std_msgs::Bool>(hotJointFoundTopic, 1);
 
 	dataNamesList.push_back(
 			"Device/SubDeviceList/Battery/Temperature/Sensor/Value");
@@ -123,13 +118,13 @@ void TemperatureNode::run() {
 					memData[i]);
 			if (memData[i] > criticalUpperTemperature) {
 				hotJointFound = true;
-				sendPauseRequest();
+				publishHotSensorFound(true);
 				break;
 			}
 		}
 
 		if (!hotJointFound) {
-			sendResumeRequest();
+			publishHotSensorFound(false);
 		}
 
 		usleep(1000 * 1000);
@@ -153,18 +148,11 @@ bool TemperatureNode::connectProxy() {
 	return true;
 }
 
-void TemperatureNode::sendPauseRequest() {
-	// send pause command
-	kinematic_calibration::CmdPauseService pause;
-	pause.request.reason = string("temperature");
-	serviceClientPause.call(pause.request, pause.response);
-}
-
-void TemperatureNode::sendResumeRequest() {
-	// send resume command
-	kinematic_calibration::CmdPauseService resume;
-	resume.request.reason = string("temperature");
-	serviceClientResume.call(resume.request, resume.response);
+void TemperatureNode::publishHotSensorFound(bool found) {
+	// publish whether a hot joint was found
+	std_msgs::Bool msg;
+	msg.data = found;
+	pub.publish(msg);
 }
 
 } /* namespace kinematic_calibration */
