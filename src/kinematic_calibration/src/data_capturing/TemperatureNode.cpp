@@ -102,7 +102,7 @@ void TemperatureNode::run() {
 
 	bool hotJointFound = false;
 
-	while (1) {
+	while (ros::ok()) {
 		memData = m_memoryProxy->getListData(memDataNames);
 		hotJointFound = false;
 
@@ -116,6 +116,9 @@ void TemperatureNode::run() {
 		for (int i = 0; i < memData.size(); i++) {
 			ROS_INFO("joint: %s, temperature: %f", dataNamesList[i].c_str(),
 					memData[i]);
+		}
+
+		for (int i = 0; i < memData.size(); i++) {
 			if (memData[i] > criticalUpperTemperature) {
 				hotJointFound = true;
 				publishHotSensorFound(true);
@@ -149,6 +152,8 @@ bool TemperatureNode::connectProxy() {
 }
 
 void TemperatureNode::publishHotSensorFound(bool found) {
+	ROS_INFO("Publish hotSensorFoundMessage: %s", found ? "true" : "false");
+
 	// publish whether a hot joint was found
 	std_msgs::Bool msg;
 	msg.data = found;
