@@ -8,9 +8,15 @@
 #ifndef TEMPERATURENODE_H_
 #define TEMPERATURENODE_H_
 
-#include <alproxies/almemoryproxy.h>
+#include <alcommon/albroker.h>
 #include <alcommon/almodule.h>
+#include <alproxies/almemoryproxy.h>
+#include <alvalue/alvalue.h>
+#include <boost/smart_ptr/shared_ptr.hpp>
+#include <ros/node_handle.h>
 #include <ros/ros.h>
+#include <ros/service_client.h>
+#include <string>
 
 using namespace AL;
 using namespace ros;
@@ -27,10 +33,6 @@ public:
 			const std::string& name);
 	virtual ~TemperatureNode();
 
-	void temperatureCallback(const string &key, const ALValue &value,
-			const ALValue &message);
-
-
 	bool connectProxy();
 
 	void run();
@@ -38,9 +40,14 @@ public:
 protected:
 	boost::shared_ptr<AL::ALBroker> m_broker;
 	boost::shared_ptr<AL::ALMemoryProxy> m_memoryProxy;
+	boost::shared_ptr<AL::ALMotionProxy> m_motionProxy;
+	void sendPauseRequest();
+	void sendResumeRequest();
 
 private:
-	ALMemoryProxy memoryProxy;
+	//ALMemoryProxy memoryProxy;
+	//ALMotionProxy motionProxy;
+	vector<string> dataNamesList;
 
 	NodeHandle nh;
 	ServiceClient serviceClientPause;

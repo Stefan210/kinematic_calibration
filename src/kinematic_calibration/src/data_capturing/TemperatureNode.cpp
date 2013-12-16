@@ -34,15 +34,64 @@ TemperatureNode::TemperatureNode(boost::shared_ptr<AL::ALBroker> broker,
 		ROS_ERROR("Error!");
 		throw std::exception();
 	}
-	setModuleDescription("");
-
-	functionName("temperatureCallback", getName(), "");
-	BIND_METHOD(TemperatureNode::temperatureCallback);
 
 	serviceClientPause = nh.serviceClient<CmdPauseService>(
 			"/kinematic_calibration/data_capture/pause");
 	serviceClientResume = nh.serviceClient<CmdPauseService>(
 			"/kinematic_calibration/data_capture/resume");
+
+	dataNamesList.push_back(
+			"Device/SubDeviceList/Battery/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/HeadPitch/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/HeadYaw/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/LAnklePitch/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/LAnkleRoll/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/LElbowRoll/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/LElbowYaw/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/LHand/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/LHipPitch/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/LHipRoll/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/LHipYawPitch/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/LKneePitch/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/LShoulderPitch/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/LShoulderRoll/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/LWristYaw/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/RAnklePitch/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/RAnkleRoll/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/RElbowRoll/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/RElbowYaw/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/RHand/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/RHipPitch/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/RHipRoll/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/RKneePitch/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/RShoulderPitch/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/RShoulderRoll/Temperature/Sensor/Value");
+	dataNamesList.push_back(
+			"Device/SubDeviceList/RWristYaw/Temperature/Sensor/Value");
 }
 
 TemperatureNode::~TemperatureNode() {
@@ -50,32 +99,39 @@ TemperatureNode::~TemperatureNode() {
 }
 
 void TemperatureNode::run() {
-	string eventName = "HotJointDetected";
-	string callbackModule = "TemperatureNode";
-	string callbackMessage = "TemperatureNode";
-	string callbackMethod = "temperatureCallback";
-	this->m_memoryProxy->subscribeToMicroEvent(eventName, callbackModule,
-			callbackMessage, callbackMethod);
+	vector<float> memData;
+	ALValue memDataNames(dataNamesList);
+
+	// TODO: parameterize
+	const float criticalTemp = 75.0;
+
+	bool hotJointFound = false;
+
 	while (1) {
-		usleep(100 * 1000);
+		memData = m_memoryProxy->getListData(memDataNames);
+		hotJointFound = false;
+
+		if (memData.size() != memDataNames.getSize()) {
+			ROS_ERROR("memData length %zu does not match expected length %u",
+					memData.size(), memDataNames.getSize());
+			continue;
+		}
+
+		ROS_INFO("Current Temperatures:");
+		for(int i = 0; i < memData.size(); i++) {
+			ROS_INFO("joint: %s, temperature: %d", dataNamesList[i].c_str(), memData[i]);
+			if(memData[i] > criticalTemp) {
+				hotJointFound = true;
+				sendPauseRequest();
+			}
+		}
+
+		if(!hotJointFound) {
+			sendResumeRequest();
+		}
+
+		usleep(1000 * 1000);
 	}
-}
-
-void TemperatureNode::temperatureCallback(const string& key,
-		const ALValue& value, const ALValue& message) {
-	// send pause command
-	kinematic_calibration::CmdPauseService pause;
-	pause.request.reason = string("temperature");
-	serviceClientPause.call(pause.request, pause.response);
-
-	// sleep for a while
-	// TODO: parameterize!
-	usleep(60 * 1e6);
-
-	// send resume command
-	kinematic_calibration::CmdPauseService resume;
-	resume.request.reason = string("temperature");
-	serviceClientResume.call(resume.request, resume.response);
 }
 
 bool TemperatureNode::connectProxy() {
@@ -93,6 +149,20 @@ bool TemperatureNode::connectProxy() {
 	}
 	ROS_INFO("Proxy to ALMemory ready.");
 	return true;
+}
+
+void TemperatureNode::sendPauseRequest() {
+	// send pause command
+	kinematic_calibration::CmdPauseService pause;
+	pause.request.reason = string("temperature");
+	serviceClientPause.call(pause.request, pause.response);
+}
+
+void TemperatureNode::sendResumeRequest() {
+	// send resume command
+	kinematic_calibration::CmdPauseService resume;
+	resume.request.reason = string("temperature");
+	serviceClientResume.call(resume.request, resume.response);
 }
 
 } /* namespace kinematic_calibration */
