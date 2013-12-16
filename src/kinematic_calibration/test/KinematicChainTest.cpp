@@ -5,8 +5,8 @@
  *      Author: stefan
  */
 
-#include "../include/KinematicChain.h"
-#include "../include/ModelLoader.h"
+#include "../include/common/KinematicChain.h"
+#include "../include/common/ModelLoader.h"
 
 #include <gtest/gtest.h>
 #include <fstream>
@@ -50,7 +50,7 @@ TEST(KinematicChainTest, getTransformTest1) {
 	tf::Matrix3x3(transform.getRotation()).getRPY(r, p, y);
 
 	// assert
-	ASSERT_DOUBLE_EQ(0.2, p);
+	ASSERT_DOUBLE_EQ(-0.2, p);
 }
 
 TEST(KinematicChainTest, getJointNamesTest) {

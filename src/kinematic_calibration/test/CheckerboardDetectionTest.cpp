@@ -5,10 +5,12 @@
  *      Author: stefan
  */
 
-#include "../include/CheckerboardDetection.h"
+#include "../include/data_capturing/CheckerboardDetection.h"
 
-// gtest specific includes
 #include <gtest/gtest.h>
+#include <opencv2/core/core.hpp>
+#include <cmath>
+#include <iostream>
 
 #define FILENAME "board_4x4.ppm"
 

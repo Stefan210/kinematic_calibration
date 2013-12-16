@@ -5,7 +5,7 @@
  *      Author: stefan
  */
 
-#include "../include/ModelLoader.h"
+#include "../include/common/ModelLoader.h"
 
 #include <gtest/gtest.h>
 #include <fstream>
