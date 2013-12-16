@@ -103,7 +103,7 @@ void TemperatureNode::run() {
 	ALValue memDataNames(dataNamesList);
 
 	// TODO: parameterize
-	const float criticalTemp = 75.0;
+	const float criticalUpperTemperature = 75.0;
 
 	bool hotJointFound = false;
 
@@ -118,15 +118,17 @@ void TemperatureNode::run() {
 		}
 
 		ROS_INFO("Current Temperatures:");
-		for(int i = 0; i < memData.size(); i++) {
-			ROS_INFO("joint: %s, temperature: %d", dataNamesList[i].c_str(), memData[i]);
-			if(memData[i] > criticalTemp) {
+		for (int i = 0; i < memData.size(); i++) {
+			ROS_INFO("joint: %s, temperature: %f", dataNamesList[i].c_str(),
+					memData[i]);
+			if (memData[i] > criticalUpperTemperature) {
 				hotJointFound = true;
 				sendPauseRequest();
+				break;
 			}
 		}
 
-		if(!hotJointFound) {
+		if (!hotJointFound) {
 			sendResumeRequest();
 		}
 
