@@ -61,10 +61,10 @@ void JointUpdate::getModifiedJoints(vector<urdf::Joint>& joints) {
 
 void JointUpdate::readOldCalibrationData(const string& filename) {
 	// check whether an old file exists at all
-	ifstream f(filename.c_str());
+	ifstream fi(filename.c_str());
 
 	// if not, there is nothing to do
-	if (false == f.good())
+	if (false == fi.good())
 		return;
 
 	// otherwise parse the file and save the contents
