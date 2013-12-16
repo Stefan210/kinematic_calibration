@@ -255,6 +255,9 @@ target_link_libraries(jointUpdate modelLoader ${catkin_LIBRARIES})
 add_executable(jointUpdateNode src/result_publishing/JointUpdateNode.cpp)
 target_link_libraries(jointUpdateNode jointUpdate ${catkin_LIBRARIES})
 
+catkin_add_gtest(jointUpdateTest test/JointUpdateTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
+target_link_libraries(jointUpdateTest jointUpdate modelLoader ${catkin_LIBRARIES})
+
 ### Temperature
 if( ${NAOqi_FOUND} ) 
     message(STATUS "NAOqi C++ SDK found; C++ nodes will be built")

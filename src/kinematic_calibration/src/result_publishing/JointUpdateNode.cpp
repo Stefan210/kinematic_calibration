@@ -22,17 +22,15 @@ using namespace ros;
 using namespace std;
 
 void resultCb(const calibrationResultConstPtr& msg);
-string prefix;
-string filename;
+string jointOffsetsFilename;
 
 int main(int argc, char** argv) {
 	init(argc, argv, "JointUpdateNode");
 
 	// TODO: Parameterize!
-	filename = "calibration_result.xacro";
+	jointOffsetsFilename = "calibration_joint_offsets.xacro";
 
 	NodeHandle nh;
-	nh.getParam("chain_name", prefix);
 	Subscriber sub = nh.subscribe("/kinematic_calibration/calibration_result",
 			1, resultCb);
 	spin();
@@ -51,7 +49,7 @@ void resultCb(const calibrationResultConstPtr& msg) {
 		offsets[msg->jointNames[i]] = msg->jointOffsets[i];
 	}
 
-	JointUpdate ju(model, prefix);
-	ju.writeCalibrationData(offsets, filename);
+	JointUpdate ju(model);
+	ju.writeCalibrationData(offsets, jointOffsetsFilename);
 }
 
