@@ -14,4 +14,4 @@ geometry_msgs/Transform cameraTransform
 
 # intrinsic camera parameters for the raw (distorted) images.
 # K = (fx, fy, cx, cy)
-float64[9]  K
+float64[]  K

@@ -13,6 +13,7 @@
 #include <kinematic_calibration/measurementData.h>
 #include <ros/node_handle.h>
 #include <ros/subscriber.h>
+#include <ros/publisher.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <string>
 #include <vector>
@@ -54,6 +55,8 @@ protected:
 
 	void printPoints();
 
+	void publishResults();
+
 	void measurementCb(const measurementDataConstPtr& msg);
 	void camerainfoCallback(const sensor_msgs::CameraInfoConstPtr& msg);
 
@@ -61,6 +64,7 @@ private:
 	NodeHandle nh;
 	Subscriber measurementSubsriber;
 	Subscriber cameraInfoSubscriber;
+	Publisher resultPublisher;
 
 	vector<measurementData> measurements;
 	image_geometry::PinholeCameraModel cameraModel;

@@ -8,6 +8,8 @@
 #include "../../include/optimization/OptimizationNode.h"
 
 #include <boost/smart_ptr/shared_ptr.hpp>
+#include <geometry_msgs/Transform.h>
+#include <kinematic_calibration/calibrationResult.h>
 #include <ros/console.h>
 #include <ros/init.h>
 #include <rosconsole/macros_generated.h>
@@ -15,13 +17,15 @@
 #include <tf/LinearMath/Quaternion.h>
 #include <tf/LinearMath/Transform.h>
 #include <tf/LinearMath/Vector3.h>
+#include <tf/transform_datatypes.h>
 #include <cmath>
 #include <iostream>
 #include <map>
 #include <utility>
 
 #include "../../include/common/FrameImageConverter.h"
-#include "../../include/common/KinematicChain.h"
+//#include "../../include/common/KinematicChain.h"
+#include "../../include/optimization/CameraIntrinsicsVertex.h"
 #include "../../include/optimization/G2oJointOffsetOptimization.h"
 
 namespace kinematic_calibration {
@@ -33,6 +37,9 @@ OptimizationNode::OptimizationNode() :
 			&OptimizationNode::measurementCb, this);
 	cameraInfoSubscriber = nh.subscribe("/nao_camera/camera_info", 1,
 			&OptimizationNode::camerainfoCallback, this);
+
+	resultPublisher = nh.advertise<kinematic_calibration::calibrationResult>(
+			"/kinematic_calibration/calibration_result", 1);
 
 	// instantiate the model loader
 	modelLoader.initializeFromRos();
@@ -51,6 +58,7 @@ void OptimizationNode::startLoop() {
 	ROS_INFO("Publishing results...");
 	printPoints();
 	printResult();
+	publishResults();
 }
 
 void OptimizationNode::collectData() {
@@ -171,6 +179,41 @@ void OptimizationNode::printPoints() {
 		cout << "\tdist: " << dist;
 		cout << "\n";
 	}
+}
+
+void OptimizationNode::publishResults() {
+	kinematic_calibration::calibrationResult msg;
+
+	// joint offsets
+	for (map<string, double>::iterator it = result.jointOffsets.begin();
+			it != result.jointOffsets.end(); it++) {
+		msg.jointNames.push_back(it->first);
+		msg.jointOffsets.push_back(it->second);
+	}
+
+	// chain names and marker transformations
+	for (map<string, tf::Transform>::iterator it =
+			result.markerTransformations.begin();
+			it != result.markerTransformations.end(); it++) {
+		msg.chainNames.push_back(it->first);
+		geometry_msgs::Transform transform;
+		tf::transformTFToMsg(it->second, transform);
+		msg.endeffectorToMarker.push_back(transform);
+	}
+
+	// camera intrinsics
+	msg.K.push_back(result.cameraK[K_FX_IDX]);
+	msg.K.push_back(result.cameraK[K_FY_IDX]);
+	msg.K.push_back(result.cameraK[K_CX_IDX]);
+	msg.K.push_back(result.cameraK[K_CY_IDX]);
+
+	// camera transform
+	geometry_msgs::Transform cameraTransform;
+	tf::transformTFToMsg(result.cameraToHeadTransformation, cameraTransform);
+	msg.cameraTransform = cameraTransform;
+
+	// publish result
+	resultPublisher.publish(msg);
 }
 
 void OptimizationNode::measurementCb(const measurementDataConstPtr& msg) {
