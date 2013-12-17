@@ -9,7 +9,7 @@ float64[] jointOffsets
 string[] chainNames
 geometry_msgs/Transform[] endeffectorToMarker
 
-# transform from HeadPitch_link to CameraBottom_frame
+# delta for transform from HeadPitch_link to CameraBottom_frame
 geometry_msgs/Transform cameraTransform
 
 # intrinsic camera parameters for the raw (distorted) images.

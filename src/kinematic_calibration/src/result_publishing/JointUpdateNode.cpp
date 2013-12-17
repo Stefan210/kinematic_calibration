@@ -9,12 +9,15 @@
 #include <ros/init.h>
 #include <ros/node_handle.h>
 #include <ros/subscriber.h>
+#include <tf/LinearMath/Transform.h>
+#include <tf/transform_datatypes.h>
 #include <urdf/model.h>
 #include <map>
 #include <string>
 #include <vector>
 
 #include "../../include/common/ModelLoader.h"
+#include "../../include/result_publishing/CameraTransformUpdate.h"
 #include "../../include/result_publishing/JointUpdate.h"
 
 using namespace kinematic_calibration;
@@ -23,12 +26,14 @@ using namespace std;
 
 void resultCb(const calibrationResultConstPtr& msg);
 string jointOffsetsFilename;
+string cameraTransformFilename;
 
 int main(int argc, char** argv) {
 	init(argc, argv, "JointUpdateNode");
 
 	// TODO: Parameterize!
 	jointOffsetsFilename = "calibration_joint_offsets.xacro";
+	cameraTransformFilename = "calibration_camera_transform.xacro";
 
 	NodeHandle nh;
 	Subscriber sub = nh.subscribe("/kinematic_calibration/calibration_result",
@@ -51,5 +56,11 @@ void resultCb(const calibrationResultConstPtr& msg) {
 
 	JointUpdate ju(model);
 	ju.writeCalibrationData(offsets, jointOffsetsFilename);
+
+	tf::Transform transform;
+	tf::transformMsgToTF(msg->cameraTransform, transform);
+
+	CameraTransformUpdate ctu;
+	ctu.writeCalibrationData(transform, cameraTransformFilename);
 }
 

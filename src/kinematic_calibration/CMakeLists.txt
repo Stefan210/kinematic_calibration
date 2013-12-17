@@ -252,7 +252,7 @@ target_link_libraries(optimizationNode
 add_library(jointUpdate src/result_publishing/JointUpdate.cpp)
 target_link_libraries(jointUpdate modelLoader ${catkin_LIBRARIES})
 
-add_executable(jointUpdateNode src/result_publishing/JointUpdateNode.cpp)
+add_executable(jointUpdateNode src/result_publishing/JointUpdateNode.cpp src/result_publishing/CameraTransformUpdate.cpp)
 target_link_libraries(jointUpdateNode jointUpdate ${catkin_LIBRARIES})
 
 catkin_add_gtest(jointUpdateTest test/JointUpdateTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)

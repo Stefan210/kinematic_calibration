@@ -209,7 +209,8 @@ void OptimizationNode::publishResults() {
 
 	// camera transform
 	geometry_msgs::Transform cameraTransform;
-	tf::transformTFToMsg(result.cameraToHeadTransformation, cameraTransform);
+	tf::transformTFToMsg(result.cameraToHeadTransformation.inverse(),
+			cameraTransform);
 	msg.cameraTransform = cameraTransform;
 
 	// publish result
