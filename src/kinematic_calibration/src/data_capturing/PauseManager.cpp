@@ -69,7 +69,7 @@ void PauseManager::temperatureCb(std_msgs::BoolConstPtr msg) {
 bool PauseManager::pauseRequested() {
 	// check for incoming requests
 	this->callbackQueue.callAvailable();
-	return this->pauseReasons.empty();
+	return !this->pauseReasons.empty();
 }
 
 void PauseManager::pauseIfRequested() {
