@@ -126,7 +126,8 @@ void DataCapture::disableChainStiffness() {
 void DataCapture::setStiffness(const vector<string>& jointNames,
 		double stiffness) {
 	trajectory_msgs::JointTrajectoryPoint point;
-	point.time_from_start.sec = 1;
+    point.time_from_start.sec = 1;
+    point.time_from_start.nsec = 0;
 
 	for (unsigned int i = 0; i < jointNames.size(); i++) {
 		point.positions.push_back(stiffness);
@@ -573,8 +574,8 @@ void DataCapture::updateJointStatesRobust() {
 void DataCapture::setHeadPose(double headYaw, double headPitch, bool relative,
 		vector<string> additionalJoints, vector<double> additionalPositions) {
 	trajectory_msgs::JointTrajectoryPoint point;
-	point.time_from_start.sec = 1;
-	point.time_from_start.nsec = 0;
+    point.time_from_start.sec = 0;
+    point.time_from_start.nsec = 600 * 1000 * 1000;
 	point.positions.push_back(headYaw);
 	point.positions.push_back(headPitch);
 	point.positions.insert(point.positions.end(), additionalPositions.begin(),
