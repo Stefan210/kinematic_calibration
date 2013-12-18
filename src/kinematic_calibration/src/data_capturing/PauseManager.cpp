@@ -30,12 +30,11 @@ PauseManager::PauseManager() : nhPrivate("~") {
 
 	// get the topic name for publishing
 	if(!nhPrivate.getParam("hotjoint_topic", hotJointTopic)) {
-		hotJointTopic = "/nao_temperature/hot_joint_fount";
+        hotJointTopic = "/nao_temperature/hot_joint_found";
 	}
 
-	// subsscribe to temperature topic
-	string hotJointFoundTopic = "nao_temperature/hot_joint_found";
-	temperatureSubscriber = nh.subscribe(hotJointFoundTopic, 1, &PauseManager::temperatureCb, this);
+    // subsscribe to temperature topic
+    temperatureSubscriber = nh.subscribe(hotJointTopic, 10, &PauseManager::temperatureCb, this);
 }
 
 PauseManager::~PauseManager() {

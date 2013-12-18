@@ -33,9 +33,9 @@ TemperatureNode::TemperatureNode(boost::shared_ptr<AL::ALBroker> broker,
 	}
 
 	if(!nhPrivate.getParam("hotjoint_topic", hotJointFoundTopic)) {
-	hotJointFoundTopic = "nao_temperature/hot_joint_found";
+        hotJointFoundTopic = "nao_temperature/hot_joint_found";
 	}
-	pub = nh.advertise<std_msgs::Bool>(hotJointFoundTopic, 1);
+    pub = nh.advertise<std_msgs::Bool>(hotJointFoundTopic, 10);
 
 	dataNamesList.push_back(
 			"Device/SubDeviceList/Battery/Temperature/Sensor/Value");
@@ -100,7 +100,7 @@ void TemperatureNode::run() {
 	ALValue memDataNames(dataNamesList);
 
 	// TODO: parameterize
-	const float criticalUpperTemperature = 75.0;
+    const float criticalUpperTemperature = 75.0;
 
 	bool hotJointFound = false;
 
