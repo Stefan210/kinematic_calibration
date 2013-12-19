@@ -34,7 +34,6 @@ public:
 
 	FRIEND_TEST(JointUpdateTest, writeCalibrationDataTest1);
 
-protected:
 	void setOffsets(map<string, double> offsets);
 	void getModifiedJoints(vector<urdf::Joint>& joints);
 	void writeCalibrationData(const string& filename);
