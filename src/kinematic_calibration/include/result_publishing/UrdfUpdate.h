@@ -10,8 +10,10 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <ros/ros.h>
-#include <urdf_model/model.h>
+#include <urdf/model.h>
 #include <urdf_model/joint.h>
+#include <tf/tf.h>
+#include <fstream>
 #include <map>
 #include <string>
 
@@ -19,8 +21,6 @@ namespace kinematic_calibration {
 
 using namespace std;
 using namespace ros;
-using namespace boost;
-using namespace boost::property_tree;
 using namespace urdf;
 
 /**
@@ -36,16 +36,13 @@ public:
 	bool readFromString(const string& urdfString);
 
 	bool updateJointOffsets(const map<string, double>&);
+	bool updateCameraDeltaTransform(const tf::Transform& deltaCameraTransform);
 
 	bool writeToFile(const string& filename);
 
-protected:
-	bool initializeTree(const string& urdf);
-	bool updateSingleJointOffset(const Joint& joint);
-
 private:
-	ptree xmlTree;
-	string inUrdf;
+	string inUrdfXmlString;
+	urdf::Model urdfModel;
 	NodeHandle nh;
 };
 

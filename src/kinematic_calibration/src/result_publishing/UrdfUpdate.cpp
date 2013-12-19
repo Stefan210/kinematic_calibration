@@ -8,18 +8,23 @@
 #include "../../include/result_publishing/UrdfUpdate.h"
 
 #include <boost/foreach.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
+#include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/type_traits/is_const.hpp>
 #include <ros/console.h>
 #include <ros/node_handle.h>
 #include <rosconsole/macros_generated.h>
-#include <tf/LinearMath/Matrix3x3.h>
-#include <cstdio>
+#include <tf/LinearMath/Quaternion.h>
+#include <tf/LinearMath/Transform.h>
+#include <tf/LinearMath/Vector3.h>
+#include <tinyxml.h>
+#include <urdf/model.h>
+#include <urdf_model/pose.h>
+#include <urdf_parser/urdf_parser.h>
 #include <iostream>
 #include <iterator>
 #include <vector>
 
+#include "../../include/result_publishing/CameraTransformUpdate.h"
 #include "../../include/result_publishing/JointUpdate.h"
 
 namespace kinematic_calibration {
@@ -40,8 +45,8 @@ bool UrdfUpdate::readFromFile(const string& filename) {
 	}
 	string str((std::istreambuf_iterator<char>(t)),
 			std::istreambuf_iterator<char>());
-	this->inUrdf = str;
-	initializeTree(inUrdf);
+	this->inUrdfXmlString = str;
+	this->urdfModel.initString(this->inUrdfXmlString);
 	return true;
 }
 
@@ -51,74 +56,57 @@ bool UrdfUpdate::readFromRos(const string& paramName) {
 		ROS_ERROR("Could not load the urdf from parameter server.");
 		return false;
 	}
-	this->inUrdf = result;
-	initializeTree(inUrdf);
+	this->inUrdfXmlString = result;
+	this->urdfModel.initString(this->inUrdfXmlString);
 	return true;
 }
 
 bool UrdfUpdate::readFromString(const string& urdfString) {
-	this->inUrdf = urdfString;
-	initializeTree(inUrdf);
-	return true;
-}
-
-bool UrdfUpdate::initializeTree(const string& urdf) {
-	stringstream ss;
-	ss << urdf;
-	ptree tree;
-	read_xml(ss, tree);
-	this->xmlTree = tree.get_child("robot");
+	this->inUrdfXmlString = urdfString;
+	this->urdfModel.initString(this->inUrdfXmlString);
 	return true;
 }
 
 bool UrdfUpdate::writeToFile(const string& filename) {
-	write_xml(filename, this->xmlTree);
-	return false;
+	TiXmlDocument* doc;
+	doc = urdf::exportURDF(this->urdfModel);
+	return doc->SaveFile(filename.c_str());
 }
 
 bool UrdfUpdate::updateJointOffsets(const map<string, double>& offsets) {
-	// load the current model
-	Model model;
-	model.initString(this->inUrdf);
-
 	// apply the offsets to the model
-	JointUpdate ju(model);
+	JointUpdate ju(urdfModel);
 	ju.setOffsets(offsets);
 	vector<Joint> updatedJoints;
 	ju.getModifiedJoints(updatedJoints);
 
 	// update the corresponding xml nodes/attributes
-	BOOST_FOREACH(const Joint& joint, updatedJoints) {
-		updateSingleJointOffset(joint);
+	BOOST_FOREACH(Joint& joint, updatedJoints) {
+		urdfModel.joints_[joint.name]->parent_to_joint_origin_transform =
+				joint.parent_to_joint_origin_transform;
 	}
 	return true;
 }
 
-bool UrdfUpdate::updateSingleJointOffset(const Joint& joint) {
-	// get all joint elements of the xml tree
-	ptree& tree = this->xmlTree;
-	BOOST_FOREACH(ptree::value_type& jointElement, tree.get_child("joint")) {
-		// check whether this is the right joint
-		string jointName = jointElement.second.get<string>("<xmlattr>.name");
-		if (joint.name != jointName)
-			continue;
+bool UrdfUpdate::updateCameraDeltaTransform(
+		const tf::Transform& deltaCameraTransform) {
+	tf::Transform newCameraToHeadPitch;
 
-		// update the rpy part:
-		// the joint object already contains old value + offset,
-		// thus we can override the current rpy value
-		string path = "origin.<xmlattr>.rpy";
-		double r, p, y;
-		joint.parent_to_joint_origin_transform.rotation.getRPY(r, p, y);
-		char cvalue[80];
-		sprintf(cvalue, "%f %f %f", r, p, y);
-		string value(cvalue);
-		jointElement.second.put(path, value);
+	// calculate new transform
+	CameraTransformUpdate ctu(urdfModel);
+	ctu.getUpdatedCameraToHead(deltaCameraTransform, newCameraToHeadPitch);
 
-		// report success
-		return true;
-	}
-	// could not find the joint
-	return false;
+	urdfModel.joints_["CameraBottom"]->parent_to_joint_origin_transform.position =
+			urdf::Vector3(newCameraToHeadPitch.getOrigin().getX(),
+					newCameraToHeadPitch.getOrigin().getY(),
+					newCameraToHeadPitch.getOrigin().getZ());
+	urdfModel.joints_["CameraBottom"]->parent_to_joint_origin_transform.rotation =
+			urdf::Rotation(newCameraToHeadPitch.getRotation().getX(),
+					newCameraToHeadPitch.getRotation().getY(),
+					newCameraToHeadPitch.getRotation().getZ(),
+					newCameraToHeadPitch.getRotation().getW());
+
+	return true;
 }
 
 } /* namespace kinematic_calibration */

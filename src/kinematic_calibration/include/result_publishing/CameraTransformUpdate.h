@@ -29,6 +29,9 @@ public:
 	void writeCalibrationData(const tf::Transform& headToCameraDelta,
 			const string& filename);
 
+	void getUpdatedCameraToHead(const tf::Transform& headToCameraDelta,
+			tf::Transform& newCameraToHeadPitch);
+
 private:
 	Model model;
 	tf::Transform headToCameraDelta;

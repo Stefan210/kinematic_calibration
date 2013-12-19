@@ -24,13 +24,13 @@ CameraTransformUpdate::~CameraTransformUpdate() {
 
 }
 
-void CameraTransformUpdate::writeCalibrationData(
-		const tf::Transform& headToCameraDelta, const string& filename) {
+void CameraTransformUpdate::getUpdatedCameraToHead(
+		const tf::Transform& headToCameraDelta,
+		tf::Transform& newCameraToHeadPitch) {
 	tf::Transform cameraToHeadDelta = headToCameraDelta.inverse();
 	urdf::Pose cameraToHeadPitchPose =
 			model.getJoint("CameraBottom")->parent_to_joint_origin_transform;
-	tf::Transform
-	cameraToHeadPitch = tf::Transform(
+	tf::Transform cameraToHeadPitch = tf::Transform(
 			tf::Quaternion(cameraToHeadPitchPose.rotation.x,
 					cameraToHeadPitchPose.rotation.y,
 					cameraToHeadPitchPose.rotation.z,
@@ -39,7 +39,13 @@ void CameraTransformUpdate::writeCalibrationData(
 					cameraToHeadPitchPose.position.y,
 					cameraToHeadPitchPose.position.z));
 	// camera' to head = (camera to head) * (camera' to camera)
-	tf::Transform newCameraToHeadPitch = cameraToHeadPitch * cameraToHeadDelta;
+	newCameraToHeadPitch = cameraToHeadPitch * cameraToHeadDelta;
+}
+
+void CameraTransformUpdate::writeCalibrationData(
+		const tf::Transform& headToCameraDelta, const string& filename) {
+	tf::Transform newCameraToHeadPitch;
+	getUpdatedCameraToHead(headToCameraDelta, newCameraToHeadPitch);
 
 	double tx, ty, tz, rr, rp, ry;
 	tx = newCameraToHeadPitch.getOrigin().getX();

@@ -19,6 +19,7 @@
 #include "../../include/common/ModelLoader.h"
 #include "../../include/result_publishing/CameraTransformUpdate.h"
 #include "../../include/result_publishing/JointUpdate.h"
+#include "../../include/result_publishing/UrdfUpdate.h"
 
 using namespace kinematic_calibration;
 using namespace ros;
@@ -27,6 +28,7 @@ using namespace std;
 void resultCb(const calibrationResultConstPtr& msg);
 string jointOffsetsFilename;
 string cameraTransformFilename;
+string urdfFilename;
 
 int main(int argc, char** argv) {
 	init(argc, argv, "JointUpdateNode");
@@ -34,6 +36,7 @@ int main(int argc, char** argv) {
 	// TODO: Parameterize!
 	jointOffsetsFilename = "calibration_joint_offsets.xacro";
 	cameraTransformFilename = "calibration_camera_transform.xacro";
+	urdfFilename = "robot_model_calibrated.xml";
 
 	NodeHandle nh;
 	Subscriber sub = nh.subscribe("/kinematic_calibration/calibration_result",
@@ -49,6 +52,7 @@ void resultCb(const calibrationResultConstPtr& msg) {
 	urdf::Model model;
 	modelLoader.getUrdfModel(model);
 
+	// write the parameter file for the joint offsets
 	map<string, double> offsets;
 	for (int i = 0; i < msg->jointNames.size(); i++) {
 		offsets[msg->jointNames[i]] = msg->jointOffsets[i];
@@ -57,10 +61,18 @@ void resultCb(const calibrationResultConstPtr& msg) {
 	JointUpdate ju(model);
 	ju.writeCalibrationData(offsets, jointOffsetsFilename);
 
+	// write the parameter file for the camera transformation
 	tf::Transform transform;
 	tf::transformMsgToTF(msg->cameraTransform, transform);
 
 	CameraTransformUpdate ctu(model);
 	ctu.writeCalibrationData(transform, cameraTransformFilename);
+
+	// write the new urdf file
+	UrdfUpdate urdfUpdate;
+	urdfUpdate.readFromRos("/robot_description");
+	urdfUpdate.updateJointOffsets(offsets);
+	urdfUpdate.updateCameraDeltaTransform(transform);
+	urdfUpdate.writeToFile(urdfFilename);
 }
 
