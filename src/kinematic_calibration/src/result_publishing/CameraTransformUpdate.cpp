@@ -7,13 +7,17 @@
 
 #include "../../include/result_publishing/CameraTransformUpdate.h"
 
+#include <boost/smart_ptr/shared_ptr.hpp>
 #include <tf/tf.h>
-#include <iostream>
+#include <urdf_model/joint.h>
+#include <urdf_model/pose.h>
 #include <fstream>
+#include <iostream>
 
 namespace kinematic_calibration {
 
-CameraTransformUpdate::CameraTransformUpdate() {
+CameraTransformUpdate::CameraTransformUpdate(Model model) :
+		model(model) {
 }
 
 CameraTransformUpdate::~CameraTransformUpdate() {
@@ -22,11 +26,26 @@ CameraTransformUpdate::~CameraTransformUpdate() {
 
 void CameraTransformUpdate::writeCalibrationData(
 		const tf::Transform& headToCameraDelta, const string& filename) {
+	tf::Transform cameraToHeadDelta = headToCameraDelta.inverse();
+	urdf::Pose cameraToHeadPitchPose =
+			model.getJoint("CameraBottom")->parent_to_joint_origin_transform;
+	tf::Transform
+	cameraToHeadPitch = tf::Transform(
+			tf::Quaternion(cameraToHeadPitchPose.rotation.x,
+					cameraToHeadPitchPose.rotation.y,
+					cameraToHeadPitchPose.rotation.z,
+					cameraToHeadPitchPose.rotation.w),
+			tf::Vector3(cameraToHeadPitchPose.position.x,
+					cameraToHeadPitchPose.position.y,
+					cameraToHeadPitchPose.position.z));
+	// camera' to head = (camera to head) * (camera' to camera)
+	tf::Transform newCameraToHeadPitch = cameraToHeadPitch * cameraToHeadDelta;
+
 	double tx, ty, tz, rr, rp, ry;
-	tx = headToCameraDelta.getOrigin().getX();
-	ty = headToCameraDelta.getOrigin().getY();
-	tz = headToCameraDelta.getOrigin().getZ();
-	tf::Matrix3x3(headToCameraDelta.getRotation()).getRPY(rr, rp, ry);
+	tx = newCameraToHeadPitch.getOrigin().getX();
+	ty = newCameraToHeadPitch.getOrigin().getY();
+	tz = newCameraToHeadPitch.getOrigin().getZ();
+	tf::Matrix3x3(newCameraToHeadPitch.getRotation()).getRPY(rr, rp, ry);
 
 	// write the new calibration file
 	ofstream file;

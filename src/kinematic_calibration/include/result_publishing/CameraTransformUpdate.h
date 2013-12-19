@@ -11,7 +11,9 @@
 #include <tf/tf.h>
 #include <urdf/model.h>
 #include <string>
+#include <urdf_model/model.h>
 
+using namespace urdf;
 using namespace std;
 
 namespace kinematic_calibration {
@@ -21,13 +23,14 @@ namespace kinematic_calibration {
  */
 class CameraTransformUpdate {
 public:
-	CameraTransformUpdate();
+	CameraTransformUpdate(Model model);
 	virtual ~CameraTransformUpdate();
 
 	void writeCalibrationData(const tf::Transform& headToCameraDelta,
 			const string& filename);
 
 private:
+	Model model;
 	tf::Transform headToCameraDelta;
 };
 

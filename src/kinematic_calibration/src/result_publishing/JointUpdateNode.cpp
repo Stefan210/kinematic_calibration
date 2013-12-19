@@ -60,7 +60,7 @@ void resultCb(const calibrationResultConstPtr& msg) {
 	tf::Transform transform;
 	tf::transformMsgToTF(msg->cameraTransform, transform);
 
-	CameraTransformUpdate ctu;
+	CameraTransformUpdate ctu(model);
 	ctu.writeCalibrationData(transform, cameraTransformFilename);
 }
 
