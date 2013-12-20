@@ -42,6 +42,10 @@ OptimizationNode::OptimizationNode() :
 	resultPublisher = nh.advertise<kinematic_calibration::calibrationResult>(
 			"/kinematic_calibration/calibration_result", 1);
 
+	optimizationService = nh.advertiseService(
+			"/kinematic_calibration/start_optimization",
+			&OptimizationNode::startOptizationCallback, this);
+
 	// instantiate the model loader
 	modelLoader.initializeFromRos();
 	modelLoader.getKdlTree(kdlTree);
@@ -240,14 +244,8 @@ void OptimizationNode::publishResults() {
 
 void OptimizationNode::measurementCb(const measurementDataConstPtr& msg) {
 	const measurementData data = *msg;
-	static int numChains = 0;
 	if (data.jointState.name.empty()) {
-		numChains++;
-		// TODO: Remove "hack"!
-		if (numChains >= 2) {
-			// stop collecting data as soon as an empty message is received
-			collectingData = false;
-		}
+		return;
 	} else {
 		// check if the measurement contains to a new chain
 		if (data.chain_name != chainName) {
@@ -264,7 +262,6 @@ void OptimizationNode::measurementCb(const measurementDataConstPtr& msg) {
 		// save data
 		measurements.push_back(measurementData(data));
 		ROS_INFO("Measurement data received (#%ld).", measurements.size());
-
 	}
 }
 
@@ -275,6 +272,13 @@ void OptimizationNode::camerainfoCallback(
 	else
 		ROS_FATAL("Camera model could not be set!");
 	cameraInfoSubscriber.shutdown();
+}
+
+bool OptimizationNode::startOptizationCallback(
+		std_srvs::Empty::Request& request,
+		std_srvs::Empty::Response& response) {
+	this->collectingData = false;
+	return true;
 }
 
 } /* namespace kinematic_calibration */

@@ -12,9 +12,10 @@
 #include <kdl/tree.hpp>
 #include <kinematic_calibration/measurementData.h>
 #include <ros/node_handle.h>
-#include <ros/subscriber.h>
 #include <ros/publisher.h>
+#include <ros/subscriber.h>
 #include <sensor_msgs/CameraInfo.h>
+#include <std_srvs/Empty.h>
 #include <string>
 #include <vector>
 
@@ -59,11 +60,15 @@ protected:
 
 	void measurementCb(const measurementDataConstPtr& msg);
 	void camerainfoCallback(const sensor_msgs::CameraInfoConstPtr& msg);
+	bool startOptizationCallback(
+			std_srvs::Empty::Request& request,
+			std_srvs::Empty::Response& response);
 
 private:
 	NodeHandle nh;
 	Subscriber measurementSubsriber;
 	Subscriber cameraInfoSubscriber;
+	ServiceServer optimizationService;
 	Publisher resultPublisher;
 
 	vector<measurementData> measurements;
