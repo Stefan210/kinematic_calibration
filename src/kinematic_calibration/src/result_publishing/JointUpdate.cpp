@@ -56,6 +56,11 @@ void JointUpdate::getModifiedJoints(vector<urdf::Joint>& joints) {
 		urdf::Joint joint_new(*joint_ptr.get());
 		joint_new.parent_to_joint_origin_transform.rotation = rot_new;
 		joints.push_back(joint_new);
+		cout << "joint: " << name << " ";
+		cout << "axis: " << axis.x << " " <<  axis.y << " " <<
+				 axis.z << " ";
+		cout << "offset: " << offset << " ";
+		cout << "rpy old: " << r << " " << p << " " << y << "\n";
 	}
 }
 

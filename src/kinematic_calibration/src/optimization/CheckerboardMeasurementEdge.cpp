@@ -57,6 +57,7 @@ void CheckerboardMeasurementEdge::computeError() {
 	// get transformation from end effector to camera
 	tf::Transform cameraToEndEffector; // root = camera, tip = end effector, e.g. wrist
 	map<string, double> jointOffsets = jointOffsetVertex->estimate();
+	jointOffsets[this->kinematicChain->getTip()] = 0; // set offset of the last joint to 0
 	this->kinematicChain->getRootToTip(jointPositions, jointOffsets,
 			cameraToEndEffector);
 

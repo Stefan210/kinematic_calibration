@@ -22,6 +22,7 @@
 #include <iostream>
 #include <map>
 #include <utility>
+#include <urdf_model/model.h>
 
 #include "../../include/common/FrameImageConverter.h"
 //#include "../../include/common/KinematicChain.h"
@@ -69,11 +70,30 @@ void OptimizationNode::collectData() {
 }
 
 void OptimizationNode::optimize() {
+	// todo: parameterize!
+	string cameraJointName = "CameraBottom";
+
 	// instantiate the frame image converter
 	FrameImageConverter frameImageConverter(cameraModel);
 
 	// initial state
 	KinematicCalibrationState initialState;
+
+	// initialize transform from camera to head
+	urdf::Model model;
+	this->modelLoader.getUrdfModel(model);
+	urdf::Joint cameraJoint = *model.getJoint(cameraJointName);
+	urdf::Pose headPitchToCameraPose =
+			cameraJoint.parent_to_joint_origin_transform;
+	tf::Transform headToCamera = tf::Transform(
+			tf::Quaternion(headPitchToCameraPose.rotation.x,
+					headPitchToCameraPose.rotation.y,
+					headPitchToCameraPose.rotation.z,
+					headPitchToCameraPose.rotation.w),
+			tf::Vector3(headPitchToCameraPose.position.x,
+					headPitchToCameraPose.position.y,
+					headPitchToCameraPose.position.z));
+	initialState.cameraToHeadTransformation = headToCamera;
 
 	// optimization instance
 	G2oJointOffsetOptimization optimization(measurements, kinematicChains,
@@ -143,6 +163,7 @@ void OptimizationNode::printPoints() {
 		map<string, double> jointOffsets = result.jointOffsets;
 		for (int j = 0; j < this->kinematicChains.size(); j++) {
 			if (kinematicChains[j].getName() == current.chain_name) {
+				jointOffsets[this->kinematicChains[j].getTip()] = 0;
 				this->kinematicChains[j].getRootToTip(jointPositions,
 						jointOffsets, cameraToEndEffector);
 			}

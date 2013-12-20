@@ -115,10 +115,20 @@ void G2oJointOffsetOptimization::optimize(
 				make_pair(currentChain.getName(), currentChain));
 	}
 
-	// instantiate the vertex for the marker transformation
+	// instantiate the vertex for the camera transformation
 	TransformationVertex* cameraToHeadTransformationVertex =
 			new TransformationVertex();
 	cameraToHeadTransformationVertex->setId(++id);
+
+	Eigen::Affine3d initialCameraToHeadAffine;
+	tf::transformTFToEigen(this->initialState.cameraToHeadTransformation,
+			initialCameraToHeadAffine);
+	Eigen::Isometry3d initialCameraToHeadIsometry;
+	initialCameraToHeadIsometry.translation() =
+			initialCameraToHeadAffine.translation();
+	initialCameraToHeadIsometry.linear() =
+			initialCameraToHeadAffine.rotation();
+	cameraToHeadTransformationVertex->setEstimate(initialCameraToHeadIsometry);
 	optimizer.addVertex(cameraToHeadTransformationVertex);
 
 	// instantiate the vertex for the camera intrinsics
@@ -139,10 +149,11 @@ void G2oJointOffsetOptimization::optimize(
 					current.chain_name.c_str());
 			continue;
 		}
-
+		RobustKernel* rk = new RobustKernelHuber();
 		CheckerboardMeasurementEdge* edge = new CheckerboardMeasurementEdge(
 				current);
 		edge->setId(++id);
+		edge->setRobustKernel(rk);
 		edge->setInformation(info);
 		edge->vertices()[0] = markerTransformationVertices[current.chain_name];
 		edge->vertices()[1] = jointOffsetVertex;

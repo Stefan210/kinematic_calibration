@@ -74,5 +74,20 @@ void resultCb(const calibrationResultConstPtr& msg) {
 	urdfUpdate.updateJointOffsets(offsets);
 	urdfUpdate.updateCameraDeltaTransform(transform);
 	urdfUpdate.writeToFile(urdfFilename);
+
+	// print the marker transformations on the screen
+	for (int i = 0; i < msg->chainNames.size(); i++) {
+		double rr, rp, ry, tx, ty, tz;
+		tf::Transform current;
+		tf::transformMsgToTF(msg->endeffectorToMarker[i], current);
+		current = current.inverse();
+		tf::Matrix3x3(current.getRotation()).getRPY(rr, rp, ry);
+		tx = current.getOrigin().getX();
+		ty = current.getOrigin().getY();
+		tz = current.getOrigin().getZ();
+		cout << "chain: " << msg->chainNames[i] << "\n";
+		cout << "translation: " << tx << " " << ty << " " << tz << "\n";
+		cout << "rotation: " << rr << " " << rp << " " << ry << "\n";
+	}
 }
 
