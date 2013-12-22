@@ -224,50 +224,6 @@ void DataCapture::playChainPoses() {
 	disableChainStiffness();
 }
 
-/*
- void DataCapture::moveCheckerboardToImageRegion(Region region) {
- int xMin = 0;
- int yMin = 0;
- int xMax = 640; // TODO: parameterize!!
- int yMax = 480; // TODO: parameterize!!
- int delta = 150; // TODO: parameterize!!
-
- // set region rectangle
- double xReg, yReg;
- switch (region) {
- case LEFT_TOP:
- xReg = xMin + delta / 2;
- yReg = yMin + delta / 2;
- break;
- case LEFT_BOTTOM:
- xReg = xMin + delta / 2;
- yReg = yMax - delta / 2;
- break;
- case RIGHT_TOP:
- xReg = xMax - delta / 2;
- yReg = yMin + delta / 2;
- break;
- case RIGHT_BOTTOM:
- xReg = xMax - delta / 2;
- yReg = yMax - delta / 2;
- break;
- case CENTER:
- xReg = (xMax + xMin) / 2;
- yReg = (xMax + xMin) / 2;
- break;
- default:
- ROS_INFO("Region unknown.");
- break;
- }
-
- // move head into direction until the checkerboard is into the region
- ROS_INFO("Trying to move the head s.t. the checkerboard "
- "position is within the specified region.");
-
- ROS_INFO("Moving into region done!");
- }
- */
-
 void DataCapture::moveCheckerboardToImageRegion(Region region) {
 	int xMin = 0;
 	int yMin = 0;
