@@ -5,7 +5,7 @@
  *      Author: stefan
  */
 
-#include "/home/stefan/catkin_ws/src/kinematic_calibration/include/common/AbstractContext.h"
+#include "../../include/common/AbstractContext.h"
 
 namespace kinematic_calibration {
 
