@@ -205,8 +205,8 @@ target_link_libraries(circleDetectionTest circleDetection ${catkin_LIBRARIES})
 add_library(kinematicChain src/common/KinematicChain.cpp) 
 target_link_libraries(kinematicChain ${catkin_LIBRARIES})
 
-add_executable(kinematicChainTfComparison src/common/KinematicChainTfComparison.cpp)
-target_link_libraries(kinematicChainTfComparison kinematicChain modelLoader ${catkin_LIBRARIES})
+#add_executable(kinematicChainTfComparison src/common/KinematicChainTfComparison.cpp)
+#target_link_libraries(kinematicChainTfComparison kinematicChain modelLoader ${catkin_LIBRARIES})
 
 catkin_add_gtest(kinematicChainTest test/KinematicChainTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
 target_link_libraries(kinematicChainTest kinematicChain modelLoader ${catkin_LIBRARIES})
@@ -222,8 +222,8 @@ target_link_libraries(modelLoaderTest modelLoader ${catkin_LIBRARIES})
 add_library(frameImageConverter src/common/FrameImageConverter.cpp)
 target_link_libraries(frameImageConverter ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
-add_executable(frameImageConverterMain src/common/FrameImageConverterMain.cpp)
-target_link_libraries(frameImageConverterMain frameImageConverter modelLoader kinematicChain ${catkin_LIBRARIES} ${OpenCV_LIBS})
+#add_executable(frameImageConverterMain src/common/FrameImageConverterMain.cpp)
+#target_link_libraries(frameImageConverterMain frameImageConverter modelLoader kinematicChain ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 ### DataCapture
 add_library(dataCapture 
