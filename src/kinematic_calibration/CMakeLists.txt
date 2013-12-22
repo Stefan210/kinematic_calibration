@@ -180,6 +180,15 @@ catkin_package(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
+### Context
+add_library(context 
+	src/common/AbstractContext.cpp
+	src/common/CheckerboardContext.cpp
+	src/common/CircleContext.cpp
+	src/common/ContextFactory.cpp
+	)
+target_link_libraries(context ${catkin_LIBRARIES})
+
 ### ImagePreprocessing
 add_executable(imagePreprocessingNode src/data_capturing/ImagePreprocessingNode.cpp)
 target_link_libraries(imagePreprocessingNode ${catkin_LIBRARIES} ${OpenCV_LIBS})
