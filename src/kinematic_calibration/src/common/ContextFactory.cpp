@@ -20,7 +20,8 @@ ContextFactory::ContextFactory() {
 AbstractContext* ContextFactory::getContextFromRos() {
 	NodeHandle nh;
 	string contextType;
-	nh.getParam("type", contextType);
+	nh.getParam("context_type", contextType);
+	ROS_INFO("Context type is %s.", contextType.c_str());
 	return getContext(contextType);
 }
 
