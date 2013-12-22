@@ -8,6 +8,8 @@
 #ifndef CHECKERBOARDDETECTION_H_
 #define CHECKERBOARDDETECTION_H_
 
+#include "MarkerDetection.h"
+
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
@@ -26,7 +28,7 @@ public:
 /**
  * Class for detecting the position of a 2x2 checker board.
  */
-class CheckerboardDetection {
+class CheckerboardDetection: public MarkerDetection {
 public:
 	/**
 	 * Constructor.
@@ -44,7 +46,8 @@ public:
 	 * @param[out] out Contains the position of the detected checker board.
 	 * @return True if the checker board could be detected, false if not.
 	 */
-	bool detect(const sensor_msgs::ImageConstPtr& in_msg, CheckerboardData& out);
+	bool detect(const sensor_msgs::ImageConstPtr& in_msg,
+			CheckerboardData& out);
 
 	/**
 	 * Tries to detect the corner (center) of a 2x2 checker board pattern.
@@ -54,6 +57,17 @@ public:
 	 */
 	bool detect(const cv::Mat& image, CheckerboardData& out);
 
+	/**
+	 * Tries to detect a marker.
+	 * @param[in] in_msg image message containing the marker
+	 * @param[out] out data describing the found marker
+	 * @return true if the marker was detected otherwise false
+	 */
+	bool detect(const sensor_msgs::ImageConstPtr& in_msg, vector<double>& out);
+
+	enum Index {
+		idx_x = 0, idx_y = 1
+	};
 };
 
 } /* namespace kinematic_calibration */

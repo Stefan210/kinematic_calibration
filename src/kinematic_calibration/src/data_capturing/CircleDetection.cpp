@@ -110,4 +110,14 @@ void CircleDetection::findClosest(const cv::Mat& image,
 	out[idx_r] = circles[minIdx][2];
 }
 
+RosCircleDetection::RosCircleDetection() {
+}
+
+bool RosCircleDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
+		vector<double>& out) {
+	return CircleDetection::detect(in_msg, color, out);
+}
+
 } /* namespace kinematic_calibration */
+
+

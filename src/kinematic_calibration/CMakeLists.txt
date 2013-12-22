@@ -185,7 +185,7 @@ add_executable(imagePreprocessingNode src/data_capturing/ImagePreprocessingNode.
 target_link_libraries(imagePreprocessingNode ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 ### CheckerboardDetection
-add_library(checkerboardDetection src/data_capturing/CheckerboardDetection.cpp)
+add_library(checkerboardDetection src/data_capturing/CheckerboardDetection.cpp src/data_capturing/MarkerDetection.cpp)
 target_link_libraries(checkerboardDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 add_executable(checkerboardDetectionMain src/data_capturing/CheckerboardDetectionMain.cpp)
@@ -195,7 +195,7 @@ catkin_add_gtest(checkerboardDetectionTest test/CheckerboardDetectionTest.cpp WO
 target_link_libraries(checkerboardDetectionTest checkerboardDetection ${catkin_LIBRARIES})
 
 ### CheckerboardDetection
-add_library(circleDetection src/data_capturing/CircleDetection.cpp)
+add_library(circleDetection src/data_capturing/CircleDetection.cpp src/data_capturing/MarkerDetection.cpp)
 target_link_libraries(circleDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 catkin_add_gtest(circleDetectionTest test/CircleDetectionTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)

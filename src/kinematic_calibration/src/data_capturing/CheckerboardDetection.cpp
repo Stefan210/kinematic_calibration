@@ -83,4 +83,18 @@ bool CheckerboardDetection::detect(
 	return true;
 }
 
+bool CheckerboardDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
+		vector<double>& out) {
+	CheckerboardData cb;
+	if(detect(in_msg, out)) {
+		out.resize(2);
+		out[idx_x] = cb.x;
+		out[idx_y] = cb.y;
+		return true;
+	}
+	return false;
+}
+
 } /* namespace kinematic_calibration */
+
+

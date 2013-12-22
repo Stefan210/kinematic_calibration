@@ -8,11 +8,16 @@
 #ifndef CIRCLEDETECTION_H_
 #define CIRCLEDETECTION_H_
 
+#include "MarkerDetection.h"
+
 #include <opencv2/core/core.hpp>
 #include <sensor_msgs/Image.h>
 #include <vector>
+#include <ros/ros.h>
+#include <ros/node_handle.h>
 
 using namespace std;
+using namespace ros;
 
 namespace kinematic_calibration {
 
@@ -50,6 +55,18 @@ protected:
 	void findClosest(const cv::Mat& image, const vector<cv::Vec3f >& circles,
 			const cv::Scalar& color, vector<double>& out);
 
+};
+
+class RosCircleDetection: public CircleDetection, public MarkerDetection {
+public:
+	RosCircleDetection();
+	virtual ~RosCircleDetection() {}
+
+	virtual bool detect(const sensor_msgs::ImageConstPtr& in_msg, vector<double>& out);
+
+private:
+	NodeHandle nh;
+	cv::Scalar color;
 };
 
 } /* namespace kinematic_calibration */
