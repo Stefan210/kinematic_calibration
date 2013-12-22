@@ -38,11 +38,11 @@ using namespace nao_msgs;
 
 namespace kinematic_calibration {
 
-DataCapture::DataCapture() :
+DataCapture::DataCapture(AbstractContext& context) :
 		nhPrivate("~"), stiffnessClient(nh, "joint_stiffness_trajectory"), trajectoryClient(
 				nh, "joint_trajectory"), bodyPoseClient(nh, "body_pose"), it(
 				nh), checkerboardFound(false), receivedJointStates(false), receivedImage(
-				false) {
+				false), context(context) {
 	// get parameters
 	nhPrivate.getParam("params/headYaw_min", headYawMin);
 	nhPrivate.getParam("params/headYaw_max", headYawMax);
@@ -71,8 +71,7 @@ DataCapture::DataCapture() :
 	jointStateSub = nh.subscribe(jointStatesOps);
 
 	// subscribe the image topic
-	imageSub = it.subscribe(imageTopic, 1,
-			&DataCapture::imageCallback, this);
+	imageSub = it.subscribe(imageTopic, 1, &DataCapture::imageCallback, this);
 
 	// advertise the measurement data topic
 	measurementPub = nh.advertise<measurementData>(
@@ -93,10 +92,14 @@ DataCapture::DataCapture() :
 
 	// initialize seed
 	srand(static_cast<unsigned>(time(0)));
+
+	// get the marker detection instance
+	markerDetection = context.getMarkerDetectionInstance();
 }
 
 DataCapture::~DataCapture() {
 	disableHeadStiffness();
+	delete markerDetection;
 }
 
 void DataCapture::enableHeadStiffness() {
@@ -126,8 +129,8 @@ void DataCapture::disableChainStiffness() {
 void DataCapture::setStiffness(const vector<string>& jointNames,
 		double stiffness) {
 	trajectory_msgs::JointTrajectoryPoint point;
-    point.time_from_start.sec = 1;
-    point.time_from_start.nsec = 0;
+	point.time_from_start.sec = 1;
+	point.time_from_start.nsec = 0;
 
 	for (unsigned int i = 0; i < jointNames.size(); i++) {
 		point.positions.push_back(stiffness);
@@ -159,12 +162,11 @@ void DataCapture::playChainPoses() {
 	for (int i = start; i <= end; i++) {
 		// check for pause requests:
 		// call blocks if pause requested
-		if(pauseManager.pauseRequested()) {
+		if (pauseManager.pauseRequested()) {
 			disableChainStiffness();
 			pauseManager.pauseIfRequested();
 			enableChainStiffness();
 		}
-
 
 		// execute next pose
 		char buf[10];
@@ -329,32 +331,34 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 		}
 
 		double relX = 0, relY = 0;
+		double x = markerData[0];
+		double y = markerData[1];
 
 		// check x
-		if (checkerboardData.x < xRegMin) {
-			relX = (xRegMin - checkerboardData.x) / 640 + 0.05;
+		if (x < xRegMin) {
+			relX = (xRegMin - x) / 640 + 0.05;
 			ROS_INFO("Moving to the right (relPose = %f).", relX);
-		} else if (checkerboardData.x > xRegMax) {
-			relX = (xRegMax - checkerboardData.x) / 640 - 0.05;
+		} else if (x > xRegMax) {
+			relX = (xRegMax - x) / 640 - 0.05;
 			ROS_INFO("Moving to the left (relPose = %f).", relX);
 		} else {
 			isInRegionX = true;
 		}
 
 		// check y
-		if (checkerboardData.y < yRegMin) {
-			relY = (yRegMin - checkerboardData.y) / 480 + 0.05;
+		if (y < yRegMin) {
+			relY = (yRegMin - y) / 480 + 0.05;
 			ROS_INFO("Moving to downwards (relPose = %f).", -relY);
-		} else if (checkerboardData.y > yRegMax) {
-			relY = (yRegMax - checkerboardData.y) / 480 - 0.05;
+		} else if (y > yRegMax) {
+			relY = (yRegMax - y) / 480 - 0.05;
 			ROS_INFO("Moving to upwards (relPose = %f).", -relY);
 		} else {
 			isInRegionY = true;
 		}
 
 		// if the position did not change, we are close to the region and can stop
-		if (fabs(lastX - checkerboardData.x) < 1
-				&& fabs(lastY - checkerboardData.y) < 1) {
+		if (fabs(lastX - x) < 1
+				&& fabs(lastY - y) < 1) {
 			break;
 		}
 
@@ -364,8 +368,8 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 		}
 
 		// save last position
-		lastX = checkerboardData.x;
-		lastY = checkerboardData.y;
+		lastX = markerData[0];
+		lastY = markerData[1];
 	}
 
 	disableHeadStiffness();
@@ -373,16 +377,16 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 }
 
 void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
-	if(msg->header.stamp < this->curTime) {
+	if (msg->header.stamp < this->curTime) {
 		ROS_INFO("Skipping too old Image message.");
 		return;
 	}
 	receivedImage = true;
 	cameraFrame = msg.get()->header.frame_id;
-	checkerboardFound = checkerboardDetection.detect(msg, checkerboardData);
+	checkerboardFound = markerDetection->detect(msg, markerData);
 	if (checkerboardFound) {
-		ROS_INFO("Checkerboard found at position %f %f", checkerboardData.x,
-				checkerboardData.y);
+		ROS_INFO("Checkerboard found at position %f %f", markerData[0],
+				markerData[1]);
 	} else {
 		ROS_INFO("No checkerboard found.");
 	}
@@ -457,7 +461,7 @@ void DataCapture::findCheckerboard() {
 
 void DataCapture::jointStatesCallback(
 		const sensor_msgs::JointStateConstPtr& msg) {
-	if(msg->header.stamp < this->curTime) {
+	if (msg->header.stamp < this->curTime) {
 		ROS_INFO("Skipping too old JointState message.");
 		return;
 	}
@@ -496,8 +500,8 @@ void DataCapture::updateCheckerboardRobust() {
 		// update and save data
 		updateCheckerboardOnce();
 		found.push_back(checkerboardFound);
-		x.push_back(checkerboardData.x);
-		y.push_back(checkerboardData.y);
+		x.push_back(markerData[0]);
+		y.push_back(markerData[1]);
 
 		if (found.size() < 3)
 			continue;
@@ -560,12 +564,12 @@ void DataCapture::updateJointStatesRobust() {
 			}
 		}
 
-        // check deltas
-        unstable = false;
-		for(int i = 0; i < delta.size(); i++) {
-            if(delta[i] > 0.01)
-                unstable = true;
-        }
+		// check deltas
+		unstable = false;
+		for (int i = 0; i < delta.size(); i++) {
+			if (delta[i] > 0.01)
+				unstable = true;
+		}
 	}
 
 	this->jointState.position;
@@ -574,8 +578,8 @@ void DataCapture::updateJointStatesRobust() {
 void DataCapture::setHeadPose(double headYaw, double headPitch, bool relative,
 		vector<string> additionalJoints, vector<double> additionalPositions) {
 	trajectory_msgs::JointTrajectoryPoint point;
-    point.time_from_start.sec = 0;
-    point.time_from_start.nsec = 600 * 1000 * 1000;
+	point.time_from_start.sec = 0;
+	point.time_from_start.nsec = 600 * 1000 * 1000;
 	point.positions.push_back(headYaw);
 	point.positions.push_back(headPitch);
 	point.positions.insert(point.positions.end(), additionalPositions.begin(),
@@ -599,8 +603,8 @@ void DataCapture::publishMeasurement() {
 	updateJointStates();
 	measurementData data;
 	data.jointState = jointState;
-	data.cb_x = checkerboardData.x;
-	data.cb_y = checkerboardData.y;
+	data.cb_x = markerData[0];
+	data.cb_y = markerData[1];
 	nh.getParam("chain_name", data.chain_name);
 	ROS_INFO("Publishing measurement data...");
 	measurementPub.publish(data);
@@ -632,7 +636,8 @@ vector<double> DataCapture::generateRandomPositions(
 	return positions;
 }
 
-LeftArmDataCapture::LeftArmDataCapture() {
+LeftArmDataCapture::LeftArmDataCapture(AbstractContext& context) :
+		DataCapture(context)  {
 	jointNames.push_back("LShoulderPitch");
 	jointNames.push_back("LShoulderRoll");
 	jointNames.push_back("LElbowYaw");
@@ -652,7 +657,8 @@ const string LeftArmDataCapture::getPosePrefix() {
 	return "larm";
 }
 
-RightArmDataCapture::RightArmDataCapture() {
+RightArmDataCapture::RightArmDataCapture(AbstractContext& context) :
+		DataCapture(context) {
 	jointNames.push_back("RShoulderPitch");
 	jointNames.push_back("RShoulderRoll");
 	jointNames.push_back("RElbowYaw");

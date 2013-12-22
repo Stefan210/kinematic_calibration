@@ -34,8 +34,9 @@
 #include <string>
 #include <vector>
 
-#include "CheckerboardDetection.h"
+#include "MarkerDetection.h"
 #include "PauseManager.h"
+#include "../common/AbstractContext.h"
 
 using namespace std;
 
@@ -50,7 +51,7 @@ public:
 		LEFT_TOP, LEFT_BOTTOM, RIGHT_TOP, RIGHT_BOTTOM, CENTER
 	};
 
-	DataCapture();
+	DataCapture(AbstractContext& context);
 	virtual ~DataCapture();
 
 	void enableHeadStiffness();
@@ -81,8 +82,8 @@ private:
 	image_transport::Subscriber imageSub;
 	image_transport::ImageTransport it;
 	ros::Publisher measurementPub;
-	CheckerboardDetection checkerboardDetection;
-	CheckerboardData checkerboardData;
+	MarkerDetection* markerDetection;
+	vector<double> markerData;
 	PauseManager pauseManager;
 	bool checkerboardFound;
 	bool receivedJointStates;
@@ -97,6 +98,7 @@ private:
 	sensor_msgs::JointState jointState;
 	ros::Time curTime;
 	string imageTopic;
+	AbstractContext& context;
 	void setStiffness(const vector<string>& jointNames, double stiffness);
 	void enableStiffness(const vector<string>& jointNames);
 	void disableStiffness(const vector<string>& jointNames);
@@ -117,7 +119,7 @@ private:
 
 class LeftArmDataCapture: public DataCapture {
 public:
-	LeftArmDataCapture();
+	LeftArmDataCapture(AbstractContext& context);
 	virtual ~LeftArmDataCapture();
 
 protected:
@@ -130,7 +132,7 @@ private:
 
 class RightArmDataCapture: public DataCapture {
 public:
-	RightArmDataCapture();
+	RightArmDataCapture(AbstractContext& context);
 	virtual ~RightArmDataCapture();
 
 protected:

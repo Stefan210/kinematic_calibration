@@ -239,10 +239,10 @@ add_library(dataCapture
 	src/data_capturing/DataCapture.cpp
 	src/data_capturing/PauseManager.cpp
 	)
-target_link_libraries(dataCapture checkerboardDetection circleDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(dataCapture checkerboardDetection circleDetection context ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 add_executable(dataCaptureMain src/data_capturing/DataCaptureMain.cpp)
-target_link_libraries(dataCaptureMain dataCapture ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(dataCaptureMain dataCapture context ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 
 ### OptimizationNode
@@ -259,6 +259,7 @@ target_link_libraries(optimizationNode
 	frameImageConverter
 	modelLoader
 	kinematicChain
+	context
 	${catkin_LIBRARIES} 
 	${G2O_LIBS}
 	)
