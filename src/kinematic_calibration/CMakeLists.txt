@@ -194,6 +194,13 @@ target_link_libraries(checkerboardDetectionMain checkerboardDetection ${catkin_L
 catkin_add_gtest(checkerboardDetectionTest test/CheckerboardDetectionTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
 target_link_libraries(checkerboardDetectionTest checkerboardDetection ${catkin_LIBRARIES})
 
+### CheckerboardDetection
+add_library(circleDetection src/data_capturing/CircleDetection.cpp)
+target_link_libraries(circleDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
+catkin_add_gtest(circleDetectionTest test/CircleDetectionTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
+target_link_libraries(circleDetectionTest circleDetection ${catkin_LIBRARIES})
+
 ### KinematicChain
 add_library(kinematicChain src/common/KinematicChain.cpp) 
 target_link_libraries(kinematicChain ${catkin_LIBRARIES})
@@ -223,7 +230,7 @@ add_library(dataCapture
 	src/data_capturing/DataCapture.cpp
 	src/data_capturing/PauseManager.cpp
 	)
-target_link_libraries(dataCapture checkerboardDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(dataCapture checkerboardDetection circleDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 add_executable(dataCaptureMain src/data_capturing/DataCaptureMain.cpp)
 target_link_libraries(dataCaptureMain dataCapture ${catkin_LIBRARIES} ${OpenCV_LIBS})
