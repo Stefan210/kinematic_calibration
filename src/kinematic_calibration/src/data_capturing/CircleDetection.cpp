@@ -111,6 +111,11 @@ void CircleDetection::findClosest(const cv::Mat& image,
 }
 
 RosCircleDetection::RosCircleDetection() {
+	double r, g, b;
+	nh.getParam("marker_color_r", r);
+	nh.getParam("marker_color_g", g);
+	nh.getParam("marker_color_b", b);
+	this->color = cv::Scalar(r, g, b);
 }
 
 bool RosCircleDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
