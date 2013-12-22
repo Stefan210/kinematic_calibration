@@ -16,6 +16,8 @@ SET(G2O_LIBS cholmod cxsparse -lg2o_cli -lg2o_core
 -lg2o_types_sba -lg2o_types_sclam2d -lg2o_types_sim3 -lg2o_types_slam2d
 -lg2o_types_slam3d)
 
+link_directories (/opt/ros/groovy/lib)
+
 # Tell CMake where to find "FindNAOqi.cmake"
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
