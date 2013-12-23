@@ -206,9 +206,12 @@ target_link_libraries(checkerboardDetectionMain checkerboardDetection ${catkin_L
 catkin_add_gtest(checkerboardDetectionTest test/CheckerboardDetectionTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
 target_link_libraries(checkerboardDetectionTest checkerboardDetection ${catkin_LIBRARIES})
 
-### CheckerboardDetection
+### CircleDetection
 add_library(circleDetection src/data_capturing/CircleDetection.cpp src/data_capturing/MarkerDetection.cpp)
 target_link_libraries(circleDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
+add_executable(circleDetectionMain src/data_capturing/CircleDetectionMain.cpp)
+target_link_libraries(circleDetectionMain circleDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 catkin_add_gtest(circleDetectionTest test/CircleDetectionTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
 target_link_libraries(circleDetectionTest circleDetection ${catkin_LIBRARIES})
