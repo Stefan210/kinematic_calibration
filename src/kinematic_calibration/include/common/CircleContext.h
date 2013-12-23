@@ -10,14 +10,14 @@
 
 #include "../data_capturing/CircleDetection.h"
 #include "../data_capturing/MarkerDetection.h"
-#include "AbstractContext.h"
+#include "MarkerContext.h"
 
 namespace kinematic_calibration {
 
 /*
  *
  */
-class CircleContext: public AbstractContext {
+class CircleContext: public MarkerContext {
 public:
 	CircleContext();
 	virtual ~CircleContext();

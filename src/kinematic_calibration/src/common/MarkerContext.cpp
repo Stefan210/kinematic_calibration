@@ -5,16 +5,16 @@
  *      Author: stefan
  */
 
-#include "../../include/common/AbstractContext.h"
+#include "../../include/common/MarkerContext.h"
 
 namespace kinematic_calibration {
 
-AbstractContext::AbstractContext() {
+MarkerContext::MarkerContext() {
 	// TODO Auto-generated constructor stub
 
 }
 
-AbstractContext::~AbstractContext() {
+MarkerContext::~MarkerContext() {
 	// TODO Auto-generated destructor stub
 }
 

@@ -1,5 +1,5 @@
 /*
- * AbstractContext.h
+ * MarkerContext.h
  *
  *  Created on: 22.12.2013
  *      Author: stefan
@@ -15,10 +15,10 @@ namespace kinematic_calibration {
 /*
  *
  */
-class AbstractContext {
+class MarkerContext {
 public:
-	AbstractContext();
-	virtual ~AbstractContext();
+	MarkerContext();
+	virtual ~MarkerContext();
 
 	virtual MarkerDetection* getMarkerDetectionInstance() = 0;
 };

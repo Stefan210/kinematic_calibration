@@ -9,14 +9,14 @@
 #define CHECKERBOARDCONTEXT_H_
 
 #include "../data_capturing/CheckerboardDetection.h"
-#include "AbstractContext.h"
+#include "MarkerContext.h"
 
 namespace kinematic_calibration {
 
 /*
  *
  */
-class CheckerboardContext: public AbstractContext {
+class CheckerboardContext: public MarkerContext {
 public:
 	CheckerboardContext();
 	virtual ~CheckerboardContext();

@@ -36,7 +36,8 @@
 
 #include "MarkerDetection.h"
 #include "PauseManager.h"
-#include "../common/AbstractContext.h"
+#include "../common/CalibrationContext.h"
+#include "../common/MarkerContext.h"
 
 using namespace std;
 
@@ -51,7 +52,7 @@ public:
 		LEFT_TOP, LEFT_BOTTOM, RIGHT_TOP, RIGHT_BOTTOM, CENTER
 	};
 
-	DataCapture(AbstractContext& context);
+	DataCapture(CalibrationContext& context);
 	virtual ~DataCapture();
 
 	void enableHeadStiffness();
@@ -71,7 +72,7 @@ public:
 
 protected:
 	virtual const vector<string>& getJointNames() = 0;
-	virtual const string getPosePrefix() = 0;
+	virtual const string getPosePrefix();
 
 private:
 	ros::NodeHandle nh;
@@ -84,6 +85,9 @@ private:
 	ros::Publisher measurementPub;
 	MarkerDetection* markerDetection;
 	vector<double> markerData;
+	MarkerContext* markerContext;
+	string markerType;
+	string chainName;
 	PauseManager pauseManager;
 	bool checkerboardFound;
 	bool receivedJointStates;
@@ -98,7 +102,7 @@ private:
 	sensor_msgs::JointState jointState;
 	ros::Time curTime;
 	string imageTopic;
-	AbstractContext& context;
+	CalibrationContext& context;
 	void setStiffness(const vector<string>& jointNames, double stiffness);
 	void enableStiffness(const vector<string>& jointNames);
 	void disableStiffness(const vector<string>& jointNames);
@@ -119,12 +123,11 @@ private:
 
 class LeftArmDataCapture: public DataCapture {
 public:
-	LeftArmDataCapture(AbstractContext& context);
+	LeftArmDataCapture(CalibrationContext& context);
 	virtual ~LeftArmDataCapture();
 
 protected:
 	virtual const vector<string>& getJointNames();
-	virtual const string getPosePrefix();
 
 private:
 	vector<string> jointNames;
@@ -132,12 +135,11 @@ private:
 
 class RightArmDataCapture: public DataCapture {
 public:
-	RightArmDataCapture(AbstractContext& context);
+	RightArmDataCapture(CalibrationContext& context);
 	virtual ~RightArmDataCapture();
 
 protected:
 	virtual const vector<string>& getJointNames();
-	virtual const string getPosePrefix();
 
 private:
 	vector<string> jointNames;

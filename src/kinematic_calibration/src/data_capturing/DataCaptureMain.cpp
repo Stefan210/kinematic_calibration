@@ -12,7 +12,7 @@
 #include <cstdlib>
 
 #include "../../include/data_capturing/DataCapture.h"
-#include "../../include/common/AbstractContext.h"
+#include "../../include/common/CalibrationContext.h"
 #include "../../include/common/ContextFactory.h"
 
 using namespace kinematic_calibration;
@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
 	ros::NodeHandle nh;
 
 	// create the context object
-	AbstractContext* context = ContextFactory::getContextFromRos();
+	CalibrationContext* context = ContextFactory::getRosContext();
 
 	string chainName;
 	nh.getParam("chain_name", chainName);

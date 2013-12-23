@@ -7,29 +7,21 @@
 
 #include "../../include/common/ContextFactory.h"
 
-#include "../../include/common/CheckerboardContext.h"
-#include "../../include/common/CircleContext.h"
-
-
 namespace kinematic_calibration {
 
 ContextFactory::ContextFactory() {
 
 }
 
-AbstractContext* ContextFactory::getContextFromRos() {
-	NodeHandle nh;
-	string contextType;
-	nh.getParam("context_type", contextType);
-	ROS_INFO("Context type is %s.", contextType.c_str());
-	return getContext(contextType);
+CalibrationContext* ContextFactory::getRosContext() {
+	return new RosCalibContext();
 }
 
-AbstractContext* ContextFactory::getContext(string contextType) {
-	if("circle" == contextType) {
-		return new CircleContext();
-	} else if("checkerboard" == contextType) {
-		return new CheckerboardContext();
+CalibrationContext* ContextFactory::getContext(string contextType) {
+	if("ros" == contextType) {
+		return new RosCalibContext();
+	} else if("test" == contextType) {
+		return new TestCalibContext();
 	} else {
 		// TODO: return default context ?!
 		return NULL;

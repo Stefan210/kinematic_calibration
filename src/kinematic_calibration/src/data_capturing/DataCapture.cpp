@@ -38,7 +38,7 @@ using namespace nao_msgs;
 
 namespace kinematic_calibration {
 
-DataCapture::DataCapture(AbstractContext& context) :
+DataCapture::DataCapture(CalibrationContext& context) :
 		nhPrivate("~"), stiffnessClient(nh, "joint_stiffness_trajectory"), trajectoryClient(
 				nh, "joint_trajectory"), bodyPoseClient(nh, "body_pose"), it(
 				nh), checkerboardFound(false), receivedJointStates(false), receivedImage(
@@ -51,6 +51,10 @@ DataCapture::DataCapture(AbstractContext& context) :
 	nhPrivate.getParam("params/headPitch_max", headPitchMax);
 	nhPrivate.getParam("params/headPitch_step", headPitchStep);
 	nhPrivate.getParam("params/image_topic", imageTopic);
+	nhPrivate.getParam("params/markerType", markerType);
+
+	// get public parameters
+	nh.getParam("chain_name", chainName);
 
 	// get camera information
 	camerainfoSub = nh.subscribe("/nao_camera/camera_info", 1,
@@ -94,12 +98,14 @@ DataCapture::DataCapture(AbstractContext& context) :
 	srand(static_cast<unsigned>(time(0)));
 
 	// get the marker detection instance
-	markerDetection = context.getMarkerDetectionInstance();
+	markerContext = context.getMarkerContext(markerType);
+	markerDetection = markerContext->getMarkerDetectionInstance();
 }
 
 DataCapture::~DataCapture() {
 	disableHeadStiffness();
 	delete markerDetection;
+	delete markerContext;
 }
 
 void DataCapture::enableHeadStiffness() {
@@ -592,7 +598,11 @@ vector<double> DataCapture::generateRandomPositions(
 	return positions;
 }
 
-LeftArmDataCapture::LeftArmDataCapture(AbstractContext& context) :
+const string DataCapture::getPosePrefix() {
+	return chainName;
+}
+
+LeftArmDataCapture::LeftArmDataCapture(CalibrationContext& context) :
 		DataCapture(context)  {
 	jointNames.push_back("LShoulderPitch");
 	jointNames.push_back("LShoulderRoll");
@@ -609,11 +619,7 @@ const vector<string>& LeftArmDataCapture::getJointNames() {
 	return jointNames;
 }
 
-const string LeftArmDataCapture::getPosePrefix() {
-	return "larm";
-}
-
-RightArmDataCapture::RightArmDataCapture(AbstractContext& context) :
+RightArmDataCapture::RightArmDataCapture(CalibrationContext& context) :
 		DataCapture(context) {
 	jointNames.push_back("RShoulderPitch");
 	jointNames.push_back("RShoulderRoll");
@@ -628,10 +634,6 @@ RightArmDataCapture::~RightArmDataCapture() {
 
 const vector<string>& RightArmDataCapture::getJointNames() {
 	return jointNames;
-}
-
-const string RightArmDataCapture::getPosePrefix() {
-	return "rarm";
 }
 
 } /* namespace kinematic_calibration */

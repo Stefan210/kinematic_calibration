@@ -12,7 +12,7 @@
 #include <ros/ros.h>
 #include <string>
 
-#include "AbstractContext.h"
+#include "../../include/common/CalibrationContext.h"
 
 namespace kinematic_calibration {
 
@@ -24,8 +24,8 @@ using namespace std;
  */
 class ContextFactory {
 public:
-	static AbstractContext* getContextFromRos();
-	static AbstractContext* getContext(string contextType);
+	static CalibrationContext* getRosContext();
+	static CalibrationContext* getContext(string contextType);
 
 private:
 	ContextFactory();

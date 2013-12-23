@@ -184,10 +184,11 @@ catkin_package(
 
 ### Context
 add_library(context 
-	src/common/AbstractContext.cpp
+	src/common/CalibrationContext.cpp
 	src/common/CheckerboardContext.cpp
 	src/common/CircleContext.cpp
 	src/common/ContextFactory.cpp
+	src/common/MarkerContext.cpp
 	)
 target_link_libraries(context ${catkin_LIBRARIES})
 

@@ -1,7 +1,6 @@
 <launch>
   <arg name="chain_name" />
   <arg name="robot_ip" default"ra.local" />
-  <rosparam name="context_type" value="checkerboard" /> <!-- "checkerboard" or "circle" -->
   <rosparam file="$(find kinematic_calibration)/config/params_$(arg chain_name)_general.yaml" command="load"/>
   <node pkg="kinematic_calibration" type="imagePreprocessingNode" name="ImagePreprocessing">
   	<rosparam param="in_topic">"/nao_camera/image_raw"</rosparam>
