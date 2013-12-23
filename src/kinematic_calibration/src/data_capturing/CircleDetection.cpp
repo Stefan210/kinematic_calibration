@@ -48,10 +48,10 @@ bool CircleDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
 bool CircleDetection::detect(const cv::Mat& image, const cv::Scalar& color,
 		vector<double>& out) {
 	bool success;
-	vector<cv::Vec3f > circles;
+	vector<cv::Vec3f> circles;
 	success = detect(image, circles);
 	if (success) {
-		findClosest(image, circles, color, out);
+		return findClosest(image, circles, color, out);
 	}
 	return success;
 }
@@ -83,31 +83,38 @@ bool CircleDetection::detect(const cv::Mat& image, vector<cv::Vec3f>& out) {
 	return out.size() > 0;
 }
 
-void CircleDetection::findClosest(const cv::Mat& image,
+bool CircleDetection::findClosest(const cv::Mat& image,
 		const vector<cv::Vec3f>& circles, const cv::Scalar& color,
 		vector<double>& out) {
 	double minDist = 255 * 255 * 255;
+	double distTreshold = 100;
 	int minIdx = -1;
 
 	for (int i = 0; i < circles.size(); i++) {
 		cv::Vec3f currentCircle = circles[i];
 		int x = cvRound(currentCircle[0]);
 		int y = cvRound(currentCircle[1]);
-		uchar value_b = image.ptr < uchar > (y)[3 * x + 0];
-		uchar value_g = image.ptr < uchar > (y)[3 * x + 1];
-		uchar value_r = image.ptr < uchar > (y)[3 * x + 2];
+		uchar value_b = image.ptr<uchar>(y)[3 * x + 0];
+		uchar value_g = image.ptr<uchar>(y)[3 * x + 1];
+		uchar value_r = image.ptr<uchar>(y)[3 * x + 2];
 		double dist = fabs(value_r - color[0]) + fabs(value_g - color[1])
 				+ fabs(value_b - color[2]);
-		if(dist < minDist) {
+		if (dist < distTreshold && dist < minDist) {
 			minDist = dist;
 			minIdx = i;
 		}
 	}
 
-	out.resize(3);
-	out[idx_x] = circles[minIdx][0];
-	out[idx_y] = circles[minIdx][1];
-	out[idx_r] = circles[minIdx][2];
+	// check whether we found a circle that matches almost the color
+	if (-1 == minIdx) {
+		return false;
+	} else {
+		out.resize(3);
+		out[idx_x] = circles[minIdx][0];
+		out[idx_y] = circles[minIdx][1];
+		out[idx_r] = circles[minIdx][2];
+		return true;
+	}
 }
 
 RosCircleDetection::RosCircleDetection() {
@@ -124,5 +131,4 @@ bool RosCircleDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
 }
 
 } /* namespace kinematic_calibration */
-
 

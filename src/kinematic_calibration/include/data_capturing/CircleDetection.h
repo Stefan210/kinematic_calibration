@@ -52,7 +52,7 @@ protected:
 	 * @param[in] color RGB-color of the circle to be found
 	 * @param[out] out circle which matches the given color best
 	 */
-	void findClosest(const cv::Mat& image, const vector<cv::Vec3f >& circles,
+	bool findClosest(const cv::Mat& image, const vector<cv::Vec3f >& circles,
 			const cv::Scalar& color, vector<double>& out);
 
 };
