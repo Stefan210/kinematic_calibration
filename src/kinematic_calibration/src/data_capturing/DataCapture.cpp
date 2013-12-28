@@ -563,16 +563,18 @@ void DataCapture::publishMeasurement() {
 		return;
 	}
 	updateJointStates();
+	time_t id = time(NULL);
 	measurementData data;
 	data.jointState = jointState;
 	data.cb_x = markerData[0];
 	data.cb_y = markerData[1];
+	data.id = id;
+	data.camera_frame = this->cameraFrame;
 	nh.getParam("chain_name", data.chain_name);
 	ROS_INFO("Publishing measurement data...");
 	measurementPub.publish(data);
 
 	// save the image to disk
-	time_t id = time(NULL);
 	string filename(id + ".jpg");
 	this->markerDetection->writeImage(filename);
 }
