@@ -10,12 +10,20 @@
 namespace kinematic_calibration {
 
 MarkerDetection::MarkerDetection() {
-	// TODO Auto-generated constructor stub
 
 }
 
 MarkerDetection::~MarkerDetection() {
-	// TODO Auto-generated destructor stub
+}
+
+bool MarkerDetection::writeImage(
+		const string& filename) {
+	cv::Mat image;
+	this->getImage(image);
+	this->drawMarker(image);
+	return cv::imwrite(filename, image);
 }
 
 } /* namespace kinematic_calibration */
+
+

@@ -10,6 +10,8 @@
 
 #include <sensor_msgs/Image.h>
 #include <vector>
+#include <string>
+#include <opencv2/opencv.hpp>
 
 namespace kinematic_calibration {
 
@@ -30,6 +32,26 @@ public:
 	 * @return true if the marker was detected otherwise false
 	 */
 	virtual bool detect(const sensor_msgs::ImageConstPtr& in_msg, vector<double>& out) = 0;
+
+	/**
+	 * Writes the last image with the detected marker to the hard disk.
+	 * @param filename name of the file to be saved
+	 * @return true if success otherwise false;
+	 */
+	virtual bool writeImage(const string& filename);
+
+protected:
+	/**
+	 * Draws the detected marker into the image.
+	 * @param image
+	 */
+	virtual void drawMarker(cv::Mat& image) = 0;
+
+	/**
+	 * Returns the last image.
+	 * @param image the last image
+	 */
+	virtual void getImage(cv::Mat& image) = 0;
 };
 
 } /* namespace kinematic_calibration */
