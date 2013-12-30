@@ -74,6 +74,7 @@ void OptimizationNode::collectData() {
 	while (collectingData) {
 		ros::spinOnce();
 	}
+	removeIgnoredMeasurements();
 }
 
 void OptimizationNode::optimize() {
@@ -294,27 +295,33 @@ bool OptimizationNode::measurementOk(const measurementDataConstPtr& msg) {
 		return false;
 	}
 
-	if (isIgnored(data.id)) {
-		return false;
-	}
-
 	return true;
 }
 
-bool OptimizationNode::isIgnored(string id) {
+void OptimizationNode::removeIgnoredMeasurements() {
+	// get list of IDs to be ignored
 	XmlRpc::XmlRpcValue idList;
 	nh.getParam("ignore_measurements", idList);
 	ROS_ASSERT(idList.getType() == XmlRpc::XmlRpcValue::TypeArray);
 
-	for (int32_t i = 0; i < idList.size(); ++i) {
-		ROS_ASSERT(idList[i].getType() == XmlRpc::XmlRpcValue::TypeString);
-		string cid = static_cast<string>(idList[i]);
-		if(id == cid) {
-			return true;
+	// create new list for measurement data
+	vector<measurementData> filteredList;
+
+	// check which measurements should be ignored
+	for (vector<measurementData>::iterator it = measurements.begin();
+			it != measurements.end(); it++) {
+		string id = it->id;
+		for (int32_t i = 0; i < idList.size(); ++i) {
+			ROS_ASSERT(idList[i].getType() == XmlRpc::XmlRpcValue::TypeString);
+			string cid = static_cast<string>(idList[i]);
+			if (id != cid) {
+				filteredList.push_back(*it);
+			}
 		}
 	}
 
-	return true;
+	// reassign the measurements list
+	this->measurements = filteredList;
 }
 
 } /* namespace kinematic_calibration */

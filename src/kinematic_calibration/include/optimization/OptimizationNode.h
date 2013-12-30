@@ -65,7 +65,7 @@ protected:
 			std_srvs::Empty::Response& response);
 
 	bool measurementOk(const measurementDataConstPtr& msg);
-	bool isIgnored(string id);
+	void removeIgnoredMeasurements();
 
 private:
 	NodeHandle nh;
