@@ -1,0 +1,7 @@
+<launch>
+  <rosparam>
+  ignore_measurements: []
+  </rosparam>
+  <node pkg="kinematic_calibration" type="optimizationNode" name="optimizationNode">
+  </node>  
+</launch>
