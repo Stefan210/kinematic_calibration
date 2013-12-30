@@ -24,87 +24,20 @@ namespace kinematic_calibration {
 
 CheckerboardMeasurementEdge::CheckerboardMeasurementEdge(
 		measurementData measurement) :
-		measurement(measurement), frameImageConverter(NULL), kinematicChain(
-				NULL) {
-	resize(4);
-	for (int i = 0; i < measurement.jointState.name.size(); i++) {
-		jointPositions.insert(
-				make_pair<string, double>(measurement.jointState.name[i],
-						measurement.jointState.position[i]));
-	}
+		MeasurementEdge<2, CheckerboardMeasurementEdge>(measurement) {
+
 }
 
 CheckerboardMeasurementEdge::~CheckerboardMeasurementEdge() {
 }
 
-void CheckerboardMeasurementEdge::computeError() {
-	// check if components are initialized
-	if(NULL == kinematicChain || NULL == frameImageConverter) {
-		ROS_FATAL("Uninitialized components!");
-		return;
-	}
-
-	// get the pointers to the vertices
-	VertexSE3* markerTransformationVertex =
-			static_cast<VertexSE3*>(this->_vertices[0]);
-	JointOffsetVertex* jointOffsetVertex =
-			static_cast<JointOffsetVertex*>(this->_vertices[1]);
-	VertexSE3* cameraToHeadTransformationVertex =
-			static_cast<VertexSE3*>(this->_vertices[2]);
-	CameraIntrinsicsVertex* cameraIntrinsicsVertex =
-			static_cast<CameraIntrinsicsVertex*>(this->_vertices[3]);
-
-	// get transformation from end effector to camera
-	tf::Transform cameraToEndEffector; // root = camera, tip = end effector, e.g. wrist
-	map<string, double> jointOffsets = jointOffsetVertex->estimate();
-	jointOffsets[this->kinematicChain->getTip()] = 0; // set offset of the last joint to 0
-	this->kinematicChain->getRootToTip(jointPositions, jointOffsets,
-			cameraToEndEffector);
-
-	// get transformation from marker to end effector
-	Eigen::Isometry3d eigenTransform = markerTransformationVertex->estimate();
-	tf::Transform endEffectorToMarker;
-	tf::transformEigenToTF(eigenTransform, endEffectorToMarker);
-
-	// get transformation from camera to head
-	eigenTransform = cameraToHeadTransformationVertex->estimate();
-	tf::Transform cameraToHead;
-	tf::transformEigenToTF(eigenTransform, cameraToHead);
-
-	// get estimated camera intrinsics
-	sensor_msgs::CameraInfo cameraInfo =
-			this->frameImageConverter->getCameraModel().cameraInfo();
-	cameraInfo.K = cameraIntrinsicsVertex->estimate();
-	this->frameImageConverter->getCameraModel().fromCameraInfo(cameraInfo);
-
-	// calculate estimated x and y
-	endEffectorToMarker.setRotation(tf::Quaternion::getIdentity());
-	tf::Transform cameraToMarker = endEffectorToMarker * cameraToEndEffector
-			* cameraToHead;
+void CheckerboardMeasurementEdge::setError(tf::Transform cameraToMarker) {
 	double x, y;
 	this->frameImageConverter->project(cameraToMarker.inverse(), x, y);
 
 	// set error
 	this->_error[0] = measurement.cb_x - x;
 	this->_error[1] = measurement.cb_y - y;
-}
-
-const FrameImageConverter* CheckerboardMeasurementEdge::getFrameImageConverter() const {
-	return frameImageConverter;
-}
-
-void CheckerboardMeasurementEdge::setFrameImageConverter(
-		FrameImageConverter* frameImageConverter) {
-	this->frameImageConverter = frameImageConverter;
-}
-
-const KinematicChain* CheckerboardMeasurementEdge::getKinematicChain() const {
-	return kinematicChain;
-}
-
-void CheckerboardMeasurementEdge::setKinematicChain(
-		KinematicChain* kinematicChain) {
-	this->kinematicChain = kinematicChain;
 }
 
 } /* namespace kinematic_calibration */

@@ -140,7 +140,6 @@ void G2oJointOffsetOptimization::optimize(
 	optimizer.addVertex(cameraIntrinsicsVertex);
 
 	// add edges
-	Eigen::Matrix3d info = Eigen::Matrix3d::Identity(3, 3);
 	for (int i = 0; i < measurements.size(); i++) {
 		measurementData current = measurements[i];
 		if (markerTransformationVertices.count(current.chain_name) == 0
@@ -154,7 +153,6 @@ void G2oJointOffsetOptimization::optimize(
 				current);
 		edge->setId(++id);
 		edge->setRobustKernel(rk);
-		edge->setInformation(info);
 		edge->vertices()[0] = markerTransformationVertices[current.chain_name];
 		edge->vertices()[1] = jointOffsetVertex;
 		edge->vertices()[2] = cameraToHeadTransformationVertex;
