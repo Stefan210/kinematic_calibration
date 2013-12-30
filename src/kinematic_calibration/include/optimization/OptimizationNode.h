@@ -64,6 +64,9 @@ protected:
 			std_srvs::Empty::Request& request,
 			std_srvs::Empty::Response& response);
 
+	bool measurementOk(const measurementDataConstPtr& msg);
+	bool isIgnored(string id);
+
 private:
 	NodeHandle nh;
 	Subscriber measurementSubsriber;

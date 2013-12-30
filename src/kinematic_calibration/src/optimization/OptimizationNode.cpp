@@ -22,6 +22,7 @@
 #include <iostream>
 #include <map>
 #include <utility>
+#include <string>
 #include <urdf_model/model.h>
 
 #include "../../include/common/FrameImageConverter.h"
@@ -30,6 +31,8 @@
 #include "../../include/optimization/G2oJointOffsetOptimization.h"
 
 namespace kinematic_calibration {
+
+using namespace std;
 
 OptimizationNode::OptimizationNode() :
 		collectingData(false) {
@@ -244,7 +247,7 @@ void OptimizationNode::publishResults() {
 
 void OptimizationNode::measurementCb(const measurementDataConstPtr& msg) {
 	const measurementData data = *msg;
-	if (data.jointState.name.empty()) {
+	if (!measurementOk(msg)) {
 		return;
 	} else {
 		// check if the measurement contains to a new chain
@@ -278,6 +281,39 @@ bool OptimizationNode::startOptizationCallback(
 		std_srvs::Empty::Request& request,
 		std_srvs::Empty::Response& response) {
 	this->collectingData = false;
+	return true;
+}
+
+bool OptimizationNode::measurementOk(const measurementDataConstPtr& msg) {
+	const measurementData data = *msg;
+	if (data.jointState.name.empty()) {
+		return false;
+	}
+
+	if (data.marker_data.empty()) {
+		return false;
+	}
+
+	if (isIgnored(data.id)) {
+		return false;
+	}
+
+	return true;
+}
+
+bool OptimizationNode::isIgnored(string id) {
+	XmlRpc::XmlRpcValue idList;
+	nh.getParam("ignore_measurements", idList);
+	ROS_ASSERT(idList.getType() == XmlRpc::XmlRpcValue::TypeArray);
+
+	for (int32_t i = 0; i < idList.size(); ++i) {
+		ROS_ASSERT(idList[i].getType() == XmlRpc::XmlRpcValue::TypeString);
+		string cid = static_cast<string>(idList[i]);
+		if(id == cid) {
+			return true;
+		}
+	}
+
 	return true;
 }
 
