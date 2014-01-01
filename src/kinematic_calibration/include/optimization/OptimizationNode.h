@@ -21,6 +21,7 @@
 
 #include "../common/KinematicChain.h"
 #include "../common/ModelLoader.h"
+#include "../common/CalibrationContext.h"
 #include "KinematicCalibrationState.h"
 
 using namespace ros;
@@ -36,7 +37,7 @@ public:
 	/**
 	 * Constructor.
 	 */
-	OptimizationNode();
+	OptimizationNode(CalibrationContext* context);
 
 	/**
 	 * Deconstructor.
@@ -81,6 +82,7 @@ private:
 	KDL::Tree kdlTree;
 	string chainName, chainRoot, chainTip;
 	vector<KinematicChain> kinematicChains;
+	CalibrationContext* context;
 
 	bool collectingData;
 

@@ -38,11 +38,11 @@ using namespace std;
 namespace kinematic_calibration {
 
 G2oJointOffsetOptimization::G2oJointOffsetOptimization(
-		vector<measurementData>& measurements,
+		CalibrationContext& context, vector<measurementData>& measurements,
 		vector<KinematicChain> kinematicChains,
 		FrameImageConverter& frameImageConverter,
 		KinematicCalibrationState initialState) :
-		JointOffsetOptimization(measurements, kinematicChains,
+		JointOffsetOptimization(context, measurements, kinematicChains,
 				frameImageConverter, initialState) {
 }
 
@@ -118,8 +118,7 @@ void G2oJointOffsetOptimization::optimize(
 	Eigen::Isometry3d initialCameraToHeadIsometry;
 	initialCameraToHeadIsometry.translation() =
 			initialCameraToHeadAffine.translation();
-	initialCameraToHeadIsometry.linear() =
-			initialCameraToHeadAffine.rotation();
+	initialCameraToHeadIsometry.linear() = initialCameraToHeadAffine.rotation();
 	cameraToHeadTransformationVertex->setEstimate(initialCameraToHeadIsometry);
 	optimizer.addVertex(cameraToHeadTransformationVertex);
 

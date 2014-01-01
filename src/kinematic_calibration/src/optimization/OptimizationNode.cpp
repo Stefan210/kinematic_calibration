@@ -29,13 +29,14 @@
 //#include "../../include/common/KinematicChain.h"
 #include "../../include/optimization/CameraIntrinsicsVertex.h"
 #include "../../include/optimization/G2oJointOffsetOptimization.h"
+#include "../../include/common/CalibrationContext.h"
 
 namespace kinematic_calibration {
 
 using namespace std;
 
-OptimizationNode::OptimizationNode() :
-		collectingData(false) {
+OptimizationNode::OptimizationNode(CalibrationContext* context) :
+		collectingData(false), context(context) {
 	measurementSubsriber = nh.subscribe(
 			"/kinematic_calibration/measurement_data", 1000,
 			&OptimizationNode::measurementCb, this);
@@ -104,7 +105,7 @@ void OptimizationNode::optimize() {
 	initialState.cameraToHeadTransformation = headToCamera;
 
 	// optimization instance
-	G2oJointOffsetOptimization optimization(measurements, kinematicChains,
+	G2oJointOffsetOptimization optimization(*context, measurements, kinematicChains,
 			frameImageConverter, initialState);
 	optimization.optimize(result);
 }
@@ -326,9 +327,13 @@ void OptimizationNode::removeIgnoredMeasurements() {
 
 } /* namespace kinematic_calibration */
 
+using namespace kinematic_calibration;
+
 int main(int argc, char** argv) {
 	ros::init(argc, argv, "OptimizationNode");
-	kinematic_calibration::OptimizationNode node;
+	CalibrationContext* context = new RosCalibContext();
+	OptimizationNode node(context);
 	node.startLoop();
+	delete context;
 	return 0;
 }

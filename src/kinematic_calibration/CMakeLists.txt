@@ -190,7 +190,10 @@ add_library(context
 	src/common/ContextFactory.cpp
 	src/common/MarkerContext.cpp
 	)
-target_link_libraries(context ${catkin_LIBRARIES})
+target_link_libraries(context 
+	checkerboardDetection
+	circleDetection
+	${catkin_LIBRARIES})
 
 ### ImagePreprocessing
 add_executable(imagePreprocessingNode src/data_capturing/ImagePreprocessingNode.cpp)
