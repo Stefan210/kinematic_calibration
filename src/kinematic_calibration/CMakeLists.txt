@@ -189,10 +189,14 @@ add_library(context
 	src/common/CircleContext.cpp
 	src/common/ContextFactory.cpp
 	src/common/MarkerContext.cpp
+	src/optimization/CheckerboardMeasurementEdge.cpp
 	)
 target_link_libraries(context 
 	checkerboardDetection
 	circleDetection
+	frameImageConverter
+	kinematicChain
+	${G2O_LIBS}
 	${catkin_LIBRARIES})
 
 ### ImagePreprocessing
@@ -263,7 +267,7 @@ add_executable(optimizationNode
 	src/optimization/CameraIntrinsicsVertex.cpp
 	src/optimization/JointOffsetVertex.cpp
 	#src/optimization/MeasurementEdge.cpp
-	src/optimization/CheckerboardMeasurementEdge.cpp
+	#src/optimization/CheckerboardMeasurementEdge.cpp
 	)
 target_link_libraries(optimizationNode 
 	frameImageConverter

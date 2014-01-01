@@ -30,22 +30,26 @@ RosCalibContext::~RosCalibContext() {
 MarkerContext* RosCalibContext::getMarkerContext(const string& type) {
 	if ("checkerboard" == type) {
 		return new CheckerboardContext();
-	} else if("circle" == type) {
+	} else if ("circle" == type) {
 		return new CircleContext();
 	} else {
 		return NULL;
 	}
 }
 
-TestCalibContext::TestCalibContext() {
-}
-
-TestCalibContext::~TestCalibContext() {
-}
-
-MarkerContext* TestCalibContext::getMarkerContext(const string& type) {
-	// TODO
-	return NULL;
+g2o::OptimizableGraph::Edge* RosCalibContext::getMeasurementEdge(
+		const measurementData& m, FrameImageConverter* frameImageConverter,
+		KinematicChain* kinematicChain) {
+	MarkerContext* markerContext = getMarkerContext(m.marker_type);
+	if (NULL == markerContext) {
+		ROS_ERROR("Unknown marker type: %s", m.marker_type.c_str());
+		return NULL;
+	} else {
+		g2o::OptimizableGraph::Edge* edge = markerContext->getMeasurementEdge(m,
+				frameImageConverter, kinematicChain);
+		delete markerContext;
+		return edge;
+	}
 }
 
 } /* namespace kinematic_calibration */

@@ -26,7 +26,7 @@
 #include <urdf_model/model.h>
 
 #include "../../include/common/FrameImageConverter.h"
-//#include "../../include/common/KinematicChain.h"
+#include "../../include/common/KinematicChain.h"
 #include "../../include/optimization/CameraIntrinsicsVertex.h"
 #include "../../include/optimization/G2oJointOffsetOptimization.h"
 #include "../../include/common/CalibrationContext.h"

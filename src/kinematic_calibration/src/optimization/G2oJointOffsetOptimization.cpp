@@ -140,17 +140,13 @@ void G2oJointOffsetOptimization::optimize(
 			continue;
 		}
 		RobustKernel* rk = new RobustKernelHuber();
-		CheckerboardMeasurementEdge* edge = new CheckerboardMeasurementEdge(
-				current);
+		g2o::OptimizableGraph::Edge* edge = context.getMeasurementEdge(current, &frameImageConverter, &kinematicChainsMap.find(current.chain_name)->second);
 		edge->setId(++id);
 		edge->setRobustKernel(rk);
 		edge->vertices()[0] = markerTransformationVertices[current.chain_name];
 		edge->vertices()[1] = jointOffsetVertex;
 		edge->vertices()[2] = cameraToHeadTransformationVertex;
 		edge->vertices()[3] = cameraIntrinsicsVertex;
-		edge->setFrameImageConverter(&frameImageConverter);
-		edge->setKinematicChain(
-				&kinematicChainsMap.find(current.chain_name)->second);
 		edge->computeError();
 		optimizer.addEdge(edge);
 	}

@@ -34,7 +34,9 @@ public:
 	 * Constructor.
 	 * @param measurement Measurement represented by the edge.
 	 */
-	CheckerboardMeasurementEdge(measurementData measurement);
+	CheckerboardMeasurementEdge(measurementData measurement,
+			FrameImageConverter* frameImageConverter,
+			KinematicChain* kinematicChain);
 
 	/**
 	 * Destructor.

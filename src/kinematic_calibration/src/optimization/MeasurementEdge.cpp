@@ -21,15 +21,17 @@
 #include <vector>
 
 #include "../../include/optimization/CameraIntrinsicsVertex.h"
-#include "../../include/optimization/MeasurementEdge.h"
+//#include "../../include/optimization/MeasurementEdge.h"
 #include "../../include/optimization/JointOffsetVertex.h"
 
 namespace kinematic_calibration {
 
 template<int D, class Derived>
-MeasurementEdge<D, Derived>::MeasurementEdge(measurementData measurement) :
-		measurement(measurement), frameImageConverter(NULL), kinematicChain(
-		NULL) {
+MeasurementEdge<D, Derived>::MeasurementEdge(measurementData measurement,
+		FrameImageConverter* frameImageConverter,
+		KinematicChain* kinematicChain) :
+		measurement(measurement), frameImageConverter(frameImageConverter), kinematicChain(
+				kinematicChain) {
 	BaseMultiEdge<D, measurementData>::resize(4);
 	for (int i = 0; i < measurement.jointState.name.size(); i++) {
 		jointPositions.insert(

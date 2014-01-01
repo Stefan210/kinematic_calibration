@@ -12,9 +12,7 @@
 
 #include <string>
 
-
 using namespace std;
-
 
 namespace kinematic_calibration {
 
@@ -27,6 +25,9 @@ public:
 	virtual ~CalibrationContext();
 
 	virtual MarkerContext* getMarkerContext(const string& type) = 0;
+	virtual g2o::OptimizableGraph::Edge* getMeasurementEdge(const measurementData& m,
+			FrameImageConverter* frameImageConverter,
+			KinematicChain* kinematicChain) = 0;
 };
 
 class RosCalibContext: public CalibrationContext {
@@ -35,14 +36,9 @@ public:
 	virtual ~RosCalibContext();
 
 	virtual MarkerContext* getMarkerContext(const string& type);
-};
-
-class TestCalibContext: public CalibrationContext {
-public:
-	TestCalibContext();
-	virtual ~TestCalibContext();
-
-	virtual MarkerContext* getMarkerContext(const string& type);
+	virtual g2o::OptimizableGraph::Edge* getMeasurementEdge(const measurementData& m,
+			FrameImageConverter* frameImageConverter,
+			KinematicChain* kinematicChain);
 };
 
 } /* namespace kinematic_calibration */

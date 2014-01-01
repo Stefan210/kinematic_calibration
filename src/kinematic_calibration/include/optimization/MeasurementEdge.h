@@ -30,7 +30,9 @@ public:
 	 * Constructor.
 	 * @param measurement Measurement represented by the edge.
 	 */
-	MeasurementEdge(measurementData measurement);
+	MeasurementEdge(measurementData measurement,
+			FrameImageConverter* frameImageConverter,
+			KinematicChain* kinematicChain);
 
 	/**
 	 * Computes the error of the edge and stores it in an internal structure.

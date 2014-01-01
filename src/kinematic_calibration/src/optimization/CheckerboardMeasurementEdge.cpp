@@ -23,8 +23,10 @@
 namespace kinematic_calibration {
 
 CheckerboardMeasurementEdge::CheckerboardMeasurementEdge(
-		measurementData measurement) :
-		MeasurementEdge<2, CheckerboardMeasurementEdge>(measurement) {
+		measurementData measurement, FrameImageConverter* frameImageConverter,
+		KinematicChain* kinematicChain) :
+		MeasurementEdge<2, CheckerboardMeasurementEdge>(measurement,
+				frameImageConverter, kinematicChain) {
 
 }
 
