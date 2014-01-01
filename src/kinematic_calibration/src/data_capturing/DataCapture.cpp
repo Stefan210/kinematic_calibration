@@ -10,29 +10,30 @@
 #include <actionlib/client/simple_client_goal_state.h>
 #include <boost/bind/arg.hpp>
 #include <boost/bind/bind.hpp>
+#include <boost/bind/bind_mf_cc.hpp>
 #include <boost/bind/placeholders.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
-#include <image_transport/subscriber.h>
+//#include <image_transport/subscriber.h>
 #include <nao_msgs/JointTrajectoryGoal.h>
-#include <ros/callback_queue.h>
+//#include <ros/callback_queue.h>
 #include <ros/console.h>
 #include <ros/duration.h>
 #include <ros/forwards.h>
 #include <ros/init.h>
-#include <ros/publisher.h>
+//#include <ros/publisher.h>
 #include <ros/subscribe_options.h>
-#include <ros/subscriber.h>
+//#include <ros/subscriber.h>
 #include <rosconsole/macros_generated.h>
-#include <sensor_msgs/CameraInfo.h>
-#include <sensor_msgs/Image.h>
-#include <sensor_msgs/JointState.h>
+//#include <sensor_msgs/CameraInfo.h>
+//#include <sensor_msgs/Image.h>
+//#include <sensor_msgs/JointState.h>
 #include <std_msgs/Header.h>
 #include <unistd.h>
+//#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
-#include <cmath>
 
 using namespace nao_msgs;
 
@@ -566,8 +567,7 @@ void DataCapture::publishMeasurement() {
 	time_t id = time(NULL);
 	measurementData data;
 	data.jointState = jointState;
-	data.cb_x = markerData[0];
-	data.cb_y = markerData[1];
+	data.marker_data = markerData;
 	data.id = id;
 	data.camera_frame = this->cameraFrame;
 	nh.getParam("chain_name", data.chain_name);
@@ -578,15 +578,6 @@ void DataCapture::publishMeasurement() {
 	// save the image to disk
 	string filename(id + ".jpg");
 	this->markerDetection->writeImage(filename);
-}
-
-void DataCapture::publishEmptyMeasurement() {
-	measurementData data;
-	data.jointState = sensor_msgs::JointState();
-	data.cb_x = -1;
-	data.cb_y = -1;
-	ROS_INFO("Publishing empty measurement data...");
-	measurementPub.publish(data);
 }
 
 vector<double> DataCapture::generateRandomPositions(

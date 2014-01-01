@@ -38,8 +38,8 @@ void CheckerboardMeasurementEdge::setError(tf::Transform cameraToMarker) {
 	this->frameImageConverter->project(cameraToMarker.inverse(), x, y);
 
 	// set error
-	this->_error[0] = measurement.cb_x - x;
-	this->_error[1] = measurement.cb_y - y;
+	this->_error[0] = measurement.marker_data[0] - x;
+	this->_error[1] = measurement.marker_data[1] - y;
 }
 
 } /* namespace kinematic_calibration */

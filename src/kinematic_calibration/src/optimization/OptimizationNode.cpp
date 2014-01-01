@@ -158,7 +158,7 @@ void OptimizationNode::printPoints() {
 	// print out the measured position and the transformed position
 	for (int i = 0; i < measurements.size(); i++) {
 		measurementData current = measurements[i];
-		cout << i << " measured(x,y): " << current.cb_x << "  " << current.cb_y;
+		cout << i << " measured(x,y): " << current.marker_data[0] << "  " << current.marker_data[1];
 
 		// get transformation from end effector to camera
 		map<string, double> jointPositions;
@@ -202,10 +202,13 @@ void OptimizationNode::printPoints() {
 		tf::Vector3 origin = cameraToMarker.getOrigin();
 		double dist = origin.length();
 
+		double currentX = current.marker_data[0];
+		double currentY = current.marker_data[1];
+
 		cout << "\toptimized(x,y): " << x << " " << y;
-		cout << "\tdifference(x,y): " << (current.cb_x - x) << " "
-				<< (current.cb_y - y);
-		cout << "\tsum: " << (fabs(current.cb_x - x) + fabs(current.cb_y - y));
+		cout << "\tdifference(x,y): " << (currentX - x) << " "
+				<< (currentY - y);
+		cout << "\tsum: " << (fabs(currentX - x) + fabs(currentY - y));
 		cout << "\tdist: " << dist;
 		cout << "\n";
 	}

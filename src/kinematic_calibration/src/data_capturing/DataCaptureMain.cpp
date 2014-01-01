@@ -37,7 +37,6 @@ int main(int argc, char** argv) {
 	}
     //dataCapture.findCheckerboard();
     dataCapture->playChainPoses();
-    dataCapture->publishEmptyMeasurement();
 
     delete context;
 }
