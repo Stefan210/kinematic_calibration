@@ -571,6 +571,7 @@ void DataCapture::publishMeasurement() {
 	data.id = id;
 	data.camera_frame = this->cameraFrame;
 	nh.getParam("chain_name", data.chain_name);
+	data.marker_type = this->markerType;
 	ROS_INFO("Publishing measurement data...");
 	measurementPub.publish(data);
 
