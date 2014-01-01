@@ -38,14 +38,6 @@ using namespace std;
 namespace kinematic_calibration {
 
 G2oJointOffsetOptimization::G2oJointOffsetOptimization(
-		vector<measurementData>& measurements, KinematicChain& kinematicChain,
-		FrameImageConverter& frameImageConverter,
-		KinematicCalibrationState initialState) :
-		JointOffsetOptimization(measurements, kinematicChain,
-				frameImageConverter, initialState) {
-}
-
-G2oJointOffsetOptimization::G2oJointOffsetOptimization(
 		vector<measurementData>& measurements,
 		vector<KinematicChain> kinematicChains,
 		FrameImageConverter& frameImageConverter,

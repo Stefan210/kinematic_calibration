@@ -30,14 +30,6 @@ public:
 	 * Constructor.
 	 */
 	JointOffsetOptimization(vector<measurementData>& measurements,
-			KinematicChain kinematicChain,
-			FrameImageConverter& frameImageConverter,
-			KinematicCalibrationState initialState = KinematicCalibrationState());
-
-	/**
-	 * Constructor.
-	 */
-	JointOffsetOptimization(vector<measurementData>& measurements,
 			vector<KinematicChain> kinematicChains,
 			FrameImageConverter& frameImageConverter,
 			KinematicCalibrationState initialState = KinematicCalibrationState());
