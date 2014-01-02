@@ -47,11 +47,34 @@ bool CircleDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
 
 bool CircleDetection::detect(const cv::Mat& image, const cv::Scalar& color,
 		vector<double>& out) {
+    cv::Mat imageCopy = image.clone();
+/*
+    // TODO: move into own method
+    cout << "r, g, b: " << color << "\n";
+    for(int x = 0; x < imageCopy.cols; x++) {
+        for(int y = 0; y < imageCopy.rows; y++) {
+            int value_b = imageCopy.ptr<uchar>(y)[3 * x + 0];
+            int value_g = imageCopy.ptr<uchar>(y)[3 * x + 1];
+            int value_r = imageCopy.ptr<uchar>(y)[3 * x + 2];
+            double dist = fabs(value_r - color[0]) + fabs(value_g - color[1])
+                    + fabs(value_b - color[2]);
+            if (dist > 200) {
+//                cout << "remove pixel\n";
+                imageCopy.ptr<uchar>(y)[3 * x + 0] = 0;
+                imageCopy.ptr<uchar>(y)[3 * x + 1] = 0;
+                imageCopy.ptr<uchar>(y)[3 * x + 2] = 0;
+            } else {
+//                cout << "keep pixel\n";
+            }
+        }
+    }*/
+
+
 	bool success;
 	vector<cv::Vec3f> circles;
-	success = detect(image, circles);
+    success = detect(imageCopy, circles);
 	if (success) {
-		return findClosest(image, circles, color, out);
+        return findClosest(image, circles, color, out);
 	}
 	return success;
 }
@@ -77,44 +100,67 @@ bool CircleDetection::detect(const cv::Mat& image, vector<cv::Vec3f>& out) {
 	cv::Mat gray;
 	cv::Mat img;
 	image.copyTo(img);
-	cv::cvtColor(img, gray, CV_BGR2GRAY);
-	cv::Canny(gray, gray, 90, 80, 3);
-	cv::HoughCircles(gray, out, CV_HOUGH_GRADIENT, 2, 15, 70, 70, 8, 1000);
+    cv::cvtColor(img, gray, CV_BGR2GRAY);
+
+    cv::GaussianBlur(gray, gray, cv::Size(75, 75), 5, 5);
+
+    double treshold1 = 150;
+    double treshold2 = 70;
+    int apertureSize = 3;
+    cv::Canny(gray, gray, treshold1, treshold2, apertureSize);
+
+    double dp = 5;
+    double min_dist = 20;
+    double param1 = treshold1;
+    double param2 = 100;
+    int min_radius = 20;
+    int max_radius = 100;
+    cv::HoughCircles(gray, out, CV_HOUGH_GRADIENT, dp, min_dist, param1, param2, min_radius, max_radius);
+    ROS_INFO("Detected %u circles.", out.size());
 	return out.size() > 0;
 }
 
 bool CircleDetection::findClosest(const cv::Mat& image,
 		const vector<cv::Vec3f>& circles, const cv::Scalar& color,
-		vector<double>& out) {
-	double minDist = 255 * 255 * 255;
-	double distTreshold = 100;
+        vector<double>& out) {
+    double distTreshold = 70;
 	int minIdx = -1;
+    vector<int> validIndexes;
 
 	for (int i = 0; i < circles.size(); i++) {
 		cv::Vec3f currentCircle = circles[i];
 		int x = cvRound(currentCircle[0]);
 		int y = cvRound(currentCircle[1]);
-		uchar value_b = image.ptr<uchar>(y)[3 * x + 0];
-		uchar value_g = image.ptr<uchar>(y)[3 * x + 1];
-		uchar value_r = image.ptr<uchar>(y)[3 * x + 2];
-		double dist = fabs(value_r - color[0]) + fabs(value_g - color[1])
-				+ fabs(value_b - color[2]);
-		if (dist < distTreshold && dist < minDist) {
-			minDist = dist;
-			minIdx = i;
+        int value_b = image.ptr<uchar>(y)[3 * x + 0];
+        int value_g = image.ptr<uchar>(y)[3 * x + 1];
+        int value_r = image.ptr<uchar>(y)[3 * x + 2];
+        double dist = /*fabs(value_r - color[0]) + fabs(value_g - color[1])
+                +*/ fabs(value_b - color[2]);
+        if (dist < distTreshold) {
+            validIndexes.push_back(i);
 		}
+        cout << value_b << endl;
 	}
 
 	// check whether we found a circle that matches almost the color
-	if (-1 == minIdx) {
+    if (validIndexes.size() <= 0) {
 		return false;
-	} else {
-		out.resize(3);
-		out[idx_x] = circles[minIdx][0];
-		out[idx_y] = circles[minIdx][1];
-		out[idx_r] = circles[minIdx][2];
-		return true;
-	}
+    }
+
+    double maxRadius = 0;
+    for(int i = 0; i < validIndexes.size(); i++) {
+        if(circles[validIndexes[i]][2] > maxRadius) {
+            maxRadius = circles[validIndexes[i]][2];
+            minIdx = i;
+        }
+    }
+
+    out.resize(3);
+    out[idx_x] = circles[minIdx][0];
+    out[idx_y] = circles[minIdx][1];
+    out[idx_r] = circles[minIdx][2];
+    return true;
+
 }
 
 RosCircleDetection::RosCircleDetection() {
