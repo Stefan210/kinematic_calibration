@@ -51,10 +51,14 @@ DataCapture::DataCapture(CalibrationContext& context) :
 	nhPrivate.getParam("params/headPitch_max", headPitchMax);
 	nhPrivate.getParam("params/headPitch_step", headPitchStep);
 	nhPrivate.getParam("params/image_topic", imageTopic);
-	nhPrivate.getParam("params/markerType", markerType);
 
 	// get public parameters
 	nh.getParam("chain_name", chainName);
+    nh.getParam("marker_type", markerType);
+
+    // get the marker detection instance
+    markerContext = context.getMarkerContext(markerType);
+    markerDetection = markerContext->getMarkerDetectionInstance();
 
 	// get camera information
 	camerainfoSub = nh.subscribe("/nao_camera/camera_info", 1,
@@ -96,10 +100,6 @@ DataCapture::DataCapture(CalibrationContext& context) :
 
 	// initialize seed
 	srand(static_cast<unsigned>(time(0)));
-
-	// get the marker detection instance
-	markerContext = context.getMarkerContext(markerType);
-	markerDetection = markerContext->getMarkerDetectionInstance();
 }
 
 DataCapture::~DataCapture() {
@@ -165,7 +165,7 @@ void DataCapture::playChainPoses() {
 	nhPrivate.getParam("params/end_pose_num", end);
 	enableChainStiffness();
 	const string& prefix = getPosePrefix();
-	for (int i = start; i <= end; i++) {
+    for (int i = start; i <= end; i += 1) {
 		// check for pause requests:
 		// call blocks if pause requested
 		if (pauseManager.pauseRequested()) {
@@ -339,13 +339,9 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 }
 
 void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
-	if (msg->header.stamp < this->curTime) {
-		ROS_INFO("Skipping too old Image message.");
-		return;
-	}
 	receivedImage = true;
-	cameraFrame = msg.get()->header.frame_id;
-	checkerboardFound = markerDetection->detect(msg, markerData);
+    cameraFrame = msg.get()->header.frame_id;
+    checkerboardFound = markerDetection->detect(msg, markerData);
 	if (checkerboardFound) {
 		ROS_INFO("Checkerboard found at position %f %f", markerData[0],
 				markerData[1]);
@@ -562,21 +558,25 @@ void DataCapture::publishMeasurement() {
 		ROS_INFO("Not publishing data.");
 		return;
 	}
-	updateJointStates();
-	time_t id = time(NULL);
+    updateJointStates();
+    unsigned long id = static_cast<unsigned long>(time(0));
+    stringstream ss;
+    ss << id;
 	measurementData data;
-	data.jointState = jointState;
-	data.marker_data = markerData;
-	data.id = id;
-	data.camera_frame = this->cameraFrame;
-	nh.getParam("chain_name", data.chain_name);
-	data.marker_type = this->markerType;
-	ROS_INFO("Publishing measurement data...");
-	measurementPub.publish(data);
+    data.jointState = jointState;
+    data.marker_data = markerData;
+    data.id = ss.str();
+    data.camera_frame = this->cameraFrame;
+    nh.getParam("chain_name", data.chain_name);
+    data.marker_type = this->markerType;
+    ROS_INFO("Publishing measurement data...");
+    measurementPub.publish(data);
 
-	// save the image to disk
-	string filename(id + ".jpg");
-	this->markerDetection->writeImage(filename);
+    // save the image to disk
+    ss << ".jpg";
+    string filename = ss.str();
+    ROS_INFO("Saving image to file %s%s.", "/tmp/", filename.c_str());
+    this->markerDetection->writeImage("/tmp/" + filename);
 }
 
 vector<double> DataCapture::generateRandomPositions(

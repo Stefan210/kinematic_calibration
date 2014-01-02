@@ -61,21 +61,11 @@ bool CheckerboardDetection::detect(
 	if (patternfound) {
 		cv::cornerSubPix(gray, corners, cv::Size(11, 11), cv::Size(-1, -1),
 				cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));		
-		cv::drawChessboardCorners(gray, cv::Size(1,1), corners, true);
-		
-		cv::namedWindow("image", cv::WINDOW_AUTOSIZE);
-		cv::imshow("image", gray);
-        //cv::waitKey();
 	} else {
 		std::cout << "No pattern found." << std::endl;
-		
-		cv::namedWindow("image", cv::WINDOW_AUTOSIZE);
-		cv::imshow("image", gray);
-        //cv::waitKey();
 		return false;
 	}
 	
-
 	cv::Point2f position = corners[4];
 	out.x = position.x;
 	out.y = position.y;
@@ -86,8 +76,10 @@ bool CheckerboardDetection::detect(
 bool CheckerboardDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
 		vector<double>& out) {
 	CheckerboardData cb;
-	if(detect(in_msg, out)) {
-		out.resize(2);
+    out.resize(2);
+    if(detect(in_msg, cb)) {
+        savePosition(out);
+        saveImage(in_msg);
 		out[idx_x] = cb.x;
 		out[idx_y] = cb.y;
 		return true;

@@ -36,15 +36,13 @@ int main(int argc, char** argv) {
 }
 
 image_transport::Publisher pub;
-double r, g, b;
 
 void imageCb(const sensor_msgs::ImageConstPtr& msg) {
-	CircleDetection cd;
-	vector<double> data;
-	cv::Scalar color(r, g, b);
+    RosCircleDetection cd;
+    vector<double> data;
 
 
-	if (!cd.detect(msg, color, data)) {
+    if (!cd.detect(msg, data)) {
 		std::cout << "[main] could not detect the circle.\n";
 		return;
 	}
@@ -57,7 +55,7 @@ void imageCb(const sensor_msgs::ImageConstPtr& msg) {
 	image = input_bridge->image;
 
 	cv::Point2f center(data[0], data[1]);
-    int radius = (int)data[3];
+    int radius = (int)data[2];
     // circle center
     cv::circle( image, center, 3, cv::Scalar(255,255,255), -1, 8, 0 );
     // circle outline
@@ -70,10 +68,6 @@ void detectFromRosMsg() {
 	ros::NodeHandle nh;
 	image_transport::Subscriber sub;
 	image_transport::ImageTransport it(nh);
-
-	nh.getParam("marker_r", r);
-	nh.getParam("marker_g", g);
-	nh.getParam("marker_b", b);
 
 	sub = it.subscribe("/nao_camera/image_raw", 1, imageCb);
 	pub = it.advertise("/checkerboard/image_out", 1);
