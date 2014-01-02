@@ -315,13 +315,16 @@ void OptimizationNode::removeIgnoredMeasurements() {
 	for (vector<measurementData>::iterator it = measurements.begin();
 			it != measurements.end(); it++) {
 		string id = it->id;
+		bool remove = false;
 		for (int32_t i = 0; i < idList.size(); ++i) {
 			ROS_ASSERT(idList[i].getType() == XmlRpc::XmlRpcValue::TypeString);
 			string cid = static_cast<string>(idList[i]);
-			if (id != cid) {
-				filteredList.push_back(*it);
+			if (id == cid) {
+				remove = true;
 			}
 		}
+		if(!remove)
+			filteredList.push_back(*it);
 	}
 
 	// reassign the measurements list
