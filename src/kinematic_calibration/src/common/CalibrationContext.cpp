@@ -33,6 +33,7 @@ MarkerContext* RosCalibContext::getMarkerContext(const string& type) {
 	} else if ("circle" == type) {
 		return new CircleContext();
 	} else {
+		ROS_ERROR("Unknown marker type: %s", type.c_str());
 		return NULL;
 	}
 }
