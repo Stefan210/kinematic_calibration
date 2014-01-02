@@ -20,8 +20,6 @@ CalibrationContext* ContextFactory::getRosContext() {
 CalibrationContext* ContextFactory::getContext(string contextType) {
 	if("ros" == contextType) {
 		return new RosCalibContext();
-	} else if("test" == contextType) {
-		return new TestCalibContext();
 	} else {
 		// TODO: return default context ?!
 		return NULL;

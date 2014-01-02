@@ -8,7 +8,7 @@
 #ifndef CHECKERBOARDDETECTION_H_
 #define CHECKERBOARDDETECTION_H_
 
-#include "MarkerDetection.h"
+#include "SinglePointMarkerDetection.h"
 
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
@@ -17,8 +17,12 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
+#include <vector>
+#include <string>
 
 namespace kinematic_calibration {
+
+using namespace std;
 
 class CheckerboardData {
 public:
@@ -28,7 +32,7 @@ public:
 /**
  * Class for detecting the position of a 2x2 checker board.
  */
-class CheckerboardDetection: public MarkerDetection {
+class CheckerboardDetection: public SinglePointMarkerDetection {
 public:
 	/**
 	 * Constructor.
@@ -64,6 +68,8 @@ public:
 	 * @return true if the marker was detected otherwise false
 	 */
 	bool detect(const sensor_msgs::ImageConstPtr& in_msg, vector<double>& out);
+
+
 
 	enum Index {
 		idx_x = 0, idx_y = 1

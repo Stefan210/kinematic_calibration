@@ -38,19 +38,11 @@ using namespace std;
 namespace kinematic_calibration {
 
 G2oJointOffsetOptimization::G2oJointOffsetOptimization(
-		vector<measurementData>& measurements, KinematicChain& kinematicChain,
-		FrameImageConverter& frameImageConverter,
-		KinematicCalibrationState initialState) :
-		JointOffsetOptimization(measurements, kinematicChain,
-				frameImageConverter, initialState) {
-}
-
-G2oJointOffsetOptimization::G2oJointOffsetOptimization(
-		vector<measurementData>& measurements,
+		CalibrationContext& context, vector<measurementData>& measurements,
 		vector<KinematicChain> kinematicChains,
 		FrameImageConverter& frameImageConverter,
 		KinematicCalibrationState initialState) :
-		JointOffsetOptimization(measurements, kinematicChains,
+		JointOffsetOptimization(context, measurements, kinematicChains,
 				frameImageConverter, initialState) {
 }
 
@@ -126,8 +118,7 @@ void G2oJointOffsetOptimization::optimize(
 	Eigen::Isometry3d initialCameraToHeadIsometry;
 	initialCameraToHeadIsometry.translation() =
 			initialCameraToHeadAffine.translation();
-	initialCameraToHeadIsometry.linear() =
-			initialCameraToHeadAffine.rotation();
+	initialCameraToHeadIsometry.linear() = initialCameraToHeadAffine.rotation();
 	cameraToHeadTransformationVertex->setEstimate(initialCameraToHeadIsometry);
 	optimizer.addVertex(cameraToHeadTransformationVertex);
 
@@ -140,7 +131,6 @@ void G2oJointOffsetOptimization::optimize(
 	optimizer.addVertex(cameraIntrinsicsVertex);
 
 	// add edges
-	Eigen::Matrix3d info = Eigen::Matrix3d::Identity(3, 3);
 	for (int i = 0; i < measurements.size(); i++) {
 		measurementData current = measurements[i];
 		if (markerTransformationVertices.count(current.chain_name) == 0
@@ -150,18 +140,13 @@ void G2oJointOffsetOptimization::optimize(
 			continue;
 		}
 		RobustKernel* rk = new RobustKernelHuber();
-		CheckerboardMeasurementEdge* edge = new CheckerboardMeasurementEdge(
-				current);
+		g2o::OptimizableGraph::Edge* edge = context.getMeasurementEdge(current, &frameImageConverter, &kinematicChainsMap.find(current.chain_name)->second);
 		edge->setId(++id);
 		edge->setRobustKernel(rk);
-		edge->setInformation(info);
 		edge->vertices()[0] = markerTransformationVertices[current.chain_name];
 		edge->vertices()[1] = jointOffsetVertex;
 		edge->vertices()[2] = cameraToHeadTransformationVertex;
 		edge->vertices()[3] = cameraIntrinsicsVertex;
-		edge->setFrameImageConverter(&frameImageConverter);
-		edge->setKinematicChain(
-				&kinematicChainsMap.find(current.chain_name)->second);
 		edge->computeError();
 		optimizer.addEdge(edge);
 	}

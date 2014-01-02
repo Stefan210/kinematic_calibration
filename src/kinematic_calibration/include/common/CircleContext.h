@@ -11,6 +11,8 @@
 #include "../data_capturing/CircleDetection.h"
 #include "../data_capturing/MarkerDetection.h"
 #include "MarkerContext.h"
+#include <kinematic_calibration/measurementData.h>
+#include "../optimization/CheckerboardMeasurementEdge.h"
 
 namespace kinematic_calibration {
 
@@ -24,6 +26,12 @@ public:
 
 	virtual MarkerDetection* getMarkerDetectionInstance() {
 		return new RosCircleDetection();
+	}
+
+	virtual g2o::OptimizableGraph::Edge* getMeasurementEdge(const measurementData& m,
+			FrameImageConverter* frameImageConverter,
+			KinematicChain* kinematicChain) {
+		return new CheckerboardMeasurementEdge(m, frameImageConverter, kinematicChain);
 	}
 };
 

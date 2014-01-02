@@ -22,17 +22,21 @@
 #include <iostream>
 #include <map>
 #include <utility>
+#include <string>
 #include <urdf_model/model.h>
 
 #include "../../include/common/FrameImageConverter.h"
-//#include "../../include/common/KinematicChain.h"
+#include "../../include/common/KinematicChain.h"
 #include "../../include/optimization/CameraIntrinsicsVertex.h"
 #include "../../include/optimization/G2oJointOffsetOptimization.h"
+#include "../../include/common/CalibrationContext.h"
 
 namespace kinematic_calibration {
 
-OptimizationNode::OptimizationNode() :
-		collectingData(false) {
+using namespace std;
+
+OptimizationNode::OptimizationNode(CalibrationContext* context) :
+		collectingData(false), context(context) {
 	measurementSubsriber = nh.subscribe(
 			"/kinematic_calibration/measurement_data", 1000,
 			&OptimizationNode::measurementCb, this);
@@ -71,6 +75,7 @@ void OptimizationNode::collectData() {
 	while (collectingData) {
 		ros::spinOnce();
 	}
+	removeIgnoredMeasurements();
 }
 
 void OptimizationNode::optimize() {
@@ -100,7 +105,7 @@ void OptimizationNode::optimize() {
 	initialState.cameraToHeadTransformation = headToCamera;
 
 	// optimization instance
-	G2oJointOffsetOptimization optimization(measurements, kinematicChains,
+	G2oJointOffsetOptimization optimization(*context, measurements, kinematicChains,
 			frameImageConverter, initialState);
 	optimization.optimize(result);
 }
@@ -153,7 +158,7 @@ void OptimizationNode::printPoints() {
 	// print out the measured position and the transformed position
 	for (int i = 0; i < measurements.size(); i++) {
 		measurementData current = measurements[i];
-		cout << i << " measured(x,y): " << current.cb_x << "  " << current.cb_y;
+		cout << i << " measured(x,y): " << current.marker_data[0] << "  " << current.marker_data[1];
 
 		// get transformation from end effector to camera
 		map<string, double> jointPositions;
@@ -197,10 +202,13 @@ void OptimizationNode::printPoints() {
 		tf::Vector3 origin = cameraToMarker.getOrigin();
 		double dist = origin.length();
 
+		double currentX = current.marker_data[0];
+		double currentY = current.marker_data[1];
+
 		cout << "\toptimized(x,y): " << x << " " << y;
-		cout << "\tdifference(x,y): " << (current.cb_x - x) << " "
-				<< (current.cb_y - y);
-		cout << "\tsum: " << (fabs(current.cb_x - x) + fabs(current.cb_y - y));
+		cout << "\tdifference(x,y): " << (currentX - x) << " "
+				<< (currentY - y);
+		cout << "\tsum: " << (fabs(currentX - x) + fabs(currentY - y));
 		cout << "\tdist: " << dist;
 		cout << "\n";
 	}
@@ -244,7 +252,7 @@ void OptimizationNode::publishResults() {
 
 void OptimizationNode::measurementCb(const measurementDataConstPtr& msg) {
 	const measurementData data = *msg;
-	if (data.jointState.name.empty()) {
+	if (!measurementOk(msg)) {
 		return;
 	} else {
 		// check if the measurement contains to a new chain
@@ -281,11 +289,54 @@ bool OptimizationNode::startOptizationCallback(
 	return true;
 }
 
+bool OptimizationNode::measurementOk(const measurementDataConstPtr& msg) {
+	const measurementData data = *msg;
+	if (data.jointState.name.empty()) {
+		return false;
+	}
+
+	if (data.marker_data.empty()) {
+		return false;
+	}
+
+	return true;
+}
+
+void OptimizationNode::removeIgnoredMeasurements() {
+	// get list of IDs to be ignored
+	XmlRpc::XmlRpcValue idList;
+	nh.getParam("ignore_measurements", idList);
+	ROS_ASSERT(idList.getType() == XmlRpc::XmlRpcValue::TypeArray);
+
+	// create new list for measurement data
+	vector<measurementData> filteredList;
+
+	// check which measurements should be ignored
+	for (vector<measurementData>::iterator it = measurements.begin();
+			it != measurements.end(); it++) {
+		string id = it->id;
+		for (int32_t i = 0; i < idList.size(); ++i) {
+			ROS_ASSERT(idList[i].getType() == XmlRpc::XmlRpcValue::TypeString);
+			string cid = static_cast<string>(idList[i]);
+			if (id != cid) {
+				filteredList.push_back(*it);
+			}
+		}
+	}
+
+	// reassign the measurements list
+	this->measurements = filteredList;
+}
+
 } /* namespace kinematic_calibration */
+
+using namespace kinematic_calibration;
 
 int main(int argc, char** argv) {
 	ros::init(argc, argv, "OptimizationNode");
-	kinematic_calibration::OptimizationNode node;
+	CalibrationContext* context = new RosCalibContext();
+	OptimizationNode node(context);
 	node.startLoop();
+	delete context;
 	return 0;
 }

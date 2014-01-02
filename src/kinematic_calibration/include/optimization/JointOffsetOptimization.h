@@ -16,6 +16,7 @@
 #include "../../include/optimization/KinematicCalibrationState.h"
 #include "../../include/common/KinematicChain.h"
 #include "../../include/common/FrameImageConverter.h"
+#include "../../include/common/CalibrationContext.h"
 
 using namespace std;
 
@@ -29,15 +30,7 @@ public:
 	/**
 	 * Constructor.
 	 */
-	JointOffsetOptimization(vector<measurementData>& measurements,
-			KinematicChain kinematicChain,
-			FrameImageConverter& frameImageConverter,
-			KinematicCalibrationState initialState = KinematicCalibrationState());
-
-	/**
-	 * Constructor.
-	 */
-	JointOffsetOptimization(vector<measurementData>& measurements,
+	JointOffsetOptimization(CalibrationContext& context, vector<measurementData>& measurements,
 			vector<KinematicChain> kinematicChains,
 			FrameImageConverter& frameImageConverter,
 			KinematicCalibrationState initialState = KinematicCalibrationState());
@@ -73,6 +66,11 @@ protected:
 	 * Initial state for the optimization;
 	 */
 	KinematicCalibrationState initialState;
+
+	/**
+	 * Calibration context instance.
+	 */
+	CalibrationContext& context;
 };
 
 } /* namespace kinematic_calibration */

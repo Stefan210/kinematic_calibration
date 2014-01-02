@@ -61,7 +61,6 @@ public:
 	void disableChainStiffness();
 
 	void playChainPoses();
-    void publishEmptyMeasurement();
 
 	void setHeadPose(double headYaw, double headPitch, bool relative = false,
 			vector<string> additionalJoints = vector<string>(),

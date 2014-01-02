@@ -8,7 +8,7 @@
 #ifndef CIRCLEDETECTION_H_
 #define CIRCLEDETECTION_H_
 
-#include "MarkerDetection.h"
+#include "SinglePointMarkerDetection.h"
 
 #include <opencv2/core/core.hpp>
 #include <sensor_msgs/Image.h>
@@ -44,6 +44,8 @@ public:
 
 	bool detect(const cv::Mat& image, vector<cv::Vec3f >& out);
 
+
+
 protected:
 	/**
 	 * Finds the circle which matches the given color best.
@@ -57,7 +59,7 @@ protected:
 
 };
 
-class RosCircleDetection: public CircleDetection, public MarkerDetection {
+class RosCircleDetection: public CircleDetection, public SinglePointMarkerDetection {
 public:
 	RosCircleDetection();
 	virtual ~RosCircleDetection() {}

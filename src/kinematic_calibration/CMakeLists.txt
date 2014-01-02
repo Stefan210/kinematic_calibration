@@ -189,15 +189,22 @@ add_library(context
 	src/common/CircleContext.cpp
 	src/common/ContextFactory.cpp
 	src/common/MarkerContext.cpp
+	src/optimization/CheckerboardMeasurementEdge.cpp
 	)
-target_link_libraries(context ${catkin_LIBRARIES})
+target_link_libraries(context 
+	checkerboardDetection
+	circleDetection
+	frameImageConverter
+	kinematicChain
+	${G2O_LIBS}
+	${catkin_LIBRARIES})
 
 ### ImagePreprocessing
 add_executable(imagePreprocessingNode src/data_capturing/ImagePreprocessingNode.cpp)
 target_link_libraries(imagePreprocessingNode ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 ### CheckerboardDetection
-add_library(checkerboardDetection src/data_capturing/CheckerboardDetection.cpp src/data_capturing/MarkerDetection.cpp)
+add_library(checkerboardDetection src/data_capturing/CheckerboardDetection.cpp src/data_capturing/MarkerDetection.cpp src/data_capturing/SinglePointMarkerDetection.cpp)
 target_link_libraries(checkerboardDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 add_executable(checkerboardDetectionMain src/data_capturing/CheckerboardDetectionMain.cpp)
@@ -207,7 +214,7 @@ catkin_add_gtest(checkerboardDetectionTest test/CheckerboardDetectionTest.cpp WO
 target_link_libraries(checkerboardDetectionTest checkerboardDetection ${catkin_LIBRARIES})
 
 ### CircleDetection
-add_library(circleDetection src/data_capturing/CircleDetection.cpp src/data_capturing/MarkerDetection.cpp)
+add_library(circleDetection src/data_capturing/CircleDetection.cpp src/data_capturing/MarkerDetection.cpp src/data_capturing/SinglePointMarkerDetection.cpp)
 target_link_libraries(circleDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 add_executable(circleDetectionMain src/data_capturing/CircleDetectionMain.cpp)
@@ -259,7 +266,8 @@ add_executable(optimizationNode
 	src/optimization/G2oJointOffsetOptimization.cpp
 	src/optimization/CameraIntrinsicsVertex.cpp
 	src/optimization/JointOffsetVertex.cpp
-	src/optimization/CheckerboardMeasurementEdge.cpp
+	#src/optimization/MeasurementEdge.cpp
+	#src/optimization/CheckerboardMeasurementEdge.cpp
 	)
 target_link_libraries(optimizationNode 
 	frameImageConverter
