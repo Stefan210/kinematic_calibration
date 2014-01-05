@@ -1,4 +1,4 @@
 chain_name: larm
-chain_root: CameraBottom_frame
-chain_tip: l_wrist_frame 
-marker_type: circle
+chain_root: HeadPitch_link
+chain_tip: l_wrist
+marker_type: checkerboard

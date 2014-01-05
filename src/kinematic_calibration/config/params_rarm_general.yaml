@@ -1,4 +1,4 @@
 chain_name: rarm
-chain_root: CameraBottom_frame
+chain_root: HeadPitch_link
 chain_tip: r_wrist
 marker_type: checkerboard
