@@ -1,0 +1,4 @@
+calibrate_joint_offsets: true
+calibrate_camera_transform: true
+calibrate_camera_intrinsics: true
+calibrate_marker_transform: true

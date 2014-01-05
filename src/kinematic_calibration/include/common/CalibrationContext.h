@@ -11,10 +11,13 @@
 #include "MarkerContext.h"
 
 #include <string>
+#include <ros/ros.h>
 
 using namespace std;
 
 namespace kinematic_calibration {
+
+class CalibrationOptions;
 
 /*
  *
@@ -28,6 +31,7 @@ public:
 	virtual g2o::OptimizableGraph::Edge* getMeasurementEdge(const measurementData& m,
 			FrameImageConverter* frameImageConverter,
 			KinematicChain* kinematicChain) = 0;
+	virtual CalibrationOptions getCalibrationOptions() = 0;
 };
 
 class RosCalibContext: public CalibrationContext {
@@ -39,8 +43,23 @@ public:
 	virtual g2o::OptimizableGraph::Edge* getMeasurementEdge(const measurementData& m,
 			FrameImageConverter* frameImageConverter,
 			KinematicChain* kinematicChain);
+	virtual CalibrationOptions getCalibrationOptions();
+
+protected:
+	ros::NodeHandle nh;
 };
 
+// TODO: move into own file?!
+/**
+ * Container for calibration options.
+ */
+class CalibrationOptions {
+public:
+	bool calibrateJointOffsets;
+	bool calibrateCameraTransform;
+	bool calibrateCameraIntrinsics;
+	bool calibrateMarkerTransform;
+};
 } /* namespace kinematic_calibration */
 
 #endif /* CALIBRATIONCONTEXT_H_ */

@@ -2,6 +2,7 @@
   <rosparam>
   ignore_measurements: []
   </rosparam>
-  <node pkg="kinematic_calibration" type="optimizationNode" name="optimizationNode">
+  <rosparam file="$(find kinematic_calibration)/config/params_general.yaml" command="load"/>
+  <node pkg="kinematic_calibration" type="optimizationNode" name="optimizationNode" output="screen">
   </node>  
 </launch>

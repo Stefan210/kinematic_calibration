@@ -105,8 +105,8 @@ void OptimizationNode::optimize() {
 	initialState.cameraToHeadTransformation = headToCamera;
 
 	// optimization instance
-	G2oJointOffsetOptimization optimization(*context, measurements, kinematicChains,
-			frameImageConverter, initialState);
+	G2oJointOffsetOptimization optimization(*context, measurements,
+			kinematicChains, frameImageConverter, initialState);
 	optimization.optimize(result);
 }
 
@@ -158,7 +158,8 @@ void OptimizationNode::printPoints() {
 	// print out the measured position and the transformed position
 	for (int i = 0; i < measurements.size(); i++) {
 		measurementData current = measurements[i];
-		cout << i << " measured(x,y): " << current.marker_data[0] << "  " << current.marker_data[1];
+		cout << i << " measured(x,y): " << current.marker_data[0] << "  "
+				<< current.marker_data[1];
 
 		// get transformation from end effector to camera
 		map<string, double> jointPositions;
@@ -275,8 +276,11 @@ void OptimizationNode::measurementCb(const measurementDataConstPtr& msg) {
 
 void OptimizationNode::camerainfoCallback(
 		const sensor_msgs::CameraInfoConstPtr& msg) {
-	if (cameraModel.fromCameraInfo(msg))
+	if (cameraModel.fromCameraInfo(msg)) {
 		ROS_INFO("Camera model set.");
+		cout << "Initial intrinsics: " << cameraModel.fullIntrinsicMatrix() << endl;
+	}
+
 	else
 		ROS_FATAL("Camera model could not be set!");
 	cameraInfoSubscriber.shutdown();
@@ -323,7 +327,7 @@ void OptimizationNode::removeIgnoredMeasurements() {
 				remove = true;
 			}
 		}
-		if(!remove)
+		if (!remove)
 			filteredList.push_back(*it);
 	}
 

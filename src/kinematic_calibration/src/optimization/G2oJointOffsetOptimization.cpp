@@ -72,6 +72,9 @@ void G2oJointOffsetOptimization::optimize(
 
 	optimizer.setAlgorithm(algorithm);
 
+	// get the options
+	CalibrationOptions options = context.getCalibrationOptions();
+
 	int id = 0;
 
 	// instantiate the vertex for the joint offsets
@@ -88,8 +91,8 @@ void G2oJointOffsetOptimization::optimize(
 		}
 	}
 	JointOffsetVertex* jointOffsetVertex = new JointOffsetVertex(jointNames);
-	//JointOffsetVertex* jointOffsetVertex = JointOffsetVertex::getInstance(jointNames.size());
 	jointOffsetVertex->setId(++id);
+	jointOffsetVertex->setFixed(!options.calibrateJointOffsets);
 	optimizer.addVertex(jointOffsetVertex);
 
 	// instantiate the vertices for the marker transformations
@@ -99,6 +102,7 @@ void G2oJointOffsetOptimization::optimize(
 		MarkerTransformationVertex* markerTransformationVertex =
 				new MarkerTransformationVertex();
 		markerTransformationVertex->setId(++id);
+		markerTransformationVertex->setFixed(!options.calibrateMarkerTransform);
 		optimizer.addVertex(markerTransformationVertex);
 		KinematicChain currentChain = kinematicChains[i];
 		markerTransformationVertices.insert(
@@ -111,6 +115,8 @@ void G2oJointOffsetOptimization::optimize(
 	TransformationVertex* cameraToHeadTransformationVertex =
 			new TransformationVertex();
 	cameraToHeadTransformationVertex->setId(++id);
+	cameraToHeadTransformationVertex->setFixed(
+			!options.calibrateCameraTransform);
 
 	Eigen::Affine3d initialCameraToHeadAffine;
 	tf::transformTFToEigen(this->initialState.cameraToHeadTransformation,
@@ -126,8 +132,8 @@ void G2oJointOffsetOptimization::optimize(
 	CameraIntrinsicsVertex* cameraIntrinsicsVertex = new CameraIntrinsicsVertex(
 			frameImageConverter.getCameraModel().cameraInfo());
 	cameraIntrinsicsVertex->setId(++id);
+	cameraIntrinsicsVertex->setFixed(!options.calibrateCameraIntrinsics);
 	cameraIntrinsicsVertex->setToOrigin();
-	//cameraIntrinsicsVertex->setFixed(true);
 	optimizer.addVertex(cameraIntrinsicsVertex);
 
 	// add edges
@@ -140,9 +146,12 @@ void G2oJointOffsetOptimization::optimize(
 			continue;
 		}
 		RobustKernel* rk = new RobustKernelHuber();
-		g2o::OptimizableGraph::Edge* edge = context.getMeasurementEdge(current, &frameImageConverter, &kinematicChainsMap.find(current.chain_name)->second);
+		//rk->setDelta(10.0);
+		g2o::OptimizableGraph::Edge* edge = context.getMeasurementEdge(current,
+				&frameImageConverter,
+				&kinematicChainsMap.find(current.chain_name)->second);
 		edge->setId(++id);
-		edge->setRobustKernel(rk);
+		//edge->setRobustKernel(rk);
 		edge->vertices()[0] = markerTransformationVertices[current.chain_name];
 		edge->vertices()[1] = jointOffsetVertex;
 		edge->vertices()[2] = cameraToHeadTransformationVertex;

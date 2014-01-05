@@ -53,5 +53,15 @@ g2o::OptimizableGraph::Edge* RosCalibContext::getMeasurementEdge(
 	}
 }
 
+CalibrationOptions RosCalibContext::getCalibrationOptions() {
+	CalibrationOptions options;
+	nh.getParam("calibrate_joint_offsets", options.calibrateJointOffsets);
+	nh.getParam("calibrate_camera_transform", options.calibrateCameraTransform);
+	nh.getParam("calibrate_camera_intrinsics",
+			options.calibrateCameraIntrinsics);
+	nh.getParam("calibrate_marker_transform", options.calibrateMarkerTransform);
+	return options;
+}
+
 } /* namespace kinematic_calibration */
 
