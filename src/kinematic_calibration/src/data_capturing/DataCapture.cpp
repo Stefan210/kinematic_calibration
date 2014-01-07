@@ -156,7 +156,7 @@ void DataCapture::enableStiffness(const vector<string>& jointNames) {
 }
 
 void DataCapture::disableStiffness(const vector<string>& jointNames) {
-	setStiffness(jointNames, 0.01);
+	setStiffness(jointNames, 0.0000001);
 }
 
 void DataCapture::playChainPoses() {
