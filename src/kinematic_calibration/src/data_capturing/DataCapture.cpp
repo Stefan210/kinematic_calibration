@@ -339,6 +339,10 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 }
 
 void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
+	if (msg->header.stamp < this->curTime) {
+		ROS_INFO("Skipping too old Image message.");
+		return;
+	}
 	receivedImage = true;
     cameraFrame = msg.get()->header.frame_id;
     checkerboardFound = markerDetection->detect(msg, markerData);
