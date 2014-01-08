@@ -121,17 +121,20 @@ void OptimizationNode::printResult() {
 	for (std::map<string, tf::Transform>::iterator iterator =
 			result.markerTransformations.begin();
 			iterator != result.markerTransformations.end(); iterator++) {
-		tf::Transform transform = iterator->second;
+		tf::Transform transform = iterator->second.inverse(); //TODO
 		string name = iterator->first;
+		double r, p, y;
+		tf::Matrix3x3(transform.getRotation()).getRPY(r, p, y);
 		cout << "Optimized transform form marker to end effector for chain "
 				<< name << ":\n";
 		cout << "(x, y, z) " << transform.getOrigin().x() << " "
 				<< transform.getOrigin().y() << " " << transform.getOrigin().z()
 				<< " ";
-		cout << "(q0, q1, q2, q3) " << transform.getRotation().x() << " "
+		cout << "(r, p, y) " << r << " " << p << " " << y << "\n";
+		/*cout << "(q0, q1, q2, q3) " << transform.getRotation().x() << " "
 				<< transform.getRotation().y() << " "
 				<< transform.getRotation().z() << " "
-				<< transform.getRotation().w() << "\n";
+				<< transform.getRotation().w() << "\n";*/
 	}
 
 	cout << "Optimized transform form camera to head:\n";
@@ -193,11 +196,14 @@ void OptimizationNode::printPoints() {
 		frameImageConverter.getCameraModel().fromCameraInfo(cameraInfo);
 
 		// calculate estimated x and y
-		endEffectorToMarker.setRotation(tf::Quaternion::getIdentity());
+		//endEffectorToMarker.setRotation(tf::Quaternion::getIdentity());
 		tf::Transform cameraToMarker = endEffectorToMarker * cameraToEndEffector
 				* cameraToHead;
 		double x, y;
 		frameImageConverter.project(cameraToMarker.inverse(), x, y);
+
+		// write into image (if available)
+		putToImage(current.id, x, y);
 
 		// calculate distance between camera and marker
 		tf::Vector3 origin = cameraToMarker.getOrigin();
@@ -213,6 +219,36 @@ void OptimizationNode::printPoints() {
 		cout << "\tdist: " << dist;
 		cout << "\n";
 	}
+}
+
+bool OptimizationNode::putToImage(const string& id, const double& x, const double& y) {
+	const string extension = "jpg"; // TODO: parameterize!
+
+	// build filename
+	stringstream name;
+	name << "/tmp/" << id << "." << extension;
+
+	// find image
+	FILE *file = NULL;
+    if (NULL != (file = fopen(name.str().c_str(), "r"))) {
+        fclose(file);
+    } else {
+    	// file not found
+        ROS_INFO("File %s not found!", name.str().c_str());
+    	return false;
+    }
+
+    // read the image with OpenCV
+    cv::Mat image = cv::imread(name.str());
+
+    // put a cross to the optimized/calibrated position
+	cv::line(image, cv::Point(x - 3, y - 3), cv::Point(x + 3, y + 3), CV_RGB(0, 255, 0));
+	cv::line(image, cv::Point(x - 3, y + 3), cv::Point(x + 3, y - 3), CV_RGB(0, 255, 0));
+
+    // write the image into a new file
+	stringstream newname;
+	newname << "/tmp/" << id << "_calibrated." << extension;
+	return cv::imwrite(newname.str(), image);
 }
 
 void OptimizationNode::publishResults() {

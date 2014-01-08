@@ -59,6 +59,9 @@ protected:
 
 	void publishResults();
 
+	bool putToImage(const string& id, const double& x, const double& y);
+
+
 	void measurementCb(const measurementDataConstPtr& msg);
 	void camerainfoCallback(const sensor_msgs::CameraInfoConstPtr& msg);
 	bool startOptizationCallback(
