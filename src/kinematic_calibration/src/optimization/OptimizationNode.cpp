@@ -33,6 +33,29 @@
 
 namespace kinematic_calibration {
 
+class VariancePlot {
+public:
+	VariancePlot() {
+		gnuplotPipe = popen("gnuplot -persistent", "w");
+		fprintf(gnuplotPipe,
+				"set autoscale;\n set xzeroaxis\n set yzeroaxis\n");
+		fprintf(gnuplotPipe,
+				"plot '-' with points pt 1 lc rgb 'green' title 'difference' \n");
+	}
+
+	void addPoint(double x, double y) {
+		fprintf(gnuplotPipe, "%f %f \n", x, y);
+	}
+
+	void showPlot() {
+		fprintf(gnuplotPipe, "e ,\n ");
+		fclose(gnuplotPipe);
+	}
+
+private:
+	FILE * gnuplotPipe;
+};
+
 using namespace std;
 
 OptimizationNode::OptimizationNode(CalibrationContext* context) :
@@ -132,9 +155,9 @@ void OptimizationNode::printResult() {
 				<< " ";
 		cout << "(r, p, y) " << r << " " << p << " " << y << "\n";
 		/*cout << "(q0, q1, q2, q3) " << transform.getRotation().x() << " "
-				<< transform.getRotation().y() << " "
-				<< transform.getRotation().z() << " "
-				<< transform.getRotation().w() << "\n";*/
+		 << transform.getRotation().y() << " "
+		 << transform.getRotation().z() << " "
+		 << transform.getRotation().w() << "\n";*/
 	}
 
 	cout << "Optimized transform form camera to head:\n";
@@ -157,6 +180,8 @@ void OptimizationNode::printResult() {
 void OptimizationNode::printPoints() {
 	// instantiate the frame image converter
 	FrameImageConverter frameImageConverter(cameraModel);
+
+	VariancePlot plotter;
 
 	// print out the measured position and the transformed position
 	for (int i = 0; i < measurements.size(); i++) {
@@ -218,10 +243,17 @@ void OptimizationNode::printPoints() {
 		cout << "\tsum: " << (fabs(currentX - x) + fabs(currentY - y));
 		cout << "\tdist: " << dist;
 		cout << "\n";
+
+		// add difference to plot
+		plotter.addPoint((currentX - x), (currentY - y));
 	}
+
+	// show difference plot
+	plotter.showPlot();
 }
 
-bool OptimizationNode::putToImage(const string& id, const double& x, const double& y) {
+bool OptimizationNode::putToImage(const string& id, const double& x,
+		const double& y) {
 	const string extension = "jpg"; // TODO: parameterize!
 
 	// build filename
@@ -230,22 +262,24 @@ bool OptimizationNode::putToImage(const string& id, const double& x, const doubl
 
 	// find image
 	FILE *file = NULL;
-    if (NULL != (file = fopen(name.str().c_str(), "r"))) {
-        fclose(file);
-    } else {
-    	// file not found
-        ROS_INFO("File %s not found!", name.str().c_str());
-    	return false;
-    }
+	if (NULL != (file = fopen(name.str().c_str(), "r"))) {
+		fclose(file);
+	} else {
+		// file not found
+		ROS_INFO("File %s not found!", name.str().c_str());
+		return false;
+	}
 
-    // read the image with OpenCV
-    cv::Mat image = cv::imread(name.str());
+	// read the image with OpenCV
+	cv::Mat image = cv::imread(name.str());
 
-    // put a cross to the optimized/calibrated position
-	cv::line(image, cv::Point(x - 3, y - 3), cv::Point(x + 3, y + 3), CV_RGB(0, 255, 0));
-	cv::line(image, cv::Point(x - 3, y + 3), cv::Point(x + 3, y - 3), CV_RGB(0, 255, 0));
+	// put a cross to the optimized/calibrated position
+	cv::line(image, cv::Point(x - 3, y - 3), cv::Point(x + 3, y + 3),
+			CV_RGB(0, 255, 0));
+	cv::line(image, cv::Point(x - 3, y + 3), cv::Point(x + 3, y - 3),
+			CV_RGB(0, 255, 0));
 
-    // write the image into a new file
+	// write the image into a new file
 	stringstream newname;
 	newname << "/tmp/" << id << "_calibrated." << extension;
 	return cv::imwrite(newname.str(), image);
@@ -314,7 +348,8 @@ void OptimizationNode::camerainfoCallback(
 		const sensor_msgs::CameraInfoConstPtr& msg) {
 	if (cameraModel.fromCameraInfo(msg)) {
 		ROS_INFO("Camera model set.");
-		cout << "Initial intrinsics: " << cameraModel.fullIntrinsicMatrix() << endl;
+		cout << "Initial intrinsics: " << cameraModel.fullIntrinsicMatrix()
+				<< endl;
 	}
 
 	else
