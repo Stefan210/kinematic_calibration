@@ -63,11 +63,11 @@ void MeasurementEdge<D, Derived>::computeError() {
 			static_cast<CameraIntrinsicsVertex*>(this->_vertices[3]);
 
 	// get transformation from end effector to camera
-	tf::Transform cameraToEndEffector; // root = camera, tip = end effector, e.g. wrist
+	tf::Transform headToEndEffector; // root = head, tip = end effector, e.g. wrist
 	map<string, double> jointOffsets = jointOffsetVertex->estimate();
-	jointOffsets[this->kinematicChain->getTip()] = 0; // set offset of the last joint to 0
+	//jointOffsets[this->kinematicChain->getTip()] = 0; // set offset of the last joint to 0
 	this->kinematicChain->getRootToTip(jointPositions, jointOffsets,
-			cameraToEndEffector);
+			headToEndEffector);
 
 	// get transformation from marker to end effector
 	Eigen::Isometry3d eigenTransform = markerTransformationVertex->estimate();
@@ -86,8 +86,8 @@ void MeasurementEdge<D, Derived>::computeError() {
 	this->frameImageConverter->getCameraModel().fromCameraInfo(cameraInfo);
 
 	// calculate estimated x and y
-	endEffectorToMarker.setRotation(tf::Quaternion::getIdentity());
-	tf::Transform cameraToMarker = endEffectorToMarker * cameraToEndEffector
+	//endEffectorToMarker.setRotation(tf::Quaternion::getIdentity());
+	tf::Transform cameraToMarker = endEffectorToMarker * headToEndEffector
 			* cameraToHead;
 
 	// set error
