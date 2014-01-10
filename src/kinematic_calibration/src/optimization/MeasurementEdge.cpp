@@ -82,21 +82,7 @@ void MeasurementEdge<D, Derived>::computeError() {
 	tf::transformEigenToTF(eigenTransform, cameraToHead);
 
 	// get estimated camera intrinsics
-	sensor_msgs::CameraInfo cameraInfo =
-			this->frameImageConverter->getCameraModel().cameraInfo();
-	cameraInfo.K = cameraIntrinsicsVertex->estimate();
-	cameraInfo.P[0] = cameraInfo.K[0];
-	cameraInfo.P[1] = cameraInfo.K[1];
-	cameraInfo.P[2] = cameraInfo.K[2];
-	cameraInfo.P[3] = 0;
-	cameraInfo.P[4] = cameraInfo.K[3];
-	cameraInfo.P[5] = cameraInfo.K[4];
-	cameraInfo.P[6] = cameraInfo.K[5];
-	cameraInfo.P[7] = 0;
-	cameraInfo.P[8] = cameraInfo.K[6];
-	cameraInfo.P[9] = cameraInfo.K[7];
-	cameraInfo.P[10] = cameraInfo.K[8];
-	cameraInfo.P[11] = 0;
+	sensor_msgs::CameraInfo cameraInfo = cameraIntrinsicsVertex->estimate();
 	this->frameImageConverter->getCameraModel().fromCameraInfo(cameraInfo);
 
 	// calculate estimated x and y

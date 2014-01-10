@@ -19,6 +19,11 @@ using namespace g2o;
 #define K_CX_IDX 2
 #define K_CY_IDX 5
 
+#define P_FX_IDX 0
+#define P_FY_IDX 5
+#define P_CX_IDX 2
+#define P_CY_IDX 6
+
 namespace kinematic_calibration {
 
 typedef boost::array<double, 9> CameraIntrinsicsType;
@@ -26,7 +31,7 @@ typedef boost::array<double, 9> CameraIntrinsicsType;
 /**
  * Vertex representing the camera parameters.
  */
-class CameraIntrinsicsVertex: public BaseVertex<4, CameraIntrinsicsType> {
+class CameraIntrinsicsVertex: public BaseVertex<9, sensor_msgs::CameraInfo> {
 public:
 	CameraIntrinsicsVertex(sensor_msgs::CameraInfo cameraInfo);
 	virtual ~CameraIntrinsicsVertex();
@@ -41,7 +46,7 @@ public:
 	virtual void setToOriginImpl();
 
 protected:
-	sensor_msgs::CameraInfo cameraInfo;
+	sensor_msgs::CameraInfo initial;
 
 };
 

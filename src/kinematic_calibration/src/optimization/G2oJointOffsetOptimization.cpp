@@ -217,7 +217,7 @@ void G2oJointOffsetOptimization::optimize(
 			cameraToHeadTransformationVertex->estimate();
 	tf::transformEigenToTF(eigenTransform,
 			optimizedState.cameraToHeadTransformation);
-	optimizedState.cameraK = cameraIntrinsicsVertex->estimate();
+	optimizedState.cameraInfo = cameraIntrinsicsVertex->estimate();
 
 	// get the joint transformations
 	map<string, tf::Transform> jointTransformations;

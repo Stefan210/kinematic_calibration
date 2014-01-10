@@ -59,9 +59,9 @@ public:
 	tf::Transform cameraToHeadTransformation;
 
 	/**
-	 * Estimation for the camera intrinsics matrix K (fx, fy, cx, cy).
+	 * Estimation for the camera intrinsics (mono camera; K, P and D).
 	 */
-	CameraIntrinsicsType cameraK;
+	sensor_msgs::CameraInfo cameraInfo;
 
 	/**
 	 * Estimations for the joint transformations.

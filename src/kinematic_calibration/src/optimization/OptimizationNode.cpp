@@ -127,6 +127,9 @@ void OptimizationNode::optimize() {
 					headPitchToCameraPose.position.z));
 	initialState.cameraToHeadTransformation = headToCamera;
 
+	// initialize the camera intrinsics
+	initialState.cameraInfo = cameraModel.cameraInfo();
+
 	// optimization instance
 	G2oJointOffsetOptimization optimization(*context, measurements,
 			kinematicChains, frameImageConverter, initialState);
@@ -179,10 +182,10 @@ void OptimizationNode::printResult() {
 	}
 
 	cout << "Optimized camera intrinsics:\n";
-	cout << "(fx,fy) " << result.cameraK[K_FX_IDX] << " "
-			<< result.cameraK[K_FY_IDX] << " ";
-	cout << "(cx,cy) " << result.cameraK[K_CX_IDX] << " "
-			<< result.cameraK[K_CY_IDX] << "\n";
+	cout << "(fx,fy) " << result.cameraInfo.K[K_FX_IDX] << " "
+			<< result.cameraInfo.K[K_FY_IDX] << " ";
+	cout << "(cx,cy) " << result.cameraInfo.K[K_CX_IDX] << " "
+			<< result.cameraInfo.K[K_CY_IDX] << "\n";
 }
 
 void OptimizationNode::printPoints() {
@@ -229,21 +232,7 @@ void OptimizationNode::printPoints() {
 		tf::Transform cameraToHead = result.cameraToHeadTransformation;
 
 		// get estimated camera intrinsics
-		sensor_msgs::CameraInfo cameraInfo =
-				frameImageConverter.getCameraModel().cameraInfo();
-		cameraInfo.K = result.cameraK;
-		cameraInfo.P[0] = result.cameraK[0];
-		cameraInfo.P[1] = result.cameraK[1];
-		cameraInfo.P[2] = result.cameraK[2];
-		cameraInfo.P[3] = 0;
-		cameraInfo.P[4] = result.cameraK[3];
-		cameraInfo.P[5] = result.cameraK[4];
-		cameraInfo.P[6] = result.cameraK[5];
-		cameraInfo.P[7] = 0;
-		cameraInfo.P[8] = result.cameraK[6];
-		cameraInfo.P[9] = result.cameraK[7];
-		cameraInfo.P[10] = result.cameraK[8];
-		cameraInfo.P[11] = 0;
+		sensor_msgs::CameraInfo cameraInfo = result.cameraInfo;
 		frameImageConverter.getCameraModel().fromCameraInfo(cameraInfo);
 
 		// calculate estimated x and y
@@ -332,10 +321,7 @@ void OptimizationNode::publishResults() {
 	}
 
 	// camera intrinsics
-	msg.K.push_back(result.cameraK[K_FX_IDX]);
-	msg.K.push_back(result.cameraK[K_FY_IDX]);
-	msg.K.push_back(result.cameraK[K_CX_IDX]);
-	msg.K.push_back(result.cameraK[K_CY_IDX]);
+	msg.cameraInfo = result.cameraInfo;
 
 	// camera transform
 	geometry_msgs::Transform cameraTransform;

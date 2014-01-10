@@ -12,6 +12,5 @@ geometry_msgs/Transform[] endeffectorToMarker
 # delta for transform from HeadPitch_link to CameraBottom_frame
 geometry_msgs/Transform cameraTransform
 
-# intrinsic camera parameters for the raw (distorted) images.
-# K = (fx, fy, cx, cy)
-float64[]  K
+# intrinsic camera parameters 
+sensor_msgs/CameraInfo cameraInfo
