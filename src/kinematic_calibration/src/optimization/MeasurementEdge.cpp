@@ -15,6 +15,7 @@
 #include <sensor_msgs/JointState.h>
 #include <tf/tf.h>
 #include <tf_conversions/tf_eigen.h>
+#include <eigen_conversions/eigen_kdl.h>
 #include <map>
 #include <string>
 #include <utility>
@@ -65,9 +66,10 @@ void MeasurementEdge<D, Derived>::computeError() {
 	// get transformation from end effector to camera
 	tf::Transform headToEndEffector; // root = head, tip = end effector, e.g. wrist
 	map<string, double> jointOffsets = jointOffsetVertex->estimate();
+	map<string, KDL::Frame> jointFrames = getJointFrames();
+	KinematicChain kc = kinematicChain->withFrames(jointFrames);
 	//jointOffsets[this->kinematicChain->getTip()] = 0; // set offset of the last joint to 0
-	this->kinematicChain->getRootToTip(jointPositions, jointOffsets,
-			headToEndEffector);
+	kc.getRootToTip(jointPositions, jointOffsets, headToEndEffector);
 
 	// get transformation from marker to end effector
 	Eigen::Isometry3d eigenTransform = markerTransformationVertex->estimate();
@@ -83,6 +85,18 @@ void MeasurementEdge<D, Derived>::computeError() {
 	sensor_msgs::CameraInfo cameraInfo =
 			this->frameImageConverter->getCameraModel().cameraInfo();
 	cameraInfo.K = cameraIntrinsicsVertex->estimate();
+	cameraInfo.P[0] = cameraInfo.K[0];
+	cameraInfo.P[1] = cameraInfo.K[1];
+	cameraInfo.P[2] = cameraInfo.K[2];
+	cameraInfo.P[3] = 0;
+	cameraInfo.P[4] = cameraInfo.K[3];
+	cameraInfo.P[5] = cameraInfo.K[4];
+	cameraInfo.P[6] = cameraInfo.K[5];
+	cameraInfo.P[7] = 0;
+	cameraInfo.P[8] = cameraInfo.K[6];
+	cameraInfo.P[9] = cameraInfo.K[7];
+	cameraInfo.P[10] = cameraInfo.K[8];
+	cameraInfo.P[11] = 0;
 	this->frameImageConverter->getCameraModel().fromCameraInfo(cameraInfo);
 
 	// calculate estimated x and y
@@ -93,6 +107,30 @@ void MeasurementEdge<D, Derived>::computeError() {
 	// set error
 	Derived& derivedObj = (Derived&) *this;
 	derivedObj.setError(cameraToMarker);
+}
+
+template<int D, class Derived>
+void MeasurementEdge<D, Derived>::setJointFrameVertex(const string& jointName,
+		g2o::HyperGraph::Vertex* v) {
+	int curSize = this->vertices().size();
+	BaseMultiEdge<D, measurementData>::resize(curSize + 1);
+	BaseMultiEdge<D, measurementData>::vertices()[curSize] = v;
+	this->jointFrameVerticesIndexes[jointName] = curSize;
+}
+
+template<int D, class Derived>
+map<string, KDL::Frame> MeasurementEdge<D, Derived>::getJointFrames() {
+	map<string, KDL::Frame> jointFrames;
+	for (map<string, int>::iterator it =
+			this->jointFrameVerticesIndexes.begin();
+			it != this->jointFrameVerticesIndexes.end(); it++) {
+		Eigen::Isometry3d iso = static_cast<VertexSE3*>(BaseMultiEdge<
+				D, measurementData>::vertices()[it->second])->estimate();
+		KDL::Frame frame;
+		tf::transformEigenToKDL(iso, frame);
+		jointFrames[it->first] = frame;
+	}
+	return jointFrames;
 }
 
 template<int D, class Derived>

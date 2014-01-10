@@ -154,10 +154,6 @@ void OptimizationNode::printResult() {
 				<< transform.getOrigin().y() << " " << transform.getOrigin().z()
 				<< " ";
 		cout << "(r, p, y) " << r << " " << p << " " << y << "\n";
-		/*cout << "(q0, q1, q2, q3) " << transform.getRotation().x() << " "
-		 << transform.getRotation().y() << " "
-		 << transform.getRotation().z() << " "
-		 << transform.getRotation().w() << "\n";*/
 	}
 
 	cout << "Optimized transform form camera to head:\n";
@@ -169,6 +165,18 @@ void OptimizationNode::printResult() {
 			<< result.cameraToHeadTransformation.getRotation().y() << " "
 			<< result.cameraToHeadTransformation.getRotation().z() << " "
 			<< result.cameraToHeadTransformation.getRotation().w() << "\n";
+
+	for (map<string, tf::Transform>::iterator it =
+			result.jointTransformations.begin();
+			it != result.jointTransformations.end(); it++) {
+		cout << "Optimized transform for joint " << it->first << ":\n";
+		cout << "(x, y, z) " << it->second.getOrigin().x() << " "
+				<< it->second.getOrigin().y() << " "
+				<< it->second.getOrigin().z() << " ";
+		double r, p, y;
+		tf::Matrix3x3(it->second.getRotation()).getRPY(r, p, y);
+		cout << "(r, p, y) " << r << " " << p << " " << y << "\n";
+	}
 
 	cout << "Optimized camera intrinsics:\n";
 	cout << "(fx,fy) " << result.cameraK[K_FX_IDX] << " "
@@ -182,6 +190,12 @@ void OptimizationNode::printPoints() {
 	FrameImageConverter frameImageConverter(cameraModel);
 
 	VariancePlot plotter;
+
+	// update kinematic chains
+	for (int i = 0; i < this->kinematicChains.size(); i++) {
+		this->kinematicChains[i] = this->kinematicChains[i].withTransformations(
+				result.jointTransformations);
+	}
 
 	// print out the measured position and the transformed position
 	for (int i = 0; i < measurements.size(); i++) {
@@ -218,6 +232,18 @@ void OptimizationNode::printPoints() {
 		sensor_msgs::CameraInfo cameraInfo =
 				frameImageConverter.getCameraModel().cameraInfo();
 		cameraInfo.K = result.cameraK;
+		cameraInfo.P[0] = result.cameraK[0];
+		cameraInfo.P[1] = result.cameraK[1];
+		cameraInfo.P[2] = result.cameraK[2];
+		cameraInfo.P[3] = 0;
+		cameraInfo.P[4] = result.cameraK[3];
+		cameraInfo.P[5] = result.cameraK[4];
+		cameraInfo.P[6] = result.cameraK[5];
+		cameraInfo.P[7] = 0;
+		cameraInfo.P[8] = result.cameraK[6];
+		cameraInfo.P[9] = result.cameraK[7];
+		cameraInfo.P[10] = result.cameraK[8];
+		cameraInfo.P[11] = 0;
 		frameImageConverter.getCameraModel().fromCameraInfo(cameraInfo);
 
 		// calculate estimated x and y

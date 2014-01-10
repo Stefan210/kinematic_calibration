@@ -66,7 +66,7 @@ void KinematicChain::getRootToTip(const map<string, double>& joint_positions,
 			outer_jnt_it++) {
 		double position = outer_jnt_it->second;
 		// add (optional) joint offset
-		if(joint_offsets.count(outer_jnt_it->first)) {
+		if (joint_offsets.count(outer_jnt_it->first)) {
 			position += joint_offsets.find(outer_jnt_it->first)->second;
 		}
 		sum.insert(make_pair<string, double>(outer_jnt_it->first, position));
@@ -106,6 +106,55 @@ void KinematicChain::getRootToTip(const map<string, double>& joint_positions,
 	KDL::Frame frame;
 	getRootToTip(joint_positions, joint_offsets, frame);
 	kdlFrameToTfTransform(frame, out);
+}
+
+KinematicChain KinematicChain::withFrames(
+		const map<string, KDL::Frame> framesToTip) {
+	KinematicChain copy(*this);
+	for (unsigned int i = 0; i < chain.getNrOfSegments(); i++) {
+		KDL::Segment segment = chain.getSegment(i);
+		KDL::Joint joint = segment.getJoint();
+		string name = joint.getName();
+
+		// no change for this segment
+		if (!framesToTip.count(name))
+			continue;
+
+		KDL::Segment newSegment(string(segment.getName()),
+				Joint(segment.getJoint()),
+				Frame(framesToTip.find(name)->second),
+				RigidBodyInertia(segment.getInertia()));
+		copy.chain.segments[i] = newSegment;
+	}
+	return copy;
+}
+
+KinematicChain KinematicChain::withTransformations(
+		const map<string, tf::Transform> transformationsToTip) {
+	// convert from TF to KDL
+	map<string, KDL::Frame> framesToTip;
+	for (map<string, tf::Transform>::const_iterator it = transformationsToTip.begin();
+			it != transformationsToTip.end(); it++) {
+		tf::Transform tfTransform = it->second;
+		KDL::Frame kdlFrame;
+		tf::TransformTFToKDL(tfTransform, kdlFrame);
+		framesToTip[it->first] = kdlFrame;
+	}
+
+	// delegate
+	return withFrames(framesToTip);
+}
+
+map<string, Frame> KinematicChain::getFramesToTip() {
+	map<string, Frame> frames;
+	for (unsigned int i = 0; i < chain.getNrOfSegments(); i++) {
+		KDL::Segment segment = chain.getSegment(i);
+		KDL::Joint joint = segment.getJoint();
+		string name = joint.getName();
+		Frame frameToTip = segment.getFrameToTip();
+		frames[name] = frameToTip;
+	}
+	return frames;
 }
 
 void KinematicChain::kdlFrameToTfTransform(const KDL::Frame& in,

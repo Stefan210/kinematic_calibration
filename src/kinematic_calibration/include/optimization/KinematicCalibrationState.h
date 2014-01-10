@@ -63,6 +63,11 @@ public:
 	 */
 	CameraIntrinsicsType cameraK;
 
+	/**
+	 * Estimations for the joint transformations.
+	 */
+	map<string, tf::Transform> jointTransformations;
+
 };
 
 } /* namespace kinematic_calibration */

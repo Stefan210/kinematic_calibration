@@ -32,7 +32,8 @@ public:
 	 * @param root Root element name of the chain.
 	 * @param tip Tip element name of the chain.
 	 */
-	KinematicChain(const KDL::Tree& tree, std::string root, std::string tip, std::string name="");
+	KinematicChain(const KDL::Tree& tree, std::string root, std::string tip,
+			std::string name = "");
 	virtual ~KinematicChain();
 
 	/**
@@ -40,7 +41,8 @@ public:
 	 * @param joint_positions Contains the positions of the joints.
 	 * @param out Will contain the calculated transform.
 	 */
-	void getRootToTip(const map<string, double>& joint_positions, KDL::Frame& out);
+	void getRootToTip(const map<string, double>& joint_positions,
+			KDL::Frame& out);
 
 	/**
 	 * Calculates the transform from the root to the tip of the frame.
@@ -56,8 +58,8 @@ public:
 	 * @param joint_positions Contains the positions of the joints.
 	 * @param out Will contain the calculated transform.
 	 */
-	void getRootToTip(const map<string, double>& joint_positions, tf::Transform& out);
-
+	void getRootToTip(const map<string, double>& joint_positions,
+			tf::Transform& out);
 
 	/**
 	 * Calculates the transform from the root to the tip of the frame.
@@ -67,6 +69,31 @@ public:
 	 */
 	void getRootToTip(const map<string, double>& joint_positions,
 			const map<string, double>& joint_offsets, tf::Transform& out);
+
+	/**
+	 * Returns a copy of the kinematic chain having the 6D transformations
+	 * between the joints updated with the transformations being passed
+	 * as parameters.
+	 * @param framesToTip Contains the updated/new 6D tansformation of the joints.
+	 * @return copy of the kinematic chain with updated joint transformations
+	 */
+	KinematicChain withFrames(const map<string, KDL::Frame> framesToTip);
+
+	/**
+	 * Returns a copy of the kinematic chain having the 6D transformations
+	 * between the joints updated with the transformations being passed
+	 * as parameters.
+	 * @param transformationsToTip Contains the updated/new 6D tansformation of the joints.
+	 * @return copy of the kinematic chain with updated joint transformations
+	 */
+	KinematicChain withTransformations(
+			const map<string, tf::Transform> transformationsToTip);
+
+	/**
+	 * Returns a map of joint names and their 6D transformations.
+	 * @return a map of joint names and their 6D transformations
+	 */
+	map<string, KDL::Frame> getFramesToTip();
 
 	/**
 	 * Returns a list containing the names of all joints.

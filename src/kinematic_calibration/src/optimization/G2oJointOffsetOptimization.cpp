@@ -9,6 +9,7 @@
 
 #include <tf/tf.h>
 #include <tf_conversions/tf_eigen.h>
+#include <eigen_conversions/eigen_kdl.h>
 
 #include "kinematic_calibration/measurementData.h"
 #include "../../include/optimization/JointOffsetOptimization.h"
@@ -29,6 +30,8 @@
 #include <g2o/solvers/pcg/linear_solver_pcg.h>
 #include <g2o/solvers/dense/linear_solver_dense.h>
 #include <g2o/core/robust_kernel_impl.h>
+
+#include <kdl/kdl.hpp>
 
 #include <time.h>
 #include <map>
@@ -60,6 +63,8 @@ void G2oJointOffsetOptimization::optimize(
 
 	// create the linear solver
 	MyLinearSolver* linearSolver = new MyLinearSolver();
+	//linearSolver->setTolerance(0.5);
+	//linearSolver->setAbsoluteTolerance(true);
 
 	// create the block solver on top of the linear solver
 	MyBlockSolver* blockSolver = new MyBlockSolver(linearSolver);
@@ -92,7 +97,8 @@ void G2oJointOffsetOptimization::optimize(
 	}
 	JointOffsetVertex* jointOffsetVertex = new JointOffsetVertex(jointNames);
 	jointOffsetVertex->setId(++id);
-	jointOffsetVertex->setFixed(!options.calibrateJointOffsets);
+	//jointOffsetVertex->setFixed(!options.calibrateJointOffsets);
+	jointOffsetVertex->setFixed(true);
 	optimizer.addVertex(jointOffsetVertex);
 
 	// instantiate the vertices for the marker transformations
@@ -136,6 +142,27 @@ void G2oJointOffsetOptimization::optimize(
 	cameraIntrinsicsVertex->setToOrigin();
 	optimizer.addVertex(cameraIntrinsicsVertex);
 
+	// instantiate the vertices for the joint 6D transformations
+	map<string, KDL::Frame> framesToTip; // contains all frames (=transformations) to optimize
+	for (int i = 0; i < kinematicChains.size(); i++) {
+		map<string, KDL::Frame> current = kinematicChains[i].getFramesToTip();
+		framesToTip.insert(current.begin(), current.end());
+	}
+	map<string, g2o::HyperGraph::Vertex*> jointFrameVertices;
+	for (map<string, KDL::Frame>::iterator it = framesToTip.begin();
+			it != framesToTip.end(); it++) {
+		TransformationVertex* vertex = new TransformationVertex();
+		Eigen::Affine3d eigenAffine;
+		tf::transformKDLToEigen(it->second, eigenAffine);
+		Eigen::Isometry3d eigenIsometry;
+		eigenIsometry.translation() = eigenAffine.translation();
+		eigenIsometry.linear() = eigenAffine.rotation();
+		vertex->setEstimate(eigenIsometry);
+		vertex->setId(++id);
+		jointFrameVertices[it->first] = vertex;
+		optimizer.addVertex(vertex);
+	}
+
 	// add edges
 	for (int i = 0; i < measurements.size(); i++) {
 		measurementData current = measurements[i];
@@ -156,6 +183,12 @@ void G2oJointOffsetOptimization::optimize(
 		edge->vertices()[1] = jointOffsetVertex;
 		edge->vertices()[2] = cameraToHeadTransformationVertex;
 		edge->vertices()[3] = cameraIntrinsicsVertex;
+		for (map<string, g2o::HyperGraph::Vertex*>::iterator it =
+				jointFrameVertices.begin(); it != jointFrameVertices.end();
+				it++) {
+			dynamic_cast<EdgeWithJointFrameVertices*>(edge)->setJointFrameVertex(
+					it->first, it->second);
+		}
 		edge->computeError();
 		optimizer.addEdge(edge);
 	}
@@ -165,7 +198,7 @@ void G2oJointOffsetOptimization::optimize(
 	optimizer.initializeOptimization();
 	optimizer.computeActiveErrors();
 	optimizer.setVerbose(true);
-	optimizer.optimize(100000);
+	optimizer.optimize(10);
 
 	// get results
 	optimizedState.jointOffsets =
@@ -185,6 +218,18 @@ void G2oJointOffsetOptimization::optimize(
 	tf::transformEigenToTF(eigenTransform,
 			optimizedState.cameraToHeadTransformation);
 	optimizedState.cameraK = cameraIntrinsicsVertex->estimate();
+
+	// get the joint transformations
+	map<string, tf::Transform> jointTransformations;
+	for (map<string, g2o::HyperGraph::Vertex*>::iterator it =
+			jointFrameVertices.begin(); it != jointFrameVertices.end(); it++) {
+		Eigen::Isometry3d eigenTransform =
+				static_cast<TransformationVertex*>(it->second)->estimate();
+		tf::Transform tfTransform;
+		tf::transformEigenToTF(eigenTransform, tfTransform);
+		jointTransformations[it->first] = tfTransform;
+	}
+	optimizedState.jointTransformations = jointTransformations;
 }
 
 } /* namespace kinematic_calibration */
