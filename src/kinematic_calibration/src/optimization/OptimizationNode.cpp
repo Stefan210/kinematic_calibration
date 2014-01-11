@@ -33,18 +33,43 @@
 
 namespace kinematic_calibration {
 
-class VariancePlot {
+class Plot2D {
 public:
-	VariancePlot() {
+	Plot2D(string title = "") {
 		gnuplotPipe = popen("gnuplot -persistent", "w");
 		fprintf(gnuplotPipe,
 				"set autoscale;\n set xzeroaxis\n set yzeroaxis\n");
 		fprintf(gnuplotPipe,
-				"plot '-' with points pt 1 lc rgb 'green' title 'difference' \n");
+				"plot '-' with points pt 1 lc rgb 'green' title '%s' \n",
+				title.c_str());
 	}
 
 	void addPoint(double x, double y) {
 		fprintf(gnuplotPipe, "%f %f \n", x, y);
+	}
+
+	void showPlot() {
+		fprintf(gnuplotPipe, "e ,\n ");
+		fclose(gnuplotPipe);
+	}
+
+private:
+	FILE * gnuplotPipe;
+};
+
+class Plot3D {
+public:
+	Plot3D(string title = "") {
+		gnuplotPipe = popen("gnuplot -persistent", "w");
+		fprintf(gnuplotPipe,
+				"set autoscale;\n set xzeroaxis\n set yzeroaxis\n set zzeroaxis\n");
+		fprintf(gnuplotPipe,
+				"splot '-' with points pt 1 lc rgb 'red' title '%s' \n",
+				title.c_str());
+	}
+
+	void addPoint(double x, double y, double z) {
+		fprintf(gnuplotPipe, "%f %f %f \n", x, y, z);
 	}
 
 	void showPlot() {
@@ -192,7 +217,8 @@ void OptimizationNode::printPoints() {
 	// instantiate the frame image converter
 	FrameImageConverter frameImageConverter(cameraModel);
 
-	VariancePlot plotter;
+	Plot2D plotterDiff;
+	Plot3D plotEndp;
 
 	// update kinematic chains
 	for (int i = 0; i < this->kinematicChains.size(); i++) {
@@ -260,11 +286,12 @@ void OptimizationNode::printPoints() {
 		cout << "\n";
 
 		// add difference to plot
-		plotter.addPoint((currentX - x), (currentY - y));
+		plotterDiff.addPoint((currentX - x), (currentY - y));
+		//plotEndp.addPoint(origin.x(), origin.y(), origin.z());
 	}
 
 	// show difference plot
-	plotter.showPlot();
+	plotterDiff.showPlot();
 }
 
 bool OptimizationNode::putToImage(const string& id, const double& x,
