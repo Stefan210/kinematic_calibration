@@ -346,6 +346,7 @@ void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 	receivedImage = true;
     cameraFrame = msg.get()->header.frame_id;
     checkerboardFound = markerDetection->detect(msg, markerData);
+    image = *msg;
 	if (checkerboardFound) {
 		ROS_INFO("Checkerboard found at position %f %f", markerData[0],
 				markerData[1]);
@@ -572,7 +573,11 @@ void DataCapture::publishMeasurement() {
     data.id = ss.str();
     data.camera_frame = this->cameraFrame;
     nh.getParam("chain_name", data.chain_name);
+    nh.getParam("chain_root", data.chain_root);
+    nh.getParam("chain_tip", data.chain_tip);
     data.marker_type = this->markerType;
+    data.header.stamp = this->curTime;
+    data.image = this->image;
     ROS_INFO("Publishing measurement data...");
     measurementPub.publish(data);
 

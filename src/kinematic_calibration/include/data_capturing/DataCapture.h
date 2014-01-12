@@ -102,6 +102,7 @@ private:
 	ros::Time curTime;
 	string imageTopic;
 	CalibrationContext& context;
+	sensor_msgs::Image image;
 	void setStiffness(const vector<string>& jointNames, double stiffness);
 	void enableStiffness(const vector<string>& jointNames);
 	void disableStiffness(const vector<string>& jointNames);
