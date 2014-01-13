@@ -165,7 +165,7 @@ void DataCapture::playChainPoses() {
 	nhPrivate.getParam("params/end_pose_num", end);
 	enableChainStiffness();
 	const string& prefix = getPosePrefix();
-    for (int i = start; i <= end; i += 1) {
+    for (int i = start; i <= end; i += 3) {
 		// check for pause requests:
 		// call blocks if pause requested
 		if (pauseManager.pauseRequested()) {
@@ -180,6 +180,7 @@ void DataCapture::playChainPoses() {
 		string poseName(buf);
 		BodyPoseGoal goal;
 		goal.pose_name = poseName;
+        this->currentPoseName = poseName;
 		ROS_INFO("Calling pose manager for executing pose %s...", buf);
 		actionlib::SimpleClientGoalState goalState =
 				bodyPoseClient.sendGoalAndWait(goal);
@@ -566,6 +567,7 @@ void DataCapture::publishMeasurement() {
     updateJointStates();
     unsigned long id = static_cast<unsigned long>(time(0));
     stringstream ss;
+    ss << this->currentPoseName << "-";
     ss << id;
 	measurementData data;
     data.jointState = jointState;
