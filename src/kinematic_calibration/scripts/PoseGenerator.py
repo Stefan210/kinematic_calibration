@@ -47,7 +47,7 @@ class PoseGenerator():
             f.close()
             
 if __name__ == '__main__':
-    jointNames = ['LShoulderPitch', 'LShoulderRoll', 'LElbowYaw', 'LElbowRoll', 'LWristYaw', 'LHand'];
+    jointNames = ['LShoulderPitch', 'LShoulderRoll', 'LElbowYaw', 'LElbowRoll', 'LWristYaw'];
     minpos = [0.20, -0.31, -2.08, -1.27, -1.10, 0.374];
     maxpos = [0.31, 0.88, 0.93, -0.06, 1.74, 0.374];
     generator = PoseGenerator("larm", jointNames, minpos, maxpos, "poses_generated.yaml");
