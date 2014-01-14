@@ -211,238 +211,237 @@ void OptimizationNode::printResult() {
 			<< result.cameraInfo.K[K_FY_IDX] << " ";
 	cout << "(cx,cy) " << result.cameraInfo.K[K_CX_IDX] << " "
 			<< result.cameraInfo.K[K_CY_IDX] << "\n";
+	cout << "D: " << result.cameraInfo.D[0] << ", " <<
+		result.cameraInfo.D[1] << ", " << result.cameraInfo.D[2] << ", "<<
+		result.cameraInfo.D[3] << ", "<< result.cameraInfo.D[5] << "\n";
 }
 
 void OptimizationNode::printPoints() {
-	// instantiate the frame image converter
-	FrameImageConverter frameImageConverter(cameraModel);
+// instantiate the frame image converter
+FrameImageConverter frameImageConverter(cameraModel);
 
-	Plot2D plotterDiff;
-	Plot3D plotEndp;
+Plot2D plotterDiff;
+Plot3D plotEndp;
 
-	// update kinematic chains
-	for (int i = 0; i < this->kinematicChains.size(); i++) {
-		this->kinematicChains[i] = this->kinematicChains[i].withTransformations(
-				result.jointTransformations);
+// update kinematic chains
+for (int i = 0; i < this->kinematicChains.size(); i++) {
+	this->kinematicChains[i] = this->kinematicChains[i].withTransformations(
+			result.jointTransformations);
+}
+
+// print out the measured position and the transformed position
+for (int i = 0; i < measurements.size(); i++) {
+	measurementData current = measurements[i];
+	cout << i << " measured(x,y): " << current.marker_data[0] << "  "
+			<< current.marker_data[1];
+
+	// get transformation from end effector to camera
+	map<string, double> jointPositions;
+	for (int i = 0; i < current.jointState.name.size(); i++) {
+		jointPositions.insert(
+				make_pair<string, double>(current.jointState.name[i],
+						current.jointState.position[i]));
 	}
 
-	// print out the measured position and the transformed position
-	for (int i = 0; i < measurements.size(); i++) {
-		measurementData current = measurements[i];
-		cout << i << " measured(x,y): " << current.marker_data[0] << "  "
-				<< current.marker_data[1];
-
-		// get transformation from end effector to camera
-		map<string, double> jointPositions;
-		for (int i = 0; i < current.jointState.name.size(); i++) {
-			jointPositions.insert(
-					make_pair<string, double>(current.jointState.name[i],
-							current.jointState.position[i]));
+	tf::Transform cameraToEndEffector; // root = camera, tip = end effector, e.g. wrist
+	map<string, double> jointOffsets = result.jointOffsets;
+	for (int j = 0; j < this->kinematicChains.size(); j++) {
+		if (kinematicChains[j].getName() == current.chain_name) {
+			jointOffsets[this->kinematicChains[j].getTip()] = 0;
+			this->kinematicChains[j].getRootToTip(jointPositions, jointOffsets,
+					cameraToEndEffector);
 		}
-
-		tf::Transform cameraToEndEffector; // root = camera, tip = end effector, e.g. wrist
-		map<string, double> jointOffsets = result.jointOffsets;
-		for (int j = 0; j < this->kinematicChains.size(); j++) {
-			if (kinematicChains[j].getName() == current.chain_name) {
-				jointOffsets[this->kinematicChains[j].getTip()] = 0;
-				this->kinematicChains[j].getRootToTip(jointPositions,
-						jointOffsets, cameraToEndEffector);
-			}
-		}
-
-		// get transformation from marker to end effector
-		tf::Transform endEffectorToMarker =
-				result.markerTransformations[current.chain_name];
-
-		// get transformation from camera to head
-		tf::Transform cameraToHead = result.cameraToHeadTransformation;
-
-		// get estimated camera intrinsics
-		sensor_msgs::CameraInfo cameraInfo = result.cameraInfo;
-		frameImageConverter.getCameraModel().fromCameraInfo(cameraInfo);
-
-		// calculate estimated x and y
-		//endEffectorToMarker.setRotation(tf::Quaternion::getIdentity());
-		tf::Transform cameraToMarker = endEffectorToMarker * cameraToEndEffector
-				* cameraToHead;
-		double x, y;
-		frameImageConverter.project(cameraToMarker.inverse(), x, y);
-
-		// write into image (if available)
-		putToImage(current.id, x, y);
-
-		// calculate distance between camera and marker
-		tf::Vector3 origin = cameraToMarker.getOrigin();
-		double dist = origin.length();
-
-		double currentX = current.marker_data[0];
-		double currentY = current.marker_data[1];
-
-		cout << "\toptimized(x,y): " << x << " " << y;
-		cout << "\tdifference(x,y): " << (currentX - x) << " "
-				<< (currentY - y);
-		cout << "\tsum: " << (fabs(currentX - x) + fabs(currentY - y));
-		cout << "\tdist: " << dist;
-		cout << "\n";
-
-		// add difference to plot
-		plotterDiff.addPoint((currentX - x), (currentY - y));
-		//plotEndp.addPoint(origin.x(), origin.y(), origin.z());
 	}
 
-	// show difference plot
-	plotterDiff.showPlot();
+	// get transformation from marker to end effector
+	tf::Transform endEffectorToMarker =
+			result.markerTransformations[current.chain_name];
+
+	// get transformation from camera to head
+	tf::Transform cameraToHead = result.cameraToHeadTransformation;
+
+	// get estimated camera intrinsics
+	sensor_msgs::CameraInfo cameraInfo = result.cameraInfo;
+	frameImageConverter.getCameraModel().fromCameraInfo(cameraInfo);
+
+	// calculate estimated x and y
+	//endEffectorToMarker.setRotation(tf::Quaternion::getIdentity());
+	tf::Transform cameraToMarker = endEffectorToMarker * cameraToEndEffector
+			* cameraToHead;
+	double x, y;
+	frameImageConverter.project(cameraToMarker.inverse(), x, y);
+
+	// write into image (if available)
+	putToImage(current.id, x, y);
+
+	// calculate distance between camera and marker
+	tf::Vector3 origin = cameraToMarker.getOrigin();
+	double dist = origin.length();
+
+	double currentX = current.marker_data[0];
+	double currentY = current.marker_data[1];
+
+	cout << "\toptimized(x,y): " << x << " " << y;
+	cout << "\tdifference(x,y): " << (currentX - x) << " " << (currentY - y);
+	cout << "\tsum: " << (fabs(currentX - x) + fabs(currentY - y));
+	cout << "\tdist: " << dist;
+	cout << "\n";
+
+	// add difference to plot
+	plotterDiff.addPoint((currentX - x), (currentY - y));
+	//plotEndp.addPoint(origin.x(), origin.y(), origin.z());
+}
+
+// show difference plot
+plotterDiff.showPlot();
 }
 
 bool OptimizationNode::putToImage(const string& id, const double& x,
-		const double& y) {
-	const string extension = "jpg"; // TODO: parameterize!
+	const double& y) {
+const string extension = "jpg"; // TODO: parameterize!
 
-	// build filename
-	stringstream name;
-	name << "/tmp/" << id << "." << extension;
+// build filename
+stringstream name;
+name << "/tmp/" << id << "." << extension;
 
-	// find image
-	FILE *file = NULL;
-	if (NULL != (file = fopen(name.str().c_str(), "r"))) {
-		fclose(file);
-	} else {
-		// file not found
-		ROS_INFO("File %s not found!", name.str().c_str());
-		return false;
-	}
+// find image
+FILE *file = NULL;
+if (NULL != (file = fopen(name.str().c_str(), "r"))) {
+	fclose(file);
+} else {
+	// file not found
+	ROS_INFO("File %s not found!", name.str().c_str());
+	return false;
+}
 
-	// read the image with OpenCV
-	cv::Mat image = cv::imread(name.str());
+// read the image with OpenCV
+cv::Mat image = cv::imread(name.str());
 
-	// put a cross to the optimized/calibrated position
-	cv::line(image, cv::Point(x - 3, y - 3), cv::Point(x + 3, y + 3),
-			CV_RGB(0, 255, 0));
-	cv::line(image, cv::Point(x - 3, y + 3), cv::Point(x + 3, y - 3),
-			CV_RGB(0, 255, 0));
+// put a cross to the optimized/calibrated position
+cv::line(image, cv::Point(x - 3, y - 3), cv::Point(x + 3, y + 3),
+		CV_RGB(0, 255, 0));
+cv::line(image, cv::Point(x - 3, y + 3), cv::Point(x + 3, y - 3),
+		CV_RGB(0, 255, 0));
 
-	// write the image into a new file
-	stringstream newname;
-	newname << "/tmp/" << id << "_calibrated." << extension;
-	return cv::imwrite(newname.str(), image);
+// write the image into a new file
+stringstream newname;
+newname << "/tmp/" << id << "_calibrated." << extension;
+return cv::imwrite(newname.str(), image);
 }
 
 void OptimizationNode::publishResults() {
-	kinematic_calibration::calibrationResult msg;
+kinematic_calibration::calibrationResult msg;
 
-	// joint offsets
-	for (map<string, double>::iterator it = result.jointOffsets.begin();
-			it != result.jointOffsets.end(); it++) {
-		msg.jointNames.push_back(it->first);
-		msg.jointOffsets.push_back(it->second);
-	}
+// joint offsets
+for (map<string, double>::iterator it = result.jointOffsets.begin();
+		it != result.jointOffsets.end(); it++) {
+	msg.jointNames.push_back(it->first);
+	msg.jointOffsets.push_back(it->second);
+}
 
-	// chain names and marker transformations
-	for (map<string, tf::Transform>::iterator it =
-			result.markerTransformations.begin();
-			it != result.markerTransformations.end(); it++) {
-		msg.chainNames.push_back(it->first);
-		geometry_msgs::Transform transform;
-		tf::transformTFToMsg(it->second, transform);
-		msg.endeffectorToMarker.push_back(transform);
-	}
+// chain names and marker transformations
+for (map<string, tf::Transform>::iterator it =
+		result.markerTransformations.begin();
+		it != result.markerTransformations.end(); it++) {
+	msg.chainNames.push_back(it->first);
+	geometry_msgs::Transform transform;
+	tf::transformTFToMsg(it->second, transform);
+	msg.endeffectorToMarker.push_back(transform);
+}
 
-	// camera intrinsics
-	msg.cameraInfo = result.cameraInfo;
+// camera intrinsics
+msg.cameraInfo = result.cameraInfo;
 
-	// camera transform
-	geometry_msgs::Transform cameraTransform;
-	tf::transformTFToMsg(result.cameraToHeadTransformation.inverse(),
-			cameraTransform);
-	msg.cameraTransform = cameraTransform;
+// camera transform
+geometry_msgs::Transform cameraTransform;
+tf::transformTFToMsg(result.cameraToHeadTransformation.inverse(),
+		cameraTransform);
+msg.cameraTransform = cameraTransform;
 
-	// publish result
-	resultPublisher.publish(msg);
+// publish result
+resultPublisher.publish(msg);
 }
 
 void OptimizationNode::measurementCb(const measurementDataConstPtr& msg) {
-	const measurementData data = *msg;
-	if (!measurementOk(msg)) {
-		return;
-	} else {
-		// check if the measurement contains to a new chain
-		if (data.chain_name != chainName) {
-			// get the parameters
-			nh.getParam("chain_name", chainName);
-			nh.getParam("chain_root", chainRoot);
-			nh.getParam("chain_tip", chainTip);
-			// instantiate the kinematic chain
-			KinematicChain kinematicChain(kdlTree, chainRoot, chainTip,
-					chainName);
-			this->kinematicChains.push_back(kinematicChain);
-			ROS_INFO("Receive data for chain %s.", chainName.c_str());
-		}
-		// save data
-		measurements.push_back(measurementData(data));
-		ROS_INFO("Measurement data received (#%ld).", measurements.size());
+const measurementData data = *msg;
+if (!measurementOk(msg)) {
+	return;
+} else {
+	// check if the measurement contains to a new chain
+	if (data.chain_name != chainName) {
+		// get the parameters
+		nh.getParam("chain_name", chainName);
+		nh.getParam("chain_root", chainRoot);
+		nh.getParam("chain_tip", chainTip);
+		// instantiate the kinematic chain
+		KinematicChain kinematicChain(kdlTree, chainRoot, chainTip, chainName);
+		this->kinematicChains.push_back(kinematicChain);
+		ROS_INFO("Receive data for chain %s.", chainName.c_str());
 	}
+	// save data
+	measurements.push_back(measurementData(data));
+	ROS_INFO("Measurement data received (#%ld).", measurements.size());
+}
 }
 
 void OptimizationNode::camerainfoCallback(
-		const sensor_msgs::CameraInfoConstPtr& msg) {
-	if (cameraModel.fromCameraInfo(msg)) {
-		ROS_INFO("Camera model set.");
-		cout << "Initial intrinsics: " << cameraModel.fullIntrinsicMatrix()
-				<< endl;
-	}
+	const sensor_msgs::CameraInfoConstPtr& msg) {
+if (cameraModel.fromCameraInfo(msg)) {
+	ROS_INFO("Camera model set.");
+	cout << "Initial intrinsics: " << cameraModel.fullIntrinsicMatrix() << endl;
+}
 
-	else
-		ROS_FATAL("Camera model could not be set!");
-	cameraInfoSubscriber.shutdown();
+else
+	ROS_FATAL("Camera model could not be set!");
+cameraInfoSubscriber.shutdown();
 }
 
 bool OptimizationNode::startOptizationCallback(
-		std_srvs::Empty::Request& request,
-		std_srvs::Empty::Response& response) {
-	this->collectingData = false;
-	return true;
+	std_srvs::Empty::Request& request, std_srvs::Empty::Response& response) {
+this->collectingData = false;
+return true;
 }
 
 bool OptimizationNode::measurementOk(const measurementDataConstPtr& msg) {
-	const measurementData data = *msg;
-	if (data.jointState.name.empty()) {
-		return false;
-	}
+const measurementData data = *msg;
+if (data.jointState.name.empty()) {
+	return false;
+}
 
-	if (data.marker_data.empty()) {
-		return false;
-	}
+if (data.marker_data.empty()) {
+	return false;
+}
 
-	return true;
+return true;
 }
 
 void OptimizationNode::removeIgnoredMeasurements() {
-	// get list of IDs to be ignored
-	XmlRpc::XmlRpcValue idList;
-	nh.getParam("ignore_measurements", idList);
-	ROS_ASSERT(idList.getType() == XmlRpc::XmlRpcValue::TypeArray);
+// get list of IDs to be ignored
+XmlRpc::XmlRpcValue idList;
+nh.getParam("ignore_measurements", idList);
+ROS_ASSERT(idList.getType() == XmlRpc::XmlRpcValue::TypeArray);
 
-	// create new list for measurement data
-	vector<measurementData> filteredList;
+// create new list for measurement data
+vector<measurementData> filteredList;
 
-	// check which measurements should be ignored
-	for (vector<measurementData>::iterator it = measurements.begin();
-			it != measurements.end(); it++) {
-		string id = it->id;
-		bool remove = false;
-		for (int32_t i = 0; i < idList.size(); ++i) {
-			ROS_ASSERT(idList[i].getType() == XmlRpc::XmlRpcValue::TypeString);
-			string cid = static_cast<string>(idList[i]);
-			if (id == cid) {
-				remove = true;
-			}
+// check which measurements should be ignored
+for (vector<measurementData>::iterator it = measurements.begin();
+		it != measurements.end(); it++) {
+	string id = it->id;
+	bool remove = false;
+	for (int32_t i = 0; i < idList.size(); ++i) {
+		ROS_ASSERT(idList[i].getType() == XmlRpc::XmlRpcValue::TypeString);
+		string cid = static_cast<string>(idList[i]);
+		if (id == cid) {
+			remove = true;
 		}
-		if (!remove)
-			filteredList.push_back(*it);
 	}
+	if (!remove)
+		filteredList.push_back(*it);
+}
 
-	// reassign the measurements list
-	this->measurements = filteredList;
+// reassign the measurements list
+this->measurements = filteredList;
 }
 
 } /* namespace kinematic_calibration */
@@ -450,10 +449,10 @@ void OptimizationNode::removeIgnoredMeasurements() {
 using namespace kinematic_calibration;
 
 int main(int argc, char** argv) {
-	ros::init(argc, argv, "OptimizationNode");
-	CalibrationContext* context = new RosCalibContext();
-	OptimizationNode node(context);
-	node.startLoop();
-	delete context;
-	return 0;
+ros::init(argc, argv, "OptimizationNode");
+CalibrationContext* context = new RosCalibContext();
+OptimizationNode node(context);
+node.startLoop();
+delete context;
+return 0;
 }
