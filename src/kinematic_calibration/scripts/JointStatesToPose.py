@@ -69,8 +69,8 @@ class JointStatesToPose():
 
 if __name__ == '__main__':
     #converter = JointStatesToPose("chain", ['HeadYaw', 'HeadPitch', 'RHand']);
-    converter = JointStatesToPose("larm", ['LShoulderPitch', 'LShoulderRoll', 'LElbowYaw', 'LElbowRoll', 'LWristYaw', 'LHand']);
-    #converter = JointStatesToPose("rarm", ['RShoulderPitch', 'RShoulderRoll', 'RElbowYaw', 'RElbowRoll', 'RWristYaw', 'RHand']);
+    #converter = JointStatesToPose("larm", ['LShoulderPitch', 'LShoulderRoll', 'LElbowYaw', 'LElbowRoll', 'LWristYaw']);
+    converter = JointStatesToPose("rarm", ['RShoulderPitch', 'RShoulderRoll', 'RElbowYaw', 'RElbowRoll', 'RWristYaw']);
     converter.loadFromYamlFile(sys.argv[1])
     converter.jointStatesToPose(float(sys.argv[3]))
     converter.saveToYamlFile(sys.argv[2])

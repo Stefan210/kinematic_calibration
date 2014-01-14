@@ -440,7 +440,7 @@ void DataCapture::updateCheckerboard() {
 
 void DataCapture::updateCheckerboardOnce() {
 	receivedImage = false;
-	usleep(0.3 * 1000 * 1000);
+	usleep(0.1 * 1000 * 1000);
 	ROS_INFO("Waiting for image message...");
 	while (ros::getGlobalCallbackQueue()->isEmpty())
 		;
@@ -494,7 +494,7 @@ void DataCapture::updateJointStates() {
 
 void DataCapture::updateJointStatesOnce() {
 	receivedJointStates = false;
-	usleep(0.3 * 1000 * 1000);
+	usleep(0.1 * 1000 * 1000);
 	ROS_INFO("Waiting for joint state message...");
 	while (jointStatesQueue.isEmpty())
 		;
