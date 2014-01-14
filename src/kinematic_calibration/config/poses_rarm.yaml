@@ -438,3 +438,40 @@ rarm088:
   positions: [-0.32056403160095215, 0.3141592741012573, 1.8914642333984375, 0.03490658476948738,
     -1.4710640907287598, -0.3700000047683716]
   time_from_start: 1.0
+
+rarm089:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw]
+  positions: [0.7532360553741455, -0.02611994743347168, 1.4940741062164307, 1.0201520919799805, -0.06447005271911621]
+  time_from_start: 1.0
+rarm090:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw]
+  positions: [0.7762460708618164, -0.3896780014038086, 0.9847860336303711, 0.6274480819702148, 0.05058002471923828]
+  time_from_start: 1.0
+rarm091:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw]
+  positions: [0.8437418937683105, -0.5722239017486572, 1.3053920269012451, 0.4817180633544922, -0.37433791160583496]
+  time_from_start: 1.0
+rarm092:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw]
+  positions: [0.5737578868865967, 0.18864011764526367, 2.0856685638427734, 0.48018407821655273, -1.1336679458618164]
+  time_from_start: 1.0
+rarm093:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw]
+  positions: [-0.2638061046600342, 0.14108610153198242, -0.03072190284729004, 1.1305999755859375, 0.724006175994873]
+  time_from_start: 1.0
+rarm094:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw]
+  positions: [-0.23619413375854492, 0.3141592741012573, -0.023051977157592773, 0.7363619804382324, 0.724006175994873]
+  time_from_start: 1.0
+rarm095:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw]
+  positions: [0.14117002487182617, 0.3141592741012573, -0.6857399940490723, 0.4188239574432373, 1.2977221012115479]
+  time_from_start: 1.0
+rarm096:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw]
+  positions: [0.023051977157592773, 0.3141592741012573, -0.678070068359375, 0.6213119029998779, 0.8467259407043457]
+  time_from_start: 1.0
+rarm097:
+  joint_names: [RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw]
+  positions: [0.2945699691772461, 0.3141592741012573, 0.21932005882263184, 0.788517951965332, 0.36658406257629395]
+  time_from_start: 1.0
