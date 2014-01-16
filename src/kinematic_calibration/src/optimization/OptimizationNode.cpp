@@ -30,6 +30,7 @@
 #include "../../include/optimization/CameraIntrinsicsVertex.h"
 #include "../../include/optimization/G2oJointOffsetOptimization.h"
 #include "../../include/common/CalibrationContext.h"
+#include "../../include/optimization/LocOptJointOffsetOptimization.h"
 
 namespace kinematic_calibration {
 
@@ -156,8 +157,12 @@ void OptimizationNode::optimize() {
 	initialState.cameraInfo = cameraModel.cameraInfo();
 
 	// optimization instance
+
 	G2oJointOffsetOptimization optimization(*context, measurements,
 			kinematicChains, frameImageConverter, initialState);
+	/*
+	HCJointOffsetOptimization optimization(*context, measurements,
+			kinematicChains, frameImageConverter, initialState);*/
 	optimization.optimize(result);
 }
 

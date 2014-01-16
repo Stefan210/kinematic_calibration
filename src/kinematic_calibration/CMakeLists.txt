@@ -268,6 +268,8 @@ add_executable(optimizationNode
 	src/optimization/JointOffsetVertex.cpp
 	#src/optimization/MeasurementEdge.cpp
 	#src/optimization/CheckerboardMeasurementEdge.cpp
+	src/optimization/LocOptKinCalState.cpp
+	src/optimization/LocOptJointOffsetOptimization.cpp
 	)
 target_link_libraries(optimizationNode 
 	frameImageConverter
