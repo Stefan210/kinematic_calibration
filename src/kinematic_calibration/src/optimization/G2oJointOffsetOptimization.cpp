@@ -115,6 +115,9 @@ void G2oJointOffsetOptimization::optimize(
 		markerTransformationVertex->setFixed(!options.calibrateMarkerTransform);
 		optimizer.addVertex(markerTransformationVertex);
 		KinematicChain currentChain = kinematicChains[i];
+		Eigen::Isometry3d markerEigen;
+		tfToEigen(initialState.markerTransformations[currentChain.getName()], markerEigen);
+		markerTransformationVertex->setEstimate(markerEigen);
 		markerTransformationVertices.insert(
 				make_pair(currentChain.getName(), markerTransformationVertex));
 		kinematicChainsMap.insert(
@@ -127,14 +130,9 @@ void G2oJointOffsetOptimization::optimize(
 	cameraToHeadTransformationVertex->setId(++id);
 	cameraToHeadTransformationVertex->setFixed(
 			!options.calibrateCameraTransform);
-
-	Eigen::Affine3d initialCameraToHeadAffine;
-	tf::transformTFToEigen(this->initialState.cameraToHeadTransformation,
-			initialCameraToHeadAffine);
 	Eigen::Isometry3d initialCameraToHeadIsometry;
-	initialCameraToHeadIsometry.translation() =
-			initialCameraToHeadAffine.translation();
-	initialCameraToHeadIsometry.linear() = initialCameraToHeadAffine.rotation();
+	tfToEigen(this->initialState.cameraToHeadTransformation,
+			initialCameraToHeadIsometry);
 	cameraToHeadTransformationVertex->setEstimate(initialCameraToHeadIsometry);
 	optimizer.addVertex(cameraToHeadTransformationVertex);
 
@@ -241,6 +239,14 @@ void G2oJointOffsetOptimization::optimize(
 		jointTransformations[it->first] = tfTransform;
 	}
 	optimizedState.jointTransformations = jointTransformations;
+}
+
+void G2oJointOffsetOptimization::tfToEigen(const tf::Transform& tfTransformation,
+		Eigen::Isometry3d& eigenIsometry) const {
+	Eigen::Affine3d eigenAffine;
+	tf::transformTFToEigen(tfTransformation, eigenAffine);
+	eigenIsometry.translation() = eigenAffine.translation();
+	eigenIsometry.linear() = eigenAffine.rotation();
 }
 
 } /* namespace kinematic_calibration */
