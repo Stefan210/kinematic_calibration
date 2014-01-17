@@ -215,7 +215,7 @@ target_link_libraries(checkerboardDetectionTest checkerboardDetection ${catkin_L
 
 ### CircleDetection
 add_library(circleDetection src/data_capturing/CircleDetection.cpp src/data_capturing/MarkerDetection.cpp src/data_capturing/SinglePointMarkerDetection.cpp)
-target_link_libraries(circleDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(circleDetection frameImageConverter ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 add_executable(circleDetectionMain src/data_capturing/CircleDetectionMain.cpp)
 target_link_libraries(circleDetectionMain circleDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
