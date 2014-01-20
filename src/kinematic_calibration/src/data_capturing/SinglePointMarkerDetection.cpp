@@ -29,7 +29,7 @@ SinglePointMarkerDetection::~SinglePointMarkerDetection() {
 
 void SinglePointMarkerDetection::drawMarker(cv::Mat& image) {
 	// check whether the marker position was saved
-	if (this->position.size() != 2) {
+	if (this->position.size() < 2) {
 		ROS_ERROR("Marker position was not set!");
 		return;
 	}

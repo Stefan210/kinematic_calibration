@@ -177,6 +177,10 @@ RosCircleDetection::RosCircleDetection() :
 	}
 	camerainfoSub.shutdown();
 	ROS_INFO("Done.");
+	
+	ROS_INFO("Filling tf buffer...");
+	usleep(1e6);
+	ROS_INFO("Done.");
 }
 
 bool RosCircleDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
@@ -207,6 +211,9 @@ bool RosCircleDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
 	if (success) {
 		saveImage(in_msg);
 		savePosition(out);
+	} else {
+		// fill with dummy values
+		out.resize(3);
 	}
 	return success;
 }
@@ -226,7 +233,7 @@ bool CircleDetection::findClosestRegion(const cv::Mat& image,
 		const vector<cv::Vec3f>& circles, const cv::Point2d& center,
 		const double& radius, vector<double>& out) {
 	int bestIdx = -1;
-	double minDist = 1e20;
+	double minDist = 1e200;
 	for (int i = 0; i < circles.size(); i++) {
 		double currentDist = (center.x - circles[i][0])
 				* (center.x - circles[i][0]);
@@ -240,14 +247,15 @@ bool CircleDetection::findClosestRegion(const cv::Mat& image,
 	if (bestIdx == -1)
 		return false;
 
-	if (sqrt(minDist) > radius)
-		return false;
+	//if (sqrt(minDist) > radius)
+	//	return false;
 
-	out.push_back(circles[bestIdx][0]);
-	out.push_back(circles[bestIdx][1]);
-	out.push_back(circles[bestIdx][2]);
+	out.resize(3);
+	out[idx_x] = circles[bestIdx][0];
+	out[idx_y] = circles[bestIdx][1];
+	out[idx_r] = circles[bestIdx][2];
 
-	return true;;
+	return true;
 }
 
 void RosCircleDetection::camerainfoCallback(
