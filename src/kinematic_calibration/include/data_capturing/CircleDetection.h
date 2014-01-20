@@ -17,6 +17,7 @@
 #include <sensor_msgs/Image.h>
 #include <string>
 #include <vector>
+#include <tf/transform_listener.h>
 
 #include "SinglePointMarkerDetection.h"
 
@@ -100,6 +101,7 @@ private:
 	string markerFrame;
 	bool cameraInfoSet;
 	image_geometry::PinholeCameraModel cameraModel;
+	tf::TransformListener transformListener;
 };
 
 } /* namespace kinematic_calibration */

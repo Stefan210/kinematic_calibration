@@ -88,7 +88,7 @@ bool CircleDetection::detect(const cv::Mat& image, vector<cv::Vec3f>& out) {
 	int apertureSize = 3;
 	cv::Canny(gray, gray, treshold1, treshold2, apertureSize);
 
-	GaussianBlur( gray, gray, cv::Size(9, 9), 2, 2 );
+	GaussianBlur(gray, gray, cv::Size(9, 9), 2, 2);
 
 	double dp = 2;
 	double min_dist = 15;
@@ -158,7 +158,8 @@ bool CircleDetection::findClosestColor(const cv::Mat& image,
 
 }
 
-RosCircleDetection::RosCircleDetection() {
+RosCircleDetection::RosCircleDetection() :
+		transformListener(ros::Duration(15, 0)) {
 	double r, g, b;
 	nh.getParam("marker_color_r", r);
 	nh.getParam("marker_color_g", g);
@@ -188,7 +189,6 @@ bool RosCircleDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
 		cv::Point2d center;
 		double radius;
 		// get the transformation via TF
-		tf::TransformListener transformListener;
 		transformListener.waitForTransform(cameraFrame, markerFrame, now,
 				ros::Duration(1.0));
 		transformListener.lookupTransform(cameraFrame, markerFrame, now,
