@@ -164,6 +164,7 @@ void DataCapture::playChainPoses() {
 	nhPrivate.getParam("params/start_pose_num", start);
 	nhPrivate.getParam("params/end_pose_num", end);
 	CalibrationOptions options = context.getCalibrationOptions();
+	enableHeadStiffness();
 	enableChainStiffness();
 	const string& prefix = getPosePrefix();
 	for (int i = start; i <= end; i += 1) {
@@ -214,8 +215,7 @@ void DataCapture::playChainPoses() {
 
 		// move the head s.t. the checkerboard is
 		// within the corner regions and publish the data
-		publishMeasurement();
-		enableHeadStiffness();
+		publishMeasurement();		
 		ROS_INFO("Moving head to LEFT_TOP region...");
 		setHeadPose(-0.3, 0.15, true, getJointNames(),
 				generateRandomPositions(getJointNames()));
@@ -235,9 +235,9 @@ void DataCapture::playChainPoses() {
 		ROS_INFO("Monving back to CENTER region...");
 		setHeadPose(-0.3, -0.15, true);
 		//publishMeasurement();
-		disableHeadStiffness();
 	}
 	disableChainStiffness();
+	disableHeadStiffness();
 }
 
 void DataCapture::moveCheckerboardToImageRegion(Region region) {
