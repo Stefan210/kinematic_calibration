@@ -166,7 +166,7 @@ void DataCapture::playChainPoses() {
 	CalibrationOptions options = context.getCalibrationOptions();
 	enableChainStiffness();
 	const string& prefix = getPosePrefix();
-	for (int i = start; i <= end; i += 3) {
+	for (int i = start; i <= end; i += 1) {
 		// check for pause requests:
 		// call blocks if pause requested
 		if (pauseManager.pauseRequested()) {
