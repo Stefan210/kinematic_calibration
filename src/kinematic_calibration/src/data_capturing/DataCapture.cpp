@@ -54,11 +54,11 @@ DataCapture::DataCapture(CalibrationContext& context) :
 
 	// get public parameters
 	nh.getParam("chain_name", chainName);
-    nh.getParam("marker_type", markerType);
+	nh.getParam("marker_type", markerType);
 
-    // get the marker detection instance
-    markerContext = context.getMarkerContext(markerType);
-    markerDetection = markerContext->getMarkerDetectionInstance();
+	// get the marker detection instance
+	markerContext = context.getMarkerContext(markerType);
+	markerDetection = markerContext->getMarkerDetectionInstance();
 
 	// get camera information
 	camerainfoSub = nh.subscribe("/nao_camera/camera_info", 1,
@@ -163,9 +163,10 @@ void DataCapture::playChainPoses() {
 	int start, end;
 	nhPrivate.getParam("params/start_pose_num", start);
 	nhPrivate.getParam("params/end_pose_num", end);
+	CalibrationOptions options = context.getCalibrationOptions();
 	enableChainStiffness();
 	const string& prefix = getPosePrefix();
-    for (int i = start; i <= end; i += 1) {
+	for (int i = start; i <= end; i += 1) {
 		// check for pause requests:
 		// call blocks if pause requested
 		if (pauseManager.pauseRequested()) {
@@ -180,7 +181,7 @@ void DataCapture::playChainPoses() {
 		string poseName(buf);
 		BodyPoseGoal goal;
 		goal.pose_name = poseName;
-        this->currentPoseName = poseName;
+		this->currentPoseName = poseName;
 		ROS_INFO("Calling pose manager for executing pose %s...", buf);
 		actionlib::SimpleClientGoalState goalState =
 				bodyPoseClient.sendGoalAndWait(goal);
@@ -195,6 +196,14 @@ void DataCapture::playChainPoses() {
 		findCheckerboard();
 		if (!checkerboardFound)
 			continue;
+
+		// only the marker needs to be calibrated
+		if (!options.calibrateCameraIntrinsics
+				&& !options.calibrateCameraTransform
+				&& !options.calibrateJointOffsets) {
+			publishMeasurement();
+			continue;
+		}
 
 		// move the head s.t. the checkerboard is
 		// within the center region of the camera image
@@ -320,8 +329,7 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 		}
 
 		// if the position did not change, we are close to the region and can stop
-		if (fabs(lastX - x) < 1
-				&& fabs(lastY - y) < 1) {
+		if (fabs(lastX - x) < 1 && fabs(lastY - y) < 1) {
 			break;
 		}
 
@@ -345,9 +353,9 @@ void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 		return;
 	}
 	receivedImage = true;
-    cameraFrame = msg.get()->header.frame_id;
-    checkerboardFound = markerDetection->detect(msg, markerData);
-    image = *msg;
+	cameraFrame = msg.get()->header.frame_id;
+	checkerboardFound = markerDetection->detect(msg, markerData);
+	image = *msg;
 	if (checkerboardFound) {
 		ROS_INFO("Checkerboard found at position %f %f", markerData[0],
 				markerData[1]);
@@ -564,30 +572,30 @@ void DataCapture::publishMeasurement() {
 		ROS_INFO("Not publishing data.");
 		return;
 	}
-    updateJointStates();
-    unsigned long id = static_cast<unsigned long>(time(0));
-    stringstream ss;
-    ss << this->currentPoseName << "-";
-    ss << id;
+	updateJointStates();
+	unsigned long id = static_cast<unsigned long>(time(0));
+	stringstream ss;
+	ss << this->currentPoseName << "-";
+	ss << id;
 	measurementData data;
-    data.jointState = jointState;
-    data.marker_data = markerData;
-    data.id = ss.str();
-    data.camera_frame = this->cameraFrame;
-    nh.getParam("chain_name", data.chain_name);
-    nh.getParam("chain_root", data.chain_root);
-    nh.getParam("chain_tip", data.chain_tip);
-    data.marker_type = this->markerType;
-    data.header.stamp = this->curTime;
-    data.image = this->image;
-    ROS_INFO("Publishing measurement data...");
-    measurementPub.publish(data);
+	data.jointState = jointState;
+	data.marker_data = markerData;
+	data.id = ss.str();
+	data.camera_frame = this->cameraFrame;
+	nh.getParam("chain_name", data.chain_name);
+	nh.getParam("chain_root", data.chain_root);
+	nh.getParam("chain_tip", data.chain_tip);
+	data.marker_type = this->markerType;
+	data.header.stamp = this->curTime;
+	data.image = this->image;
+	ROS_INFO("Publishing measurement data...");
+	measurementPub.publish(data);
 
-    // save the image to disk
-    ss << ".jpg";
-    string filename = ss.str();
-    ROS_INFO("Saving image to file %s%s.", "/tmp/", filename.c_str());
-    this->markerDetection->writeImage("/tmp/" + filename);
+	// save the image to disk
+	ss << ".jpg";
+	string filename = ss.str();
+	ROS_INFO("Saving image to file %s%s.", "/tmp/", filename.c_str());
+	this->markerDetection->writeImage("/tmp/" + filename);
 }
 
 vector<double> DataCapture::generateRandomPositions(
@@ -612,7 +620,7 @@ const string DataCapture::getPosePrefix() {
 }
 
 LeftArmDataCapture::LeftArmDataCapture(CalibrationContext& context) :
-		DataCapture(context)  {
+		DataCapture(context) {
 	jointNames.push_back("LShoulderPitch");
 	jointNames.push_back("LShoulderRoll");
 	jointNames.push_back("LElbowYaw");
