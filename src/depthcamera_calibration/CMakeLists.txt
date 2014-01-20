@@ -6,6 +6,8 @@ project(calibration)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs visualization_msgs pcl pcl_ros)
 
+link_directories (/opt/ros/groovy/lib)
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
