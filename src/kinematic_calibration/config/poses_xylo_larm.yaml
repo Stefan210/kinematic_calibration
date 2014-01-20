@@ -1,49 +1,49 @@
 xylo_larm001:
   joint_names: ['HeadYaw', 'HeadPitch', 'LShoulderPitch', 'LShoulderRoll', 'LElbowYaw', 'LElbowRoll', 'LWristYaw']
   positions: [0.07819199562072754, -0.2623560428619385, -0.04146003723144531, 0.6810541152954102, -0.05373191833496094, -0.914222002029419, -0.08287787437438965]
-  time_from_start: 1.0
+  time_from_start: 1
 
 xylo_larm002:
   joint_names: ['HeadYaw', 'HeadPitch', 'LShoulderPitch', 'LShoulderRoll', 'LElbowYaw', 'LElbowRoll', 'LWristYaw']
-  positions: [0.06745409965515137, -0.3083760738372803, -0.03072190284729004, 0.4141380786895752, -0.02151799201965332, -0.9126880168914795, -0.09054803848266602]
-  time_from_start: 1.0
+  positions: [-0.37819199562072754, -0.1083760738372803, -0.03072190284729004, 0.4141380786895752, -0.02151799201965332, -0.9126880168914795, -0.09054803848266602]
+  time_from_start: 1
 
 xylo_larm003:
   joint_names: ['HeadYaw', 'HeadPitch', 'LShoulderPitch', 'LShoulderRoll', 'LElbowYaw', 'LElbowRoll', 'LWristYaw']
-  positions: [0.06745409965515137, -0.3083760738372803, 0.07665801048278809, 0.38345813751220703, -0.033789873123168945, -0.9126880168914795, -0.3866100311279297]
-  time_from_start: 1.0
+  positions: [-0.3745409965515137, -0.1083760738372803, 0.07665801048278809, 0.38345813751220703, -0.033789873123168945, -0.9126880168914795, -0.3866100311279297]
+  time_from_start: 1
 
 xylo_larm004:
   joint_names: ['HeadYaw', 'HeadPitch', 'LShoulderPitch', 'LShoulderRoll', 'LElbowYaw', 'LElbowRoll', 'LWristYaw']
   positions: [-0.24241399765014648, -0.3083760738372803, 0.07665801048278809, 0.37578797340393066, -0.0123138427734375, -0.9126880168914795, -0.4771158695220947]
-  time_from_start: 1.0
+  time_from_start: 1
 
 xylo_larm005:
   joint_names: ['HeadYaw', 'HeadPitch', 'LShoulderPitch', 'LShoulderRoll', 'LElbowYaw', 'LElbowRoll', 'LWristYaw']
-  positions: [-0.12122797966003418, -0.27002596855163574, -0.029187917709350586, 0.5230519771575928, -0.04606199264526367, -0.9126880168914795, 0.11500812321901321]
-  time_from_start: 1.0
+  positions: [-0.12122797966003418, 0.27002596855163574, -0.029187917709350586, 0.5230519771575928, -0.04606199264526367, -0.9126880168914795, 0.11500812321901321]
+  time_from_start: 1
 
 xylo_larm006:
   joint_names: ['HeadYaw', 'HeadPitch', 'LShoulderPitch', 'LShoulderRoll', 'LElbowYaw', 'LElbowRoll', 'LWristYaw']
   positions: [0.4754979610443115, -0.2807638645172119, -0.02611994743347168, 1.2455661296844482, -0.052197933197021484, -0.9126880168914795, 0.010695934295654297]
-  time_from_start: 1.0
+  time_from_start: 1
 
 xylo_larm007:
   joint_names: ['HeadYaw', 'HeadPitch', 'LShoulderPitch', 'LShoulderRoll', 'LElbowYaw', 'LElbowRoll', 'LWristYaw']
   positions: [0.2929520606994629, -0.260822057723999, 0.2208540439605713, 0.8421239852905273, -0.3007059097290039, -0.9126880168914795, 0.16716408729553223]
-  time_from_start: 1.0
+  time_from_start: 1
 
 xylo_larm008:
   joint_names: ['HeadYaw', 'HeadPitch', 'LShoulderPitch', 'LShoulderRoll', 'LElbowYaw', 'LElbowRoll', 'LWristYaw']
   positions: [0.400331974029541, -0.46331000328063965, -0.23934602737426758, 1.175002098083496, -0.260822057723999, -0.9157559871673584, 0.16716408729553223]
-  time_from_start: 1.0
+  time_from_start: 1
 
 xylo_larm009:
   joint_names: ['HeadYaw', 'HeadPitch', 'LShoulderPitch', 'LShoulderRoll', 'LElbowYaw', 'LElbowRoll', 'LWristYaw']
   positions: [0.01222991943359375, -0.6719517707824707, -0.02611994743347168, 1.081428050994873, -0.07213997840881348, -0.9372320175170898, -0.6305160522460938]
-  time_from_start: 1.0
+  time_from_start: 1
 
 xylo_larm010:
   joint_names: ['HeadYaw', 'HeadPitch', 'LShoulderPitch', 'LShoulderRoll', 'LElbowYaw', 'LElbowRoll', 'LWristYaw']
   positions: [0.06592011451721191, -0.6213119029998779, 0.056715965270996094, 0.3420400619506836, 0.1058039665222168, -0.37578797340393066, -0.6811380386352539]
-  time_from_start: 1.0
+  time_from_start: 1
