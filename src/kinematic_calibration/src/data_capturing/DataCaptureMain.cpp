@@ -27,9 +27,9 @@ int main(int argc, char** argv) {
 	string chainName;
 	nh.getParam("chain_name", chainName);
 	DataCapture* dataCapture;
-	if("larm" == chainName || "xylo_larm" == chain_name) {
+	if("larm" == chainName || "xylo_larm" == chainName) {
 		dataCapture = new LeftArmDataCapture(*context);
-	} else if("rarm" == chainName || "xylo_rarm" == chain_name) {
+	} else if("rarm" == chainName || "xylo_rarm" == chainName) {
 		dataCapture = new RightArmDataCapture(*context);
 	} else {
 		ROS_FATAL("No parameter was set for the chain type!");
