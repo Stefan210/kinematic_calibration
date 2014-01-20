@@ -1,0 +1,4 @@
+chain_name: xylo_larm
+chain_root: HeadPitch_link
+chain_tip: l_wrist
+marker_type: circle
