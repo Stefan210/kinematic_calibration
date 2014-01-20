@@ -1,11 +1,11 @@
 start_pose_num: 1
 end_pose_num: 10 
 headYaw_min: 0
-headYaw_max: 0
-headYaw_step: 0
+headYaw_max: -1
+headYaw_step: 1
 headPitch_min: 0
-haedPitch_max: 0
-headPitch_step: 0
+haedPitch_max: -1
+headPitch_step: 1
 marker_color_r: 255
 marker_color_g: 255
 marker_color_b: 255
