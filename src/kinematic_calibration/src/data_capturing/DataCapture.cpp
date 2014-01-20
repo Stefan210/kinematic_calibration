@@ -42,7 +42,8 @@ DataCapture::DataCapture(CalibrationContext& context) :
 		nhPrivate("~"), stiffnessClient(nh, "joint_stiffness_trajectory"), trajectoryClient(
 				nh, "joint_trajectory"), bodyPoseClient(nh, "body_pose"), it(
 				nh), checkerboardFound(false), receivedJointStates(false), receivedImage(
-				false), context(context) {
+				false), context(context), headStiffnessRequests(0), chainStiffnessRequests(0)
+	{
 	// get parameters
 	nhPrivate.getParam("params/headYaw_min", headYawMin);
 	nhPrivate.getParam("params/headYaw_max", headYawMax);
@@ -109,12 +110,21 @@ DataCapture::~DataCapture() {
 }
 
 void DataCapture::enableHeadStiffness() {
+	if(headStiffnessRequests > 0) {
+		headStiffnessRequests++;
+		return; // stiffness was set before, nothing to do
+	}
 	ROS_INFO("Setting head stiffness...");
 	enableStiffness(headJointNames);
 	ROS_INFO("Done.");
+	headStiffnessRequests++;
 }
 
 void DataCapture::disableHeadStiffness() {
+	return; // TODO: remove (only for debugging!)
+	headStiffnessRequests--;
+	if(headStiffnessRequests > 0)
+		return; // stiffness requests still exist
 	ROS_INFO("Resetting head stiffness...");
 	disableStiffness(headJointNames);
 	ROS_INFO("Done.");
@@ -183,6 +193,7 @@ void DataCapture::playChainPoses() {
 		BodyPoseGoal goal;
 		goal.pose_name = poseName;
 		this->currentPoseName = poseName;
+		enableHeadStiffness();
 		ROS_INFO("Calling pose manager for executing pose %s...", buf);
 		actionlib::SimpleClientGoalState goalState =
 				bodyPoseClient.sendGoalAndWait(goal);
@@ -458,6 +469,7 @@ void DataCapture::updateCheckerboardOnce() {
 }
 
 void DataCapture::updateCheckerboardRobust() {
+	int tries = 0;
 	bool unstable = true;
 	vector<bool> found;
 	vector<double> x;
@@ -490,6 +502,12 @@ void DataCapture::updateCheckerboardRobust() {
 		if (cbNotFound == true) {
 			unstable = false;
 		} else if (cbFound && xError < 3 && yError < 3) {
+			unstable = false;
+		}
+		
+		if(++tries > 20) {
+			// did not find the checkerboard within a specified period
+			checkerboardFound = false;
 			unstable = false;
 		}
 	}
