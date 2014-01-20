@@ -30,6 +30,7 @@
 #include "../../include/optimization/CameraIntrinsicsVertex.h"
 #include "../../include/optimization/G2oJointOffsetOptimization.h"
 #include "../../include/common/CalibrationContext.h"
+#include "../../include/optimization/LocOptJointOffsetOptimization.h"
 
 namespace kinematic_calibration {
 
@@ -134,7 +135,7 @@ void OptimizationNode::optimize() {
 	FrameImageConverter frameImageConverter(cameraModel);
 
 	// initial state
-	KinematicCalibrationState initialState;
+	KinematicCalibrationState initialState = this->initialState;
 
 	// initialize transform from camera to head
 	urdf::Model model;
@@ -156,8 +157,12 @@ void OptimizationNode::optimize() {
 	initialState.cameraInfo = cameraModel.cameraInfo();
 
 	// optimization instance
+
 	G2oJointOffsetOptimization optimization(*context, measurements,
 			kinematicChains, frameImageConverter, initialState);
+	/*
+	 HCJointOffsetOptimization optimization(*context, measurements,
+	 kinematicChains, frameImageConverter, initialState);*/
 	optimization.optimize(result);
 }
 
@@ -211,22 +216,25 @@ void OptimizationNode::printResult() {
 			<< result.cameraInfo.K[K_FY_IDX] << " ";
 	cout << "(cx,cy) " << result.cameraInfo.K[K_CX_IDX] << " "
 			<< result.cameraInfo.K[K_CY_IDX] << "\n";
+	cout << "D: " << result.cameraInfo.D[0] << ", " << result.cameraInfo.D[1]
+			<< ", " << result.cameraInfo.D[2] << ", " << result.cameraInfo.D[3]
+			<< ", " << result.cameraInfo.D[5] << "\n";
 }
 
 void OptimizationNode::printPoints() {
-	// instantiate the frame image converter
+// instantiate the frame image converter
 	FrameImageConverter frameImageConverter(cameraModel);
 
 	Plot2D plotterDiff;
 	Plot3D plotEndp;
 
-	// update kinematic chains
+// update kinematic chains
 	for (int i = 0; i < this->kinematicChains.size(); i++) {
 		this->kinematicChains[i] = this->kinematicChains[i].withTransformations(
 				result.jointTransformations);
 	}
 
-	// print out the measured position and the transformed position
+// print out the measured position and the transformed position
 	for (int i = 0; i < measurements.size(); i++) {
 		measurementData current = measurements[i];
 		cout << i << " measured(x,y): " << current.marker_data[0] << "  "
@@ -290,7 +298,7 @@ void OptimizationNode::printPoints() {
 		//plotEndp.addPoint(origin.x(), origin.y(), origin.z());
 	}
 
-	// show difference plot
+// show difference plot
 	plotterDiff.showPlot();
 }
 
@@ -298,11 +306,11 @@ bool OptimizationNode::putToImage(const string& id, const double& x,
 		const double& y) {
 	const string extension = "jpg"; // TODO: parameterize!
 
-	// build filename
+// build filename
 	stringstream name;
 	name << "/tmp/" << id << "." << extension;
 
-	// find image
+// find image
 	FILE *file = NULL;
 	if (NULL != (file = fopen(name.str().c_str(), "r"))) {
 		fclose(file);
@@ -312,16 +320,16 @@ bool OptimizationNode::putToImage(const string& id, const double& x,
 		return false;
 	}
 
-	// read the image with OpenCV
+// read the image with OpenCV
 	cv::Mat image = cv::imread(name.str());
 
-	// put a cross to the optimized/calibrated position
+// put a cross to the optimized/calibrated position
 	cv::line(image, cv::Point(x - 3, y - 3), cv::Point(x + 3, y + 3),
 			CV_RGB(0, 255, 0));
 	cv::line(image, cv::Point(x - 3, y + 3), cv::Point(x + 3, y - 3),
 			CV_RGB(0, 255, 0));
 
-	// write the image into a new file
+// write the image into a new file
 	stringstream newname;
 	newname << "/tmp/" << id << "_calibrated." << extension;
 	return cv::imwrite(newname.str(), image);
@@ -330,14 +338,14 @@ bool OptimizationNode::putToImage(const string& id, const double& x,
 void OptimizationNode::publishResults() {
 	kinematic_calibration::calibrationResult msg;
 
-	// joint offsets
+// joint offsets
 	for (map<string, double>::iterator it = result.jointOffsets.begin();
 			it != result.jointOffsets.end(); it++) {
 		msg.jointNames.push_back(it->first);
 		msg.jointOffsets.push_back(it->second);
 	}
 
-	// chain names and marker transformations
+// chain names and marker transformations
 	for (map<string, tf::Transform>::iterator it =
 			result.markerTransformations.begin();
 			it != result.markerTransformations.end(); it++) {
@@ -347,16 +355,16 @@ void OptimizationNode::publishResults() {
 		msg.endeffectorToMarker.push_back(transform);
 	}
 
-	// camera intrinsics
+// camera intrinsics
 	msg.cameraInfo = result.cameraInfo;
 
-	// camera transform
+// camera transform
 	geometry_msgs::Transform cameraTransform;
 	tf::transformTFToMsg(result.cameraToHeadTransformation.inverse(),
 			cameraTransform);
 	msg.cameraTransform = cameraTransform;
 
-	// publish result
+// publish result
 	resultPublisher.publish(msg);
 }
 
@@ -376,6 +384,22 @@ void OptimizationNode::measurementCb(const measurementDataConstPtr& msg) {
 					chainName);
 			this->kinematicChains.push_back(kinematicChain);
 			ROS_INFO("Receive data for chain %s.", chainName.c_str());
+			// try to get the current transformation from chain tip to marker frame
+			if (nh.hasParam("marker_frame")) {
+				string markerFrame;
+				nh.getParam("marker_frame", markerFrame);
+				KinematicChain markerChain(kdlTree, chainTip, markerFrame,
+						"marker");
+				tf::Transform markerTransform;
+				KDL::Frame kdlFrame;
+				markerChain.getRootToTip(map<string, double>(), kdlFrame);
+				tf::transformKDLToTF(kdlFrame, markerTransform);
+				this->initialState.markerTransformations[chainName] =
+						markerTransform;
+				cout << markerTransform.getOrigin().getX() << " "
+						<< markerTransform.getOrigin().getY() << " "
+						<< markerTransform.getOrigin().getZ() << " " << endl;
+			}
 		}
 		// save data
 		measurements.push_back(measurementData(data));
@@ -417,15 +441,15 @@ bool OptimizationNode::measurementOk(const measurementDataConstPtr& msg) {
 }
 
 void OptimizationNode::removeIgnoredMeasurements() {
-	// get list of IDs to be ignored
+// get list of IDs to be ignored
 	XmlRpc::XmlRpcValue idList;
 	nh.getParam("ignore_measurements", idList);
 	ROS_ASSERT(idList.getType() == XmlRpc::XmlRpcValue::TypeArray);
 
-	// create new list for measurement data
+// create new list for measurement data
 	vector<measurementData> filteredList;
 
-	// check which measurements should be ignored
+// check which measurements should be ignored
 	for (vector<measurementData>::iterator it = measurements.begin();
 			it != measurements.end(); it++) {
 		string id = it->id;
@@ -441,7 +465,7 @@ void OptimizationNode::removeIgnoredMeasurements() {
 			filteredList.push_back(*it);
 	}
 
-	// reassign the measurements list
+// reassign the measurements list
 	this->measurements = filteredList;
 }
 

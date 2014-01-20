@@ -15,6 +15,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <camera_calibration_parsers/parse_yml.h>
 
 #include "../../include/common/ModelLoader.h"
 #include "../../include/result_publishing/CameraTransformUpdate.h"
@@ -29,6 +30,8 @@ void resultCb(const calibrationResultConstPtr& msg);
 string jointOffsetsFilename;
 string cameraTransformFilename;
 string urdfFilename;
+string markerTransformsFilename;
+string cameraIntrnsicsFilename;
 
 int main(int argc, char** argv) {
 	init(argc, argv, "JointUpdateNode");
@@ -37,6 +40,8 @@ int main(int argc, char** argv) {
 	jointOffsetsFilename = "calibration_joint_offsets.xacro";
 	cameraTransformFilename = "calibration_camera_transform.xacro";
 	urdfFilename = "robot_model_calibrated.xml";
+	markerTransformsFilename = "calibration_marker_transforamtions.xacro";
+	cameraIntrnsicsFilename = "nao_bottom_640x480.yaml";
 
 	NodeHandle nh;
 	Subscriber sub = nh.subscribe("/kinematic_calibration/calibration_result",
@@ -75,7 +80,13 @@ void resultCb(const calibrationResultConstPtr& msg) {
 	urdfUpdate.updateCameraDeltaTransform(transform);
 	urdfUpdate.writeToFile(urdfFilename);
 
-	// print the marker transformations on the screen
+	// print the marker transformation on the screen and as parameters in a file
+	// TODO: move into own class?
+	// TODO: also update urdf...
+	ofstream file;
+	file.open(markerTransformsFilename.c_str());
+	file << "<?xml version=\"1.0\"?>\n";
+	file << "<robot>\n";
 	for (int i = 0; i < msg->chainNames.size(); i++) {
 		double rr, rp, ry, tx, ty, tz;
 		tf::Transform current;
@@ -88,6 +99,25 @@ void resultCb(const calibrationResultConstPtr& msg) {
 		cout << "chain: " << msg->chainNames[i] << "\n";
 		cout << "translation: " << tx << " " << ty << " " << tz << "\n";
 		cout << "rotation: " << rr << " " << rp << " " << ry << "\n";
+		file << "\t<property name=\"" << msg->chainNames[i] << "_marker_tx"
+				<< "\" value=\"" << tx << "\" />\n";
+		file << "\t<property name=\"" << msg->chainNames[i] << "_marker_ty"
+				<< "\" value=\"" << ty << "\" />\n";
+		file << "\t<property name=\"" << msg->chainNames[i] << "_marker_tz"
+				<< "\" value=\"" << tz << "\" />\n";
+		file << "\t<property name=\"" << msg->chainNames[i] << "_marker_rr"
+				<< "\" value=\"" << rr << "\" />\n";
+		file << "\t<property name=\"" << msg->chainNames[i] << "_marker_rp"
+				<< "\" value=\"" << rp << "\" />\n";
+		file << "\t<property name=\"" << msg->chainNames[i] << "_marker_ry"
+				<< "\" value=\"" << ry << "\" />\n";
 	}
+	file << "</robot>\n";
+	file.close();
+
+	// write camera intrinsics
+	const string cameraName = "nao_camera";
+	camera_calibration_parsers::writeCalibrationYml(cameraIntrnsicsFilename,
+			cameraName, msg->cameraInfo);
 }
 

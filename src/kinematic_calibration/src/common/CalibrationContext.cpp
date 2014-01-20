@@ -27,7 +27,7 @@ RosCalibContext::RosCalibContext() {
 RosCalibContext::~RosCalibContext() {
 }
 
-MarkerContext* RosCalibContext::getMarkerContext(const string& type) {
+MarkerContext* RosCalibContext::getMarkerContext(const string& type) const {
 	if ("checkerboard" == type) {
 		return new CheckerboardContext();
 	} else if ("circle" == type) {
@@ -40,7 +40,7 @@ MarkerContext* RosCalibContext::getMarkerContext(const string& type) {
 
 g2o::OptimizableGraph::Edge* RosCalibContext::getMeasurementEdge(
 		const measurementData& m, FrameImageConverter* frameImageConverter,
-		KinematicChain* kinematicChain) {
+		KinematicChain* kinematicChain) const {
 	MarkerContext* markerContext = getMarkerContext(m.marker_type);
 	if (NULL == markerContext) {
 		ROS_ERROR("Unknown marker type: %s", m.marker_type.c_str());
@@ -53,7 +53,7 @@ g2o::OptimizableGraph::Edge* RosCalibContext::getMeasurementEdge(
 	}
 }
 
-CalibrationOptions RosCalibContext::getCalibrationOptions() {
+CalibrationOptions RosCalibContext::getCalibrationOptions() const {
 	CalibrationOptions options;
 	nh.getParam("calibrate_joint_offsets", options.calibrateJointOffsets);
 	nh.getParam("calibrate_camera_transform", options.calibrateCameraTransform);

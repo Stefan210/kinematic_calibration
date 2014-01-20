@@ -4,7 +4,7 @@ project(kinematic_calibration)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED roscpp cv_bridge image_transport urdf orocos_kdl kdl_parser tf tf_conversions nao_msgs actionlib image_geometry message_generation eigen_conversions)
+find_package(catkin REQUIRED roscpp cv_bridge image_transport urdf orocos_kdl kdl_parser tf tf_conversions nao_msgs actionlib image_geometry message_generation eigen_conversions camera_calibration_parsers)
 find_package(OpenCV REQUIRED)
 
 SET(G2O_LIBS cholmod cxsparse -lg2o_cli -lg2o_core
@@ -215,7 +215,7 @@ target_link_libraries(checkerboardDetectionTest checkerboardDetection ${catkin_L
 
 ### CircleDetection
 add_library(circleDetection src/data_capturing/CircleDetection.cpp src/data_capturing/MarkerDetection.cpp src/data_capturing/SinglePointMarkerDetection.cpp)
-target_link_libraries(circleDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(circleDetection frameImageConverter ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 add_executable(circleDetectionMain src/data_capturing/CircleDetectionMain.cpp)
 target_link_libraries(circleDetectionMain circleDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
@@ -268,6 +268,8 @@ add_executable(optimizationNode
 	src/optimization/JointOffsetVertex.cpp
 	#src/optimization/MeasurementEdge.cpp
 	#src/optimization/CheckerboardMeasurementEdge.cpp
+	src/optimization/LocOptKinCalState.cpp
+	src/optimization/LocOptJointOffsetOptimization.cpp
 	)
 target_link_libraries(optimizationNode 
 	frameImageConverter

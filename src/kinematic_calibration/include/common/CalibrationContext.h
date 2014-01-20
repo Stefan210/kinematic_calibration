@@ -27,11 +27,11 @@ public:
 	CalibrationContext();
 	virtual ~CalibrationContext();
 
-	virtual MarkerContext* getMarkerContext(const string& type) = 0;
+	virtual MarkerContext* getMarkerContext(const string& type) const = 0;
 	virtual g2o::OptimizableGraph::Edge* getMeasurementEdge(const measurementData& m,
 			FrameImageConverter* frameImageConverter,
-			KinematicChain* kinematicChain) = 0;
-	virtual CalibrationOptions getCalibrationOptions() = 0;
+			KinematicChain* kinematicChain) const = 0;
+	virtual CalibrationOptions getCalibrationOptions() const = 0;
 };
 
 class RosCalibContext: public CalibrationContext {
@@ -39,11 +39,11 @@ public:
 	RosCalibContext();
 	virtual ~RosCalibContext();
 
-	virtual MarkerContext* getMarkerContext(const string& type);
+	virtual MarkerContext* getMarkerContext(const string& type) const;
 	virtual g2o::OptimizableGraph::Edge* getMeasurementEdge(const measurementData& m,
 			FrameImageConverter* frameImageConverter,
-			KinematicChain* kinematicChain);
-	virtual CalibrationOptions getCalibrationOptions();
+			KinematicChain* kinematicChain) const;
+	virtual CalibrationOptions getCalibrationOptions() const;
 
 protected:
 	ros::NodeHandle nh;

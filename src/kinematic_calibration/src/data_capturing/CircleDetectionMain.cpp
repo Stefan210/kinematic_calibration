@@ -6,14 +6,16 @@
  */
 
 
+#include <boost/bind/arg.hpp>
+#include <boost/bind/bind.hpp>
+#include <boost/bind/placeholders.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
 #include <image_transport/publisher.h>
 #include <image_transport/subscriber.h>
-//#include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/core/core.hpp>
-#include <opencv2/core/types_c.h>
+//#include <opencv2/core/types_c.h>
 #include <ros/init.h>
 #include <ros/node_handle.h>
 #include <sensor_msgs/image_encodings.h>
@@ -26,7 +28,7 @@
 using namespace kinematic_calibration;
 using namespace std;
 
-void imageCb(const sensor_msgs::ImageConstPtr& msg);
+void imageCb(const sensor_msgs::ImageConstPtr& msg, RosCircleDetection* cd);
 void detectFromRosMsg();
 
 int main(int argc, char** argv) {
@@ -37,12 +39,10 @@ int main(int argc, char** argv) {
 
 image_transport::Publisher pub;
 
-void imageCb(const sensor_msgs::ImageConstPtr& msg) {
-    RosCircleDetection cd;
+void imageCb(const sensor_msgs::ImageConstPtr& msg, RosCircleDetection* cd) {
     vector<double> data;
 
-
-    if (!cd.detect(msg, data)) {
+    if (!cd->detect(msg, data)) {
 		std::cout << "[main] could not detect the circle.\n";
 		return;
 	}
@@ -69,7 +69,8 @@ void detectFromRosMsg() {
 	image_transport::Subscriber sub;
 	image_transport::ImageTransport it(nh);
 
-	sub = it.subscribe("/nao_camera/image_raw", 1, imageCb);
+	RosCircleDetection cd;
+	sub = it.subscribe("/nao_camera/image_raw", 1, boost::bind(imageCb, _1, &cd));
 	pub = it.advertise("/checkerboard/image_out", 1);
 	ros::spin();
 }

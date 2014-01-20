@@ -52,6 +52,10 @@ public:
 	 * @param[out] optimizedState Contains the optimized calibration state.
 	 */
 	void optimize(KinematicCalibrationState& optimizedState);
+
+protected:
+	void tfToEigen(const tf::Transform& tfTransformation,
+			Eigen::Isometry3d& eigenIsometry) const;
 };
 
 }

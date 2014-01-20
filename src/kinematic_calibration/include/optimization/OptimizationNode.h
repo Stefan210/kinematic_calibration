@@ -86,6 +86,7 @@ private:
 	string chainName, chainRoot, chainTip;
 	vector<KinematicChain> kinematicChains;
 	CalibrationContext* context;
+	KinematicCalibrationState initialState;
 
 	bool collectingData;
 
