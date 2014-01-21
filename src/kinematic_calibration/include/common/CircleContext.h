@@ -8,11 +8,13 @@
 #ifndef CIRCLECONTEXT_H_
 #define CIRCLECONTEXT_H_
 
+#include <g2o/core/optimizable_graph.h>
+#include <kinematic_calibration/measurementData.h>
+
 #include "../data_capturing/CircleDetection.h"
 #include "../data_capturing/MarkerDetection.h"
+#include "../optimization/CircleMeasurementEdge.h"
 #include "MarkerContext.h"
-#include <kinematic_calibration/measurementData.h>
-#include "../optimization/CheckerboardMeasurementEdge.h"
 
 namespace kinematic_calibration {
 
@@ -31,7 +33,7 @@ public:
 	virtual g2o::OptimizableGraph::Edge* getMeasurementEdge(const measurementData& m,
 			FrameImageConverter* frameImageConverter,
 			KinematicChain* kinematicChain) {
-		return new CheckerboardMeasurementEdge(m, frameImageConverter, kinematicChain);
+		return new CircleMeasurementEdge(m, frameImageConverter, kinematicChain);
 	}
 };
 

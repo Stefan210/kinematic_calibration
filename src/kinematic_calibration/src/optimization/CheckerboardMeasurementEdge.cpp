@@ -43,8 +43,8 @@ void CheckerboardMeasurementEdge::setError(tf::Transform cameraToMarker) {
 	this->_error[0] = measurement.marker_data[0] - x;
 	this->_error[1] = measurement.marker_data[1] - y;
 
-	this->_error[0] = fabs(this->_error[0]) < 5 ? 0 : this->_error[0];
-	this->_error[1] = fabs(this->_error[1]) < 5 ? 0 : this->_error[1];
+	//this->_error[0] = fabs(this->_error[0]) < 5 ? 0 : this->_error[0];
+	//this->_error[1] = fabs(this->_error[1]) < 5 ? 0 : this->_error[1];
 
 	//this->_error[0] /= (dist * dist);
 	//this->_error[1] /= (dist * dist);

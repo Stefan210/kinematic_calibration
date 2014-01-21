@@ -190,6 +190,7 @@ add_library(context
 	src/common/ContextFactory.cpp
 	src/common/MarkerContext.cpp
 	src/optimization/CheckerboardMeasurementEdge.cpp
+	src/optimization/CircleMeasurementEdge.cpp
 	)
 target_link_libraries(context 
 	checkerboardDetection
@@ -268,6 +269,7 @@ add_executable(optimizationNode
 	src/optimization/JointOffsetVertex.cpp
 	#src/optimization/MeasurementEdge.cpp
 	#src/optimization/CheckerboardMeasurementEdge.cpp
+	#src/optimization/CircleMeasurementEdge.cpp
 	src/optimization/LocOptKinCalState.cpp
 	src/optimization/LocOptJointOffsetOptimization.cpp
 	)
