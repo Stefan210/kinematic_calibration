@@ -290,7 +290,7 @@ add_executable(updateNode
 	src/result_publishing/UrdfUpdate.cpp	
 	src/result_publishing/JointUpdate.cpp
 	)
-target_link_libraries(jointUpdateNode modelLoader ${catkin_LIBRARIES})
+target_link_libraries(updateNode modelLoader ${catkin_LIBRARIES})
 
 catkin_add_gtest(jointUpdateTest test/JointUpdateTest.cpp src/result_publishing/JointUpdate.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
 target_link_libraries(jointUpdateTest modelLoader ${catkin_LIBRARIES})
