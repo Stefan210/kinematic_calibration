@@ -34,9 +34,9 @@ namespace kinematic_calibration {
 
 CircleMeasurementEdge::CircleMeasurementEdge(measurementData measurement,
 		FrameImageConverter* frameImageConverter,
-		KinematicChain* kinematicChain) :
+		KinematicChain* kinematicChain, double radius) :
 		MeasurementEdge<10, CircleMeasurementEdge>(measurement,
-				frameImageConverter, kinematicChain) {
+				frameImageConverter, kinematicChain), radius(radius) {
 	calculateMeasurementConturs();
 }
 
@@ -120,9 +120,6 @@ void CircleMeasurementEdge::calculateEstimatedContoursUsingCircle(
 
 void CircleMeasurementEdge::calculateEstimatedContoursUsingEllipse(
 		const tf::Transform& cameraToMarker) {
-	// get the radius from ROS
-	double radius = 0.011; // TODO: get from ROS parameter server!!!
-
 	// get current estimated camera intrinsics
 	CameraIntrinsicsVertex* cameraIntrinsicsVertex =
 			static_cast<CameraIntrinsicsVertex*>(this->_vertices[3]);

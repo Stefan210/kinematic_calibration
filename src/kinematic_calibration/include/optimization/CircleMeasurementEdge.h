@@ -23,7 +23,7 @@ class CircleMeasurementEdge: public MeasurementEdge<10, CircleMeasurementEdge> {
 public:
 	CircleMeasurementEdge(measurementData measurement,
 			FrameImageConverter* frameImageConverter,
-			KinematicChain* kinematicChain);
+			KinematicChain* kinematicChain, double radius);
 	virtual ~CircleMeasurementEdge();
 
 	void setError(tf::Transform cameraToMarker);
@@ -50,10 +50,22 @@ protected:
 	 */
 	void calculateEstimatedContours(const tf::Transform& cameraToMarker);
 
+	/**
+	 * List of measured contour points.
+	 * Once calculated, the points are constant.
+	 */
 	vector<Eigen::Vector2d> measurementPoints;
+
+	/**
+	 * List of estimated contour points.
+	 * The points will be recalculated within every iteration of the optimziation.
+	 */
 	vector<Eigen::Vector2d> estimatedPoints;
 
-	Eigen::Matrix<double, 3, 3> camera_matrix;
+	/**
+	 * The radius of the circle [m].
+	 */
+	double radius;
 
 private:
 	void calculateEstimatedContoursUsingEllipse(
