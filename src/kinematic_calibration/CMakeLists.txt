@@ -284,7 +284,7 @@ target_link_libraries(optimizationNode
 	
 	
 ### Result publishing
-add_executable(jointUpdateNode 
+add_executable(updateNode 
 	src/result_publishing/UpdateNode.cpp 
 	src/result_publishing/CameraTransformUpdate.cpp
 	src/result_publishing/UrdfUpdate.cpp	
