@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
 	jointOffsetsFilename = "calibration_joint_offsets.xacro";
 	cameraTransformFilename = "calibration_camera_transform.xacro";
 	urdfFilename = "robot_model_calibrated.xml";
-	markerTransformsFilename = "calibration_marker_transforamtions.xacro";
+	markerTransformsFilename = "calibration_marker_transformations.xacro";
 	cameraIntrnsicsFilename = "nao_bottom_640x480.yaml";
 
 	NodeHandle nh;
@@ -56,6 +56,13 @@ void resultCb(const calibrationResultConstPtr& msg) {
 
 	urdf::Model model;
 	modelLoader.getUrdfModel(model);
+
+	// get the robot name and prepend to the filenames
+	string filePrefix = model.getName();
+	jointOffsetsFilename = filePrefix + "_" + jointOffsetsFilename;
+	cameraTransformFilename = filePrefix + "_" + cameraTransformFilename;
+	urdfFilename = filePrefix + "_" + urdfFilename;
+	markerTransformsFilename = filePrefix + "_" + markerTransformsFilename;
 
 	// write the parameter file for the joint offsets
 	map<string, double> offsets;
