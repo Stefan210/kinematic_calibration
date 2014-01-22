@@ -2,3 +2,4 @@ chain_name: rarm
 chain_root: HeadPitch_link
 chain_tip: r_wrist
 marker_type: checkerboard
+marker_frame: RMarker_frame

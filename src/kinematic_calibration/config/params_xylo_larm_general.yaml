@@ -3,3 +3,4 @@ chain_root: HeadPitch_link
 chain_tip: l_stick
 marker_type: circle
 marker_frame: l_tip
+xylo_larm_marker_radius: 0.11

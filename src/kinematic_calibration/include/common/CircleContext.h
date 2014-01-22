@@ -30,12 +30,15 @@ public:
 		return new RosCircleDetection();
 	}
 
-	virtual g2o::OptimizableGraph::Edge* getMeasurementEdge(const measurementData& m,
-			FrameImageConverter* frameImageConverter,
+	virtual g2o::OptimizableGraph::Edge* getMeasurementEdge(
+			const measurementData& m, FrameImageConverter* frameImageConverter,
 			KinematicChain* kinematicChain) {
 		double radius;
-		nh.param("marker_radius", radius, 0.11);
-		return new CircleMeasurementEdge(m, frameImageConverter, kinematicChain, radius);
+		string parameterName = kinematicChain->getName()
+				+ "_marker_radius";
+		nh.param(parameterName, radius, 0.11);
+		return new CircleMeasurementEdge(m, frameImageConverter, kinematicChain,
+				radius);
 	}
 };
 
