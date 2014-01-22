@@ -35,15 +35,22 @@ string cameraIntrnsicsFilename;
 
 int main(int argc, char** argv) {
 	init(argc, argv, "JointUpdateNode");
-
-	// TODO: Parameterize!
-	jointOffsetsFilename = "calibration_joint_offsets.xacro";
-	cameraTransformFilename = "calibration_camera_transform.xacro";
-	urdfFilename = "robot_model_calibrated.xml";
-	markerTransformsFilename = "calibration_marker_transformations.xacro";
-	cameraIntrnsicsFilename = "nao_bottom_640x480.yaml";
-
 	NodeHandle nh;
+
+	// get the filenames
+	nh.param(string("joint_offsets_filename_suffix"), jointOffsetsFilename,
+			string("calibration_joint_offsets.xacro"));
+	nh.param(string("camera_transform_filename_suffix"),
+			cameraTransformFilename,
+			string("calibration_camera_transform.xacro"));
+	nh.param(string("urdf_filename_suffix"), urdfFilename,
+			string("robot_model_calibrated.xml"));
+	nh.param(string("marker_transforms_filename_suffix"),
+			markerTransformsFilename,
+			string("calibration_marker_transformations.xacro"));
+	nh.param(string("camera_intrnsics_filename"), cameraIntrnsicsFilename,
+			string("nao_bottom_640x480.yaml"));
+
 	Subscriber sub = nh.subscribe("/kinematic_calibration/calibration_result",
 			1, resultCb);
 	spin();
