@@ -1,5 +1,5 @@
 /*
- * JointUpdateNode.cpp
+ * UpdateNode.cpp
  *
  *  Created on: 27.11.2013
  *      Author: stefan

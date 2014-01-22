@@ -283,19 +283,17 @@ target_link_libraries(optimizationNode
 	)
 	
 	
-### JointUpdate
-add_library(jointUpdate src/result_publishing/JointUpdate.cpp)
-target_link_libraries(jointUpdate modelLoader ${catkin_LIBRARIES})
-
+### Result publishing
 add_executable(jointUpdateNode 
-	src/result_publishing/JointUpdateNode.cpp 
+	src/result_publishing/UpdateNode.cpp 
 	src/result_publishing/CameraTransformUpdate.cpp
 	src/result_publishing/UrdfUpdate.cpp	
+	src/result_publishing/JointUpdate.cpp
 	)
-target_link_libraries(jointUpdateNode jointUpdate ${catkin_LIBRARIES})
+target_link_libraries(jointUpdateNode modelLoader ${catkin_LIBRARIES})
 
-catkin_add_gtest(jointUpdateTest test/JointUpdateTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
-target_link_libraries(jointUpdateTest jointUpdate modelLoader ${catkin_LIBRARIES})
+catkin_add_gtest(jointUpdateTest test/JointUpdateTest.cpp src/result_publishing/JointUpdate.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
+target_link_libraries(jointUpdateTest modelLoader ${catkin_LIBRARIES})
 
 ### Temperature
 if( ${NAOqi_FOUND} ) 
