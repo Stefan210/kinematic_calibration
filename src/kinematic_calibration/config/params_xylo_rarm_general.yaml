@@ -1,0 +1,6 @@
+chain_name: xylo_rarm
+chain_root: HeadPitch_link
+chain_tip: r_stick
+marker_type: circle
+marker_frame: r_tip
+xylo_larm_marker_radius: 0.011
