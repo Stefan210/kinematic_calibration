@@ -34,9 +34,13 @@ public:
 			const measurementData& m, FrameImageConverter* frameImageConverter,
 			KinematicChain* kinematicChain) {
 		double radius;
-		string parameterName = kinematicChain->getName()
-				+ "_marker_radius";
-		nh.param(parameterName, radius, 0.011);
+		string parameterName = kinematicChain->getName() + "_marker_radius";
+		radius = 0.011;
+		if (nh.hasParam(parameterName))
+			nh.getParam(parameterName, radius);
+		else
+			ROS_WARN("No parameter set for %s. Using default value %f.",
+					parameterName.c_str(), radius);
 		return new CircleMeasurementEdge(m, frameImageConverter, kinematicChain,
 				radius);
 	}
