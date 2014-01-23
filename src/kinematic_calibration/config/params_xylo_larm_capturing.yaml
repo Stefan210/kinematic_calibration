@@ -1,5 +1,5 @@
 start_pose_num: 1
-end_pose_num: 10 
+end_pose_num: 10
 headYaw_min: 0
 headYaw_max: -1
 headYaw_step: 1
