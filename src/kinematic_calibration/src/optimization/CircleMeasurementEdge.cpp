@@ -35,7 +35,7 @@ namespace kinematic_calibration {
 CircleMeasurementEdge::CircleMeasurementEdge(measurementData measurement,
 		FrameImageConverter* frameImageConverter,
 		KinematicChain* kinematicChain, double radius) :
-		MeasurementEdge<10, CircleMeasurementEdge>(measurement,
+		MeasurementEdge<5, CircleMeasurementEdge>(measurement,
 				frameImageConverter, kinematicChain), radius(radius) {
 	calculateMeasurementConturs();
 }
@@ -47,13 +47,23 @@ CircleMeasurementEdge::~CircleMeasurementEdge() {
 void CircleMeasurementEdge::setError(tf::Transform cameraToMarker) {
 	this->calculateEstimatedContours(cameraToMarker);
 
-	for (int i = 0; i < this->dimension(); i = i + 2) {
-		// x
-		this->_error[i] = this->measurementPoints[i][0]
-				- this->estimatedPoints[i][0];
-		// y
-		this->_error[i + 1] = this->measurementPoints[i][1]
-				- this->estimatedPoints[i][1];
+	double xe, ye, xm, ym, r, xec, yec;
+	r = this->measurement.marker_data[CircleDetection::idx_r];
+
+	// distance of center
+	xec = this->estimatedPoints[0][0];
+	yec = this->estimatedPoints[0][1];
+	xm = this->measurement.marker_data[CircleDetection::idx_x];
+	ym = this->measurement.marker_data[CircleDetection::idx_y];
+
+	this->_error[0] = sqrt((xec - xm) * (xec - xm) + ((yec - ym) * (yec - ym)));
+
+	// distance of points on the contour
+	for (int i = 1; i < this->dimension(); i++) {
+		xe = this->estimatedPoints[i][0];
+		ye = this->estimatedPoints[i][1];
+		this->_error[i] = sqrt(
+				(xe - xec) * (xe - xec) + (ye - yec) * (ye - yec)) - r;
 	}
 }
 
@@ -159,8 +169,8 @@ void CircleMeasurementEdge::calculateEstimatedContoursUsingEllipse(
 	if (av * dv - bv * bv <= 0) {
 		cerr
 				<< boost::format(
-						"This is not an ellipse at (%6.3f, %6.3f, %6.3f)") % a(0)
-						% a(1) % a(2) << endl;
+						"This is not an ellipse at (%6.3f, %6.3f, %6.3f)")
+						% a(0) % a(1) % a(2) << endl;
 		//z << 320,240,20,20;
 		estimatedPoints.resize(5);
 		return;
@@ -196,10 +206,10 @@ void CircleMeasurementEdge::calculateEstimatedContoursUsingEllipse(
 	 */
 	estimatedPoints.clear();
 	estimatedPoints.push_back(Eigen::Vector2d(K(0), K(1)));
-	estimatedPoints.push_back(Eigen::Vector2d(K(0) - l1 / 2, K(1)));
-	estimatedPoints.push_back(Eigen::Vector2d(K(0), K(1) - l2 / 2));
-	estimatedPoints.push_back(Eigen::Vector2d(K(0) + l1 / 2, K(1)));
-	estimatedPoints.push_back(Eigen::Vector2d(K(0), K(1) + l2 / 2));
+	estimatedPoints.push_back(Eigen::Vector2d(K(0) - (l1 / 2), K(1)));
+	estimatedPoints.push_back(Eigen::Vector2d(K(0), K(1) - (l2 / 2)));
+	estimatedPoints.push_back(Eigen::Vector2d(K(0) + (l1 / 2), K(1)));
+	estimatedPoints.push_back(Eigen::Vector2d(K(0), K(1) + (l2 / 2)));
 }
 
 } /* namespace kinematic_calibration */

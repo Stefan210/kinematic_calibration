@@ -16,16 +16,23 @@
 
 namespace kinematic_calibration {
 
-/*
- *
+/**
+ * Represents an edge for detected circles within an image.
  */
-class CircleMeasurementEdge: public MeasurementEdge<10, CircleMeasurementEdge> {
+class CircleMeasurementEdge: public MeasurementEdge<5, CircleMeasurementEdge> {
 public:
 	CircleMeasurementEdge(measurementData measurement,
 			FrameImageConverter* frameImageConverter,
 			KinematicChain* kinematicChain, double radius);
 	virtual ~CircleMeasurementEdge();
 
+	/**
+	 * Calculates the error vector.
+	 * _error[0] is the distance between measured and estimated center of the circle.
+	 * _error[1-4] are the distances between the estimated points on the ellipse
+	 * and the circle contour, using the measured circle radius.
+	 * @param cameraToMarker
+	 */
 	void setError(tf::Transform cameraToMarker);
 
 protected:
