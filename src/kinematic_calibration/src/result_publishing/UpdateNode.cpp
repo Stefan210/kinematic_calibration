@@ -51,13 +51,6 @@ int main(int argc, char** argv) {
 	nh.param(string("camera_intrnsics_filename"), cameraIntrnsicsFilename,
 			string("nao_bottom_640x480.yaml"));
 
-	Subscriber sub = nh.subscribe("/kinematic_calibration/calibration_result",
-			1, resultCb);
-	spin();
-	return 0;
-}
-
-void resultCb(const calibrationResultConstPtr& msg) {
 	ModelLoader modelLoader;
 	modelLoader.initializeFromRos();
 
@@ -70,6 +63,19 @@ void resultCb(const calibrationResultConstPtr& msg) {
 	cameraTransformFilename = filePrefix + "_" + cameraTransformFilename;
 	urdfFilename = filePrefix + "_" + urdfFilename;
 	markerTransformsFilename = filePrefix + "_" + markerTransformsFilename;
+
+	Subscriber sub = nh.subscribe("/kinematic_calibration/calibration_result",
+			1, resultCb);
+	spin();
+	return 0;
+}
+
+void resultCb(const calibrationResultConstPtr& msg) {
+	ModelLoader modelLoader;
+	modelLoader.initializeFromRos();
+
+	urdf::Model model;
+	modelLoader.getUrdfModel(model);
 
 	// write the parameter file for the joint offsets
 	map<string, double> offsets;
