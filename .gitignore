@@ -7,3 +7,12 @@ install
 src/g2o*
 src/nao_*
 src/humanoid_msgs
+g2o/*
+*catkin*
+*cmake*
+*CMakeFiles*
+*test_results*
+*~
+*gtest*
+*CMakeCache*
+*Makefile
