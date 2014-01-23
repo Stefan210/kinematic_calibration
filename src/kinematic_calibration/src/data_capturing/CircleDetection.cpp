@@ -85,17 +85,17 @@ bool CircleDetection::detect(const cv::Mat& image, vector<cv::Vec3f>& out) {
 
 	double treshold1 = 90;
 	double treshold2 = 80;
-	int apertureSize = 3;
+	int apertureSize = 7;
 	cv::Canny(gray, gray, treshold1, treshold2, apertureSize);
 
 	GaussianBlur(gray, gray, cv::Size(9, 9), 2, 2);
 
 	double dp = 2;
-	double min_dist = 15;
+	double min_dist = 50;
 	double param1 = 70;
 	double param2 = 70;
 	int min_radius = 10;
-	int max_radius = 40;
+	int max_radius = 100;
 	cv::HoughCircles(gray, out, CV_HOUGH_GRADIENT, dp, min_dist, param1, param2,
 			min_radius, max_radius);
 	ROS_INFO("Detected %lu circles.", out.size());
