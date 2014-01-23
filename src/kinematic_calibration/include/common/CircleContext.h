@@ -36,7 +36,7 @@ public:
 		double radius;
 		string parameterName = kinematicChain->getName()
 				+ "_marker_radius";
-		nh.param(parameterName, radius, 0.11);
+		nh.param(parameterName, radius, 0.011);
 		return new CircleMeasurementEdge(m, frameImageConverter, kinematicChain,
 				radius);
 	}
