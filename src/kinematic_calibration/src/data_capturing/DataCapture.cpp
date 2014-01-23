@@ -35,6 +35,7 @@
 #include <iostream>
 
 using namespace nao_msgs;
+using namespace std;
 
 namespace kinematic_calibration {
 
