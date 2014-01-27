@@ -7,10 +7,31 @@
 
 #include "../../include/optimization/LocOptKinCalState.h"
 
+#include <bits/streambuf_iterator.h>
+#include <boost/smart_ptr/shared_ptr.hpp>
+#include <eigen_conversions/eigen_kdl.h>
+#include <Eigen/src/Geometry/Transform.h>
+#include <g2o/core/optimizable_graph.h>
+#include <g2o/core/base_vertex.h>
+#include <image_geometry/pinhole_camera_model.h>
+#include <kdl/frames.hpp>
+#include <ros/console.h>
+#include <rosconsole/macros_generated.h>
+#include <stdlib.h>
+#include <tf/tf.h>
+#include <tf_conversions/tf_eigen.h>
+#include <algorithm>
+#include <cstring>
+#include <utility>
+
+#include "../../include/optimization/CameraIntrinsicsVertex.h"
+#include "../../include/optimization/KinematicCalibrationState.h"
+#include "../../include/optimization/MeasurementEdge.h"
+
 namespace kinematic_calibration {
 
 LocOptKinCalState::LocOptKinCalState(const CalibrationContext& context,
-		const KinematicCalibrationState& initialState,
+		KinematicCalibrationState& initialState,
 		vector<measurementData>& measurements,
 		vector<KinematicChain> kinematicChains,
 		FrameImageConverter& frameImageConverter) :
@@ -18,22 +39,22 @@ LocOptKinCalState::LocOptKinCalState(const CalibrationContext& context,
 				vector<g2o::OptimizableGraph::Edge*>()), vertices(
 				map<string, g2o::OptimizableGraph::Vertex*>()), delta(NULL), kinematicChains(
 				kinematicChains), frameImageConverter(frameImageConverter) {
-	cout << "buildGraph" << endl;
+
 	// initially build the graph
 	buildGraph(context, initialState, measurements);
-	cout << "initializeDelta" << endl;
+
 	// initialize the delta vector
 	initializeDelta();
-	cout << "updateError" << endl;
+
 	// update the error
 	updateError();
-	cout << "updateState" << endl;
+
 	// update the state
 	updateState();
 }
 
 LocOptKinCalState::LocOptKinCalState(const CalibrationContext& context,
-		const KinematicCalibrationState& initialState, double* delta,
+		KinematicCalibrationState& initialState, double* delta,
 		int deltaSize, vector<g2o::OptimizableGraph::Edge*> edges,
 		map<string, g2o::OptimizableGraph::Vertex*> vertices,
 		vector<KinematicChain> kinematicChains,
@@ -81,7 +102,36 @@ void LocOptKinCalState::updateError() {
 			this->vertices.begin(); it != this->vertices.end(); it++) {
 		string key = it->first;
 		if (!it->second->fixed()) {
-			it->second->setToOrigin();
+			string prefix = "MarkerTransformation_";
+			if (key.substr(0, prefix.size()) == prefix) {
+				// set marker transformation manually to initial value
+				string chain_name = key.substr(prefix.size());
+				tf::Transform tfTransformation =
+						this->initialState.markerTransformations[chain_name];
+				Eigen::Affine3d eigenAffine;
+				Eigen::Isometry3d eigenIsometry;
+				tf::transformTFToEigen(tfTransformation, eigenAffine);
+				eigenIsometry.translation() = eigenAffine.translation();
+				eigenIsometry.linear() = eigenAffine.rotation();;
+				static_cast<VertexSE3*>(it->second)->setEstimate(
+						eigenIsometry);
+			} else if ("CameraTransformation" == key) {
+				// set camera transformation manually to initial value
+				Eigen::Affine3d initialCameraToHeadAffine;
+				tf::transformTFToEigen(this->initialState.cameraToHeadTransformation,
+						initialCameraToHeadAffine);
+				Eigen::Isometry3d initialCameraToHeadIsometry;
+				initialCameraToHeadIsometry.translation() =
+						initialCameraToHeadAffine.translation();
+				initialCameraToHeadIsometry.linear() = initialCameraToHeadAffine.rotation();
+				static_cast<VertexSE3*>(it->second)->setEstimate(initialCameraToHeadIsometry);
+
+
+			} else {
+				// reset the vertex value to its initial value
+				it->second->setToOrigin();
+			}
+			// add the current delta
 			it->second->oplus(&delta[idx]);
 			idx += it->second->dimension();
 		}
@@ -89,13 +139,10 @@ void LocOptKinCalState::updateError() {
 
 	// get the errors from the edges
 	for (int i = 0; i < this->edges.size(); i++) {
-		cout << "0" << endl;
-		edges[i]->computeError();
-		cout << "1" << endl;
-		error += edges[i]->chi2();
-		cout << "2" << endl;
-		break;
+		edges[i]->computeError(); cout << i << " " << endl;
+		error += edges[i]->chi2(); cout << i << " " << endl;
 	}
+	cout << "error " << error << endl;
 }
 
 void LocOptKinCalState::updateState() {
@@ -155,7 +202,7 @@ vector<boost::shared_ptr<LocOptKinCalState> > LocOptKinCalState::getNeighborStat
 		// allocate new delta
 		double* newDelta = (double*) malloc(deltaSize * sizeof(double));
 		memcpy(newDelta, delta, deltaSize);
-		newDelta[i] += step;
+		newDelta[i] = delta[i] + step;
 		// create new state
 		boost::shared_ptr<LocOptKinCalState> ptr(
 				new LocOptKinCalState(context, initialState, newDelta,
@@ -169,7 +216,7 @@ vector<boost::shared_ptr<LocOptKinCalState> > LocOptKinCalState::getNeighborStat
 		// allocate new delta
 		double* newDelta = (double*) malloc(deltaSize * sizeof(double));
 		memcpy(newDelta, delta, deltaSize);
-		newDelta[i] -= step;
+		newDelta[i] = delta[i] - step;
 		// create new state
 		boost::shared_ptr<LocOptKinCalState> ptr(
 				new LocOptKinCalState(context, initialState, newDelta,

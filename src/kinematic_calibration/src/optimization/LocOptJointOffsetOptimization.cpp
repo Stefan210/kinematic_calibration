@@ -46,15 +46,17 @@ void HCJointOffsetOptimization::optimize(
 	boost::shared_ptr<LocOptKinCalState> bestNeighbor(
 			new LocOptKinCalState(context, initialState, measurements,
 					kinematicChains, frameImageConverter));
-	double bestError = INFINITY;
+	//double bestError = INFINITY;
 	bool canImprove = true;
 	int numOfIterations = 0;
 	double step = 0.1;
 
 	while (canImprove) {
 
-		if (numOfIterations++ % 100 == 0) {
-			std::cout << numOfIterations << std::endl;
+		if (numOfIterations++ % 100 == 0 || true) {
+			std::cout << "iteration: " << numOfIterations << " error: "
+					<< currentState->getError() << std::endl;
+
 		}
 
 		vector<boost::shared_ptr<LocOptKinCalState> > neighbors =
@@ -63,6 +65,7 @@ void HCJointOffsetOptimization::optimize(
 
 		// find the best neighbor
 		for (int i = 0; i < neighbors.size(); i++) {
+			//cout << "neighbour " << i << " has error " << neighbors[i]->getError() << endl;
 			boost::shared_ptr<LocOptKinCalState> currentNeighbor = neighbors[i];
 			if (currentNeighbor->getError() < bestNeighbor->getError()) {
 				bestNeighbor = currentNeighbor;
@@ -73,10 +76,14 @@ void HCJointOffsetOptimization::optimize(
 		if (bestNeighbor->getError() < currentState->getError()) {
 			currentState = bestNeighbor;
 			step = 0.1;
-		} else if (step /= 10 && step < 1e-6) {
-			canImprove = false;
+		} else {
+			step = step / 10;
+			if(step < 1e-6)
+				canImprove = false;
 		}
 	}
+
+	optimizedState = currentState->getResult();
 }
 
 } /* namespace kinematic_calibration */

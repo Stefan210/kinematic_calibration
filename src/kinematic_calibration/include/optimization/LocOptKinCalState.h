@@ -40,7 +40,7 @@ public:
 	 * @param initialState initial state
 	 */
 	LocOptKinCalState(const CalibrationContext& context,
-			const KinematicCalibrationState& initialState,
+			KinematicCalibrationState& initialState,
 			vector<measurementData>& measurements,
 			vector<KinematicChain> kinematicChains,
 			FrameImageConverter& frameImageConverter);
@@ -54,7 +54,7 @@ public:
 	 * @param vertices vertices of the graph
 	 */
 	LocOptKinCalState(const CalibrationContext& context,
-			const KinematicCalibrationState& initialState, double* delta,
+			KinematicCalibrationState& initialState, double* delta,
 			int deltaSize, vector<g2o::OptimizableGraph::Edge*> edges,
 			map<string, g2o::OptimizableGraph::Vertex*> vertices,
 			vector<KinematicChain> kinematicChains,
@@ -81,7 +81,7 @@ public:
 
 protected:
 	const CalibrationContext& context;
-	const KinematicCalibrationState& initialState;
+	KinematicCalibrationState& initialState;
 	vector<KinematicChain> kinematicChains;
 	FrameImageConverter& frameImageConverter;
 	vector<g2o::OptimizableGraph::Edge*> edges;
