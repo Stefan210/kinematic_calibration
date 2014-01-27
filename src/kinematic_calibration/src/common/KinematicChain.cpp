@@ -40,8 +40,8 @@ void KinematicChain::getRootToTip(const map<string, double>& joint_positions,
 		KDL::Frame& out) {
 	KDL::Frame rootToTip = KDL::Frame::Identity();
 	for (unsigned int i = 0; i < chain.getNrOfSegments(); i++) {
-		KDL::Segment segment = chain.getSegment(i);
-		KDL::Joint joint = segment.getJoint();
+		const KDL::Segment& segment = chain.getSegment(i);
+		const KDL::Joint& joint = segment.getJoint();
 
 		double position = 0.0;
 		std::map<std::string, double>::const_iterator jnt =
