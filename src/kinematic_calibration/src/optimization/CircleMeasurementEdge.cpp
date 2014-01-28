@@ -9,25 +9,15 @@
 
 #include <boost/format/format_class.hpp>
 #include <boost/format/format_fwd.hpp>
-#include <Eigen/src/Core/CommaInitializer.h>
-#include <Eigen/src/Core/CwiseUnaryOp.h>
-#include <Eigen/src/Core/DenseBase.h>
-#include <Eigen/src/Core/GlobalFunctions.h>
-#include <Eigen/src/Core/Matrix.h>
-#include <Eigen/src/Core/MatrixBase.h>
-#include <Eigen/src/Core/Transpose.h>
-#include <Eigen/src/Core/util/ForwardDeclarations.h>
-#include <Eigen/src/Eigenvalues/EigenSolver.h>
 #include <kinematic_calibration/measurementData.h>
-#include <tf/LinearMath/Transform.h>
+#include <tf/tf.h>
 #include <cmath>
-#include <complex>
 #include <iostream>
-#include <valarray>
 
 #include "../../include/data_capturing/CircleDetection.h"
 #include "../../include/optimization/CameraIntrinsicsVertex.h"
 
+using namespace Eigen;
 using namespace std;
 
 namespace kinematic_calibration {
@@ -137,25 +127,52 @@ void CircleMeasurementEdge::calculateEstimatedContoursUsingEllipse(
 	Eigen::Matrix<double, 3, 4> projectionMatrix;
 	projectionMatrix << cameraInfo.P[0], cameraInfo.P[1], cameraInfo.P[2], cameraInfo.P[3], cameraInfo.P[4], cameraInfo.P[5], cameraInfo.P[6], cameraInfo.P[7], cameraInfo.P[8], cameraInfo.P[9], cameraInfo.P[10], cameraInfo.P[11];
 
-	// a = state = current estimated transformation
-	Eigen::Matrix<double, 3, 1> a;
+	// pos = translation of the current estimated transformation
+	Eigen::Vector3d pos;
 	tf::Transform markerToCamera = cameraToMarker.inverse();
-	a << markerToCamera.getOrigin().getX(), markerToCamera.getOrigin().getY(), markerToCamera.getOrigin().getZ();
+	pos << markerToCamera.getOrigin().getX(), markerToCamera.getOrigin().getY(), markerToCamera.getOrigin().getZ();
 
 	// estimated ellipse data (x, y, r1, r2 | r1 < r2)
-	Eigen::Matrix<double, 4, 1> z;
+	Vector5d es = this->projectSphereToImage(pos, projectionMatrix, radius);
 
-	//cout << "State a:\n" << a << endl;
-	double gamma = a.transpose() * a - radius * radius;
-	double beta = 1.0 / (a.transpose() * a - gamma);
+	// calculate the five points
+	double x0 = es(0);
+	double y0 = es(1);
+	double a = es(2);
+	double b = es(3);
+	double alpha = -es(4);
+
+	estimatedPoints.clear();
+	estimatedPoints.push_back(Eigen::Vector2d(x0, y0));
+	estimatedPoints.push_back(getEllipsePoint(x0, y0, a, b, alpha, 0));
+	estimatedPoints.push_back(getEllipsePoint(x0, y0, a, b, alpha, M_PI_2));
+	estimatedPoints.push_back(getEllipsePoint(x0, y0, a, b, alpha, M_PI));
+	estimatedPoints.push_back(
+			getEllipsePoint(x0, y0, a, b, alpha, M_PI + M_PI_2));
+}
+
+Vector2d CircleMeasurementEdge::getEllipsePoint(const double& x0,
+		const double& y0, const double& a, const double& b, const double& alpha,
+		const double& t) const {
+	return Eigen::Vector2d(
+			x0 + a * cos(0) * cos(alpha) - b * sin(t) * sin(alpha),
+			y0 + a * cos(0) * cos(alpha) + b * sin(t) * sin(alpha));
+}
+
+Vector5d CircleMeasurementEdge::projectSphereToImage(const Eigen::Vector3d& pos,
+		const Eigen::Matrix<double, 3, 4>& projectionMatrix,
+		const double& sphereRadius) const {
+	Vector5d z_pred;
+	double gamma = pos.transpose() * pos - sphereRadius * sphereRadius;
+	double beta = 1.0 / (pos.transpose() * pos - gamma);
 	Eigen::Matrix4d Sstar;
-	Sstar << Eigen::Matrix3d::Identity() - beta * a * a.transpose(), -beta * a, -beta
-			* a.transpose(), -beta;
-	//cout << "Sstar:\n" << Sstar << endl;
+	Sstar << Eigen::Matrix3d::Identity() - beta * pos * pos.transpose(), -beta
+			* pos, -beta * pos.transpose(), -beta;
+//cout << "Sstar:\n" << Sstar << endl;
 	Eigen::Matrix3d Cstar = projectionMatrix * Sstar
 			* projectionMatrix.transpose();
 	Eigen::Matrix3d CstarI = Cstar.inverse();
-	//cout << "CstarI:\n" << CstarI << endl;
+//cout << "CstarI:\n" << CstarI << endl;
 	double av = CstarI(0, 0);
 	double bv = CstarI(0, 1);
 	double cv = CstarI(0, 2);
@@ -169,47 +186,47 @@ void CircleMeasurementEdge::calculateEstimatedContoursUsingEllipse(
 	if (av * dv - bv * bv <= 0) {
 		cerr
 				<< boost::format(
-						"This is not an ellipse at (%6.3f, %6.3f, %6.3f)")
-						% a(0) % a(1) % a(2) << endl;
-		//z << 320,240,20,20;
-		estimatedPoints.resize(5);
-		return;
+						"This is not an ellipse at (%6.3f, %6.3f, %6.3f")
+						% pos(0) % pos(1) % pos(2) << endl;
+		throw std::runtime_error("This is not an ellipse");
 	}
-	Eigen::Vector2d K = -A.inverse() * B * 0.5;
-	double tmp = B.transpose() * A.inverse() * B;
-	Eigen::Matrix2d M = A / (tmp * 0.25 - fv);
-	//cout << "M\n" << M << endl;
-	Eigen::EigenSolver<Eigen::Matrix2d> es;
-	es.compute(M, /* computeEigenvectors = */true);
-	//cout << "The eigenvalues of M are: " << es.eigenvalues().transpose() << endl;
-	//cout << "The eigenvectors of M are:\n " << es.eigenvectors() << endl;
-	Eigen::VectorXcd v = es.eigenvalues();
-	//cout << "Eigenvalues: " << v << endl;
-	double l1 = 1.0 / sqrt(v(0).real()); // real part of first eigenvalue
-	double l2 = 1.0 / sqrt(v(1).real());
-	if (l1 <= l2)
-		z << K(0), K(1), l1, l2;
-	else
-		z << K(0), K(1), l2, l1;
 
-	// calculate the five points
-	/*
-	 * 							(Point1)
-	 * 								|
-	 * 								r
-	 * 								|
-	 * (Point0)		<---r--->	(Center)		<---r--->	(Point2)
-	 * 								|
-	 * 								r
-	 * 								|
-	 * 							(Point4)
-	 */
-	estimatedPoints.clear();
-	estimatedPoints.push_back(Eigen::Vector2d(K(0), K(1)));
-	estimatedPoints.push_back(Eigen::Vector2d(K(0) - (l1 / 2), K(1)));
-	estimatedPoints.push_back(Eigen::Vector2d(K(0), K(1) - (l2 / 2)));
-	estimatedPoints.push_back(Eigen::Vector2d(K(0) + (l1 / 2), K(1)));
-	estimatedPoints.push_back(Eigen::Vector2d(K(0), K(1) + (l2 / 2)));
+	Eigen::Vector2d K2;
+	double b1 = B(0);
+	double b2 = B(1);
+	double a11 = av;
+	double a12 = bv;
+	double a22 = dv;
+	double denom = 2 * (a12 * a12 - a11 * a22);
+	K2 << (a22 * b1 - a12 * b2) / denom, (a11 * b2 - a12 * b1) / denom;
+	double mu = 1
+			/ (a11 * K2(0) * K2(0) + 2 * a12 * K2(0) * K2(1)
+					+ a22 * K2(1) * K2(1) - fv);
+	double m11 = mu * a11;
+	double m12 = mu * a12;
+	double m22 = mu * a22;
+	double la1 = ((m11 + m22) + sqrt((m11 - m22) * (m11 - m22) + 4 * m12 * m12))
+			/ 2.0;
+	double la2 = ((m11 + m22) - sqrt((m11 - m22) * (m11 - m22) + 4 * m12 * m12))
+			/ 2.0;
+	double b = 1 / sqrt(la1); // semi-minor axis
+	double a = 1 / sqrt(la2); // semi-major axis
+	Eigen::Vector2d U1, U2; //direction of minor and major axis
+	if (m11 >= m22) {
+		U1 << (la1 - m22), m12;
+		U1 = U1 / U1.norm();
+	} else {
+		U1 << m12, (la1 - m11);
+		U1 = U1 / U1.norm();
+	}
+	U2 << -U1(1), U1(0); //U2 is orthogonal to U1
+	double theta2 = 0.5 * atan2(-2 * a12, (a22 - a11)); // angle between major axis and pos. x-axis
+	Vector5d z2;
+	z2 << K2(0), K2(1), a, b, theta2;
+
+	return z2;
 }
 
-} /* namespace kinematic_calibration */
+}
+/* namespace kinematic_calibration */
+

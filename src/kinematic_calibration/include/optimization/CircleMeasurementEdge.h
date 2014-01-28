@@ -8,13 +8,15 @@
 #ifndef CIRCLEMEASUREMENTEDGE_H_
 #define CIRCLEMEASUREMENTEDGE_H_
 
-#include <Eigen/Dense>
 #include <kinematic_calibration/measurementData.h>
+#include <Eigen/Dense>
 #include <vector>
 
 #include "MeasurementEdge.h"
 
 namespace kinematic_calibration {
+
+typedef Matrix<double,5,1> Vector5d;
 
 /**
  * Represents an edge for detected circles within an image.
@@ -77,8 +79,16 @@ protected:
 private:
 	void calculateEstimatedContoursUsingEllipse(
 			const tf::Transform& cameraToMarker);
+
 	void calculateEstimatedContoursUsingCircle(
 			const tf::Transform& cameraToMarker);
+
+	Vector5d projectSphereToImage(const Eigen::Vector3d& pos,
+			const Eigen::Matrix<double, 3, 4>& projectionMatrix,
+			const double& sphereRadius) const;
+
+	Vector2d getEllipsePoint(const double& x0, const double& y0, const double& a,
+			const double& b, const double& alpha, const double& t) const;
 };
 
 } /* namespace kinematic_calibration */
