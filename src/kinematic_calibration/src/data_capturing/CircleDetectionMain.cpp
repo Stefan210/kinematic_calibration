@@ -37,7 +37,9 @@ int main(int argc, char** argv) {
 	return 0;
 }
 
-image_transport::Publisher pub;
+image_transport::Publisher circlePub;
+image_transport::Publisher cannyPub;
+image_transport::Publisher gaussPub;
 
 void imageCb(const sensor_msgs::ImageConstPtr& msg, RosCircleDetection* cd) {
     vector<double> data;
@@ -61,7 +63,23 @@ void imageCb(const sensor_msgs::ImageConstPtr& msg, RosCircleDetection* cd) {
     // circle outline
     cv::circle( image, center, radius, cv::Scalar(255,255,255), 3, 8, 0 );
 
-	pub.publish(input_bridge->toImageMsg());
+
+    // publish image after applying the canny filter
+    cv_bridge::CvImage cannyMsg;
+    cannyMsg.header   = input_bridge->header;
+    cannyMsg.encoding = "mono8";
+    cannyMsg.image    = cd->getCannyImg();
+    cannyPub.publish(cannyMsg.toImageMsg());
+
+    // publish image after applying the gaussian filter
+    cv_bridge::CvImage gaussMsg;
+    gaussMsg.header   = input_bridge->header;
+    gaussMsg.encoding = "mono8";
+    gaussMsg.image    = cd->getGaussImg();
+    gaussPub.publish(gaussMsg.toImageMsg());
+
+    // publish the input image with the detected circle
+	circlePub.publish(input_bridge->toImageMsg());
 }
 
 void detectFromRosMsg() {
@@ -71,7 +89,9 @@ void detectFromRosMsg() {
 
 	RosCircleDetection cd;
 	sub = it.subscribe("/nao_camera/image_raw", 1, boost::bind(imageCb, _1, &cd));
-	pub = it.advertise("/checkerboard/image_out", 1);
+	circlePub = it.advertise("/circle_detection/circle", 1);
+	cannyPub = it.advertise("/circle_detection/canny", 1);
+	gaussPub = it.advertise("/circle_detection/gauss", 1);
 	ros::spin();
 }
 

@@ -9,16 +9,16 @@
 #define CIRCLEDETECTION_H_
 
 #include <image_geometry/pinhole_camera_model.h>
+#include <image_transport/publisher.h>
 #include <opencv2/core/core.hpp>
 #include <ros/node_handle.h>
 #include <ros/ros.h>
 #include <ros/subscriber.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/Image.h>
+#include <tf/transform_listener.h>
 #include <string>
 #include <vector>
-#include <tf/transform_listener.h>
-
 #include "SinglePointMarkerDetection.h"
 
 using namespace std;
@@ -54,6 +54,14 @@ public:
 
 	void msgToImg(const sensor_msgs::ImageConstPtr& in_msg, cv::Mat& out_image);
 
+	const cv::Mat& getCannyImg() const {
+		return cannyImg;
+	}
+
+	const cv::Mat& getGaussImg() const {
+		return gaussImg;
+	}
+
 protected:
 	/**
 	 * Finds the circle which matches the given color best.
@@ -80,6 +88,15 @@ protected:
 			const vector<cv::Vec3f>& circles, const cv::Point2d& center,
 			const double& radius, vector<double>& out);
 
+	/**
+	 * Image after applying the Canny filter.
+	 */
+	cv::Mat cannyImg;
+
+	/**
+	 * Image after applying the GaussianBlur filter.
+	 */
+	cv::Mat gaussImg;
 };
 
 class RosCircleDetection: public CircleDetection,

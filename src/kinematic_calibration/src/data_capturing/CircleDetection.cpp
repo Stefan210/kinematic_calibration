@@ -83,12 +83,16 @@ bool CircleDetection::detect(const cv::Mat& image, vector<cv::Vec3f>& out) {
 	image.copyTo(img);
 	cv::cvtColor(img, gray, CV_BGR2GRAY);
 
+	GaussianBlur(gray, gray, cv::Size(31, 31), 7, 7);
+
 	double treshold1 = 90;
 	double treshold2 = 80;
 	int apertureSize = 7;
 	cv::Canny(gray, gray, treshold1, treshold2, apertureSize);
+	this->cannyImg = gray.clone();
 
 	GaussianBlur(gray, gray, cv::Size(9, 9), 2, 2);
+	this->gaussImg = gray.clone();
 
 	double dp = 2;
 	double min_dist = 50;
