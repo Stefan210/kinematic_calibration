@@ -19,12 +19,13 @@ b) Adjust the contents of the file "params_general" to your needs:
 - file name suffixes which will contain the calibrated values after the optimization:
       joint_offsets_filename_suffix: [string]
       camera_transform_filename_suffix: [string]
-      urdf_filename_suffix: robot_model_[string]
+      urdf_filename_suffix: [string]
       marker_transforms_filename_suffix: [string]
       camera_intrnsics_filename: [string]
+      
+      The final filenames whill have prepended the name of the robot.
 
-c)
-For each kinematic chain, create or modify the following three files:
+c) For each kinematic chain, create or modify the following three files:
 - params_CHAINNAME_general.yaml (contains general information about the chain):
       chain_name: [string] (identifier of the chain; eg. larm)
       chain_root: [string] (first frame after the camera; eg. HeadPitch_link)
