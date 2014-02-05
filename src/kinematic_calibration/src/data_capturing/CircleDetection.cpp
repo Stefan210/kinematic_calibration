@@ -102,7 +102,6 @@ bool CircleDetection::detect(const cv::Mat& image, vector<cv::Vec3f>& out) {
 	int max_radius = 100;
 	cv::HoughCircles(gray, out, CV_HOUGH_GRADIENT, dp, min_dist, param1, param2,
 			min_radius, max_radius);
-	ROS_INFO("Detected %lu circles.", out.size());
 	return out.size() > 0;
 }
 
@@ -227,6 +226,7 @@ bool CircleDetection::detect(const cv::Mat& image, const cv::Point2d& center,
 	bool success;
 	vector<cv::Vec3f> circles;
 	success = detect(image, circles);
+	ROS_INFO("Detected %lu circles.", circles.size());
 	if (success) {
 		return findClosestRegion(image, circles, center, radius, out);
 	}
