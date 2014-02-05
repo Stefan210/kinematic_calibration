@@ -54,12 +54,12 @@ public:
 
 	void msgToImg(const sensor_msgs::ImageConstPtr& in_msg, cv::Mat& out_image);
 
-	const cv::Mat& getCannyImg() const {
-		return cannyImg;
+	cv::Mat getCannyImg() const {
+		return cannyImg.clone();
 	}
 
-	const cv::Mat& getGaussImg() const {
-		return gaussImg;
+	cv::Mat getGaussImg() const {
+		return gaussImg.clone();
 	}
 
 protected:

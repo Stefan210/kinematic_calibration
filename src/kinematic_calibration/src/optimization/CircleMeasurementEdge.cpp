@@ -13,6 +13,9 @@
 #include <tf/tf.h>
 #include <cmath>
 #include <iostream>
+#include <opencv2/opencv.hpp>
+#include <sensor_msgs/image_encodings.h>
+#include <cv_bridge/cv_bridge.h>
 
 #include "../../include/data_capturing/CircleDetection.h"
 #include "../../include/optimization/CameraIntrinsicsVertex.h"
@@ -25,7 +28,7 @@ namespace kinematic_calibration {
 CircleMeasurementEdge::CircleMeasurementEdge(measurementData measurement,
 		FrameImageConverter* frameImageConverter,
 		KinematicChain* kinematicChain, double radius) :
-		MeasurementEdge<5, CircleMeasurementEdge>(measurement,
+		MeasurementEdge<2, CircleMeasurementEdge>(measurement,
 				frameImageConverter, kinematicChain), radius(radius) {
 	calculateMeasurementConturs();
 }
@@ -35,90 +38,86 @@ CircleMeasurementEdge::~CircleMeasurementEdge() {
 }
 
 void CircleMeasurementEdge::setError(tf::Transform cameraToMarker) {
-	this->calculateEstimatedContours(cameraToMarker);
+	this->calculateEstimatedEllipse(cameraToMarker);
 
 	double xe, ye, xm, ym, r, xec, yec;
 	r = this->measurement.marker_data[CircleDetection::idx_r];
 
 	// distance of center
-	xec = this->estimatedPoints[0][0];
-	yec = this->estimatedPoints[0][1];
+	xec = this->estimatedEllipse[0];
+	yec = this->estimatedEllipse[1];
 	xm = this->measurement.marker_data[CircleDetection::idx_x];
 	ym = this->measurement.marker_data[CircleDetection::idx_y];
 
 	this->_error[0] = sqrt((xec - xm) * (xec - xm) + ((yec - ym) * (yec - ym)));
 
-	// distance of points on the contour
-	for (int i = 1; i < this->dimension(); i++) {
-		xe = this->estimatedPoints[i][0];
-		ye = this->estimatedPoints[i][1];
-		this->_error[i] = sqrt(
-				(xe - xec) * (xe - xec) + (ye - yec) * (ye - yec)) - r;
+	// contour
+	double x0, y0, a, b, alpha;
+	this->getEllipseData(x0, y0, a, b, alpha);
+	this->_error[1] = 0;
+	int numOfPoints = 16;
+	int matchingPoints = 0;
+	cv::Mat tempImg(this->circleDetection.getGaussImg());
+	cv::Mat colorImg;
+	cv::cvtColor(tempImg, colorImg, CV_GRAY2BGR);
+	for (int i = 0; i < numOfPoints; i++) {
+		// check whether the current point is part
+		// of the contour pixels in the measurement image
+		Vector2d point = this->getEllipsePoint(x0, y0, a, b, -alpha,
+				i * 2 * M_PI / numOfPoints);
+		int x = (int) point[0];
+		int y = (int) point[1];
+		if (this->circleDetection.getGaussImg().ptr<uchar>(y)[1 * x]
+				> 0) {
+			// pixel is white i.e. part of a contour
+			matchingPoints++;
+			colorImg.ptr<uchar>(y)[3 * x] = 255;
+		} else {
+			colorImg.ptr<uchar>(y)[3 * x + 1] = 255;
+			colorImg.ptr<uchar>(y)[3 * x + 2] = 255;
+		}
 	}
+	this->_error[1] = numOfPoints - matchingPoints;
+
+	// TODO: remove following debug code
+	//cout << "Matching points: " << matchingPoints << endl;
+	stringstream ss1, ss2;
+	ss1 << "/tmp/" << measurement.id << ".contours.jpg";
+	cv::imwrite(ss1.str(), colorImg);
+
+	Vector5d ep = this->estimatedEllipse;
+	cv_bridge::CvImageConstPtr cv_ptr;
+	sensor_msgs::ImageConstPtr imgMsgPtr(
+			new sensor_msgs::Image(this->measurement.image));
+	// Convert from ROS message to OpenCV image.
+	try {
+		cv_ptr = cv_bridge::toCvShare(imgMsgPtr,
+				sensor_msgs::image_encodings::BGR8);
+	} catch (cv_bridge::Exception& e) {
+		ROS_ERROR("cv_bridge exception: %s", e.what());
+	}
+	cv::Mat image = circleDetection.getGaussImg();// cv_ptr->image;
+	cv::ellipse(image, cv::Point2d(ep(0), ep(1)), cv::Size(ep(2), ep(3)),
+			ep(4) * 180.0 / M_PI, 0, 360, cv::Scalar(255, 0, 0), 2, 8);
+	ss2 << "/tmp/" << measurement.id << ".ellipse.jpg";
+	cv::imwrite(ss2.str(), image);
+
 }
 
 void CircleMeasurementEdge::calculateMeasurementConturs() {
-	double x = this->measurement.marker_data[CircleDetection::idx_x];
-	double y = this->measurement.marker_data[CircleDetection::idx_y];
-	double r = this->measurement.marker_data[CircleDetection::idx_r];
+	vector<cv::Vec3f> vec;
+	cv::Mat out_image;
+	cv_bridge::CvImageConstPtr cv_ptr;
 
-	// calculate the five points
-	/*
-	 * 							(Point1)
-	 * 								|
-	 * 								r
-	 * 								|
-	 * (Point0)		<---r--->	(Center)		<---r--->	(Point2)
-	 * 								|
-	 * 								r
-	 * 								|
-	 * 							(Point4)
-	 */
-	measurementPoints.clear();
-	measurementPoints.push_back(Eigen::Vector2d(x, y));
-	measurementPoints.push_back(Eigen::Vector2d(x - r, y));
-	measurementPoints.push_back(Eigen::Vector2d(x, y - r));
-	measurementPoints.push_back(Eigen::Vector2d(x + r, y));
-	measurementPoints.push_back(Eigen::Vector2d(x, y + r));
+	// Convert from ROS message to OpenCV image.
+	this->circleDetection.msgToImg(
+			boost::shared_ptr<sensor_msgs::Image>(
+					new sensor_msgs::Image(this->measurement.image)),
+			out_image);
+	this->circleDetection.detect(out_image, vec);
 }
 
-void CircleMeasurementEdge::calculateEstimatedContours(
-		const tf::Transform& cameraToMarker) {
-	// TODO: replace hard coded strategy decision
-	//calculateEstimatedContoursUsingCircle(cameraToMarker);
-	calculateEstimatedContoursUsingEllipse(cameraToMarker);
-}
-
-void CircleMeasurementEdge::calculateEstimatedContoursUsingCircle(
-		const tf::Transform& cameraToMarker) {
-	// get radius from measurement
-	double r = this->measurement.marker_data[CircleDetection::idx_r];
-
-	// get the estimated center of the circle
-	double x, y;
-	this->frameImageConverter->project(cameraToMarker.inverse(), x, y);
-
-	// calculate the five points
-	/*
-	 * 							(Point1)
-	 * 								|
-	 * 								r
-	 * 								|
-	 * (Point0)		<---r--->	(Center)		<---r--->	(Point2)
-	 * 								|
-	 * 								r
-	 * 								|
-	 * 							(Point4)
-	 */
-	estimatedPoints.clear();
-	estimatedPoints.push_back(Eigen::Vector2d(x, y));
-	estimatedPoints.push_back(Eigen::Vector2d(x - r, y));
-	estimatedPoints.push_back(Eigen::Vector2d(x, y - r));
-	estimatedPoints.push_back(Eigen::Vector2d(x + r, y));
-	estimatedPoints.push_back(Eigen::Vector2d(x, y + r));
-}
-
-void CircleMeasurementEdge::calculateEstimatedContoursUsingEllipse(
+void CircleMeasurementEdge::calculateEstimatedEllipse(
 		const tf::Transform& cameraToMarker) {
 	// get current estimated camera intrinsics
 	CameraIntrinsicsVertex* cameraIntrinsicsVertex =
@@ -132,31 +131,26 @@ void CircleMeasurementEdge::calculateEstimatedContoursUsingEllipse(
 	tf::Transform markerToCamera = cameraToMarker.inverse();
 	pos << markerToCamera.getOrigin().getX(), markerToCamera.getOrigin().getY(), markerToCamera.getOrigin().getZ();
 
-	// estimated ellipse data (x, y, r1, r2 | r1 < r2)
-	Vector5d es = this->projectSphereToImage(pos, projectionMatrix, radius);
+	// estimated ellipse data
+	this->estimatedEllipse = this->projectSphereToImage(pos, projectionMatrix,
+			radius);
+}
 
-	// calculate the five points
-	double x0 = es(0);
-	double y0 = es(1);
-	double a = es(2);
-	double b = es(3);
-	double alpha = -es(4);
-
-	estimatedPoints.clear();
-	estimatedPoints.push_back(Eigen::Vector2d(x0, y0));
-	estimatedPoints.push_back(getEllipsePoint(x0, y0, a, b, alpha, 0));
-	estimatedPoints.push_back(getEllipsePoint(x0, y0, a, b, alpha, M_PI_2));
-	estimatedPoints.push_back(getEllipsePoint(x0, y0, a, b, alpha, M_PI));
-	estimatedPoints.push_back(
-			getEllipsePoint(x0, y0, a, b, alpha, M_PI + M_PI_2));
+void CircleMeasurementEdge::getEllipseData(double& x0, double& y0, double& a,
+		double& b, double& alpha) {
+	x0 = this->estimatedEllipse[0];
+	y0 = this->estimatedEllipse[1];
+	a = this->estimatedEllipse[2];
+	b = this->estimatedEllipse[3];
+	alpha = -this->estimatedEllipse[4];
 }
 
 Vector2d CircleMeasurementEdge::getEllipsePoint(const double& x0,
 		const double& y0, const double& a, const double& b, const double& alpha,
 		const double& t) const {
 	return Eigen::Vector2d(
-			x0 + a * cos(0) * cos(alpha) - b * sin(t) * sin(alpha),
-			y0 + a * cos(0) * cos(alpha) + b * sin(t) * sin(alpha));
+			x0 + a * cos(t) * cos(alpha) - b * sin(t) * sin(alpha),
+			y0 + a * cos(t) * cos(alpha) + b * sin(t) * sin(alpha));
 }
 
 Vector5d CircleMeasurementEdge::projectSphereToImage(const Eigen::Vector3d& pos,
@@ -168,11 +162,11 @@ Vector5d CircleMeasurementEdge::projectSphereToImage(const Eigen::Vector3d& pos,
 	Eigen::Matrix4d Sstar;
 	Sstar << Eigen::Matrix3d::Identity() - beta * pos * pos.transpose(), -beta
 			* pos, -beta * pos.transpose(), -beta;
-//cout << "Sstar:\n" << Sstar << endl;
+	//cout << "Sstar:\n" << Sstar << endl;
 	Eigen::Matrix3d Cstar = projectionMatrix * Sstar
 			* projectionMatrix.transpose();
 	Eigen::Matrix3d CstarI = Cstar.inverse();
-//cout << "CstarI:\n" << CstarI << endl;
+	//cout << "CstarI:\n" << CstarI << endl;
 	double av = CstarI(0, 0);
 	double bv = CstarI(0, 1);
 	double cv = CstarI(0, 2);

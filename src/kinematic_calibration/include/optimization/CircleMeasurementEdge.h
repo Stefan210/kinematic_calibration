@@ -11,6 +11,7 @@
 #include <kinematic_calibration/measurementData.h>
 #include <Eigen/Dense>
 #include <vector>
+#include "../data_capturing/CircleDetection.h"
 
 #include "MeasurementEdge.h"
 
@@ -21,7 +22,7 @@ typedef Matrix<double,5,1> Vector5d;
 /**
  * Represents an edge for detected circles within an image.
  */
-class CircleMeasurementEdge: public MeasurementEdge<5, CircleMeasurementEdge> {
+class CircleMeasurementEdge: public MeasurementEdge<2, CircleMeasurementEdge> {
 public:
 	CircleMeasurementEdge(measurementData measurement,
 			FrameImageConverter* frameImageConverter,
@@ -39,56 +40,56 @@ public:
 
 protected:
 	/**
-	 * Takes the center and the radius from the measurement and calculates
-	 * four points in 2D, approx. representing the contours of the circle:
-	 * 							(Point1)
-	 * 								|
-	 * 								r
-	 * 								|
-	 * (Point0)		<---r--->	(Center)		<---r--->	(Point2)
-	 * 								|
-	 * 								r
-	 * 								|
-	 * 							(Point4)
+	 * Takes the measurement image and tries to extract the circle's contours.
+	 * The result will be a binary image having pixels being part of a contour
+	 * set to the color white and other pixels set to black.
 	 */
 	void calculateMeasurementConturs();
 
 	/**
-	 * Calculates the estimated contour points (see calculateMeasurementConturs()).
-	 * @param cameraToMarker
+	 * Calculates the estimated ellipse.
+	 * @param cameraToMarker Transformation to use.
 	 */
-	void calculateEstimatedContours(const tf::Transform& cameraToMarker);
+	void calculateEstimatedEllipse(const tf::Transform& cameraToMarker);
 
 	/**
-	 * List of measured contour points.
-	 * Once calculated, the points are constant.
+	 * The measured center of the circle/ellipse.
 	 */
-	vector<Eigen::Vector2d> measurementPoints;
+	Vector2d measurementCenter;
 
 	/**
-	 * List of estimated contour points.
-	 * The points will be recalculated within every iteration of the optimziation.
+	 * The estimated ellipse.
+	 * [x0, y0, a, b, -alpha]
 	 */
-	vector<Eigen::Vector2d> estimatedPoints;
+	Vector5d estimatedEllipse;
 
 	/**
-	 * The radius of the circle [m].
+	 * The estimated contour of the circle.
+	 */
+	vector<Vector2d> estimatedContour;
+
+	/**
+	 * The measured radius of the circle [m].
 	 */
 	double radius;
 
+	/**
+	 * A binary image having pixels being part of a contour
+	 * set to the color white and other pixels set to black.
+	 */
+	//cv::Mat contourImage;
+
+	CircleDetection circleDetection;
+
 private:
-	void calculateEstimatedContoursUsingEllipse(
-			const tf::Transform& cameraToMarker);
-
-	void calculateEstimatedContoursUsingCircle(
-			const tf::Transform& cameraToMarker);
-
 	Vector5d projectSphereToImage(const Eigen::Vector3d& pos,
 			const Eigen::Matrix<double, 3, 4>& projectionMatrix,
 			const double& sphereRadius) const;
 
 	Vector2d getEllipsePoint(const double& x0, const double& y0, const double& a,
 			const double& b, const double& alpha, const double& t) const;
+
+	void getEllipseData(double& x0, double& y0, double& a, double& b, double& alpha);
 };
 
 } /* namespace kinematic_calibration */
