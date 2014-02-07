@@ -27,37 +27,93 @@ using namespace ros;
 namespace kinematic_calibration {
 
 /**
- *
+ *	Class for detecting circles in 2D images.
  */
 class CircleDetection {
 public:
+	/**
+	 * Constructor.
+	 */
 	CircleDetection();
+
+	/**
+	 * Destructor.
+	 */
 	virtual ~CircleDetection();
 
 	enum Index {
 		idx_x = 0, idx_y = 1, idx_r = 2
 	};
 
+	/**
+	 * Detects the circle which matches the given color best.
+	 * @param[in] in_msg Message containing the image with the circle to detect.
+	 * @param[in] color Color of the circle.
+	 * @param[out] out Circle which matches the given color best.
+	 * @return True if at least one circle was found, otherwise false.
+	 */
 	bool detect(const sensor_msgs::ImageConstPtr& in_msg,
 			const cv::Scalar& color, vector<double>& out);
 
+	/**
+	 * Detects the circle which matches the given color best.
+	 * @param[in] image Image with the circle to detect.
+	 * @param[in] color Color of the circle.
+	 * @param[out] out Circle which matches the given color best.
+	 * @return True if at least one circle was found, otherwise false.
+	 */
 	bool detect(const cv::Mat& image, const cv::Scalar& color,
 			vector<double>& out);
 
+	/**
+	 * Detects all circles contained in the given image.
+	 * @param[in] in_msg Message containing the image with the circles to detect.
+	 * @param[out] out All circles contained in the given image.
+	 * @return True if at least one circle was found, otherwise false.
+	 */
 	bool detect(const sensor_msgs::ImageConstPtr& in_msg,
 			vector<cv::Vec3f>& out);
 
+	/**
+	 * Detects all circles contained in the given image.
+	 * @param[in] image Image with the circles to detect.
+	 * @param[out] out All circles contained in the given image.
+	 * @return True if at least one circle was found, otherwise false.
+	 */
 	bool detect(const cv::Mat& image, vector<cv::Vec3f>& out);
 
+	/**
+	 * Detects the circle which is closest to the specified center and within
+	 * the specified radius.
+	 * @param[in] image Image with the circle to detect.
+	 * @param[in] center Predicted center of the circle.
+	 * @param[in] radius Radius around the predicted center.
+	 * @param[out] out circle which is closest to the specified center and within
+	 * the specified radius.
+	 * @return True if at least one circle was found, otherwise false.
+	 */
 	bool detect(const cv::Mat& image, const cv::Point2d& center,
 			const double& radius, vector<double>& out);
 
+	/**
+	 * Converts the ROS image message to a OpenCV image.
+	 * @param[in] in_msg The ROS image message to convert.
+	 * @param[out] out_image The resulting OpenCV image.
+	 */
 	void msgToImg(const sensor_msgs::ImageConstPtr& in_msg, cv::Mat& out_image);
 
+	/**
+	 * Returns the image after applying the Canny filter.
+	 * @return Image after applying the Canny filter.
+	 */
 	virtual cv::Mat getCannyImg() const {
 		return cannyImg.clone();
 	}
 
+	/**
+	 * Returns the image after applying the Gaussian filter.
+	 * @return Image after applying the Gaussian filter.
+	 */
 	virtual cv::Mat getGaussImg() const {
 		return gaussImg.clone();
 	}
@@ -99,16 +155,36 @@ protected:
 	cv::Mat gaussImg;
 };
 
+/**
+ * Class for circle detection within the ROS context.
+ */
 class RosCircleDetection: public CircleDetection,
 		public SinglePointMarkerDetection {
 public:
+	/**
+	 * Constructor.
+	 */
 	RosCircleDetection();
+
+	/**
+	 * Destructor.
+	 */
 	virtual ~RosCircleDetection() {
 	}
 
+	/**
+	 * Detects the circle in the given image.
+	 * @param[in] in_msg Message containing the image with the circle to detect.
+	 * @param[out] out The detected circle.
+	 * @return True if the circle was found, otherwise false.
+	 */
 	virtual bool detect(const sensor_msgs::ImageConstPtr& in_msg,
 			vector<double>& out);
 
+	/**
+	 * Callback method for camera info messages.
+	 * @param[in] msg The received camera info message.
+	 */
 	void camerainfoCallback(const sensor_msgs::CameraInfoConstPtr& msg);
 
 private:
