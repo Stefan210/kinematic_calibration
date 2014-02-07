@@ -269,5 +269,44 @@ void RosCircleDetection::camerainfoCallback(
 	cameraInfoSet = true;
 }
 
+AveragingCircleDetection::AveragingCircleDetection(
+		RosCircleDetection& detection) :
+		detection(detection), cacheSize(3) {
+}
+
+bool AveragingCircleDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
+		vector<double>& out) {
+	// delegate call
+	bool success = this->detection.detect(in_msg, out);
+
+	// evaluate the result
+	if(!success) {
+		// no marker was found -> reset cached data
+		this->positions.clear();
+	} else {
+		// save current data
+		this->positions.push_back(out);
+
+		// remove too old data
+		while(this->positions.size() > cacheSize)
+			this->positions.erase(this->positions.begin());
+
+		// build the average
+		for(int i = 0; i < out.size(); i++) {
+			out[i] = 0.0;
+		}
+		for(int i = 0; i < this->positions.size(); i++) {
+			for(int j = 0; j < out.size(); j++) {
+				out[j] += this->positions[i][j];
+			}
+		}
+		for(int i = 0; i < out.size(); i++) {
+			out[i] /= this->positions.size();
+		}
+	}
+
+	return success;
+}
+
 } /* namespace kinematic_calibration */
 

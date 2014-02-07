@@ -54,11 +54,11 @@ public:
 
 	void msgToImg(const sensor_msgs::ImageConstPtr& in_msg, cv::Mat& out_image);
 
-	cv::Mat getCannyImg() const {
+	virtual cv::Mat getCannyImg() const {
 		return cannyImg.clone();
 	}
 
-	cv::Mat getGaussImg() const {
+	virtual cv::Mat getGaussImg() const {
 		return gaussImg.clone();
 	}
 
@@ -119,6 +119,64 @@ private:
 	bool cameraInfoSet;
 	image_geometry::PinholeCameraModel cameraModel;
 	tf::TransformListener transformListener;
+};
+
+/**
+ * Decorator class for circle detection (or similar).
+ * Keeps a history of older images and takes the average
+ * of formerly detected positions. This helps in cases
+ * where the image is not perfectly stable (e.g. changing light)
+ * or where the image processing steps are non-deterministic.
+ */
+class AveragingCircleDetection: public RosCircleDetection {
+public:
+	/**
+	 * Constructor.
+	 * @param detection The underlying marker detection instance.
+	 */
+	AveragingCircleDetection(RosCircleDetection& detection);
+
+	/**
+	 * Destructor.
+	 */
+	virtual ~AveragingCircleDetection() {
+	}
+
+	/**
+	 * The detection method delegates the call to the underlying
+	 * detection instance. The last messages as well as the last
+	 * detection results will be cached. The method returns an
+	 * average of the last results.
+	 * @param in_msg The image which contains the marker to detect
+	 * @param out The detected marker data. (e.g. x, y, r)
+	 * @return True if detection was successful, otherwise false.
+	 */
+	virtual bool detect(const sensor_msgs::ImageConstPtr& in_msg,
+			vector<double>& out);
+
+	virtual cv::Mat getCannyImg() const {
+		return detection.getCannyImg();
+	}
+
+	virtual cv::Mat getGaussImg() const {
+		return detection.getGaussImg();
+	}
+
+private:
+	/**
+	 * The underlying marker detection instance.
+	 */
+	RosCircleDetection& detection;
+
+	/**
+	 * Collection of saved positions.
+	 */
+	vector<vector<double> > positions;
+
+	/**
+	 * Number of positions to average.
+	 */
+	int cacheSize;
 };
 
 } /* namespace kinematic_calibration */

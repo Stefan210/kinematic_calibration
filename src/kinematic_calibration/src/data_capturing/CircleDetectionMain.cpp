@@ -88,7 +88,8 @@ void detectFromRosMsg() {
 	image_transport::ImageTransport it(nh);
 
 	RosCircleDetection cd;
-	sub = it.subscribe("/nao_camera/image_raw", 1, boost::bind(imageCb, _1, &cd));
+	AveragingCircleDetection decorator(cd);
+	sub = it.subscribe("/nao_camera/image_raw", 1, boost::bind(imageCb, _1, &decorator));
 	circlePub = it.advertise("/circle_detection/circle", 1);
 	cannyPub = it.advertise("/circle_detection/canny", 1);
 	gaussPub = it.advertise("/circle_detection/gauss", 1);
