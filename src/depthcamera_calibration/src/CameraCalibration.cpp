@@ -4,7 +4,7 @@
  *  Created on: 23.05.2013
  *      Author: Stefan Wrobel
  */
-
+#include <pcl_conversions/pcl_conversions.h> 
 #include "../include/CameraCalibration.h"
 
 using namespace std;

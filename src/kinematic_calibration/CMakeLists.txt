@@ -4,7 +4,8 @@ project(kinematic_calibration)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED roscpp cv_bridge image_transport urdf orocos_kdl kdl_parser tf tf_conversions nao_msgs actionlib image_geometry message_generation eigen_conversions camera_calibration_parsers)
+find_package(catkin REQUIRED roscpp cv_bridge image_transport urdf kdl_parser tf tf_conversions nao_msgs actionlib image_geometry message_generation eigen_conversions camera_calibration_parsers)
+find_package(orocos_kdl REQUIRED)
 find_package(OpenCV REQUIRED)
 
 SET(G2O_LIBS cholmod cxsparse -lg2o_cli -lg2o_core
@@ -16,7 +17,7 @@ SET(G2O_LIBS cholmod cxsparse -lg2o_cli -lg2o_core
 -lg2o_types_sba -lg2o_types_sclam2d -lg2o_types_sim3 -lg2o_types_slam2d
 -lg2o_types_slam3d)
 
-link_directories (/opt/ros/groovy/lib)
+#link_directories (/opt/ros/groovy/lib)
 
 # Tell CMake where to find "FindNAOqi.cmake"
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -198,11 +199,12 @@ target_link_libraries(context
 	frameImageConverter
 	kinematicChain
 	${G2O_LIBS}
+        ${orocos_kdl_LIBRARIES}
 	${catkin_LIBRARIES})
 
 ### ImagePreprocessing
 add_executable(imagePreprocessingNode src/data_capturing/ImagePreprocessingNode.cpp)
-target_link_libraries(imagePreprocessingNode ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(imagePreprocessingNode ${catkin_LIBRARIES} ${OpenCV_LIBS} ${orocos_kdl_LIBRARIES})
 
 ### CheckerboardDetection
 add_library(checkerboardDetection src/data_capturing/CheckerboardDetection.cpp src/data_capturing/MarkerDetection.cpp src/data_capturing/SinglePointMarkerDetection.cpp)
