@@ -1,0 +1,26 @@
+<launch>
+  <arg name="chain_name" value="xylo_larm" />
+  <arg name="robot_ip" default="ra.local" />
+  <rosparam file="$(find kinematic_calibration)/config/params_$(arg chain_name)_general.yaml" command="load"/>
+  <node pkg="kinematic_calibration" type="dataCaptureMain" name="DataCapture" output="screen" >
+    <rosparam file="$(find kinematic_calibration)/config/params_$(arg chain_name)_capturing.yaml" command="load" ns="params" />
+  	<rosparam param="image_topic" ns="params">"/nao_camera/image_raw"</rosparam>
+  	<rosparam param="hotjoint_topic" ns="params">"/nao_temperature/hot_joint_found"</rosparam>
+  </node>
+  <node pkg="kinematic_calibration" type="temperatureNode" name="TemperatureNode" args="--pip $(arg robot_ip)">
+  	<rosparam param="hotjoint_topic" ns="params">"/nao_temperature/hot_joint_found"</rosparam>
+  </node>
+  <node pkg="nao_remote" type="pose_manager.py" name="pose_manager">
+    <rosparam file="$(find kinematic_calibration)/config/poses_$(arg chain_name).yaml" command="load" ns="poses" />
+  </node>  
+  <rosparam file="$(find kinematic_calibration)/config/params_general.yaml" command="load"/>
+  <node pkg="kinematic_calibration" type="optimizationNode" name="optimizationNode" output="screen" />
+  <node pkg="kinematic_calibration" type="updateNode" name="updateNode" />
+  <rosparam>
+  ignore_measurements: []
+  calibrate_joint_offsets: false
+  calibrate_camera_transform: false
+  calibrate_camera_intrinsics: false
+  calibrate_marker_transform: true
+  </rosparam>
+</launch>
