@@ -4,9 +4,12 @@ project(calibration)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs visualization_msgs pcl pcl_ros)
+find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs visualization_msgs pcl_ros)
 
-link_directories (/opt/ros/groovy/lib)
+find_package(PCL REQUIRED)
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+#link_directories (/opt/ros/groovy/lib)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -136,13 +139,13 @@ include_directories(include
 # catkin_add_nosetests(test)
 
 add_library(BallDetection src/BallDetection.cpp)
-target_link_libraries(BallDetection ${catkin_LIBRARIES})
+target_link_libraries(BallDetection ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 
 add_executable(BallDetectionMain src/BallDetectionMain.cpp)
 target_link_libraries(BallDetectionMain BallDetection)
 
 add_executable(GroundDetectionMain src/GroundDetectionMain.cpp src/GroundDetection.cpp)
-target_link_libraries(GroundDetectionMain ${catkin_LIBRARIES})
+target_link_libraries(GroundDetectionMain ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 
 add_library(G2oOptimization 
 	src/EdgeMarkerMeasurement.cpp
@@ -183,6 +186,7 @@ add_executable(CameraCalibration
 target_link_libraries(CameraCalibration 
   ${catkin_LIBRARIES} 
   G2oOptimization
+  ${PCL_LIBRARIES}
 )
 
 

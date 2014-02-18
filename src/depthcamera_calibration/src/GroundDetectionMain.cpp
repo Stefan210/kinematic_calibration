@@ -18,6 +18,7 @@
 #include <pcl/ros/conversions.h>
 #include <pcl/point_cloud.h>
 tf::TransformListener* ptf;
+#include <pcl_conversions/pcl_conversions.h>
 
 void msg_cb(const sensor_msgs::PointCloud2& input) {
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr initialCloud = pcl::PointCloud<
