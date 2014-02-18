@@ -126,7 +126,7 @@ Execute
       rosrun kinematic_calibration IgnoreMeasurementsConfigGeneration.py /tmp/bad/ && rosparam load ignore_measurements.yaml
 
 b) Start the optimization process:
-      roslaunch kinematic_calibration optimization.launch
+      rosservice call /kinematic_calibration/start_optimization
       
 
 
