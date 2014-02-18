@@ -150,7 +150,7 @@ Vector2d CircleMeasurementEdge::getEllipsePoint(const double& x0,
 		const double& t) const {
 	return Eigen::Vector2d(
 			x0 + a * cos(t) * cos(alpha) - b * sin(t) * sin(alpha),
-			y0 + a * cos(t) * cos(alpha) + b * sin(t) * sin(alpha));
+			y0 + a * cos(t) * sin(alpha) + b * sin(t) * cos(alpha));
 }
 
 Vector5d CircleMeasurementEdge::projectSphereToImage(const Eigen::Vector3d& pos,
