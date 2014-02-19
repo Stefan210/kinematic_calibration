@@ -76,24 +76,29 @@ bool CircleDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
 	return detect(image, out);
 }
 
-bool CircleDetection::detect(const cv::Mat& image, vector<cv::Vec3f>& out) {
-	// detect circles
-	cv::Mat gray;
+void CircleDetection::processImage(const cv::Mat& in, cv::Mat& out) {
 	cv::Mat img;
-	image.copyTo(img);
-	cv::cvtColor(img, gray, CV_BGR2GRAY);
+	in.copyTo(img);
+	cv::cvtColor(img, out, CV_BGR2GRAY);
 
-	GaussianBlur(gray, gray, cv::Size(9, 9), 2, 2);
+	GaussianBlur(out, out, cv::Size(9, 9), 2, 2);
 
 	double treshold1 = 150; //90
 	double treshold2 = 50; //80
 	int apertureSize = 3; //7
-	cv::Canny(gray, gray, treshold1, treshold2, apertureSize);
-	this->cannyImg = gray.clone();
+	cv::Canny(out, out, treshold1, treshold2, apertureSize);
+	this->cannyImg = out.clone();
 
-	GaussianBlur(gray, gray, cv::Size(9, 9), 2, 2);
-	this->gaussImg = gray.clone();
+	GaussianBlur(out, out, cv::Size(9, 9), 2, 2);
+	this->gaussImg = out.clone();
+}
 
+bool CircleDetection::detect(const cv::Mat& image, vector<cv::Vec3f>& out) {
+	// process image
+	cv::Mat gray;
+	processImage(image, gray);
+
+	// detect circles
 	double dp = 2;
 	double min_dist = 50;
 	double param1 = 70;

@@ -118,6 +118,14 @@ public:
 		return gaussImg.clone();
 	}
 
+	/**
+	 * Applies image processing steps s.t. the circle
+	 * can be found in the resulting image.
+	 * @param[in] in The original image to be processed.
+	 * @param[out] out The processed image, ready for circle detection.
+	 */
+	virtual void processImage(const cv::Mat& in, cv::Mat& out);
+
 protected:
 	/**
 	 * Finds the circle which matches the given color best.
