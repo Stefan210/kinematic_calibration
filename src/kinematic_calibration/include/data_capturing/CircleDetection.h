@@ -106,7 +106,7 @@ public:
 	 * Returns the image after applying the Canny filter.
 	 * @return Image after applying the Canny filter.
 	 */
-	virtual cv::Mat getCannyImg() const {
+	virtual cv::Mat getCannyImg() {
 		return cannyImg.clone();
 	}
 
@@ -114,7 +114,7 @@ public:
 	 * Returns the image after applying the Gaussian filter.
 	 * @return Image after applying the Gaussian filter.
 	 */
-	virtual cv::Mat getGaussImg() const {
+	virtual cv::Mat getGaussImg() {
 		return gaussImg.clone();
 	}
 
@@ -206,9 +206,8 @@ private:
 };
 
 /**
- * Decorator class for circle detection (or similar).
  * Keeps a history of older images and takes the average
- * of formerly detected positions. This helps in cases
+ * of former processed images. This helps in cases
  * where the image is not perfectly stable (e.g. changing light)
  * or where the image processing steps are non-deterministic.
  */
@@ -216,9 +215,8 @@ class AveragingCircleDetection: public RosCircleDetection {
 public:
 	/**
 	 * Constructor.
-	 * @param detection The underlying marker detection instance.
 	 */
-	AveragingCircleDetection(RosCircleDetection& detection);
+	AveragingCircleDetection();
 
 	/**
 	 * Destructor.
@@ -226,41 +224,17 @@ public:
 	virtual ~AveragingCircleDetection() {
 	}
 
-	/**
-	 * The detection method delegates the call to the underlying
-	 * detection instance. The last messages as well as the last
-	 * detection results will be cached. The method returns an
-	 * average of the last results.
-	 * @param in_msg The image which contains the marker to detect
-	 * @param out The detected marker data. (e.g. x, y, r)
-	 * @return True if detection was successful, otherwise false.
-	 */
+	virtual void processImage(const cv::Mat& in, cv::Mat& out);
+
 	virtual bool detect(const sensor_msgs::ImageConstPtr& in_msg,
 			vector<double>& out);
 
-	virtual cv::Mat getCannyImg() const {
-		return detection.getCannyImg();
-	}
-
-	virtual cv::Mat getGaussImg() const {
-		return detection.getGaussImg();
-	}
-
 private:
-	/**
-	 * The underlying marker detection instance.
-	 */
-	RosCircleDetection& detection;
+	vector<sensor_msgs::ImageConstPtr> images;
 
-	/**
-	 * Collection of saved positions.
-	 */
-	vector<vector<double> > positions;
+	vector<cv::Mat> canny;
 
-	/**
-	 * Number of positions to average.
-	 */
-	int cacheSize;
+	vector<cv::Mat> gauss;
 };
 
 } /* namespace kinematic_calibration */

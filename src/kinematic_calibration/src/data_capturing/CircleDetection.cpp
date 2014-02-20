@@ -274,43 +274,56 @@ void RosCircleDetection::camerainfoCallback(
 	cameraInfoSet = true;
 }
 
-AveragingCircleDetection::AveragingCircleDetection(
-		RosCircleDetection& detection) :
-		detection(detection), cacheSize(3) {
+AveragingCircleDetection::AveragingCircleDetection() {
 }
 
 bool AveragingCircleDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
 		vector<double>& out) {
-	// delegate call
-	bool success = this->detection.detect(in_msg, out);
+	// save the current image
+	images.push_back(in_msg);
 
-	// evaluate the result
-	if(!success) {
-		// no marker was found -> reset cached data
-		this->positions.clear();
-	} else {
-		// save current data
-		this->positions.push_back(out);
-
-		// remove too old data
-		while(this->positions.size() > cacheSize)
-			this->positions.erase(this->positions.begin());
-
-		// build the average
-		for(int i = 0; i < out.size(); i++) {
-			out[i] = 0.0;
-		}
-		for(int i = 0; i < this->positions.size(); i++) {
-			for(int j = 0; j < out.size(); j++) {
-				out[j] += this->positions[i][j];
-			}
-		}
-		for(int i = 0; i < out.size(); i++) {
-			out[i] /= this->positions.size();
-		}
+	// remove images which are too old
+	ros::Time timeNew = in_msg->header.stamp;
+	ros::Duration timeSpan(1, 0);
+	while((images[0]->header.stamp + timeSpan) < timeNew) {
+		images.erase(images.begin());
+		gauss.erase(gauss.begin());
+		canny.erase(canny.begin());
 	}
 
-	return success;
+	// delegate to the base detect method
+	// which in turn calls our processImage() method
+	return RosCircleDetection::detect(in_msg, out);
+}
+
+void AveragingCircleDetection::processImage(const cv::Mat& in, cv::Mat& out) {
+	// process the new image (gives canny and canny+gauss)
+	RosCircleDetection::processImage(in, out);
+
+	// save the processed images
+	canny.push_back(RosCircleDetection::getCannyImg());
+	gauss.push_back(RosCircleDetection::getGaussImg());
+
+	// build the average
+	cv::Mat cannyAvg, gaussAvg;
+	assert(canny.size() == gauss.size());
+	int size = canny.size();
+	cannyAvg = canny[0] / size;
+	gaussAvg = gauss[0] / size;
+	for(int i = 1; i < size; i++) {
+		cannyAvg += canny[i] / size;
+		gaussAvg += gauss[i] / size;
+	}
+
+	cv::threshold(cannyAvg, cannyAvg, 10, 255, cv::THRESH_BINARY);
+	cv::threshold(gaussAvg, gaussAvg, 10, 255, cv::THRESH_BINARY);
+
+	// save the averaged images
+	this->cannyImg = cannyAvg.clone();
+	this->gaussImg = gaussAvg.clone();
+
+	// return one of the averaged images
+	out = gaussImg;
 }
 
 } /* namespace kinematic_calibration */
