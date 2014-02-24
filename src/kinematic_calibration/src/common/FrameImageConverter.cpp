@@ -28,7 +28,13 @@ void FrameImageConverter::project(const tf::Transform& transform, double& x,
 	cv::Point3d pt_cv(pt.x(), pt.y(), pt.z());
 	cv::Point2d uv, uv_rect;
 	uv_rect = cameraModel.project3dToPixel(pt_cv);
-	uv = cameraModel.unrectifyPoint(uv_rect);
+	try {
+		// distortion model is given
+		uv = cameraModel.unrectifyPoint(uv_rect);
+	} catch(image_geometry::Exception& e) {
+		// no distortion model given -> use unrectified point
+		uv = uv_rect;
+	}
 	x = uv.x;
 	y = uv.y;
 	//std::cout << "rectified: " << uv_rect.x << ", " << uv_rect.y
