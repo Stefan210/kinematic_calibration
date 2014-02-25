@@ -202,9 +202,11 @@ target_link_libraries(context
         ${orocos_kdl_LIBRARIES}
 	${catkin_LIBRARIES})
 
+
 ### ImagePreprocessing
 add_executable(imagePreprocessingNode src/data_capturing/ImagePreprocessingNode.cpp)
 target_link_libraries(imagePreprocessingNode ${catkin_LIBRARIES} ${OpenCV_LIBS} ${orocos_kdl_LIBRARIES})
+
 
 ### CheckerboardDetection
 add_library(checkerboardDetection src/data_capturing/CheckerboardDetection.cpp src/data_capturing/MarkerDetection.cpp src/data_capturing/SinglePointMarkerDetection.cpp)
@@ -216,6 +218,7 @@ target_link_libraries(checkerboardDetectionMain checkerboardDetection ${catkin_L
 catkin_add_gtest(checkerboardDetectionTest test/CheckerboardDetectionTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
 target_link_libraries(checkerboardDetectionTest checkerboardDetection ${catkin_LIBRARIES})
 
+
 ### CircleDetection
 add_library(circleDetection src/data_capturing/CircleDetection.cpp src/data_capturing/MarkerDetection.cpp src/data_capturing/SinglePointMarkerDetection.cpp)
 target_link_libraries(circleDetection frameImageConverter ${catkin_LIBRARIES} ${OpenCV_LIBS})
@@ -226,6 +229,7 @@ target_link_libraries(circleDetectionMain circleDetection ${catkin_LIBRARIES} ${
 catkin_add_gtest(circleDetectionTest test/CircleDetectionTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
 target_link_libraries(circleDetectionTest circleDetection ${catkin_LIBRARIES})
 
+
 ### KinematicChain
 add_library(kinematicChain src/common/KinematicChain.cpp) 
 target_link_libraries(kinematicChain ${catkin_LIBRARIES})
@@ -234,7 +238,8 @@ target_link_libraries(kinematicChain ${catkin_LIBRARIES})
 #target_link_libraries(kinematicChainTfComparison kinematicChain modelLoader ${catkin_LIBRARIES})
 
 catkin_add_gtest(kinematicChainTest test/KinematicChainTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
-target_link_libraries(kinematicChainTest kinematicChain modelLoader ${catkin_LIBRARIES})
+target_link_libraries(kinematicChainTest kinematicChain modelLoader frameImageConverter ${catkin_LIBRARIES})
+
 
 ### ModelLoader
 add_library(modelLoader src/common/ModelLoader.cpp) 
@@ -243,12 +248,22 @@ target_link_libraries(modelLoader ${catkin_LIBRARIES})
 catkin_add_gtest(modelLoaderTest test/ModelLoaderTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
 target_link_libraries(modelLoaderTest modelLoader ${catkin_LIBRARIES})
 
+
 ### FrameImageConverter
 add_library(frameImageConverter src/common/FrameImageConverter.cpp)
 target_link_libraries(frameImageConverter ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 #add_executable(frameImageConverterMain src/common/FrameImageConverterMain.cpp)
 #target_link_libraries(frameImageConverterMain frameImageConverter modelLoader kinematicChain ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
+
+### ErrorModel
+add_library(errorModel src/common/ErrorModel.cpp src/optimization/KinematicCalibrationState.cpp)
+target_link_libraries(errorModel modelLoader frameImageConverter kinematicChain ${catkin_LIBRARIES})
+
+catkin_add_gtest(errorModelTest test/ErrorModelTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
+target_link_libraries(errorModelTest errorModel ${catkin_LIBRARIES})
+
 
 ### DataCapture
 add_library(dataCapture 
@@ -296,6 +311,7 @@ target_link_libraries(updateNode modelLoader ${catkin_LIBRARIES})
 
 catkin_add_gtest(jointUpdateTest test/JointUpdateTest.cpp src/result_publishing/JointUpdate.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
 target_link_libraries(jointUpdateTest modelLoader ${catkin_LIBRARIES})
+
 
 ### Temperature
 if( ${NAOqi_FOUND} ) 
