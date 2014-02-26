@@ -81,11 +81,20 @@ SinglePointErrorModel::~SinglePointErrorModel() {
 
 void SinglePointErrorModel::getError(const KinematicCalibrationState& state,
 		const measurementData& measurement, vector<double>& delta) {
+	double x, y;
+	this->getImageCoordinates(state, measurement, x, y);
+	delta.clear();
+	delta.push_back((x - measurement.marker_data[0]));
+	delta.push_back((y - measurement.marker_data[1]));
 }
 
 void SinglePointErrorModel::getSquaredError(
 		const KinematicCalibrationState& state,
 		const measurementData& measurement, vector<double>& error) {
+	vector<double> delta;
+	this->getError(state, measurement, delta);
+	error.push_back(delta[0]*delta[0]);
+	error.push_back(delta[1]*delta[1]);
 }
 
 CircleErrorModel::CircleErrorModel(KinematicChain& kinematicChain) :
