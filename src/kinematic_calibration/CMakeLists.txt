@@ -258,8 +258,13 @@ target_link_libraries(frameImageConverter ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 
 ### ErrorModel
-add_library(errorModel src/common/ErrorModel.cpp src/optimization/KinematicCalibrationState.cpp)
-target_link_libraries(errorModel modelLoader frameImageConverter kinematicChain ${catkin_LIBRARIES})
+add_library(errorModel 
+	src/common/ErrorModel.cpp 
+	src/optimization/KinematicCalibrationState.cpp
+	src/optimization/CameraIntrinsicsVertex.cpp
+	src/optimization/JointOffsetVertex.cpp
+	)
+target_link_libraries(errorModel modelLoader frameImageConverter kinematicChain ${catkin_LIBRARIES} ${G2O_LIBS})
 
 catkin_add_gtest(errorModelTest test/ErrorModelTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
 target_link_libraries(errorModelTest errorModel ${catkin_LIBRARIES})
@@ -298,6 +303,9 @@ target_link_libraries(optimizationNode
 	${catkin_LIBRARIES} 
 	${G2O_LIBS}
 	)
+	
+catkin_add_gtest(cameraIntrinsicsVertexTest test/CameraIntrinsicsVertexTest.cpp src/optimization/CameraIntrinsicsVertex.cpp)
+target_link_libraries(cameraIntrinsicsVertexTest ${catkin_LIBRARIES} ${G2O_LIBS})
 	
 	
 ### Result publishing
