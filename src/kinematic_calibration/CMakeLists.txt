@@ -289,6 +289,7 @@ add_executable(optimizationNode
 	src/optimization/G2oJointOffsetOptimization.cpp
 	src/optimization/CameraIntrinsicsVertex.cpp
 	src/optimization/JointOffsetVertex.cpp
+	src/optimization/TransformationVertex.cpp
 	#src/optimization/MeasurementEdge.cpp
 	#src/optimization/CheckerboardMeasurementEdge.cpp
 	#src/optimization/CircleMeasurementEdge.cpp
@@ -306,6 +307,9 @@ target_link_libraries(optimizationNode
 	
 catkin_add_gtest(cameraIntrinsicsVertexTest test/CameraIntrinsicsVertexTest.cpp src/optimization/CameraIntrinsicsVertex.cpp)
 target_link_libraries(cameraIntrinsicsVertexTest ${catkin_LIBRARIES} ${G2O_LIBS})
+
+catkin_add_gtest(transformationVertexTest test/TransformationVertexTest.cpp src/optimization/TransformationVertex.cpp)
+target_link_libraries(transformationVertexTest ${catkin_LIBRARIES} ${G2O_LIBS})
 	
 	
 ### Result publishing
