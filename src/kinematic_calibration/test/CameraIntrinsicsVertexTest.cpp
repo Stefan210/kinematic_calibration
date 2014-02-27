@@ -39,27 +39,27 @@ TEST(CameraIntrinsicsVertexTest, oplusDeltaTest) {
 
 	CameraIntrinsicsVertex vertex(msg);
 	double delta[vertex.dimension()];
-	for(int i = 0; i < vertex.dimension(); i++)
-		delta[i] = i+1;
+	for (int i = 0; i < vertex.dimension(); i++)
+		delta[i] = i + 1;
 
 	// act
 	vertex.oplus(delta);
 	sensor_msgs::CameraInfo updatedCamera = vertex.estimate();
 
 	// assert
-	ASSERT_EQ(msg.P[0]+1, updatedCamera.P[0]);
-	ASSERT_EQ(msg.P[5]+2, updatedCamera.P[5]);
-	ASSERT_EQ(msg.P[2]+3, updatedCamera.P[2]);
-	ASSERT_EQ(msg.P[6]+4, updatedCamera.P[6]);
+	ASSERT_EQ(msg.P[0] + 1, updatedCamera.P[0]);
+	ASSERT_EQ(msg.P[5] + 2, updatedCamera.P[5]);
+	ASSERT_EQ(msg.P[2] + 3, updatedCamera.P[2]);
+	ASSERT_EQ(msg.P[6] + 4, updatedCamera.P[6]);
 	ASSERT_EQ(updatedCamera.K[0], updatedCamera.P[0]);
 	ASSERT_EQ(updatedCamera.K[4], updatedCamera.P[5]);
 	ASSERT_EQ(updatedCamera.K[2], updatedCamera.P[2]);
 	ASSERT_EQ(updatedCamera.K[5], updatedCamera.P[6]);
-	ASSERT_EQ(msg.D[0]+5, updatedCamera.D[0]);
-	ASSERT_EQ(msg.D[1]+6, updatedCamera.D[1]);
-	ASSERT_EQ(msg.D[2]+7, updatedCamera.D[2]);
-	ASSERT_EQ(msg.D[3]+8, updatedCamera.D[3]);
-	ASSERT_EQ(msg.D[4]+9, updatedCamera.D[4]);
+	ASSERT_EQ(msg.D[0] + 5, updatedCamera.D[0]);
+	ASSERT_EQ(msg.D[1] + 6, updatedCamera.D[1]);
+	ASSERT_EQ(msg.D[2] + 7, updatedCamera.D[2]);
+	ASSERT_EQ(msg.D[3] + 8, updatedCamera.D[3]);
+	ASSERT_EQ(msg.D[4] + 9, updatedCamera.D[4]);
 }
 
 TEST(CameraIntrinsicsVertexTest, setToOriginTest) {
@@ -89,8 +89,8 @@ TEST(CameraIntrinsicsVertexTest, setToOriginTest) {
 
 	CameraIntrinsicsVertex vertex(msg);
 	double delta[vertex.dimension()];
-	for(int i = 0; i < vertex.dimension(); i++)
-		delta[i] = i+1;
+	for (int i = 0; i < vertex.dimension(); i++)
+		delta[i] = i + 1;
 
 	// act
 	vertex.oplus(delta);
