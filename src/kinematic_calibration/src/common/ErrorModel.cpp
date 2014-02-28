@@ -16,6 +16,9 @@
 #include "../../include/common/FrameImageConverter.h"
 #include "../../include/common/KinematicChain.h"
 #include "../../include/optimization/KinematicCalibrationState.h"
+#include "../../include/optimization/CameraIntrinsicsVertex.h"
+#include "../../include/optimization/JointOffsetVertex.h"
+#include "../../include/optimization/TransformationVertex.h"
 
 namespace kinematic_calibration {
 
@@ -66,10 +69,242 @@ void ErrorModel::getImageCoordinates(const KinematicCalibrationState& state,
 	cout << "coordinates: " << x << " " << y << endl;
 }
 
+vector<double> ErrorModel::calcCameraIntrinsicsDerivatives(
+		KinematicCalibrationState state, measurementData measurement,
+		const double& h) {
+	vector<double> cameraPartialDerivatives;
+
+	// camera parameters: fx, fy, cx, cy, d[0-4]
+	CameraIntrinsicsVertex civ(state.cameraInfo);
+	for (int index = 0; index < civ.dimension(); index++) {
+		// errors around the current point
+		vector<double> errorMinus, errorPlus;
+
+		// initialize the delta vector
+		double delta[civ.dimension()];
+		for (int j = 0; j < civ.dimension(); j++)
+			delta[j] = 0.0;
+
+		// update delta (plus)
+		civ.setToOrigin();
+		delta[index] = h;
+		civ.oplus(delta);
+		state.cameraInfo = civ.estimate();
+
+		// update error
+		this->getSquaredError(state, measurement, errorPlus);
+
+		// update delta (minus)
+		civ.setToOrigin();
+		delta[index] = -h;
+		civ.oplus(delta);
+		state.cameraInfo = civ.estimate();
+
+		// update error
+		this->getSquaredError(state, measurement, errorMinus);
+
+		// calculate the sum of the vectors
+		double errorPlusSum = 0, errorMinusSum = 0;
+		for (int j = 0; j < errorPlus.size(); j++) {
+			errorPlusSum += errorPlus[j];
+			errorMinusSum += errorMinus[j];
+		}
+
+		// calculate the derivative
+		double derivative = (errorPlusSum - errorMinusSum) / (2 * h);
+		cameraPartialDerivatives.push_back(derivative);
+	}
+	// reset state
+	civ.setToOrigin();
+	state.cameraInfo = civ.estimate();
+
+	return cameraPartialDerivatives;
+}
+
+vector<double> ErrorModel::calcCameraTransformDerivatives(
+		KinematicCalibrationState state, measurementData measurement,
+		const double& h) {
+	vector<double> partialDerivatives;
+	tf::Transform cameraTransform = state.cameraToHeadTransformation;
+
+	// camera transform parameters: tx, ty, tz, rr, rp, ry
+	TransformationVertex vertex;
+	for (int index = 0; index < vertex.dimension(); index++) {
+		// errors around the current point
+		vector<double> errorMinus, errorPlus;
+
+		// initialize the delta vector
+		double delta[vertex.dimension()];
+		for (int j = 0; j < vertex.dimension(); j++)
+			delta[j] = 0.0;
+
+		// update delta (plus)
+		vertex.setEstimateFromTfTransform(cameraTransform);
+		delta[index] = h;
+		vertex.oplus(delta);
+		state.cameraToHeadTransformation = vertex.estimateAsTfTransform();
+
+		// update error
+		this->getSquaredError(state, measurement, errorPlus);
+
+		// update delta (minus)
+		vertex.setEstimateFromTfTransform(cameraTransform);
+		delta[index] = -h;
+		vertex.oplus(delta);
+		state.cameraToHeadTransformation = vertex.estimateAsTfTransform();
+
+		// update error
+		this->getSquaredError(state, measurement, errorMinus);
+
+		// calculate the sum of the vectors
+		double errorPlusSum = 0, errorMinusSum = 0;
+		for (int j = 0; j < errorPlus.size(); j++) {
+			errorPlusSum += errorPlus[j];
+			errorMinusSum += errorMinus[j];
+		}
+
+		// calculate the derivative
+		double derivative = (errorPlusSum - errorMinusSum) / (2 * h);
+		partialDerivatives.push_back(derivative);
+	}
+	// reset state
+	state.cameraToHeadTransformation = cameraTransform;
+
+	return partialDerivatives;
+}
+
+vector<double> ErrorModel::calcMarkerTransformDerivatives(
+		KinematicCalibrationState state, measurementData measurement,
+		const double& h) {
+	vector<double> partialDerivatives;
+	tf::Transform markerTransform =
+			state.markerTransformations[kinematicChain.getName()];
+
+	// marker transform parameters: tx, ty, tz, rr, rp, ry
+	TransformationVertex vertex;
+	for (int index = 0; index < vertex.dimension(); index++) {
+		// errors around the current point
+		vector<double> errorMinus, errorPlus;
+
+		// initialize the delta vector
+		double delta[vertex.dimension()];
+		for (int j = 0; j < vertex.dimension(); j++)
+			delta[j] = 0.0;
+
+		// update delta (plus)
+		vertex.setEstimateFromTfTransform(markerTransform);
+		delta[index] = h;
+		vertex.oplus(delta);
+		state.markerTransformations[kinematicChain.getName()] =
+				vertex.estimateAsTfTransform();
+
+		// update error
+		this->getSquaredError(state, measurement, errorPlus);
+
+		// update delta (minus)
+		vertex.setEstimateFromTfTransform(markerTransform);
+		delta[index] = -h;
+		vertex.oplus(delta);
+		state.markerTransformations[kinematicChain.getName()] =
+				vertex.estimateAsTfTransform();
+
+		// update error
+		this->getSquaredError(state, measurement, errorMinus);
+
+		// calculate the sum of the vectors
+		double errorPlusSum = 0, errorMinusSum = 0;
+		for (int j = 0; j < errorPlus.size(); j++) {
+			errorPlusSum += errorPlus[j];
+			errorMinusSum += errorMinus[j];
+		}
+
+		// calculate the derivative
+		double derivative = (errorPlusSum - errorMinusSum) / (2 * h);
+		partialDerivatives.push_back(derivative);
+	}
+	// reset state
+	state.markerTransformations[kinematicChain.getName()] = markerTransform;
+
+	return partialDerivatives;
+}
+
+vector<double> ErrorModel::calcJointOffsetsDerivatives(
+		KinematicCalibrationState state, measurementData measurement,
+		const double& h) {
+	// TODO
+	vector<double> partialDerivatives;
+	map<string, double> jointOffsets = state.jointOffsets;
+
+	// joint offsets: from root (head) to tip
+	vector<string> jointNames;
+	kinematicChain.getJointNames(jointNames);
+	JointOffsetVertex vertex(jointNames);
+	for (int index = 0; index < vertex.dimension(); index++) {
+		// errors around the current point
+		vector<double> errorMinus, errorPlus;
+
+		// initialize the delta vector
+		double delta[vertex.dimension()];
+		for (int j = 0; j < vertex.dimension(); j++)
+			delta[j] = 0.0;
+
+		// update delta (plus)
+		vertex.setToOrigin();
+		delta[index] = h;
+		vertex.oplus(delta);
+		state.jointOffsets = vertex.estimate();
+
+		// update error
+		this->getSquaredError(state, measurement, errorPlus);
+
+		// update delta (minus)
+		vertex.setToOrigin();
+		delta[index] = -h;
+		vertex.oplus(delta);
+		state.jointOffsets = vertex.estimate();
+
+		// update error
+		this->getSquaredError(state, measurement, errorMinus);
+
+		// calculate the sum of the vectors
+		double errorPlusSum = 0, errorMinusSum = 0;
+		for (int j = 0; j < errorPlus.size(); j++) {
+			errorPlusSum += errorPlus[j];
+			errorMinusSum += errorMinus[j];
+		}
+
+		// calculate the derivative
+		double derivative = (errorPlusSum - errorMinusSum) / (2 * h);
+		partialDerivatives.push_back(derivative);
+	}
+	// reset state
+	state.jointOffsets = jointOffsets;
+	return partialDerivatives;
+}
+
 void ErrorModel::getPartialDerivativesVector(
 		const KinematicCalibrationState& state,
 		const measurementData& measurement,
 		Eigen::RowVectorXd& partialDerivates) {
+	// initialize delta value
+	double h = 1e-9;
+	vector<double> partialDerivatesVector;
+
+	// TODO: save the returned vectors of partial derivates
+	// and append them to the Eigen RowVector
+
+	// camera parameters: fx, fy, cx, cy, d[0-4]
+	calcCameraIntrinsicsDerivatives(state, measurement, h);
+
+	// camera transform parameters: tx, ty, tz, rr, rp, ry
+	calcCameraTransformDerivatives(state, measurement, h);
+
+	// joint offsets: from root (head) to tip
+	calcJointOffsetsDerivatives(state, measurement, h);
+
+	// marker transform parameters: tx, ty, tz, rr, rp, ry
+	calcMarkerTransformDerivatives(state, measurement, h);
+
 }
 
 SinglePointErrorModel::SinglePointErrorModel(KinematicChain& kinematicChain) :
@@ -93,8 +328,8 @@ void SinglePointErrorModel::getSquaredError(
 		const measurementData& measurement, vector<double>& error) {
 	vector<double> delta;
 	this->getError(state, measurement, delta);
-	error.push_back(delta[0]*delta[0]);
-	error.push_back(delta[1]*delta[1]);
+	error.push_back(delta[0] * delta[0]);
+	error.push_back(delta[1] * delta[1]);
 }
 
 CircleErrorModel::CircleErrorModel(KinematicChain& kinematicChain) :
@@ -113,3 +348,4 @@ void CircleErrorModel::getSquaredError(const KinematicCalibrationState& state,
 }
 
 } /* namespace kinematic_calibration */
+

@@ -52,6 +52,18 @@ public:
 
 protected:
 	KinematicChain& kinematicChain;
+
+	vector<double> calcCameraIntrinsicsDerivatives(KinematicCalibrationState state,
+			measurementData measurement, const double& h);
+
+	vector<double> calcCameraTransformDerivatives(KinematicCalibrationState state,
+			measurementData measurement, const double& h);
+
+	vector<double> calcMarkerTransformDerivatives(KinematicCalibrationState state,
+			measurementData measurement, const double& h);
+
+	vector<double> calcJointOffsetsDerivatives(KinematicCalibrationState state,
+			measurementData measurement, const double& h);
 };
 
 /**
