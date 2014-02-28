@@ -245,6 +245,95 @@ TEST(SinglePointErrorModel, getSquaredErrorTest) {
 	ASSERT_NEAR(y_error * y_error, error[1], eps);
 }
 
+class TestingSinglePointErrorModel: public SinglePointErrorModel {
+public:
+	TestingSinglePointErrorModel(KinematicChain& kinematicChain) :
+			SinglePointErrorModel(kinematicChain) {
+	}
+	using SinglePointErrorModel::calcCameraIntrinsicsDerivatives;
+};
+
+TEST(SinglePointErrorModel, calcCameraIntrinsicsDerivativesTest) {
+	// arrange
+	ifstream file("nao.urdf");
+	std::string urdfStr((std::istreambuf_iterator<char>(file)),
+			std::istreambuf_iterator<char>());
+	ModelLoader modelLoader;
+	modelLoader.initializeFromUrdf(urdfStr);
+	KDL::Tree tree;
+	modelLoader.getKdlTree(tree);
+
+	map<string, double> pos;
+	pos["HeadPitch"] = 0.1;
+	pos["HeadYaw"] = 0.2;
+	pos["LShoulderPitch"] = 0.3;
+	pos["LShoulderRoll"] = 0.4;
+	pos["LElbowYaw"] = 0.5;
+	pos["LElbowRoll"] = 0.6;
+	pos["LWristYaw"] = 0.7;
+
+	KinematicCalibrationState state;
+	state.cameraInfo.height = 480;
+	state.cameraInfo.width = 640;
+	state.cameraInfo.distortion_model = "plumb_bob";
+	state.cameraInfo.D.resize(5);
+	for (int i = 0; i < 5; i++)
+		state.cameraInfo.D[i] = 0.0;
+	for (int i = 0; i < 12; i++)
+		state.cameraInfo.P[i] = 0.0;
+	for (int i = 0; i < 9; i++)
+		state.cameraInfo.K[i] = 0.0;
+	state.cameraInfo.P[0] = 550;
+	state.cameraInfo.P[5] = 550;
+	state.cameraInfo.P[2] = 320;
+	state.cameraInfo.P[6] = 200;
+	state.cameraInfo.P[10] = 1;
+	state.cameraInfo.K[0] = 550;
+	state.cameraInfo.K[4] = 550;
+	state.cameraInfo.K[2] = 320;
+	state.cameraInfo.K[5] = 200;
+	state.cameraInfo.K[8] = 1;
+	state.cameraToHeadTransformation.setIdentity();
+
+	measurementData measurement;
+	measurement.marker_data.push_back(100.0); // x
+	measurement.marker_data.push_back(100.0); // y
+	measurement.chain_name = "test_larm";
+	measurement.chain_root = "CameraBottom_frame";
+	measurement.chain_tip = "LWristYaw_link";
+	for (map<string, double>::iterator it = pos.begin(); it != pos.end();
+			it++) {
+		measurement.jointState.name.push_back(it->first);
+		measurement.jointState.position.push_back(it->second);
+	}
+
+	KinematicChain chain(tree, measurement.chain_root, measurement.chain_tip,
+			measurement.chain_name);
+
+	double x, y;
+	TestingSinglePointErrorModel errorModel(chain);
+
+	vector<double> derivatives;
+	double h = 1e-6;
+
+	// act
+	derivatives = errorModel.calcCameraIntrinsicsDerivatives(state, measurement,
+			h);
+
+	// assert
+	// Note: The following expected values are calculated using Mathematica.
+	double fx_expected = -628.631 + 4.08241 * state.cameraInfo.P[0];
+	double fy_expected = -55.6749 + 0.154985 * state.cameraInfo.P[5];
+	double cx_expected = -1771.58 + 2 * state.cameraInfo.P[2];
+	double cy_expected = -506.212 + 2 * state.cameraInfo.P[6];
+	double eps = 1;
+	ASSERT_EQ(derivatives.size(), 9);
+	ASSERT_NEAR(fx_expected, derivatives[0], eps);
+	ASSERT_NEAR(fy_expected, derivatives[1], eps);
+	ASSERT_NEAR(cx_expected, derivatives[2], eps);
+	ASSERT_NEAR(cy_expected, derivatives[3], eps);
+}
+
 } /* namespace kinematic_calibration */
 
 // Run all the tests that were declared with TEST()
