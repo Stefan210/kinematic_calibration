@@ -275,29 +275,44 @@ double ErrorModel::calculateDerivative(const vector<double>& errorMinus,
 	return derivative;
 }
 
+void ErrorModel::appendVector(vector<double>& v1, const vector<double>& v2) {
+	v1.insert(v1.end(), v2.begin(), v2.end());
+}
+
 void ErrorModel::getPartialDerivativesVector(
 		const KinematicCalibrationState& state,
 		const measurementData& measurement,
 		Eigen::RowVectorXd& partialDerivates) {
 	// initialize delta value
 	double h = 1e-9;
-	vector<double> partialDerivatesVector;
+	vector<double> partialDerivatesVector, currentPartialDerivatives;
 
 	// TODO: save the returned vectors of partial derivates
 	// and append them to the Eigen RowVector
 
 	// camera parameters: fx, fy, cx, cy, d[0-4]
-	calcCameraIntrinsicsDerivatives(state, measurement, h);
+	currentPartialDerivatives = calcCameraIntrinsicsDerivatives(state,
+			measurement, h);
+	appendVector(currentPartialDerivatives, partialDerivatesVector);
 
 	// camera transform parameters: tx, ty, tz, rr, rp, ry
-	calcCameraTransformDerivatives(state, measurement, h);
+	currentPartialDerivatives = calcCameraTransformDerivatives(state,
+			measurement, h);
+	appendVector(currentPartialDerivatives, partialDerivatesVector);
 
 	// joint offsets: from root (head) to tip
-	calcJointOffsetsDerivatives(state, measurement, h);
+	currentPartialDerivatives = calcJointOffsetsDerivatives(state, measurement,
+			h);
+	appendVector(currentPartialDerivatives, partialDerivatesVector);
 
 	// marker transform parameters: tx, ty, tz, rr, rp, ry
-	calcMarkerTransformDerivatives(state, measurement, h);
+	currentPartialDerivatives = calcMarkerTransformDerivatives(state,
+			measurement, h);
+	appendVector(currentPartialDerivatives, partialDerivatesVector);
 
+	// convert to Eigen vector
+	for (int i = 0; i < partialDerivatesVector.size(); i++)
+		partialDerivates << partialDerivatesVector[i];
 }
 
 SinglePointErrorModel::SinglePointErrorModel(KinematicChain& kinematicChain) :

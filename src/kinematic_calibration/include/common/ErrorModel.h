@@ -71,6 +71,8 @@ protected:
 
 	double calculateDerivative(const vector<double>& errorMinusVec,
 			const vector<double>& errorPlusVec, const double& h);
+
+	void appendVector(vector<double>& v1, const vector<double>& v2);
 };
 
 /**
