@@ -38,8 +38,7 @@ public:
 	virtual ~ErrorModel();
 
 	virtual void getImageCoordinates(const KinematicCalibrationState& state,
-			const measurementData& measurement, double& x,
-			double& y);
+			const measurementData& measurement, double& x, double& y);
 
 	virtual void getError(const KinematicCalibrationState& state,
 			const measurementData& measurement, vector<double>& delta) = 0;
@@ -47,29 +46,37 @@ public:
 	virtual void getSquaredError(const KinematicCalibrationState& state,
 			const measurementData& measurement, vector<double>& error) = 0;
 
-	virtual void getPartialDerivativesVector(const KinematicCalibrationState& state,
-			const measurementData& measurement, Eigen::RowVectorXd& partialDerivates);
+	virtual void getPartialDerivativesVector(
+			const KinematicCalibrationState& state,
+			const measurementData& measurement,
+			Eigen::RowVectorXd& partialDerivates);
 
 protected:
 	KinematicChain& kinematicChain;
 
-	vector<double> calcCameraIntrinsicsDerivatives(KinematicCalibrationState state,
-			measurementData measurement, const double& h);
+	vector<double> calcCameraIntrinsicsDerivatives(
+			KinematicCalibrationState state, measurementData measurement,
+			const double& h);
 
-	vector<double> calcCameraTransformDerivatives(KinematicCalibrationState state,
-			measurementData measurement, const double& h);
+	vector<double> calcCameraTransformDerivatives(
+			KinematicCalibrationState state, measurementData measurement,
+			const double& h);
 
-	vector<double> calcMarkerTransformDerivatives(KinematicCalibrationState state,
-			measurementData measurement, const double& h);
+	vector<double> calcMarkerTransformDerivatives(
+			KinematicCalibrationState state, measurementData measurement,
+			const double& h);
 
 	vector<double> calcJointOffsetsDerivatives(KinematicCalibrationState state,
 			measurementData measurement, const double& h);
+
+	double calculateDerivative(const vector<double>& errorMinusVec,
+			const vector<double>& errorPlusVec, const double& h);
 };
 
 /**
  * Error model for optimizing one point of a marker (e.g. chessboard).
  */
-class SinglePointErrorModel : public ErrorModel {
+class SinglePointErrorModel: public ErrorModel {
 public:
 
 	SinglePointErrorModel(KinematicChain& kinematicChain);
@@ -86,7 +93,7 @@ public:
 /**
  * Error model for optimizing a circle marker.
  */
-class CircleErrorModel : public ErrorModel {
+class CircleErrorModel: public ErrorModel {
 public:
 
 	CircleErrorModel(KinematicChain& kinematicChain);

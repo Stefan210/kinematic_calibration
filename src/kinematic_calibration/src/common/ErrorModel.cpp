@@ -20,6 +20,9 @@
 #include "../../include/optimization/JointOffsetVertex.h"
 #include "../../include/optimization/TransformationVertex.h"
 
+#include <fenv.h>
+#pragma STDC FENV_ACCESS ON
+
 namespace kinematic_calibration {
 
 ErrorModel::ErrorModel(KinematicChain& kinematicChain) :
@@ -103,15 +106,8 @@ vector<double> ErrorModel::calcCameraIntrinsicsDerivatives(
 		// update error
 		this->getSquaredError(state, measurement, errorMinus);
 
-		// calculate the sum of the vectors
-		double errorPlusSum = 0, errorMinusSum = 0;
-		for (int j = 0; j < errorPlus.size(); j++) {
-			errorPlusSum += errorPlus[j];
-			errorMinusSum += errorMinus[j];
-		}
-
 		// calculate the derivative
-		double derivative = (errorPlusSum - errorMinusSum) / (2 * h);
+		double derivative = calculateDerivative(errorMinus, errorPlus, h);
 		cameraPartialDerivatives.push_back(derivative);
 	}
 	// reset state
@@ -156,15 +152,8 @@ vector<double> ErrorModel::calcCameraTransformDerivatives(
 		// update error
 		this->getSquaredError(state, measurement, errorMinus);
 
-		// calculate the sum of the vectors
-		double errorPlusSum = 0, errorMinusSum = 0;
-		for (int j = 0; j < errorPlus.size(); j++) {
-			errorPlusSum += errorPlus[j];
-			errorMinusSum += errorMinus[j];
-		}
-
 		// calculate the derivative
-		double derivative = (errorPlusSum - errorMinusSum) / (2 * h);
+		double derivative = calculateDerivative(errorMinus, errorPlus, h);
 		partialDerivatives.push_back(derivative);
 	}
 	// reset state
@@ -211,15 +200,8 @@ vector<double> ErrorModel::calcMarkerTransformDerivatives(
 		// update error
 		this->getSquaredError(state, measurement, errorMinus);
 
-		// calculate the sum of the vectors
-		double errorPlusSum = 0, errorMinusSum = 0;
-		for (int j = 0; j < errorPlus.size(); j++) {
-			errorPlusSum += errorPlus[j];
-			errorMinusSum += errorMinus[j];
-		}
-
 		// calculate the derivative
-		double derivative = (errorPlusSum - errorMinusSum) / (2 * h);
+		double derivative = calculateDerivative(errorMinus, errorPlus, h);
 		partialDerivatives.push_back(derivative);
 	}
 	// reset state
@@ -231,7 +213,6 @@ vector<double> ErrorModel::calcMarkerTransformDerivatives(
 vector<double> ErrorModel::calcJointOffsetsDerivatives(
 		KinematicCalibrationState state, measurementData measurement,
 		const double& h) {
-	// TODO
 	vector<double> partialDerivatives;
 	map<string, double> jointOffsets = state.jointOffsets;
 
@@ -266,20 +247,32 @@ vector<double> ErrorModel::calcJointOffsetsDerivatives(
 		// update error
 		this->getSquaredError(state, measurement, errorMinus);
 
-		// calculate the sum of the vectors
-		double errorPlusSum = 0, errorMinusSum = 0;
-		for (int j = 0; j < errorPlus.size(); j++) {
-			errorPlusSum += errorPlus[j];
-			errorMinusSum += errorMinus[j];
-		}
-
 		// calculate the derivative
-		double derivative = (errorPlusSum - errorMinusSum) / (2 * h);
+		double derivative = calculateDerivative(errorMinus, errorPlus, h);
 		partialDerivatives.push_back(derivative);
 	}
 	// reset state
 	state.jointOffsets = jointOffsets;
 	return partialDerivatives;
+}
+
+double ErrorModel::calculateDerivative(const vector<double>& errorMinus,
+		const vector<double>& errorPlus, const double& h) {
+	// calculate the sum of the vectors
+	double errorPlusSum = 0, errorMinusSum = 0;
+	for (int j = 0; j < errorPlus.size(); j++) {
+		errorPlusSum += errorPlus[j];
+		errorMinusSum += errorMinus[j];
+	}
+
+	// calculate the derivative
+	double derivative = (errorPlusSum - errorMinusSum) / (2 * h);
+	fexcept_t flagp = 0;
+	if (fetestexcept(FE_ALL_EXCEPT)) {
+		// TODO: How to handle this correctly?!
+		// derivative = 0;
+	}
+	return derivative;
 }
 
 void ErrorModel::getPartialDerivativesVector(
@@ -348,4 +341,3 @@ void CircleErrorModel::getSquaredError(const KinematicCalibrationState& state,
 }
 
 } /* namespace kinematic_calibration */
-
