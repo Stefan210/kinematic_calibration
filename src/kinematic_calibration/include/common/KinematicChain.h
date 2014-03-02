@@ -42,7 +42,7 @@ public:
 	 * @param out Will contain the calculated transform.
 	 */
 	void getRootToTip(const map<string, double>& joint_positions,
-			KDL::Frame& out);
+			KDL::Frame& out) const;
 
 	/**
 	 * Calculates the transform from the root to the tip of the frame.
@@ -51,7 +51,7 @@ public:
 	 * @param out Will contain the calculated transform.
 	 */
 	void getRootToTip(const map<string, double>& joint_positions,
-			const map<string, double>& joint_offsets, KDL::Frame& out);
+			const map<string, double>& joint_offsets, KDL::Frame& out) const;
 
 	/**
 	 * Calculates the transform from the root to the tip of the frame.
@@ -59,7 +59,7 @@ public:
 	 * @param out Will contain the calculated transform.
 	 */
 	void getRootToTip(const map<string, double>& joint_positions,
-			tf::Transform& out);
+			tf::Transform& out) const;
 
 	/**
 	 * Calculates the transform from the root to the tip of the frame.
@@ -68,7 +68,7 @@ public:
 	 * @param out Will contain the calculated transform.
 	 */
 	void getRootToTip(const map<string, double>& joint_positions,
-			const map<string, double>& joint_offsets, tf::Transform& out);
+			const map<string, double>& joint_offsets, tf::Transform& out) const;
 
 	/**
 	 * Returns a copy of the kinematic chain having the 6D transformations
@@ -93,13 +93,13 @@ public:
 	 * Returns a map of joint names and their 6D transformations.
 	 * @return a map of joint names and their 6D transformations
 	 */
-	map<string, KDL::Frame> getFramesToTip();
+	map<string, KDL::Frame> getFramesToTip() const;
 
 	/**
 	 * Returns a list containing the names of all joints.
 	 * @param jointNames Returns a list containing the names of all joints.
 	 */
-	void getJointNames(vector<string>& jointNames);
+	void getJointNames(vector<string>& jointNames) const;
 
 	/**
 	 * Returns the chain.
@@ -139,10 +139,10 @@ private:
 	string tip;
 	string name;
 	void getJointWithOffset(const KDL::Joint& old_joint, double offset,
-			KDL::Joint& new_joint);
+			KDL::Joint& new_joint) const;
 	void getSegmentWithJointOffset(const KDL::Segment& old_segment,
-			double offset, KDL::Segment new_segment);
-	void kdlFrameToTfTransform(const KDL::Frame& in, tf::Transform& out);
+			double offset, KDL::Segment new_segment) const;
+	void kdlFrameToTfTransform(const KDL::Frame& in, tf::Transform& out) const;
 };
 
 } /* namespace kinematic_calibration */
