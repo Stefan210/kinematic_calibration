@@ -264,6 +264,7 @@ add_library(errorModel
 	src/optimization/CameraIntrinsicsVertex.cpp
 	src/optimization/JointOffsetVertex.cpp
 	src/optimization/TransformationVertex.cpp
+	src/common/MeasurementPose.cpp
 	)
 target_link_libraries(errorModel modelLoader frameImageConverter kinematicChain ${catkin_LIBRARIES} ${G2O_LIBS})
 

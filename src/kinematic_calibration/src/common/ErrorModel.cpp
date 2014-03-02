@@ -15,6 +15,7 @@
 
 #include "../../include/common/FrameImageConverter.h"
 #include "../../include/common/KinematicChain.h"
+#include "../../include/common/MeasurementPose.h"
 #include "../../include/optimization/KinematicCalibrationState.h"
 #include "../../include/optimization/CameraIntrinsicsVertex.h"
 #include "../../include/optimization/JointOffsetVertex.h"
@@ -35,41 +36,8 @@ ErrorModel::~ErrorModel() {
 
 void ErrorModel::getImageCoordinates(const KinematicCalibrationState& state,
 		const measurementData& measurement, double& x, double& y) {
-	// 1) initialize the camera model from state
-	image_geometry::PinholeCameraModel cameraModel;
-	cameraModel.fromCameraInfo(state.cameraInfo);
-	FrameImageConverter fic(cameraModel);
-
-	// 2) initialize the three parts of the chain transformation:
-	tf::Transform cameraToMarker, endEffectorToMarker, headToEndEffector,
-			cameraToHead;
-	// 2a) check whether a marker transformation is given and get it
-	if (state.markerTransformations.count(kinematicChain.getName())) {
-		endEffectorToMarker = state.markerTransformations.find(
-				kinematicChain.getName())->second;
-	} else {
-		endEffectorToMarker.setIdentity();
-	}
-
-	// 2b) get the camera transformation
-	cameraToHead = state.cameraToHeadTransformation;
-
-	// 3) get joint positions and joint offsets
-	map<string, double> jointPositions, jointOffsets;
-	for (int i = 0; i < measurement.jointState.name.size(); i++) {
-		jointPositions[measurement.jointState.name[i]] =
-				measurement.jointState.position[i];
-	}
-	jointOffsets = state.jointOffsets;
-
-	// 4) get the transformation from camera to marker
-	kinematicChain.getRootToTip(jointPositions, jointOffsets,
-			headToEndEffector);
-	cameraToMarker = endEffectorToMarker * headToEndEffector * cameraToHead;
-
-	// 5) project the point into image coordinates
-	fic.project(cameraToMarker.inverse(), x, y);
-	cout << "coordinates: " << x << " " << y << endl;
+	MeasurementPose pose(kinematicChain, measurement.jointState);
+	pose.predictImageCoordinates(state, x, y);
 }
 
 vector<double> ErrorModel::calcCameraIntrinsicsDerivatives(
