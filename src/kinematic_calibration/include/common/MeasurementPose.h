@@ -8,7 +8,9 @@
 #ifndef MEASUREMENTPOSE_H_
 #define MEASUREMENTPOSE_H_
 
+#include <eigen3/Eigen/Dense>
 #include <sensor_msgs/JointState.h>
+#include <vector>
 
 namespace kinematic_calibration {
 class KinematicCalibrationState;
@@ -22,6 +24,8 @@ class KinematicChain;
 } /* namespace kinematic_calibration */
 
 namespace kinematic_calibration {
+
+using namespace std;
 
 /**
  * Represents a pose for the kinematic chain to be optimized.
@@ -57,7 +61,6 @@ public:
 	 */
 	void predictImageCoordinates(const KinematicCalibrationState& state,
 			double& x, double& y);
-
 private:
 	const KinematicChain& kinematicChain;
 	const sensor_msgs::JointState& jointState;

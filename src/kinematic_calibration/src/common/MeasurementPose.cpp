@@ -31,8 +31,7 @@ MeasurementPose::~MeasurementPose() {
 void MeasurementPose::predictEndEffectorPose(
 		const KinematicCalibrationState& state, tf::Transform& cameraToMarker) {
 	// initialize the three parts of the chain transformation:
-	tf::Transform endEffectorToMarker, headToEndEffector,
-			cameraToHead;
+	tf::Transform endEffectorToMarker, headToEndEffector, cameraToHead;
 	// check whether a marker transformation is given and get it
 	if (state.markerTransformations.count(kinematicChain.getName())) {
 		endEffectorToMarker = state.markerTransformations.find(
@@ -47,8 +46,7 @@ void MeasurementPose::predictEndEffectorPose(
 	// get joint positions and joint offsets
 	map<string, double> jointPositions, jointOffsets;
 	for (int i = 0; i < jointState.name.size(); i++) {
-		jointPositions[jointState.name[i]] =
-				jointState.position[i];
+		jointPositions[jointState.name[i]] = jointState.position[i];
 	}
 	jointOffsets = state.jointOffsets;
 
