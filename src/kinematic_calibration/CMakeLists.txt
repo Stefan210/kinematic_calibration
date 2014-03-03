@@ -272,6 +272,15 @@ catkin_add_gtest(errorModelTest test/ErrorModelTest.cpp WORKING_DIRECTORY ${PROJ
 target_link_libraries(errorModelTest errorModel ${catkin_LIBRARIES})
 
 
+### PoseSelection
+add_library(poseSelection
+	src/common/PoseSet.cpp
+	src/common/ErrorModel.cpp
+	)
+	
+target_link_libraries(poseSelection ${catkin_LIBRARIES})
+
+
 ### DataCapture
 add_library(dataCapture 
 	src/data_capturing/DataCapture.cpp
