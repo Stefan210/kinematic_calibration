@@ -15,6 +15,9 @@
 #include <string>
 #include <vector>
 
+#include "ErrorModel.h"
+#include "../optimization/KinematicCalibrationState.h"
+
 namespace kinematic_calibration {
 
 using namespace std;
@@ -55,7 +58,7 @@ public:
 	 * @return All "successor" pose sets having
 	 * one more pose in the active pose set than the current pose set.
 	 */
-	virtual vector<PoseSet> addPose() const = 0;
+	virtual vector< shared_ptr<PoseSet> > addPose() const = 0;
 
 	/**
 	 * For each pose in the active pose set, remove it and create a
@@ -65,7 +68,7 @@ public:
 	 * @return All "successor" pose sets having one pose less in the
 	 * active pose set than the current pose set.
 	 */
-	virtual vector<PoseSet> removePose() const = 0;
+	virtual vector< shared_ptr<PoseSet> > removePose() const = 0;
 
 	/**
 	 * Returns the number of all active poses.
@@ -76,10 +79,16 @@ public:
 };
 
 class MeasurementPoseSet: public PoseSet {
+public:
 	/**
 	 * Constructor.
 	 */
-	MeasurementPoseSet();
+	MeasurementPoseSet(ErrorModel& errorModel,
+			KinematicCalibrationState& state);
+
+	MeasurementPoseSet(ErrorModel& errorModel, KinematicCalibrationState& state,
+			shared_ptr<map<string, measurementData> > poseSet,
+			vector<string> activePoses);
 
 	/**
 	 * Destructor.
@@ -101,20 +110,24 @@ class MeasurementPoseSet: public PoseSet {
 	// overridden methods
 	virtual Eigen::MatrixXd getJacobian() const;
 	virtual void initializePoseSet(const int& n);
-	virtual vector<PoseSet> addPose() const = 0;
-	virtual vector<PoseSet> removePose() const = 0;
-	virtual int getNumberOfPoses() const = 0;
+	virtual vector< shared_ptr<PoseSet> > addPose() const;
+	virtual vector< shared_ptr<PoseSet> > removePose() const;
+	virtual int getNumberOfPoses() const;
 
 private:
 	/**
 	 * Set of all poses (active and currently unused!).
 	 */
-	shared_ptr< map<string, measurementData> > poseSet;
+	shared_ptr<map<string, measurementData> > poseSet;
 
 	/**
 	 * Active poses (used e.g. for calculating the jacobian matrix).
 	 */
 	vector<string> activePoses;
+
+	ErrorModel& errorModel;
+
+	KinematicCalibrationState& state;
 };
 
 } /* namespace kinematic_calibration */
