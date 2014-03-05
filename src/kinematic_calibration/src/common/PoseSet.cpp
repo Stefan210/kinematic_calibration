@@ -22,42 +22,41 @@ PoseSet::~PoseSet() {
 	// TODO Auto-generated destructor stub
 }
 
-MeasurementPoseSet::MeasurementPoseSet(ErrorModel& errorModel,
-		KinematicCalibrationState& state) :
-		errorModel(errorModel), state(state), poseSet(
-				shared_ptr<map<string, measurementData> >(
-						new map<string, measurementData>())) {
+MeasurementPoseSet::MeasurementPoseSet(KinematicCalibrationState& state) :
+		numOfPoses(0), state(state), poseSet(
+				shared_ptr<map<int, MeasurementPose> >(
+						new map<int, MeasurementPose>())) {
 }
 
-MeasurementPoseSet::MeasurementPoseSet(ErrorModel& errorModel,
-		KinematicCalibrationState& state,
-		shared_ptr<map<string, measurementData> > poseSet,
-		vector<string> activePoses) :
-		errorModel(errorModel), state(state), poseSet(poseSet), activePoses(
+MeasurementPoseSet::MeasurementPoseSet(KinematicCalibrationState& state,
+		shared_ptr<map<int, MeasurementPose> > poseSet, vector<int> activePoses,
+		int numOfPoses) :
+		numOfPoses(numOfPoses), state(state), poseSet(poseSet), activePoses(
 				activePoses) {
 }
 
 MeasurementPoseSet::~MeasurementPoseSet() {
 }
 
-void MeasurementPoseSet::addMeasurement(const measurementData& measurement) {
-	(*this->poseSet)[measurement.id] = measurement;
+void MeasurementPoseSet::addMeasurementPose(MeasurementPose pose) {
+	(*this->poseSet)[numOfPoses++] = pose;
 }
 
-void MeasurementPoseSet::addMeasurements(
-		const vector<measurementData>& measurements) {
-	for (vector<measurementData>::const_iterator it = measurements.begin();
-			it != measurements.end(); it++) {
-		addMeasurement(*it);
+void MeasurementPoseSet::addMeasurementPoses(vector<MeasurementPose> poses) {
+	for (vector<MeasurementPose>::const_iterator it = poses.begin();
+			it != poses.end(); it++) {
+		addMeasurementPose(*it);
 	}
 }
 
 Eigen::MatrixXd MeasurementPoseSet::getJacobian() const {
+	// TODO
+
 	Eigen::MatrixXd jacobian;
-	for (vector<string>::const_iterator it = this->activePoses.begin();
+	for (vector<int>::const_iterator it = this->activePoses.begin();
 			it != this->activePoses.end(); it++) {
-		Eigen::RowVectorXd derivativesVector;
-		errorModel.getPartialDerivativesVector(state, (*this->poseSet)[*it],
+		Eigen::MatrixXd derivativesVector;
+		(*this->poseSet)[*it].getPartialDerivatives(state,
 				derivativesVector);
 		jacobian << derivativesVector;
 	}
@@ -66,9 +65,9 @@ Eigen::MatrixXd MeasurementPoseSet::getJacobian() const {
 
 void MeasurementPoseSet::initializePoseSet(const int& n) {
 	// take the first n poses of the pose set
-	for (map<string, measurementData>::iterator it = this->poseSet->begin();
+	for (map<int, MeasurementPose>::iterator it = this->poseSet->begin();
 			it != this->poseSet->end(); it++) {
-		if(this->activePoses.size() >= n)
+		if (this->activePoses.size() >= n)
 			break;
 
 		this->activePoses.push_back(it->first);
@@ -79,7 +78,7 @@ vector<shared_ptr<PoseSet> > MeasurementPoseSet::addPose() const {
 	vector<shared_ptr<PoseSet> > successors;
 
 	// iterate through all available poses
-	for (map<string, measurementData>::iterator it = poseSet->begin();
+	for (map<int, MeasurementPose>::iterator it = poseSet->begin();
 			it != poseSet->end(); it++) {
 		// check whether the pose is already one of the active poses
 		if (this->activePoses.end()
@@ -90,14 +89,14 @@ vector<shared_ptr<PoseSet> > MeasurementPoseSet::addPose() const {
 		}
 
 		// add the new pose
-		vector<string> newPoses = this->activePoses;
+		vector<int> newPoses = this->activePoses;
 		newPoses.push_back(it->first);
 
 		// create a new pose set instance
 		successors.push_back(
 				shared_ptr<MeasurementPoseSet>(
-						new MeasurementPoseSet(errorModel, state, poseSet,
-								newPoses)));
+						new MeasurementPoseSet(state, poseSet, newPoses,
+								numOfPoses)));
 	}
 	return successors;
 }
@@ -106,11 +105,11 @@ vector<shared_ptr<PoseSet> > MeasurementPoseSet::removePose() const {
 	vector<shared_ptr<PoseSet> > successors;
 
 	// iterate through all active poses
-	for (vector<string>::const_iterator remIt = activePoses.begin();
+	for (vector<int>::const_iterator remIt = activePoses.begin();
 			remIt != activePoses.end(); remIt++) {
 		// copy all poses except the one to be removed
-		vector<string> newPoses;
-		for (vector<string>::const_iterator copyIt = activePoses.begin();
+		vector<int> newPoses;
+		for (vector<int>::const_iterator copyIt = activePoses.begin();
 				copyIt != activePoses.end(); copyIt++) {
 			if (remIt != copyIt) {
 				newPoses.push_back(*copyIt);
@@ -120,8 +119,8 @@ vector<shared_ptr<PoseSet> > MeasurementPoseSet::removePose() const {
 		// create a new pose set instance
 		successors.push_back(
 				shared_ptr<MeasurementPoseSet>(
-						new MeasurementPoseSet(errorModel, state, poseSet,
-								newPoses)));
+						new MeasurementPoseSet(state, poseSet, newPoses,
+								numOfPoses)));
 	}
 
 	return successors;

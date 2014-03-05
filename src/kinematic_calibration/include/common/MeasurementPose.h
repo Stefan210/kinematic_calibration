@@ -8,19 +8,15 @@
 #ifndef MEASUREMENTPOSE_H_
 #define MEASUREMENTPOSE_H_
 
-#include <eigen3/Eigen/Dense>
+#include <boost/shared_ptr.hpp>
 #include <sensor_msgs/JointState.h>
+#include <eigen3/Eigen/Dense>
 #include <vector>
+
+#include "KinematicChain.h"
 
 namespace kinematic_calibration {
 class KinematicCalibrationState;
-} /* namespace kinematic_calibration */
-namespace tf {
-class Transform;
-} /* namespace tf */
-
-namespace kinematic_calibration {
-class KinematicChain;
 } /* namespace kinematic_calibration */
 
 namespace kinematic_calibration {
@@ -37,8 +33,10 @@ public:
 	 * @param kinematicChain The kinematic model for the chain.
 	 * @param jointState The joint states of the kinematic chain.
 	 */
-	MeasurementPose(const KinematicChain& kinematicChain,
-			const sensor_msgs::JointState& jointState);
+	MeasurementPose(KinematicChain kinematicChain,
+			sensor_msgs::JointState jointState);
+
+	MeasurementPose();
 
 	/**
 	 * Desctructor.
@@ -61,9 +59,35 @@ public:
 	 */
 	void predictImageCoordinates(const KinematicCalibrationState& state,
 			double& x, double& y);
+
+	void getPartialDerivatives(const KinematicCalibrationState& state,
+			Eigen::MatrixXd& derivatives);
+
+	MeasurementPose& operator=(const MeasurementPose& newval);
+
+protected:
+	void calcCameraIntrinsicsDerivatives(KinematicCalibrationState state,
+			const double& h,
+			vector<double>& derivativesX, vector<double>& derivativesY);
+
+	void calcCameraTransformDerivatives(KinematicCalibrationState state,
+			const double& h,
+			vector<double>& derivativesX, vector<double>& derivativesY);
+
+	void calcMarkerTransformDerivatives(KinematicCalibrationState state,
+			const double& h,
+			vector<double>& derivativesX, vector<double>& derivativesY);
+
+	void calcJointOffsetsDerivatives(KinematicCalibrationState state,
+			const double& h,
+			vector<double>& derivativesX, vector<double>& derivativesY);
+
+	double calculateDerivative(const double& plus, const double& minus,
+			const double& h);
+
 private:
-	const KinematicChain& kinematicChain;
-	const sensor_msgs::JointState& jointState;
+	KinematicChain kinematicChain;
+	sensor_msgs::JointState jointState;
 };
 
 } /* namespace kinematic_calibration */

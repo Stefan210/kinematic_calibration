@@ -17,6 +17,7 @@
 
 #include "ErrorModel.h"
 #include "../optimization/KinematicCalibrationState.h"
+#include "MeasurementPose.h"
 
 namespace kinematic_calibration {
 
@@ -83,12 +84,11 @@ public:
 	/**
 	 * Constructor.
 	 */
-	MeasurementPoseSet(ErrorModel& errorModel,
-			KinematicCalibrationState& state);
+	MeasurementPoseSet(KinematicCalibrationState& state);
 
-	MeasurementPoseSet(ErrorModel& errorModel, KinematicCalibrationState& state,
-			shared_ptr<map<string, measurementData> > poseSet,
-			vector<string> activePoses);
+	MeasurementPoseSet(KinematicCalibrationState& state,
+			shared_ptr<map<int, MeasurementPose> > poseSet,
+			vector<int> activePoses, int numOfPoses);
 
 	/**
 	 * Destructor.
@@ -96,16 +96,16 @@ public:
 	virtual ~MeasurementPoseSet();
 
 	/**
-	 * Adds a single measurement to the pose set.
-	 * @param measurement Measurement to be added.
+	 * Adds a single pose to the pose set.
+	 * @param measurementPose Pose to be added.
 	 */
-	void addMeasurement(const measurementData& measurement);
+	void addMeasurementPose(MeasurementPose measurementPose);
 
 	/**
 	 * Adds a set of poses to the pose set.
-	 * @param measurements Measurements to be added.
+	 * @param measurementPosees Poses to be added.
 	 */
-	void addMeasurements(const vector<measurementData>& measurements);
+	void addMeasurementPoses(vector<MeasurementPose> measurementPoses);
 
 	// overridden methods
 	virtual Eigen::MatrixXd getJacobian() const;
@@ -118,16 +118,16 @@ private:
 	/**
 	 * Set of all poses (active and currently unused!).
 	 */
-	shared_ptr<map<string, measurementData> > poseSet;
+	shared_ptr<map<int, MeasurementPose> > poseSet;
 
 	/**
 	 * Active poses (used e.g. for calculating the jacobian matrix).
 	 */
-	vector<string> activePoses;
-
-	ErrorModel& errorModel;
+	vector<int> activePoses;
 
 	KinematicCalibrationState& state;
+
+	int numOfPoses;
 };
 
 } /* namespace kinematic_calibration */
