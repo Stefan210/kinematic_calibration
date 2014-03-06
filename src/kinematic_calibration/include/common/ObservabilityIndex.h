@@ -33,6 +33,15 @@ public:
 	 * @param[out] index The calculated index.
 	 */
 	virtual void calculateIndex(const PoseSet& poseSet, double& index) = 0;
+
+protected:
+	/**
+	 * Performs the SVD on the jacobian of the poseSet and returns
+	 * the vector of the singular values.
+	 * @param[in] poseSet The pose set for which should be used.
+	 * @return The singular values of the jacobian.
+	 */
+	Eigen::VectorXd getSingularValues(const PoseSet& poseSet);
 };
 
 /**
