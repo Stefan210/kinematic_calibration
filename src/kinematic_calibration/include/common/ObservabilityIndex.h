@@ -33,6 +33,9 @@ public:
 	void calculateIndex(const PoseSet& poseSet, double& index) = 0;
 };
 
+/**
+ * Observability index based on the product of the singular values.
+ */
 class ProductSingularValuesIndex: public ObservabilityIndex {
 public:
 
@@ -44,6 +47,9 @@ public:
 	void calculateIndex(const PoseSet& poseSet, double& index);
 };
 
+/**
+ * Observability index based on the inverse condition number of the jacobian.
+ */
 class InverseConditionNumberIndex: public ObservabilityIndex {
 public:
 
@@ -55,6 +61,9 @@ public:
 	void calculateIndex(const PoseSet& poseSet, double& index);
 };
 
+/**
+ * Observability index based on the minimum singular value.
+ */
 class MinimumSingularValueIndex: public ObservabilityIndex {
 public:
 
@@ -65,6 +74,9 @@ public:
 	void calculateIndex(const PoseSet& poseSet, double& index);
 };
 
+/**
+ * Combination of the inverse condition number and the minimum singular value indices.
+ */
 class NoiseAmplificationIndex: public ObservabilityIndex {
 public:
 
