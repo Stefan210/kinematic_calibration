@@ -276,6 +276,7 @@ target_link_libraries(errorModelTest errorModel ${catkin_LIBRARIES})
 add_library(poseSelection
 	src/common/PoseSet.cpp
 	src/common/ErrorModel.cpp
+	src/common/ObservabilityIndex.cpp
 	)
 	
 target_link_libraries(poseSelection ${catkin_LIBRARIES})
