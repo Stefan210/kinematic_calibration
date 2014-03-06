@@ -5,7 +5,7 @@
  *      Author: stefan
  */
 
-#include "/home/stefan/catkin_ws/src/kinematic_calibration/include/common/ObservabilityIndex.h"
+#include "../../include/common/ObservabilityIndex.h"
 
 namespace kinematic_calibration {
 
