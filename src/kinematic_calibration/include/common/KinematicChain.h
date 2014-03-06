@@ -34,6 +34,9 @@ public:
 	 */
 	KinematicChain(const KDL::Tree& tree, std::string root, std::string tip,
 			std::string name = "");
+
+	KinematicChain() {}
+
 	virtual ~KinematicChain();
 
 	/**
