@@ -50,8 +50,6 @@ void MeasurementPoseSet::addMeasurementPoses(vector<MeasurementPose> poses) {
 }
 
 Eigen::MatrixXd MeasurementPoseSet::getJacobian() const {
-	// TODO
-
 	Eigen::MatrixXd jacobian;
 	for (vector<int>::const_iterator it = this->activePoses.begin();
 			it != this->activePoses.end(); it++) {
