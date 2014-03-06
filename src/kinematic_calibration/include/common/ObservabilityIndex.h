@@ -8,6 +8,8 @@
 #ifndef OBSERVABILITYINDEX_H_
 #define OBSERVABILITYINDEX_H_
 
+#include "PoseSet.h"
+
 namespace kinematic_calibration {
 
 /**
@@ -30,7 +32,7 @@ public:
 	 * @param[in] poseSet The pose set for which the index should be calculated.
 	 * @param[out] index The calculated index.
 	 */
-	void calculateIndex(const PoseSet& poseSet, double& index) = 0;
+	virtual void calculateIndex(const PoseSet& poseSet, double& index) = 0;
 };
 
 /**
