@@ -42,7 +42,7 @@ protected:
 	/**
 	 * Initializes the kinematic chain for which the poses should be selected.
 	 */
-	virtual void initiializeKinematicChain();
+	virtual void initializeKinematicChain);
 
 	/**
 	 * Initializes the initial state.

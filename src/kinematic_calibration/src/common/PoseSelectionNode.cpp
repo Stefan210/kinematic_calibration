@@ -41,11 +41,11 @@ PoseSelectionNode::~PoseSelectionNode() {
 
 void PoseSelectionNode::initialize() {
 	this->initializeCamera();
-	this->initiializeKinematicChain();
+	this->initializeKinematicChain();
 	this->initializeState();
 }
 
-void PoseSelectionNode::initiializeKinematicChain() {
+void PoseSelectionNode::initializeKinematicChain() {
 	// instantiate the model loader
 	KDL::Tree kdlTree;
 	modelLoader.initializeFromRos();
