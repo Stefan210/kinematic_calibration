@@ -62,7 +62,7 @@ void PoseSelectionNode::initializeKinematicChain() {
 	nh.getParam("chain_tip", chainTip);
 
 	this->kinematicChainPtr = boost::make_shared<KinematicChain>(kdlTree,
-			chainName, chainRoot, chainTip);
+			chainRoot, chainTip, chainName);
 }
 
 void PoseSelectionNode::initializeState() {
@@ -92,7 +92,7 @@ void PoseSelectionNode::initializeState() {
 
 void PoseSelectionNode::initializeCamera() {
 	// TODO: parameterize!
-	string topic = "/nao_camera/image_raw";
+	string topic = "/nao_camera/camera_info";
 	cameraInfoSubscriber = nh.subscribe(topic, 1,
 			&PoseSelectionNode::camerainfoCallback, this);
 	while (ros::getGlobalCallbackQueue()->isEmpty()) {
@@ -121,16 +121,19 @@ shared_ptr<PoseSet> PoseSelectionNode::getOptimalPoseSet() {
 
 	// calculate the best 50 poses
 	for (int i = 0; i < 50; i++) {
+		cout << "Iteration: " << i << endl;
 		vector<shared_ptr<PoseSet> > successors = poseSet->addPose();
 		for (vector<shared_ptr<PoseSet> >::iterator it = successors.begin();
 				it != successors.end(); it++) {
 			bestIndexValue = -1;
 			double curIndexValue;
 			this->observabilityIndex->calculateIndex(**it, curIndexValue);
-			if(curIndexValue > bestIndexValue) {
+			if (curIndexValue > bestIndexValue) {
 				curIndexValue = bestIndexValue;
 				bestSuccessor = *it;
 			}
+			cout << "Current: " << curIndexValue << " Best: " << bestIndexValue
+					<< endl;
 		}
 	}
 
@@ -179,7 +182,21 @@ void MeasurementMsgPoseSource::measurementCb(
 		const measurementDataConstPtr& msg) {
 	// add the joint states (i.e. the pose) for the respective chain
 	this->poses[msg->chain_name].push_back(msg->jointState);
+	cout << "measurementCb" << endl;
 }
 
 } /* namespace kinematic_calibration */
+
+using namespace kinematic_calibration;
+
+int main(int argc, char** argv) {
+	ros::init(argc, argv, "PoseSelectionNode");
+	//CalibrationContext* context = new RosCalibContext();
+	PoseSelectionNode node;
+	cout << "sleeping..." << endl;
+	usleep(10 * 1e6);
+	cout << "done" << endl;
+	node.getOptimalPoseSet();
+	return 0;
+}
 
