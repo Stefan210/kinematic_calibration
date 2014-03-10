@@ -111,4 +111,37 @@ void PoseSelectionNode::camerainfoCallback(
 		ROS_FATAL("Camera model could not be set!");
 }
 
+MeasurementMsgPoseSource::MeasurementMsgPoseSource() {
+	this->topic = "/kinematic_calibration/measurement_data";
+	this->nh.setCallbackQueue(&callbackQueue);
+	this->measurementSubscriber = nh.subscribe(topic, 1000,
+			&MeasurementMsgPoseSource::measurementCb, this);
+}
+
+MeasurementMsgPoseSource::~MeasurementMsgPoseSource() {
+	// nothing to do
+}
+
+void MeasurementMsgPoseSource::getPoses(const KinematicChain& kinematicChain,
+		vector<MeasurementPose>& poses) {
+	// process all pending messages
+	// TODO: test whether this really works!
+	callbackQueue.callAvailable();
+
+	// add all available poses for the requested chain
+	vector<sensor_msgs::JointState> jointStates =
+			this->poses[kinematicChain.getName()];
+	for (vector<sensor_msgs::JointState>::iterator it = jointStates.begin();
+			it != jointStates.end(); it++) {
+		poses.push_back(MeasurementPose(kinematicChain, *it));
+	}
+}
+
+void MeasurementMsgPoseSource::measurementCb(
+		const measurementDataConstPtr& msg) {
+	// add the joint states (i.e. the pose) for the respective chain
+	this->poses[msg->chain_name].push_back(msg->jointState);
+}
+
 } /* namespace kinematic_calibration */
+

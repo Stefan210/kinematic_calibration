@@ -10,13 +10,24 @@
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <image_geometry/pinhole_camera_model.h>
+#include <kinematic_calibration/measurementData.h>
+#include <ros/callback_queue.h>
 #include <ros/node_handle.h>
+#include <ros/subscriber.h>
+#include <sensor_msgs/CameraInfo.h>
+#include <map>
+#include <string>
+#include <vector>
 
 #include "../optimization/KinematicCalibrationState.h"
 #include "KinematicChain.h"
+#include "MeasurementPose.h"
 #include "ModelLoader.h"
 
 namespace kinematic_calibration {
+
+using namespace std;
+using namespace ros;
 
 /**
  * Node for the selection of poses for the calibration.
@@ -42,7 +53,7 @@ protected:
 	/**
 	 * Initializes the kinematic chain for which the poses should be selected.
 	 */
-	virtual void initializeKinematicChain);
+	virtual void initializeKinematicChain();
 
 	/**
 	 * Initializes the initial state.
@@ -76,23 +87,106 @@ protected:
 	// TODO: observability index strategy
 
 private:
-	void camerainfoCallback(
-			const sensor_msgs::CameraInfoConstPtr& msg);
+	void camerainfoCallback(const sensor_msgs::CameraInfoConstPtr& msg);
 
 	/**
 	 * NodeHandle instance.
 	 */
-	ros::NodeHandle nh;
+	NodeHandle nh;
 
 	/**
 	 * Subscriber for camera info messages.
 	 */
-	ros::Subscriber cameraInfoSubscriber;
+	Subscriber cameraInfoSubscriber;
 
 	/**
 	 * Source for loading the robot model.
 	 */
 	ModelLoader modelLoader;
+};
+
+/**
+ * (Abstract) base class for getting measurement poses.
+ */
+class PoseSource {
+public:
+	/**
+	 * Constructor.
+	 */
+	PoseSource() {
+		// nothing to do
+	}
+
+	/**
+	 * Destructor.
+	 */
+	virtual ~PoseSource() {
+		// nothing to do
+	}
+
+	/**
+	 * Adds poses for the specified kinematic chain to the list.
+	 * The number of poses to be added is unspecified,
+	 * i.e. the poses added can be within the range [0,inf].
+	 * @param[in] kinematicChain The kinematic chain for which new
+	 * 			measurement poses should be added.
+	 * @param[out] poses The list to which the new poses should be added.
+	 */
+	virtual void getPoses(const KinematicChain& kinematicChain,
+			vector<MeasurementPose>& poses) = 0;
+};
+
+/**
+ * Subscribes to the measurement topic and collects the poses.
+ */
+class MeasurementMsgPoseSource: public PoseSource {
+public:
+	/**
+	 * Constructor.
+	 */
+	MeasurementMsgPoseSource();
+
+	/**
+	 * Desctructor.
+	 */
+	virtual ~MeasurementMsgPoseSource();
+
+	virtual void getPoses(const KinematicChain& kinematicChain,
+			vector<MeasurementPose>& poses);
+
+protected:
+	/**
+	 * Callback method for measurement messages.
+	 * @param[in] msg Incoming measurement message.
+	 */
+	void measurementCb(const measurementDataConstPtr& msg);
+
+private:
+	/**
+	 * NodeHandle instance.
+	 */
+	NodeHandle nh;
+
+	/**
+	 * Subscriber for measurement messages.
+	 */
+	Subscriber measurementSubscriber;
+
+	/**
+	 * Topic of the measurements.
+	 */
+	string topic;
+
+	/**
+	 * Collected poses.
+	 */
+	map<string, vector < sensor_msgs::JointState > > poses;
+
+	/**
+	 * Class private callback queue.
+	 */
+	CallbackQueue callbackQueue;
+
 };
 
 } /* namespace kinematic_calibration */
