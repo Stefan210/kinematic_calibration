@@ -22,13 +22,13 @@ PoseSet::~PoseSet() {
 	// TODO Auto-generated destructor stub
 }
 
-MeasurementPoseSet::MeasurementPoseSet(KinematicCalibrationState& state) :
+MeasurementPoseSet::MeasurementPoseSet(const KinematicCalibrationState& state) :
 		numOfPoses(0), state(state), poseSet(
 				shared_ptr<map<int, MeasurementPose> >(
 						new map<int, MeasurementPose>())) {
 }
 
-MeasurementPoseSet::MeasurementPoseSet(KinematicCalibrationState& state,
+MeasurementPoseSet::MeasurementPoseSet(const KinematicCalibrationState& state,
 		shared_ptr<map<int, MeasurementPose> > poseSet, vector<int> activePoses,
 		int numOfPoses) :
 		numOfPoses(numOfPoses), state(state), poseSet(poseSet), activePoses(

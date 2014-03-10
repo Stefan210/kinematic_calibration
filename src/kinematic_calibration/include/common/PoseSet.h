@@ -84,9 +84,9 @@ public:
 	/**
 	 * Constructor.
 	 */
-	MeasurementPoseSet(KinematicCalibrationState& state);
+	MeasurementPoseSet(const KinematicCalibrationState& state);
 
-	MeasurementPoseSet(KinematicCalibrationState& state,
+	MeasurementPoseSet(const KinematicCalibrationState& state,
 			shared_ptr<map<int, MeasurementPose> > poseSet,
 			vector<int> activePoses, int numOfPoses);
 
@@ -125,7 +125,7 @@ private:
 	 */
 	vector<int> activePoses;
 
-	KinematicCalibrationState& state;
+	const KinematicCalibrationState& state;
 
 	int numOfPoses;
 };

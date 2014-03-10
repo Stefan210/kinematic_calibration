@@ -10,8 +10,7 @@
 #include <boost/smart_ptr/make_shared.hpp>
 //#include <kdl/kdl.hpp>
 #include <kdl/tree.hpp>
-#include <opencv2/core/core.hpp>
-#include <opencv2/core/operations.hpp>
+#include <opencv/cv.h>
 #include <ros/callback_queue.h>
 #include <ros/console.h>
 #include <ros/init.h>
@@ -37,6 +36,7 @@ PoseSelectionNode::PoseSelectionNode() {
 	// TODO: inject the following instances:
 	this->poseSource = boost::static_pointer_cast<PoseSource>(
 			boost::make_shared<MeasurementMsgPoseSource>());
+	this->observabilityIndex = boost::make_shared<NoiseAmplificationIndex>();
 }
 
 PoseSelectionNode::~PoseSelectionNode() {
@@ -101,6 +101,40 @@ void PoseSelectionNode::initializeCamera() {
 	}
 	ros::getGlobalCallbackQueue()->callAvailable();
 	cameraInfoSubscriber.shutdown();
+}
+
+shared_ptr<PoseSet> PoseSelectionNode::getOptimalPoseSet() {
+	// TODO: parameterize; strategy pattern; ...
+
+	// initialize the pool of all available poses
+	vector<MeasurementPose> posePool;
+	this->poseSource->getPoses(*this->kinematicChainPtr, posePool);
+
+	// initialize the initial pose set
+	shared_ptr<MeasurementPoseSet> poseSet = make_shared<MeasurementPoseSet>(
+			*this->initialState);
+	poseSet->addMeasurementPoses(posePool);
+
+	// best successor
+	shared_ptr<PoseSet> bestSuccessor;
+	double bestIndexValue = 0;
+
+	// calculate the best 50 poses
+	for (int i = 0; i < 50; i++) {
+		vector<shared_ptr<PoseSet> > successors = poseSet->addPose();
+		for (vector<shared_ptr<PoseSet> >::iterator it = successors.begin();
+				it != successors.end(); it++) {
+			bestIndexValue = -1;
+			double curIndexValue;
+			this->observabilityIndex->calculateIndex(**it, curIndexValue);
+			if(curIndexValue > bestIndexValue) {
+				curIndexValue = bestIndexValue;
+				bestSuccessor = *it;
+			}
+		}
+	}
+
+	return bestSuccessor;
 }
 
 void PoseSelectionNode::camerainfoCallback(

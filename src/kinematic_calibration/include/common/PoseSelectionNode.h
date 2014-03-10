@@ -23,6 +23,7 @@
 #include "KinematicChain.h"
 #include "MeasurementPose.h"
 #include "ModelLoader.h"
+#include "ObservabilityIndex.h"
 
 namespace kinematic_calibration {
 
@@ -51,6 +52,12 @@ public:
 	 * Initializes from ROS.
 	 */
 	void initialize();
+
+	/**
+	 * Determines the optimal pose set and returns it.
+	 * @return The optimal pose set.
+	 */
+	shared_ptr<PoseSet> getOptimalPoseSet();
 
 protected:
 	/**
@@ -87,8 +94,10 @@ protected:
 	boost::shared_ptr<PoseSource> poseSource;
 
 	// TODO: strategy for pose selection
+	// (currently no strategy pattern is used at all!)
 
-	// TODO: observability index strategy
+	// observability index
+	boost::shared_ptr<ObservabilityIndex> observabilityIndex;
 
 private:
 	void camerainfoCallback(const sensor_msgs::CameraInfoConstPtr& msg);
@@ -184,7 +193,7 @@ private:
 	/**
 	 * Collected poses.
 	 */
-	map<string, vector < sensor_msgs::JointState > > poses;
+	map<string, vector<sensor_msgs::JointState> > poses;
 
 	/**
 	 * Class private callback queue.
