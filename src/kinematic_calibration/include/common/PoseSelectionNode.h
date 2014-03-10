@@ -29,6 +29,9 @@ namespace kinematic_calibration {
 using namespace std;
 using namespace ros;
 
+// forward declaration
+class PoseSource;
+
 /**
  * Node for the selection of poses for the calibration.
  */
@@ -80,7 +83,8 @@ protected:
 	 */
 	image_geometry::PinholeCameraModel cameraModel;
 
-	// TODO: source of poses / set of poses
+	// source of poses / set of poses
+	boost::shared_ptr<PoseSource> poseSource;
 
 	// TODO: strategy for pose selection
 

@@ -33,6 +33,10 @@ using namespace std;
 
 PoseSelectionNode::PoseSelectionNode() {
 	initialize();
+
+	// TODO: inject the following instances:
+	this->poseSource = boost::static_pointer_cast<PoseSource>(
+			boost::make_shared<MeasurementMsgPoseSource>());
 }
 
 PoseSelectionNode::~PoseSelectionNode() {
