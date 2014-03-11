@@ -117,23 +117,21 @@ shared_ptr<PoseSet> PoseSelectionNode::getOptimalPoseSet() {
 
 	// best successor
 	shared_ptr<PoseSet> bestSuccessor;
-	double bestIndexValue = 0;
+	double bestIndexValue = -1;
 
 	// calculate the best 50 poses
-	for (int i = 0; i < 50; i++) {
-		cout << "Iteration: " << i << endl;
+	for (int i = 0; i < 5; i++) {
+		cout << "Iteration: " << i << " index value: " << bestIndexValue << endl;
+		bestIndexValue = -1;
 		vector<shared_ptr<PoseSet> > successors = poseSet->addPose();
 		for (vector<shared_ptr<PoseSet> >::iterator it = successors.begin();
 				it != successors.end(); it++) {
-			bestIndexValue = -1;
 			double curIndexValue;
 			this->observabilityIndex->calculateIndex(**it, curIndexValue);
 			if (curIndexValue > bestIndexValue) {
-				curIndexValue = bestIndexValue;
+				bestIndexValue = curIndexValue;
 				bestSuccessor = *it;
 			}
-			cout << "Current: " << curIndexValue << " Best: " << bestIndexValue
-					<< endl;
 		}
 	}
 
