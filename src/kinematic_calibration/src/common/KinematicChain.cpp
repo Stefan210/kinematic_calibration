@@ -29,8 +29,8 @@ KinematicChain::KinematicChain(const KDL::Tree& tree, std::string root,
 	if (!tree.getChain(root, tip, this->chain)) {
 		ROS_ERROR("Could not extract the chain!");
 	}
-	ROS_INFO("Extracted kinematic chain with %u segments and %u joints.",
-			this->chain.getNrOfSegments(), this->chain.getNrOfJoints());
+	//ROS_INFO("Extracted kinematic chain with %u segments and %u joints.",
+	//		this->chain.getNrOfSegments(), this->chain.getNrOfJoints());
 }
 
 KinematicChain::~KinematicChain() {
@@ -210,9 +210,9 @@ void KinematicChain::getJointNames(vector<string>& jointNames) const {
 		KDL::Joint joint = segment.getJoint();
 		if (joint.getType() != KDL::Joint::None) {
 			jointNames.push_back(joint.getName());
-			ROS_INFO("Added joint name %s", joint.getName().c_str());
+			//ROS_INFO("Added joint name %s", joint.getName().c_str());
 		} else {
-			ROS_INFO("Fixed joint %s", joint.getName().c_str());
+			//ROS_INFO("Fixed joint %s", joint.getName().c_str());
 		}
 	}
 }
