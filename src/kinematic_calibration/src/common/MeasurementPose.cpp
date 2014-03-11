@@ -13,6 +13,8 @@
 #include <utility>
 #include <vector>
 
+#include <gsl/gsl_deriv.h>
+
 #include "../../include/common/FrameImageConverter.h"
 #include "../../include/common/KinematicChain.h"
 #include "../../include/optimization/KinematicCalibrationState.h"
@@ -113,14 +115,19 @@ void MeasurementPose::getPartialDerivatives(
 			partialDerivatesVectorY);
 
 	// convert to Eigen vector
+	derivativesX.resize(1,
+			derivativesX.size() + partialDerivatesVectorX.size());
+	derivativesY.resize(1,
+			derivativesY.size() + partialDerivatesVectorY.size());
 	for (int i = 0; i < partialDerivatesVectorX.size(); i++) {
-		derivativesX << partialDerivatesVectorX[i];
-		derivativesY << partialDerivatesVectorY[i];
+		derivativesX.col(i) << partialDerivatesVectorX[i];
+		derivativesY.col(i) << partialDerivatesVectorY[i];
 	}
 
 	// append two rows to the jacobian matrix
-	derivatives << derivativesX;
-	derivatives << derivativesY;
+	derivatives.resize(derivatives.rows() + 2, derivativesX.cols());
+	derivatives.row(derivatives.rows() - 2) << derivativesX;
+	derivatives.row(derivatives.rows() - 1) << derivativesY;
 }
 
 void MeasurementPose::calcCameraIntrinsicsDerivatives(
