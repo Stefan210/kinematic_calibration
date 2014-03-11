@@ -41,7 +41,7 @@ public:
 	/**
 	 * Constructor.
 	 */
-	PoseSelectionNode();
+	PoseSelectionNode(PoseSource& poseSource);
 
 	/**
 	 * Desctructor.
@@ -91,7 +91,7 @@ protected:
 	image_geometry::PinholeCameraModel cameraModel;
 
 	// source of poses / set of poses
-	boost::shared_ptr<PoseSource> poseSource;
+	PoseSource& poseSource;
 
 	// TODO: strategy for pose selection
 	// (currently no strategy pattern is used at all!)

@@ -30,12 +30,10 @@ namespace kinematic_calibration {
 
 using namespace std;
 
-PoseSelectionNode::PoseSelectionNode() {
+PoseSelectionNode::PoseSelectionNode(PoseSource& poseSource) : poseSource(poseSource) {
 	initialize();
 
 	// TODO: inject the following instances:
-	this->poseSource = boost::static_pointer_cast<PoseSource>(
-			boost::make_shared<MeasurementMsgPoseSource>());
 	this->observabilityIndex = boost::make_shared<NoiseAmplificationIndex>();
 }
 
@@ -108,7 +106,7 @@ shared_ptr<PoseSet> PoseSelectionNode::getOptimalPoseSet() {
 
 	// initialize the pool of all available poses
 	vector<MeasurementPose> posePool;
-	this->poseSource->getPoses(*this->kinematicChainPtr, posePool);
+	this->poseSource.getPoses(*this->kinematicChainPtr, posePool);
 
 	// initialize the initial pose set
 	shared_ptr<MeasurementPoseSet> poseSet = make_shared<MeasurementPoseSet>(
@@ -190,11 +188,11 @@ using namespace kinematic_calibration;
 int main(int argc, char** argv) {
 	ros::init(argc, argv, "PoseSelectionNode");
 	//CalibrationContext* context = new RosCalibContext();
-	PoseSelectionNode node;
+	MeasurementMsgPoseSource* poseSource = new MeasurementMsgPoseSource();
+	PoseSelectionNode node(*poseSource);
 	cout << "sleeping..." << endl;
 	usleep(10 * 1e6);
 	cout << "done" << endl;
 	node.getOptimalPoseSet();
 	return 0;
 }
-
