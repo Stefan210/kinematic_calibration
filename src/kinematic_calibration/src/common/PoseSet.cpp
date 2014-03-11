@@ -54,9 +54,13 @@ Eigen::MatrixXd MeasurementPoseSet::getJacobian() const {
 	for (vector<int>::const_iterator it = this->activePoses.begin();
 			it != this->activePoses.end(); it++) {
 		Eigen::MatrixXd derivativesVector;
-		(*this->poseSet)[*it].getPartialDerivatives(state,
-				derivativesVector);
-		jacobian << derivativesVector;
+		(*this->poseSet)[*it].getPartialDerivatives(state, derivativesVector);
+		jacobian.resize(jacobian.rows() + derivativesVector.rows(),
+				derivativesVector.cols());
+		for (int row = 0; row < derivativesVector.rows(); row++) {
+			jacobian.row(jacobian.rows() - derivativesVector.rows() + row)
+					<< derivativesVector.row(row);
+		}
 	}
 	return jacobian;
 }
