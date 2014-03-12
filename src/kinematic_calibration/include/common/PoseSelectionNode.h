@@ -274,6 +274,23 @@ public:
 			shared_ptr<ObservabilityIndex> observabilityIndex);
 };
 
+class RandomPoseSelectionStrategy {
+public:
+	RandomPoseSelectionStrategy(const int& numOfPoses);
+	virtual ~RandomPoseSelectionStrategy() {
+	}
+
+	/**
+	 * Determines the optimal pose set and returns it.
+	 * @return The optimal pose set.
+	 */
+	shared_ptr<PoseSet> getOptimalPoseSet(shared_ptr<PoseSet> initialPoseSet,
+			shared_ptr<ObservabilityIndex> observabilityIndex);
+
+private:
+	int numOfPoses;
+};
+
 } /* namespace kinematic_calibration */
 
 #endif /* POSESELECTIONNODE_H_ */

@@ -114,12 +114,20 @@ shared_ptr<PoseSet> PoseSelectionNode::getOptimalPoseSet() {
 			*this->initialState);
 	poseSet->addMeasurementPoses(posePool);
 
-
 	ROS_INFO("Calculating optimal pose set for chain %s",
 			this->kinematicChainPtr->getName().c_str());
 
+	shared_ptr<PoseSet> resultSet = poseSet;
+
+	// initialize with 30 random poses
+	RandomPoseSelectionStrategy intializingStrategy(30);
+	resultSet = intializingStrategy.getOptimalPoseSet(resultSet, observabilityIndex);
+
+	// add 10 more optimal poses
 	IncrementalPoseSelectionStrategy selectionStrategy(10);
-	return selectionStrategy.getOptimalPoseSet(poseSet, observabilityIndex);
+	resultSet = selectionStrategy.getOptimalPoseSet(resultSet, observabilityIndex);
+
+	return resultSet;
 }
 
 IncrementalPoseSelectionStrategy::IncrementalPoseSelectionStrategy(
@@ -152,6 +160,20 @@ shared_ptr<PoseSet> IncrementalPoseSelectionStrategy::getOptimalPoseSet(
 	}
 
 	return bestSuccessor;
+}
+
+RandomPoseSelectionStrategy::RandomPoseSelectionStrategy(const int& numOfPoses) :
+		numOfPoses(numOfPoses) {
+}
+
+shared_ptr<PoseSet> RandomPoseSelectionStrategy::getOptimalPoseSet(
+		shared_ptr<PoseSet> initialPoseSet,
+		shared_ptr<ObservabilityIndex> observabilityIndex) {
+	shared_ptr<PoseSet> successor = initialPoseSet;
+	while (successor->getNumberOfPoses() < numOfPoses) {
+		successor = successor->addPose()[0];
+	}
+	return successor;
 }
 
 shared_ptr<PoseSet> ExchangePoseSelectionStrategy::getOptimalPoseSet(
