@@ -30,7 +30,8 @@ namespace kinematic_calibration {
 
 using namespace std;
 
-PoseSelectionNode::PoseSelectionNode(PoseSource& poseSource) : poseSource(poseSource) {
+PoseSelectionNode::PoseSelectionNode(PoseSource& poseSource) :
+		poseSource(poseSource) {
 	initialize();
 
 	// TODO: inject the following instances:
@@ -117,9 +118,13 @@ shared_ptr<PoseSet> PoseSelectionNode::getOptimalPoseSet() {
 	shared_ptr<PoseSet> bestSuccessor;
 	double bestIndexValue = -1;
 
+	ROS_INFO("Calculating optimal pose set for chain %s",
+			this->kinematicChainPtr->getName().c_str());
+
 	// calculate the best 50 poses
-	for (int i = 0; i < 5; i++) {
-		cout << "Iteration: " << i << " index value: " << bestIndexValue << endl;
+	for (int i = 0; i < 50; i++) {
+		cout << "Iteration: " << i << " index value: " << bestIndexValue
+				<< " size: " << poseSet->getNumberOfPoses() << endl;
 		bestIndexValue = -1;
 		vector<shared_ptr<PoseSet> > successors = poseSet->addPose();
 		for (vector<shared_ptr<PoseSet> >::iterator it = successors.begin();
@@ -148,11 +153,16 @@ void PoseSelectionNode::camerainfoCallback(
 		ROS_FATAL("Camera model could not be set!");
 }
 
-MeasurementMsgPoseSource::MeasurementMsgPoseSource() {
+MeasurementMsgPoseSource::MeasurementMsgPoseSource() :
+		collectingData(false) {
 	this->topic = "/kinematic_calibration/measurement_data";
 	this->nh.setCallbackQueue(&callbackQueue);
 	this->measurementSubscriber = nh.subscribe(topic, 1000,
 			&MeasurementMsgPoseSource::measurementCb, this);
+
+	this->msgService = nh.advertiseService(
+			"/kinematic_calibration/stop_collecting",
+			&MeasurementMsgPoseSource::stopCollectingCallback, this);
 }
 
 MeasurementMsgPoseSource::~MeasurementMsgPoseSource() {
@@ -162,8 +172,7 @@ MeasurementMsgPoseSource::~MeasurementMsgPoseSource() {
 void MeasurementMsgPoseSource::getPoses(const KinematicChain& kinematicChain,
 		vector<MeasurementPose>& poses) {
 	// process all pending messages
-	// TODO: test whether this really works!
-	callbackQueue.callAvailable();
+	collectData();
 
 	// add all available poses for the requested chain
 	vector<sensor_msgs::JointState> jointStates =
@@ -178,7 +187,22 @@ void MeasurementMsgPoseSource::measurementCb(
 		const measurementDataConstPtr& msg) {
 	// add the joint states (i.e. the pose) for the respective chain
 	this->poses[msg->chain_name].push_back(msg->jointState);
-	cout << "measurementCb" << endl;
+	ROS_INFO("Measurement data received (#%ld).",
+			this->poses[msg->chain_name].size());
+}
+
+void MeasurementMsgPoseSource::collectData() {
+	collectingData = true;
+	while (collectingData) {
+		this->callbackQueue.callAvailable();
+	}
+}
+
+bool MeasurementMsgPoseSource::stopCollectingCallback(
+		std_srvs::Empty::Request& request,
+		std_srvs::Empty::Response& response) {
+	this->collectingData = false;
+	return true;
 }
 
 } /* namespace kinematic_calibration */
@@ -190,9 +214,6 @@ int main(int argc, char** argv) {
 	//CalibrationContext* context = new RosCalibContext();
 	MeasurementMsgPoseSource* poseSource = new MeasurementMsgPoseSource();
 	PoseSelectionNode node(*poseSource);
-	cout << "sleeping..." << endl;
-	usleep(10 * 1e6);
-	cout << "done" << endl;
 	node.getOptimalPoseSet();
 	return 0;
 }

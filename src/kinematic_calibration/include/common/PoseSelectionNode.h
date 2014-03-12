@@ -14,6 +14,8 @@
 #include <ros/callback_queue.h>
 #include <ros/node_handle.h>
 #include <ros/subscriber.h>
+#include <ros/service_server.h>
+#include <std_srvs/Empty.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <map>
 #include <string>
@@ -174,6 +176,20 @@ protected:
 	 */
 	void measurementCb(const measurementDataConstPtr& msg);
 
+	/**
+	 * Calls all pending callbacks in the callback queue.
+	 */
+	void collectData();
+
+	/**
+	 * Stops the collecting of measurements.
+	 * @param request -
+	 * @param response -
+	 * @return Always true.
+	 */
+	bool stopCollectingCallback(std_srvs::Empty::Request& request,
+			std_srvs::Empty::Response& response);
+
 private:
 	/**
 	 * NodeHandle instance.
@@ -200,6 +216,15 @@ private:
 	 */
 	CallbackQueue callbackQueue;
 
+	/**
+	 * Service to stop collecting measurement messages.
+	 */
+	ServiceServer msgService;
+
+	/**
+	 * Flag that indicates whether data is being collected.
+	 */
+	bool collectingData;
 };
 
 } /* namespace kinematic_calibration */
