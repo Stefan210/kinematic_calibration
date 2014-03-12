@@ -238,11 +238,12 @@ public:
 	 * Determines the optimal pose set and returns it.
 	 * @return The optimal pose set.
 	 */
-	virtual shared_ptr<PoseSet> getOptimalPoseSet(shared_ptr<PoseSet> initialPoseSet,
+	virtual shared_ptr<PoseSet> getOptimalPoseSet(
+			shared_ptr<PoseSet> initialPoseSet,
 			shared_ptr<ObservabilityIndex> observabilityIndex) = 0;
 };
 
-class IncrementalPoseSelectionStrategy {
+class IncrementalPoseSelectionStrategy: public PoseSelectionStrategy {
 public:
 	IncrementalPoseSelectionStrategy(const int& numOfPoses);
 	virtual ~IncrementalPoseSelectionStrategy() {
@@ -259,7 +260,7 @@ private:
 	int numOfPoses;
 };
 
-class ExchangePoseSelectionStrategy {
+class ExchangePoseSelectionStrategy: public PoseSelectionStrategy {
 public:
 	ExchangePoseSelectionStrategy() {
 	}
@@ -274,7 +275,7 @@ public:
 			shared_ptr<ObservabilityIndex> observabilityIndex);
 };
 
-class RandomPoseSelectionStrategy {
+class RandomPoseSelectionStrategy: public PoseSelectionStrategy {
 public:
 	RandomPoseSelectionStrategy(const int& numOfPoses);
 	virtual ~RandomPoseSelectionStrategy() {
@@ -289,6 +290,26 @@ public:
 
 private:
 	int numOfPoses;
+};
+
+class ExchangeAddExchangePoseSelectionStrategy: public PoseSelectionStrategy {
+public:
+	ExchangeAddExchangePoseSelectionStrategy(const int& initialSize,
+			const int& finalSize);
+	virtual ~ExchangeAddExchangePoseSelectionStrategy() {
+	}
+
+	/**
+	 * Determines the optimal pose set and returns it.
+	 * @return The optimal pose set.
+	 */
+	shared_ptr<PoseSet> getOptimalPoseSet(shared_ptr<PoseSet> initialPoseSet,
+			shared_ptr<ObservabilityIndex> observabilityIndex);
+
+private:
+	int initialSize;
+	int finalSize;
+
 };
 
 } /* namespace kinematic_calibration */

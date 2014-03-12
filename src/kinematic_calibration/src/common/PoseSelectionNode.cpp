@@ -120,12 +120,20 @@ shared_ptr<PoseSet> PoseSelectionNode::getOptimalPoseSet() {
 	shared_ptr<PoseSet> resultSet = poseSet;
 
 	// initialize with 30 random poses
-	RandomPoseSelectionStrategy intializingStrategy(30);
-	resultSet = intializingStrategy.getOptimalPoseSet(resultSet, observabilityIndex);
+//	ROS_INFO("Initializing pose set with random poses...");
+//	RandomPoseSelectionStrategy intializingStrategy(30);
+//	resultSet = intializingStrategy.getOptimalPoseSet(resultSet,
+//			observabilityIndex);
 
 	// add 10 more optimal poses
-	IncrementalPoseSelectionStrategy selectionStrategy(10);
-	resultSet = selectionStrategy.getOptimalPoseSet(resultSet, observabilityIndex);
+	//IncrementalPoseSelectionStrategy selectionStrategy(10);
+	//resultSet = selectionStrategy.getOptimalPoseSet(resultSet,
+	//		observabilityIndex);
+
+	// optimize by adding and exchanging
+	ROS_INFO("Optimizing pose set with add & exchange strategy...");
+	ExchangeAddExchangePoseSelectionStrategy eaeStrategy(30, 50);
+	resultSet = eaeStrategy.getOptimalPoseSet(resultSet, observabilityIndex);
 
 	return resultSet;
 }
@@ -144,8 +152,6 @@ shared_ptr<PoseSet> IncrementalPoseSelectionStrategy::getOptimalPoseSet(
 
 	// calculate the best n poses
 	for (int i = 0; i < numOfPoses; i++) {
-		cout << "Iteration: " << i << " index value: " << bestIndexValue
-				<< " size: " << bestSuccessor->getNumberOfPoses() << endl;
 		bestIndexValue = -1;
 		vector<shared_ptr<PoseSet> > successors = bestSuccessor->addPose();
 		for (vector<shared_ptr<PoseSet> >::iterator it = successors.begin();
@@ -157,6 +163,8 @@ shared_ptr<PoseSet> IncrementalPoseSelectionStrategy::getOptimalPoseSet(
 				bestSuccessor = *it;
 			}
 		}
+		cout << "Iteration: " << i << " index value: " << bestIndexValue
+				<< " size: " << bestSuccessor->getNumberOfPoses() << endl;
 	}
 
 	return bestSuccessor;
@@ -179,8 +187,88 @@ shared_ptr<PoseSet> RandomPoseSelectionStrategy::getOptimalPoseSet(
 shared_ptr<PoseSet> ExchangePoseSelectionStrategy::getOptimalPoseSet(
 		shared_ptr<PoseSet> initialPoseSet,
 		shared_ptr<ObservabilityIndex> observabilityIndex) {
-	// TODO
-	return initialPoseSet;
+	// best successor
+	shared_ptr<PoseSet> bestSuccessor = initialPoseSet;
+	double bestIndexValue = -1, oldIndexValue = -2;
+
+	vector<shared_ptr<PoseSet> > successors;
+	bool converged = false;
+
+	while (!converged) {
+
+		oldIndexValue = bestIndexValue;
+
+		// (n) -> (n+1)
+		bestIndexValue = -1;
+		successors = bestSuccessor->addPose();
+		for (vector<shared_ptr<PoseSet> >::iterator it = successors.begin();
+				it != successors.end(); it++) {
+			double curIndexValue;
+			observabilityIndex->calculateIndex(**it, curIndexValue);
+			if (curIndexValue > bestIndexValue) {
+				bestIndexValue = curIndexValue;
+				bestSuccessor = *it;
+			}
+		}
+
+		ROS_INFO("Index n+1: %f", bestIndexValue);
+
+		// (n+1) -> (n)'
+		bestIndexValue = -1;
+		successors = bestSuccessor->removePose();
+		for (vector<shared_ptr<PoseSet> >::iterator it = successors.begin();
+				it != successors.end(); it++) {
+			double curIndexValue;
+			observabilityIndex->calculateIndex(**it, curIndexValue);
+			if (curIndexValue > bestIndexValue) {
+				bestIndexValue = curIndexValue;
+				bestSuccessor = *it;
+			}
+		}
+
+		ROS_INFO("Index n': %f", bestIndexValue);
+
+		if (fabs(oldIndexValue - bestIndexValue) < 1e-6) {
+			converged = true;
+		}
+
+	}
+
+	return bestSuccessor;
+}
+
+ExchangeAddExchangePoseSelectionStrategy::ExchangeAddExchangePoseSelectionStrategy(
+		const int& initialSize, const int& finalSize) :
+		initialSize(initialSize), finalSize(finalSize) {
+}
+
+shared_ptr<PoseSet> ExchangeAddExchangePoseSelectionStrategy::getOptimalPoseSet(
+		shared_ptr<PoseSet> initialPoseSet,
+		shared_ptr<ObservabilityIndex> observabilityIndex) {
+	shared_ptr<PoseSet> resultSet = initialPoseSet;
+
+	ROS_INFO("Initializing pose set with random poses...");
+	RandomPoseSelectionStrategy intializingStrategy(this->initialSize);
+	resultSet = intializingStrategy.getOptimalPoseSet(resultSet,
+			observabilityIndex);
+
+	// optimize by adding and exchanging
+	IncrementalPoseSelectionStrategy incrementalStrategy(1);
+	ExchangePoseSelectionStrategy exchangeStrategy;
+	ROS_INFO("Optimize pose set...");
+	resultSet = exchangeStrategy.getOptimalPoseSet(resultSet,
+			observabilityIndex);
+	for (int i = this->initialSize; i < this->finalSize; i++) {
+		ROS_INFO("Increment pose set size...", i);
+		resultSet = incrementalStrategy.getOptimalPoseSet(resultSet,
+				observabilityIndex);
+
+	}
+	ROS_INFO("Optimize pose set...");
+	resultSet = exchangeStrategy.getOptimalPoseSet(resultSet,
+			observabilityIndex);
+
+	return resultSet;
 }
 
 void PoseSelectionNode::camerainfoCallback(
