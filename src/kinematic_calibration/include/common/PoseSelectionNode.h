@@ -227,6 +227,53 @@ private:
 	bool collectingData;
 };
 
+class PoseSelectionStrategy {
+public:
+	PoseSelectionStrategy() {
+	}
+	virtual ~PoseSelectionStrategy() {
+	}
+
+	/**
+	 * Determines the optimal pose set and returns it.
+	 * @return The optimal pose set.
+	 */
+	virtual shared_ptr<PoseSet> getOptimalPoseSet(shared_ptr<PoseSet> initialPoseSet,
+			shared_ptr<ObservabilityIndex> observabilityIndex) = 0;
+};
+
+class IncrementalPoseSelectionStrategy {
+public:
+	IncrementalPoseSelectionStrategy(const int& numOfPoses);
+	virtual ~IncrementalPoseSelectionStrategy() {
+	}
+
+	/**
+	 * Determines the optimal pose set and returns it.
+	 * @return The optimal pose set.
+	 */
+	shared_ptr<PoseSet> getOptimalPoseSet(shared_ptr<PoseSet> initialPoseSet,
+			shared_ptr<ObservabilityIndex> observabilityIndex);
+
+private:
+	int numOfPoses;
+};
+
+class ExchangePoseSelectionStrategy {
+public:
+	ExchangePoseSelectionStrategy() {
+	}
+	virtual ~ExchangePoseSelectionStrategy() {
+	}
+
+	/**
+	 * Determines the optimal pose set and returns it.
+	 * @return The optimal pose set.
+	 */
+	shared_ptr<PoseSet> getOptimalPoseSet(shared_ptr<PoseSet> initialPoseSet,
+			shared_ptr<ObservabilityIndex> observabilityIndex);
+};
+
 } /* namespace kinematic_calibration */
 
 #endif /* POSESELECTIONNODE_H_ */

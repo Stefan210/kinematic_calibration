@@ -114,23 +114,36 @@ shared_ptr<PoseSet> PoseSelectionNode::getOptimalPoseSet() {
 			*this->initialState);
 	poseSet->addMeasurementPoses(posePool);
 
-	// best successor
-	shared_ptr<PoseSet> bestSuccessor;
-	double bestIndexValue = -1;
 
 	ROS_INFO("Calculating optimal pose set for chain %s",
 			this->kinematicChainPtr->getName().c_str());
 
-	// calculate the best 50 poses
-	for (int i = 0; i < 50; i++) {
+	IncrementalPoseSelectionStrategy selectionStrategy(10);
+	return selectionStrategy.getOptimalPoseSet(poseSet, observabilityIndex);
+}
+
+IncrementalPoseSelectionStrategy::IncrementalPoseSelectionStrategy(
+		const int& numOfPoses) :
+		numOfPoses(numOfPoses) {
+}
+
+shared_ptr<PoseSet> IncrementalPoseSelectionStrategy::getOptimalPoseSet(
+		shared_ptr<PoseSet> initialPoseSet,
+		shared_ptr<ObservabilityIndex> observabilityIndex) {
+	// best successor
+	shared_ptr<PoseSet> bestSuccessor = initialPoseSet;
+	double bestIndexValue = -1;
+
+	// calculate the best n poses
+	for (int i = 0; i < numOfPoses; i++) {
 		cout << "Iteration: " << i << " index value: " << bestIndexValue
-				<< " size: " << poseSet->getNumberOfPoses() << endl;
+				<< " size: " << bestSuccessor->getNumberOfPoses() << endl;
 		bestIndexValue = -1;
-		vector<shared_ptr<PoseSet> > successors = poseSet->addPose();
+		vector<shared_ptr<PoseSet> > successors = bestSuccessor->addPose();
 		for (vector<shared_ptr<PoseSet> >::iterator it = successors.begin();
 				it != successors.end(); it++) {
 			double curIndexValue;
-			this->observabilityIndex->calculateIndex(**it, curIndexValue);
+			observabilityIndex->calculateIndex(**it, curIndexValue);
 			if (curIndexValue > bestIndexValue) {
 				bestIndexValue = curIndexValue;
 				bestSuccessor = *it;
@@ -139,6 +152,13 @@ shared_ptr<PoseSet> PoseSelectionNode::getOptimalPoseSet() {
 	}
 
 	return bestSuccessor;
+}
+
+shared_ptr<PoseSet> ExchangePoseSelectionStrategy::getOptimalPoseSet(
+		shared_ptr<PoseSet> initialPoseSet,
+		shared_ptr<ObservabilityIndex> observabilityIndex) {
+	// TODO
+	return initialPoseSet;
 }
 
 void PoseSelectionNode::camerainfoCallback(
@@ -217,3 +237,4 @@ int main(int argc, char** argv) {
 	node.getOptimalPoseSet();
 	return 0;
 }
+
