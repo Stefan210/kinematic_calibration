@@ -169,6 +169,13 @@ public:
 	virtual void getPoses(const KinematicChain& kinematicChain,
 			vector<MeasurementPose>& poses);
 
+	/**
+	 * For the given joint states, returns the corresponding pose ids.
+	 * @param jointStates The given joint states.
+	 * @return The corresponding pose ids.
+	 */
+	vector<string> getPoseIds(vector<sensor_msgs::JointState> jointStates);
+
 protected:
 	/**
 	 * Callback method for measurement messages.
@@ -210,6 +217,8 @@ private:
 	 * Collected poses.
 	 */
 	map<string, vector<sensor_msgs::JointState> > poses;
+
+	map<ros::Time, string> ids;
 
 	/**
 	 * Class private callback queue.

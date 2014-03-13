@@ -132,7 +132,7 @@ shared_ptr<PoseSet> PoseSelectionNode::getOptimalPoseSet() {
 
 	// optimize by adding and exchanging
 	ROS_INFO("Optimizing pose set with add & exchange strategy...");
-	ExchangeAddExchangePoseSelectionStrategy eaeStrategy(30, 50);
+	ExchangeAddExchangePoseSelectionStrategy eaeStrategy(1, 50);
 	resultSet = eaeStrategy.getOptimalPoseSet(resultSet, observabilityIndex);
 
 	return resultSet;
@@ -158,7 +158,7 @@ shared_ptr<PoseSet> IncrementalPoseSelectionStrategy::getOptimalPoseSet(
 				it != successors.end(); it++) {
 			double curIndexValue;
 			observabilityIndex->calculateIndex(**it, curIndexValue);
-			if (curIndexValue > bestIndexValue) {
+			if (bestIndexValue ==  -1 || curIndexValue > bestIndexValue) {
 				bestIndexValue = curIndexValue;
 				bestSuccessor = *it;
 			}
@@ -201,11 +201,12 @@ shared_ptr<PoseSet> ExchangePoseSelectionStrategy::getOptimalPoseSet(
 		// (n) -> (n+1)
 		bestIndexValue = -1;
 		successors = bestSuccessor->addPose();
+		cout << "successors: " << successors.size() << endl;
 		for (vector<shared_ptr<PoseSet> >::iterator it = successors.begin();
 				it != successors.end(); it++) {
 			double curIndexValue;
 			observabilityIndex->calculateIndex(**it, curIndexValue);
-			if (curIndexValue > bestIndexValue) {
+			if (bestIndexValue == -1 || curIndexValue > bestIndexValue) {
 				bestIndexValue = curIndexValue;
 				bestSuccessor = *it;
 			}
@@ -216,11 +217,12 @@ shared_ptr<PoseSet> ExchangePoseSelectionStrategy::getOptimalPoseSet(
 		// (n+1) -> (n)'
 		bestIndexValue = -1;
 		successors = bestSuccessor->removePose();
+		cout << "successors: " << successors.size() << endl;
 		for (vector<shared_ptr<PoseSet> >::iterator it = successors.begin();
 				it != successors.end(); it++) {
 			double curIndexValue;
 			observabilityIndex->calculateIndex(**it, curIndexValue);
-			if (curIndexValue > bestIndexValue) {
+			if (bestIndexValue == -1 || curIndexValue > bestIndexValue) {
 				bestIndexValue = curIndexValue;
 				bestSuccessor = *it;
 			}
@@ -228,7 +230,7 @@ shared_ptr<PoseSet> ExchangePoseSelectionStrategy::getOptimalPoseSet(
 
 		ROS_INFO("Index n': %f", bestIndexValue);
 
-		if (fabs(oldIndexValue - bestIndexValue) < 1e-6) {
+		if (fabs(oldIndexValue - bestIndexValue) < 1e-10) {
 			converged = true;
 		}
 
@@ -317,6 +319,7 @@ void MeasurementMsgPoseSource::measurementCb(
 		const measurementDataConstPtr& msg) {
 	// add the joint states (i.e. the pose) for the respective chain
 	this->poses[msg->chain_name].push_back(msg->jointState);
+	this->ids[msg->jointState.header.stamp] = msg->id;
 	ROS_INFO("Measurement data received (#%ld).",
 			this->poses[msg->chain_name].size());
 }
@@ -332,7 +335,21 @@ bool MeasurementMsgPoseSource::stopCollectingCallback(
 		std_srvs::Empty::Request& request,
 		std_srvs::Empty::Response& response) {
 	this->collectingData = false;
+	this->measurementSubscriber.shutdown();
 	return true;
+}
+
+vector<string> MeasurementMsgPoseSource::getPoseIds(
+		vector<sensor_msgs::JointState> jointStates) {
+	vector<string> ids;
+	for (vector<sensor_msgs::JointState>::iterator it = jointStates.begin();
+			it != jointStates.end(); it++) {
+		if (this->ids.count(it->header.stamp)) {
+			ids.push_back(this->ids[it->header.stamp]);
+		}
+	}
+
+	return ids;
 }
 
 } /* namespace kinematic_calibration */
@@ -340,11 +357,26 @@ bool MeasurementMsgPoseSource::stopCollectingCallback(
 using namespace kinematic_calibration;
 
 int main(int argc, char** argv) {
-	ros::init(argc, argv, "PoseSelectionNode");
+	stringstream nodeName;
+	ros::Time::init();
+	nodeName << "PoseSelectionNode";
+	nodeName << ros::Time::now().nsec;
+	ros::init(argc, argv, nodeName.str().c_str());
 	//CalibrationContext* context = new RosCalibContext();
 	MeasurementMsgPoseSource* poseSource = new MeasurementMsgPoseSource();
 	PoseSelectionNode node(*poseSource);
-	node.getOptimalPoseSet();
+	shared_ptr<PoseSet> poses = node.getOptimalPoseSet();
+	vector<string> ids = poseSource->getPoseIds(poses->getPoses());
+	cout << "Optimized pose ids: " << endl;
+	for (int i = 0; i < ids.size(); i++) {
+		cout << ids[i] << ", ";
+	}
+	cout << endl;
+	ids = poseSource->getPoseIds(poses->getUnusedPoses());
+	cout << "Unused pose ids: " << endl;
+	for (int i = 0; i < ids.size(); i++) {
+		cout << ids[i] << ", ";
+	}
+	cout << endl;
 	return 0;
 }
-
