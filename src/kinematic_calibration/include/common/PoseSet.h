@@ -77,6 +77,14 @@ public:
 	 */
 	virtual int getNumberOfPoses() const = 0;
 
+	/**
+	 * Returns all (active) poses as joint states.
+	 * @return All (active) poses as joint states.
+	 */
+	virtual vector<sensor_msgs::JointState> getPoses() const = 0;
+
+	virtual vector<sensor_msgs::JointState> getUnusedPoses() const = 0;
+
 };
 
 class MeasurementPoseSet: public PoseSet {
@@ -113,6 +121,8 @@ public:
 	virtual vector< shared_ptr<PoseSet> > addPose() const;
 	virtual vector< shared_ptr<PoseSet> > removePose() const;
 	virtual int getNumberOfPoses() const;
+	vector<sensor_msgs::JointState> getPoses() const;
+	virtual vector<sensor_msgs::JointState> getUnusedPoses() const ;
 
 private:
 	/**

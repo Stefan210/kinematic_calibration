@@ -65,6 +65,10 @@ public:
 
 	MeasurementPose& operator=(const MeasurementPose& newval);
 
+	const sensor_msgs::JointState& getJointState() const {
+		return jointState;
+	}
+
 protected:
 	void calcCameraIntrinsicsDerivatives(KinematicCalibrationState state,
 			const double& h,

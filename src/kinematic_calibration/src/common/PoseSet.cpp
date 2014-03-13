@@ -113,7 +113,7 @@ vector<shared_ptr<PoseSet> > MeasurementPoseSet::removePose() const {
 		vector<int> newPoses;
 		for (vector<int>::const_iterator copyIt = activePoses.begin();
 				copyIt != activePoses.end(); copyIt++) {
-			if (remIt != copyIt) {
+			if (*remIt != *copyIt) {
 				newPoses.push_back(*copyIt);
 			}
 		}
@@ -130,6 +130,28 @@ vector<shared_ptr<PoseSet> > MeasurementPoseSet::removePose() const {
 
 int MeasurementPoseSet::getNumberOfPoses() const {
 	return this->activePoses.size();
+}
+
+vector<sensor_msgs::JointState> MeasurementPoseSet::getPoses() const {
+	vector<sensor_msgs::JointState> poses;
+	for (vector<int>::const_iterator it = this->activePoses.begin();
+			it != this->activePoses.end(); it++) {
+		poses.push_back((*this->poseSet)[*it].getJointState());
+	}
+	return poses;
+}
+
+vector<sensor_msgs::JointState> MeasurementPoseSet::getUnusedPoses() const {
+	vector<sensor_msgs::JointState> poses;
+	for (map<int, MeasurementPose>::const_iterator it = this->poseSet->begin();
+			it != this->poseSet->end(); it++) {
+		if (activePoses.end()
+				== std::find(activePoses.begin(), activePoses.end(),
+						it->first)) {
+			poses.push_back(it->second.getJointState());
+		}
+	}
+	return poses;
 }
 
 } /* namespace kinematic_calibration */
