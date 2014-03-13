@@ -27,14 +27,13 @@ ObservabilityIndex::~ObservabilityIndex() {
 VectorXd kinematic_calibration::ObservabilityIndex::getSingularValues(
 		const PoseSet& poseSet) {
 	MatrixXd jacobian = poseSet.getJacobian();
-	JacobiSVD<MatrixXd> svd(jacobian, ComputeThinU | ComputeThinV);
-	VectorXd singularValues = svd.singularValues();
-	return singularValues;
+	JacobiSVD<MatrixXd, HouseholderQRPreconditioner> svd(jacobian);
+	return svd.singularValues();
 }
 
 void ProductSingularValuesIndex::calculateIndex(const PoseSet& poseSet,
 		double& index) {
-	const VectorXd& singularValues = getSingularValues(poseSet);
+	const VectorXd singularValues = getSingularValues(poseSet);
 	double prod = singularValues.prod();
 	double m = poseSet.getNumberOfPoses();
 	index = pow(prod, 1 / m) / sqrt(m);
@@ -42,21 +41,22 @@ void ProductSingularValuesIndex::calculateIndex(const PoseSet& poseSet,
 
 void InverseConditionNumberIndex::calculateIndex(const PoseSet& poseSet,
 		double& index) {
-	const VectorXd& singularValues = getSingularValues(poseSet);
+	const VectorXd singularValues = getSingularValues(poseSet);
 	index = singularValues[singularValues.rows() - 1] / singularValues[0];
 }
 
 void MinimumSingularValueIndex::calculateIndex(const PoseSet& poseSet,
 		double& index) {
-	const VectorXd& singularValues = getSingularValues(poseSet);
+	const VectorXd singularValues = getSingularValues(poseSet);
 	index = singularValues[singularValues.rows() - 1];
 }
 
 void NoiseAmplificationIndex::calculateIndex(const PoseSet& poseSet,
 		double& index) {
-	const VectorXd& singularValues = getSingularValues(poseSet);
-	index = singularValues[singularValues.rows() - 1]
-			* singularValues[singularValues.rows() - 1] / singularValues[0];
+	const VectorXd singularValues = getSingularValues(poseSet);
+	double sMin = singularValues[singularValues.rows() - 1];
+	double sMax = singularValues[0];
+	index = sMin * sMin / sMax;
 }
 
 } /* namespace kinematic_calibration */
