@@ -67,9 +67,9 @@ void MeasurementEdge<D, Derived>::computeError() {
 	tf::Transform headToEndEffector; // root = head, tip = end effector, e.g. wrist
 	map<string, double> jointOffsets = jointOffsetVertex->estimate();
 	map<string, KDL::Frame> jointFrames = getJointFrames();
-	KinematicChain kc = kinematicChain->withFrames(jointFrames);
+	//KinematicChain kc = kinematicChain->withFrames(jointFrames); cout << "getRootToTip" << endl;
 	//jointOffsets[this->kinematicChain->getTip()] = 0; // set offset of the last joint to 0
-	kc.getRootToTip(jointPositions, jointOffsets, headToEndEffector);
+	kinematicChain->getRootToTip(jointPositions, jointOffsets, headToEndEffector);
 
 	// get transformation from marker to end effector
 	Eigen::Isometry3d eigenTransform = markerTransformationVertex->estimate();

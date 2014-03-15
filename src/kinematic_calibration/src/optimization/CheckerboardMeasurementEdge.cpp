@@ -11,9 +11,7 @@
 #include <image_geometry/pinhole_camera_model.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/JointState.h>
-#include <tf/LinearMath/Quaternion.h>
-#include <tf/LinearMath/Transform.h>
-#include <tf_conversions/tf_eigen.h>
+#include <tf/tf.h>
 #include <utility>
 #include <vector>
 

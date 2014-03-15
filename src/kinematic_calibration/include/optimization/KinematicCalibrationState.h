@@ -8,8 +8,7 @@
 #ifndef CALIBRATIONSTATE_H_
 #define CALIBRATIONSTATE_H_
 
-#include <tf/LinearMath/Transform.h>
-//#include <tf/tf.h>
+#include <tf/tf.h>
 #include <map>
 #include <string>
 
@@ -18,6 +17,23 @@
 using namespace std;
 
 namespace kinematic_calibration {
+/*
+ // stream operators for tf::Vector3
+ ostream &operator<<(ostream &output, const tf::Vector3 &v) {
+ output << " " << v[0] << " " << v[1] << " " << v[2];
+ return output;
+ }
+
+ // stream operators for tf::Quaternion
+ ostream &operator<<(ostream &output, const tf::Quaternion &q) {
+ output << " " << q.x() << " " << q.y() << " " << q.z() << " " << q.w();
+ return output;
+ }
+ // stream operators for tf::Transform
+ ostream &operator<<(ostream &output, const tf::Transform &t) {
+ output << " " << t.getOrigin() << " " << t.getRotation();
+ return output;
+ }*/
 
 /**
  * Represents a calibration state.
@@ -67,6 +83,29 @@ public:
 	 * Estimations for the joint transformations.
 	 */
 	map<string, tf::Transform> jointTransformations;
+
+	friend ostream& operator<<(ostream& output,
+			const KinematicCalibrationState& state) {
+
+		//output << "cameraToHeadTransformation: ";
+		//output << state.cameraToHeadTransformation;
+		//output << "cameraInfo: " << state.cameraInfo;
+//		output << "marker transformations: ";
+//		for (map<string, tf::Transform>::const_iterator it =
+//				state.markerTransformations.begin();
+//				it != state.markerTransformations.end(); it++) {
+//			output << it->first << ": ";
+//			output << it->second;
+//		}
+		output << "joint offsets: ";
+		for (map<string, double>::const_iterator it =
+				state.jointOffsets.begin(); it != state.jointOffsets.end();
+				it++) {
+			output << it->first << ": ";
+			output << it->second;
+		}
+		return output;
+	}
 
 };
 

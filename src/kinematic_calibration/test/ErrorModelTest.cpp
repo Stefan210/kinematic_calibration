@@ -11,7 +11,7 @@
 #include <fstream>
 #include <kdl/tree.hpp>
 #include <sensor_msgs/CameraInfo.h>
-#include <tf/LinearMath/Transform.h>
+#include <tf/tf.h>
 #include <cmath>
 #include <iostream>
 #include <iterator>

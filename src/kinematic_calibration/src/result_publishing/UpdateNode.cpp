@@ -9,8 +9,7 @@
 #include <ros/init.h>
 #include <ros/node_handle.h>
 #include <ros/subscriber.h>
-#include <tf/LinearMath/Transform.h>
-#include <tf/transform_datatypes.h>
+#include <tf/tf.h>
 #include <urdf/model.h>
 #include <map>
 #include <string>

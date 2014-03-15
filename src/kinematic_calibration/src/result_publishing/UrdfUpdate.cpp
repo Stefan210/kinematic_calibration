@@ -13,9 +13,7 @@
 #include <ros/console.h>
 #include <ros/node_handle.h>
 #include <rosconsole/macros_generated.h>
-#include <tf/LinearMath/Quaternion.h>
-#include <tf/LinearMath/Transform.h>
-#include <tf/LinearMath/Vector3.h>
+#include <tf/tf.h>
 #include <tinyxml.h>
 #include <urdf/model.h>
 #include <urdf_model/pose.h>

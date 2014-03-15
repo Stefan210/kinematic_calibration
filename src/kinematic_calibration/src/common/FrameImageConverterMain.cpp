@@ -25,7 +25,7 @@
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/JointState.h>
-#include <tf/LinearMath/Transform.h>
+#include <tf/tf.h>
 #include <map>
 #include <string>
 #include <utility>

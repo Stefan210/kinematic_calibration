@@ -8,7 +8,7 @@
 #include "../../include/common/MeasurementPose.h"
 
 #include <image_geometry/pinhole_camera_model.h>
-#include <tf/LinearMath/Transform.h>
+#include <tf/tf.h>
 #include <map>
 #include <utility>
 #include <vector>

@@ -14,10 +14,7 @@
 #include <ros/init.h>
 #include <rosconsole/macros_generated.h>
 #include <sensor_msgs/JointState.h>
-#include <tf/LinearMath/Quaternion.h>
-#include <tf/LinearMath/Transform.h>
-#include <tf/LinearMath/Vector3.h>
-#include <tf/transform_datatypes.h>
+#include <tf/tf.h>
 #include <cmath>
 #include <iostream>
 #include <map>
@@ -157,12 +154,48 @@ void OptimizationNode::optimize() {
 	initialState.cameraInfo = cameraModel.cameraInfo();
 
 	// optimization instance
+/*
+	CalibrationOptions options;
+	nh.getParam("calibrate_joint_offsets", options.calibrateJointOffsets);
+	nh.getParam("calibrate_camera_transform", options.calibrateCameraTransform);
+	nh.getParam("calibrate_camera_intrinsics",
+			options.calibrateCameraIntrinsics);
+	nh.getParam("calibrate_marker_transform", options.calibrateMarkerTransform);
 
-	G2oJointOffsetOptimization optimization(*context, measurements,
+	nh.setParam("calibrate_joint_offsets", false);
+	nh.setParam("calibrate_camera_transform", false);
+	nh.setParam("calibrate_camera_intrinsics",
+			false);
+	nh.setParam("calibrate_marker_transform", true);
+	G2oJointOffsetOptimization optimization1(*context, measurements,
 			kinematicChains, frameImageConverter, initialState);
-	/*
+	optimization1.optimize(result);
+
+	nh.setParam("calibrate_joint_offsets", true);
+	nh.setParam("calibrate_camera_transform", false);
+	nh.setParam("calibrate_camera_intrinsics",
+			false);
+	nh.setParam("calibrate_marker_transform", true);
+	G2oJointOffsetOptimization optimization2(*context, measurements,
+			kinematicChains, frameImageConverter, result);
+	optimization2.optimize(result);
+
+	nh.setParam("calibrate_joint_offsets", true);
+	nh.setParam("calibrate_camera_transform", true);
+	nh.setParam("calibrate_camera_intrinsics",
+			true);
+	nh.setParam("calibrate_marker_transform", true);
+	G2oJointOffsetOptimization optimization3(*context, measurements,
+			kinematicChains, frameImageConverter, result);
+	optimization3.optimize(result);
+*/
+
+/*
 	 HCJointOffsetOptimization optimization(*context, measurements,
-	 kinematicChains, frameImageConverter, initialState);*/
+	 kinematicChains, frameImageConverter, initialState);
+*/
+  	G2oJointOffsetOptimization optimization(*context, measurements,
+		kinematicChains, frameImageConverter, initialState);
 	optimization.optimize(result);
 }
 
@@ -218,7 +251,7 @@ void OptimizationNode::printResult() {
 			<< result.cameraInfo.K[K_CY_IDX] << "\n";
 	cout << "D: " << result.cameraInfo.D[0] << ", " << result.cameraInfo.D[1]
 			<< ", " << result.cameraInfo.D[2] << ", " << result.cameraInfo.D[3]
-			<< ", " << result.cameraInfo.D[5] << "\n";
+			<< ", " << result.cameraInfo.D[4] << "\n";
 }
 
 void OptimizationNode::printPoints() {
@@ -376,9 +409,12 @@ void OptimizationNode::measurementCb(const measurementDataConstPtr& msg) {
 		// check if the measurement contains to a new chain
 		if (data.chain_name != chainName) {
 			// get the parameters
-			nh.getParam("chain_name", chainName);
-			nh.getParam("chain_root", chainRoot);
-			nh.getParam("chain_tip", chainTip);
+			chainName = data.chain_name;
+			chainRoot = data.chain_root;
+			chainTip = data.chain_tip;
+			//nh.getParam("chain_name", chainName);
+			//nh.getParam("chain_root", chainRoot);
+			//nh.getParam("chain_tip", chainTip);
 			// instantiate the kinematic chain
 			KinematicChain kinematicChain(kdlTree, chainRoot, chainTip,
 					chainName);

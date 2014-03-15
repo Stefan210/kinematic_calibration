@@ -9,7 +9,7 @@
 
 #include <image_geometry/pinhole_camera_model.h>
 #include <sensor_msgs/JointState.h>
-#include <tf/LinearMath/Transform.h>
+#include <tf/tf.h>
 #include <map>
 #include <string>
 

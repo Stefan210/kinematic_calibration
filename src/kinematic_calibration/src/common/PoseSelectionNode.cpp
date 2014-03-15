@@ -17,9 +17,7 @@
 #include <ros/subscriber.h>
 #include <rosconsole/macros_generated.h>
 #include <sensor_msgs/CameraInfo.h>
-#include <tf/LinearMath/Quaternion.h>
-#include <tf/LinearMath/Transform.h>
-#include <tf/LinearMath/Vector3.h>
+#include <tf/tf.h>
 #include <urdf/model.h>
 #include <urdf_model/joint.h>
 #include <urdf_model/pose.h>
@@ -67,6 +65,12 @@ void PoseSelectionNode::initializeKinematicChain() {
 void PoseSelectionNode::initializeState() {
 	// TODO: (optionally) do not use "zero initialization" for the joint offsets and marker
 	this->initialState = boost::make_shared<KinematicCalibrationState>();
+
+	vector<string> jointNames;
+	this->kinematicChainPtr->getJointNames(jointNames);
+	for(vector<string>::const_iterator it = jointNames.begin(); it != jointNames.end(); it++) {
+		this->initialState->jointOffsets[*it] = 0.0;
+	}
 
 	// initialize transform from camera to head
 	string cameraJointName = "CameraBottom"; // todo: parameterize!

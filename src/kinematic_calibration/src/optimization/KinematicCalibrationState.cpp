@@ -7,7 +7,7 @@
 
 #include "../../include/optimization/KinematicCalibrationState.h"
 
-#include <tf/LinearMath/Transform.h>
+#include <tf/tf.h>
 
 namespace kinematic_calibration {
 
