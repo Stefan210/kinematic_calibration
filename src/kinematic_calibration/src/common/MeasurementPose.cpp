@@ -94,7 +94,7 @@ void MeasurementPose::getPartialDerivatives(
 	// calculate the derivatives
 
 	// initialize delta value
-	double h = 1e-9;
+	double h = 1e-9; //1e-9;
 	vector<double> partialDerivatesVectorX;
 	vector<double> partialDerivatesVectorY;
 
@@ -125,7 +125,7 @@ void MeasurementPose::getPartialDerivatives(
 	}
 
 	// append two rows to the jacobian matrix
-	derivatives.resize(derivatives.rows() + 2, derivativesX.cols());
+	derivatives.conservativeResize(derivatives.rows() + 2, derivativesX.cols());
 	derivatives.row(derivatives.rows() - 2) << derivativesX;
 	derivatives.row(derivatives.rows() - 1) << derivativesY;
 }
@@ -319,11 +319,14 @@ double MeasurementPose::calculateDerivative(const double& plus,
 		const double& minus, const double& h) {
 	// calculate the derivative
 	double derivative = (plus - minus) / (2 * h);
-	fexcept_t flagp = 0;
-	if (fetestexcept (FE_ALL_EXCEPT)) {
-		// TODO: How to handle this correctly?!
-		// derivative = 0;
-	}
+//	fexcept_t flagp = 0;
+
+//	if (fetestexcept(FE_ALL_EXCEPT) || plus < 1e-20 || minus < 1e-20
+//			|| isnan(derivative) || derivative < 1e-20 || derivative > 1e5) {
+//		cout << "plus: " << plus << " minus: " << minus << " derivative: " << derivative << endl;
+//		// TODO: How to handle this correctly?!
+//		derivative = 0;
+//	}
 	return derivative;
 }
 
