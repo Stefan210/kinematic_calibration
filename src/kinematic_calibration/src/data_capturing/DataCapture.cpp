@@ -188,14 +188,16 @@ void DataCapture::playChainPoses() {
 		}
 
 		// execute next pose
-		char buf[10];
-		sprintf(buf, "%s%03i", prefix.c_str(), i);
-		string poseName(buf);
+		stringstream ss;
+		ss << prefix;
+		ss << std::setfill ('0') << std::setw (3);
+		ss << i;
+		string poseName = ss.str();
 		BodyPoseGoal goal;
 		goal.pose_name = poseName;
 		this->currentPoseName = poseName;
 		enableHeadStiffness();
-		ROS_INFO("Calling pose manager for executing pose %s...", buf);
+		ROS_INFO("Calling pose manager for executing pose %s...", poseName.c_str());
 		actionlib::SimpleClientGoalState goalState =
 				bodyPoseClient.sendGoalAndWait(goal);
 		ROS_INFO("Done.");
@@ -227,7 +229,7 @@ void DataCapture::playChainPoses() {
 
 		// move the head s.t. the checkerboard is
 		// within the corner regions and publish the data
-		publishMeasurement();		
+		publishMeasurement();
 		ROS_INFO("Moving head to LEFT_TOP region...");
 		setHeadPose(-0.3, 0.15, true, getJointNames(),
 				generateRandomPositions(getJointNames()));
@@ -505,7 +507,7 @@ void DataCapture::updateCheckerboardRobust() {
 		} else if (cbFound && xError < 3 && yError < 3) {
 			unstable = false;
 		}
-		
+
 		if(++tries > 20) {
 			// did not find the checkerboard within a specified period
 			checkerboardFound = false;
