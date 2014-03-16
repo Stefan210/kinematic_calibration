@@ -50,17 +50,19 @@ void MeasurementPoseSet::addMeasurementPoses(vector<MeasurementPose> poses) {
 }
 
 Eigen::MatrixXd MeasurementPoseSet::getJacobian() const {
-	Eigen::MatrixXd jacobian;
+	Eigen::MatrixXd jacobian; int i = 0;
 	for (vector<int>::const_iterator it = this->activePoses.begin();
 			it != this->activePoses.end(); it++) {
 		Eigen::MatrixXd derivativesVector;
 		(*this->poseSet)[*it].getPartialDerivatives(state, derivativesVector);
-		jacobian.resize(jacobian.rows() + derivativesVector.rows(),
+		jacobian.conservativeResize(jacobian.rows() + derivativesVector.rows(),
 				derivativesVector.cols());
 		for (int row = 0; row < derivativesVector.rows(); row++) {
 			jacobian.row(jacobian.rows() - derivativesVector.rows() + row)
 					<< derivativesVector.row(row);
 		}
+		//cout << "measurement " << i++ << ":" << endl;
+		//cout << jacobian << endl; cout << "-------------------------" << endl;
 	}
 	return jacobian;
 }
