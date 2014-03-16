@@ -87,16 +87,31 @@ public:
 	friend ostream& operator<<(ostream& output,
 			const KinematicCalibrationState& state) {
 
-		//output << "cameraToHeadTransformation: ";
-		//output << state.cameraToHeadTransformation;
-		//output << "cameraInfo: " << state.cameraInfo;
-//		output << "marker transformations: ";
-//		for (map<string, tf::Transform>::const_iterator it =
-//				state.markerTransformations.begin();
-//				it != state.markerTransformations.end(); it++) {
-//			output << it->first << ": ";
-//			output << it->second;
-//		}
+		output << "cameraToHeadTransformation: ";
+		output << state.cameraToHeadTransformation.getOrigin().x() << " ";
+		output << state.cameraToHeadTransformation.getOrigin().y() << " ";
+		output << state.cameraToHeadTransformation.getOrigin().z() << " ";
+		output << state.cameraToHeadTransformation.getRotation().x() << " ";
+		output << state.cameraToHeadTransformation.getRotation().y() << " ";
+		output << state.cameraToHeadTransformation.getRotation().z() << " ";
+		output << state.cameraToHeadTransformation.getRotation().w() << " ";
+		output << "cameraInfo: ";
+		for (int i = 0; i < 12; i++)
+			output << state.cameraInfo.P[i] << " ";
+		for (int i = 0; i < 5; i++)
+			output << state.cameraInfo.D[i] << " ";
+		output << "marker transformations: ";
+		for (map<string, tf::Transform>::const_iterator it =
+				state.markerTransformations.begin();
+				it != state.markerTransformations.end(); it++) {
+			output << it->second.getOrigin().x() << " ";
+			output << it->second.getOrigin().y() << " ";
+			output << it->second.getOrigin().z() << " ";
+			output << it->second.getRotation().x() << " ";
+			output << it->second.getRotation().y() << " ";
+			output << it->second.getRotation().z() << " ";
+			output << it->second.getRotation().w() << " ";
+		}
 		output << "joint offsets: ";
 		for (map<string, double>::const_iterator it =
 				state.jointOffsets.begin(); it != state.jointOffsets.end();
