@@ -282,6 +282,14 @@ add_executable(poseSelectionNode
 target_link_libraries(poseSelectionNode errorModel ${catkin_LIBRARIES})
 
 
+### MeasurementToPose
+add_executable(measurementToPoseNode
+	src/common/MeasurementToPoseNode.cpp
+	)
+	
+target_link_libraries(measurementToPoseNode ${catkin_LIBRARIES})
+
+
 ### DataCapture
 add_library(dataCapture 
 	src/data_capturing/DataCapture.cpp
