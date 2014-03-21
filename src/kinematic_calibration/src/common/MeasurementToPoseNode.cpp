@@ -66,7 +66,7 @@ void MeasurementToPoseNode::measurementCb(const measurementDataConstPtr& msg) {
 	this->poseFile << poseName << ":\n";
 
 	// print joint names
-	this->poseFile << "  jointNames: [";
+	this->poseFile << "  joint_names: [";
 	int numOfJoints = 0;
 	for (int i = 0; i < msg->jointState.name.size(); i++) {
 		const string jointName = msg->jointState.name[i];
