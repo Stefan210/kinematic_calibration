@@ -42,7 +42,7 @@ namespace kinematic_calibration {
 DataCapture::DataCapture(CalibrationContext& context) :
 		nhPrivate("~"), stiffnessClient(nh, "joint_stiffness_trajectory"), trajectoryClient(
 				nh, "joint_trajectory"), bodyPoseClient(nh, "body_pose"), it(
-				nh), checkerboardFound(false), receivedJointStates(false), receivedImage(
+				nh), markerFound(false), receivedJointStates(false), receivedImage(
 				false), context(context), headStiffnessRequests(0), chainStiffnessRequests(
 				0) {
 	// get parameters
@@ -98,7 +98,7 @@ DataCapture::DataCapture(CalibrationContext& context) :
 	headJointNames.push_back("HeadYaw");
 	headJointNames.push_back("HeadPitch");
 
-	updateCheckerboard();
+	updateMarker();
 
 	// initialize seed
 	srand(static_cast<unsigned>(time(0)));
@@ -213,20 +213,20 @@ void DataCapture::playChainPoses() {
 		// find the marker
 		if (dataCaptureOptions.findMarker) {
 			ROS_INFO("Moving head in order to find the marker...");
-			findCheckerboard();
-			if (!checkerboardFound)
+			findMarker();
+			if (!markerFound)
 				continue;
 		}
 
-		// move the head s.t. the checkerboard is
-		// within the center region of the camera image
 		if (dataCaptureOptions.moveMarkerToCorners) {
+			// move the head s.t. the marker is
+			// within the center region of the camera image
 			ROS_INFO("Moving head to CENTER region...");
-			moveCheckerboardToImageRegion(CENTER);
-			if (!checkerboardFound)
+			moveMarkerToImageRegion(CENTER);
+			if (!markerFound)
 				continue;
 
-			// move the head s.t. the checkerboard is
+			// move the head s.t. the marker is
 			// within the corner regions and publish the data
 			publishMeasurement();
 			ROS_INFO("Moving head to LEFT_TOP region...");
@@ -255,7 +255,7 @@ void DataCapture::playChainPoses() {
 	disableHeadStiffness();
 }
 
-void DataCapture::moveCheckerboardToImageRegion(Region region) {
+void DataCapture::moveMarkerToImageRegion(Region region) {
 	int xMin = 0;
 	int yMin = 0;
 	int xMax = 640; // TODO: parameterize!!
@@ -300,8 +300,8 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 		break;
 	}
 
-	// move head into direction until the checkerboard is into the region
-	ROS_INFO("Trying to move the head s.t. the checkerboard "
+	// move head into direction until the marker is into the region
+	ROS_INFO("Trying to move the head s.t. the marker "
 			"position is within the rectangle (%.2f, %.2f) - (%.2f, %.2f)",
 			xRegMin, yRegMin, xRegMax, yRegMax);
 
@@ -310,10 +310,10 @@ void DataCapture::moveCheckerboardToImageRegion(Region region) {
 	double lastX = -1, lastY = -1;
 	enableHeadStiffness();
 	while (!isInRegionX || !isInRegionY) {
-		// get current checkerboard position
-		updateCheckerboard();
-		if (!checkerboardFound) {
-			ROS_INFO("Checkerboard lost.");
+		// get current marker position
+		updateMarker();
+		if (!markerFound) {
+			ROS_INFO("Marker lost.");
 			break;
 		}
 
@@ -369,13 +369,13 @@ void DataCapture::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 	}
 	receivedImage = true;
 	cameraFrame = msg.get()->header.frame_id;
-	checkerboardFound = markerDetection->detect(msg, markerData);
+	markerFound = markerDetection->detect(msg, markerData);
 	image = *msg;
-	if (checkerboardFound) {
-		ROS_INFO("Checkerboard found at position %f %f", markerData[0],
+	if (markerFound) {
+		ROS_INFO("Marker found at position %f %f", markerData[0],
 				markerData[1]);
 	} else {
-		ROS_INFO("No checkerboard found.");
+		ROS_INFO("No marker found.");
 	}
 }
 
@@ -425,21 +425,20 @@ void DataCapture::camerainfoCallback(
 	ROS_INFO("Camera model set.");
 }
 
-void DataCapture::findCheckerboard() {
-	updateCheckerboard();
-	if (checkerboardFound)
+void DataCapture::findMarker() {
+	if (markerFound)
 		return;
 
 	enableHeadStiffness();
 	for (double headYaw = headYawMin; headYaw <= headYawMax; headYaw +=
 			headYawStep) {
-		if (checkerboardFound)
+		if (markerFound)
 			break;
 		for (double headPitch = headPitchMin; headPitch <= headPitchMax;
 				headPitch += headPitchStep) {
 			setHeadPose(-headYaw, headPitch);
-			updateCheckerboard();
-			if (checkerboardFound)
+			updateMarker();
+			if (markerFound)
 				break;
 		}
 	}
@@ -456,12 +455,12 @@ void DataCapture::jointStatesCallback(
 	jointState = *msg;
 }
 
-void DataCapture::updateCheckerboard() {
+void DataCapture::updateMarker() {
 	this->curTime = ros::Time::now();
-	updateCheckerboardRobust();
+	updateMarkerRobust();
 }
 
-void DataCapture::updateCheckerboardOnce() {
+void DataCapture::updateMarkerOnce() {
 	receivedImage = false;
 	usleep(0.1 * 1000 * 1000);
 	ROS_INFO("Waiting for image message...");
@@ -472,7 +471,7 @@ void DataCapture::updateCheckerboardOnce() {
 	}
 }
 
-void DataCapture::updateCheckerboardRobust() {
+void DataCapture::updateMarkerRobust() {
 	int tries = 0;
 	bool unstable = true;
 	vector<bool> found;
@@ -486,8 +485,8 @@ void DataCapture::updateCheckerboardRobust() {
 		}
 
 		// update and save data
-		updateCheckerboardOnce();
-		found.push_back(checkerboardFound);
+		updateMarkerOnce();
+		found.push_back(markerFound);
 		x.push_back(markerData[0]);
 		y.push_back(markerData[1]);
 
@@ -510,8 +509,8 @@ void DataCapture::updateCheckerboardRobust() {
 		}
 
 		if (++tries > 20) {
-			// did not find the checkerboard within a specified period
-			checkerboardFound = false;
+			// did not find the marker within a specified period
+			markerFound = false;
 			unstable = false;
 		}
 	}
@@ -589,8 +588,8 @@ void DataCapture::setHeadPose(double headYaw, double headPitch, bool relative,
 }
 
 void DataCapture::publishMeasurement() {
-	updateCheckerboard();
-	if (!checkerboardFound) {
+	updateMarker();
+	if (!markerFound) {
 		ROS_INFO("Not publishing data.");
 		return;
 	}

@@ -65,8 +65,8 @@ public:
 			vector<string> additionalJoints = vector<string>(),
 			vector<double> additionalPositions = vector<double>());
 
-	void findCheckerboard();
-	void moveCheckerboardToImageRegion(Region region);
+	void findMarker();
+	void moveMarkerToImageRegion(Region region);
 
 protected:
 	virtual const vector<string>& getJointNames() = 0;
@@ -87,7 +87,7 @@ private:
 	string markerType;
 	string chainName;
 	PauseManager pauseManager;
-	bool checkerboardFound;
+	bool markerFound;
 	bool receivedJointStates;
 	bool receivedImage;
 	actionlib::SimpleActionClient<nao_msgs::JointTrajectoryAction> stiffnessClient;
@@ -111,9 +111,9 @@ private:
 	void imageCallback(const sensor_msgs::ImageConstPtr& msg);
 	void camerainfoCallback(const sensor_msgs::CameraInfoConstPtr& msg);
 	void jointStatesCallback(const sensor_msgs::JointStateConstPtr& msg);
-	void updateCheckerboard();
-	void updateCheckerboardOnce();
-	void updateCheckerboardRobust();
+	void updateMarker();
+	void updateMarkerOnce();
+	void updateMarkerRobust();
 	void updateJointStates();
 	void updateJointStatesOnce();
 	void updateJointStatesRobust();
