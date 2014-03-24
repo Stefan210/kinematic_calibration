@@ -63,5 +63,12 @@ CalibrationOptions RosCalibContext::getCalibrationOptions() const {
 	return options;
 }
 
+DataCaptureOptions RosCalibContext::getDataCaptureOptions() const {
+	DataCaptureOptions options;
+	nh.getParam("find_marker", options.findMarker);
+	nh.getParam("move_marker_to_corners", options.moveMarkerToCorners);
+	return options;
+}
+
 } /* namespace kinematic_calibration */
 

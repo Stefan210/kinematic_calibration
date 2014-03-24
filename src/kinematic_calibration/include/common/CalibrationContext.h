@@ -17,33 +17,73 @@ using namespace std;
 
 namespace kinematic_calibration {
 
+// forward declarations
 class CalibrationOptions;
+class DataCaptureOptions;
 
-/*
- *
+/**
+ * Abstract class containing factory methods for a specific calibration context.
  */
 class CalibrationContext {
 public:
+	/**
+	 * Constructor.
+	 */
 	CalibrationContext();
+
+	/**
+	 * Destructor.
+	 */
 	virtual ~CalibrationContext();
 
+	/**
+	 * Creates and returns an instance to a marker context
+	 * (i.e. factory methods for a specific marker type).
+	 * NOTE: The caller is responsible for destruction of the returned object!
+	 * @param type Type of the marker.
+	 * @return An instance to a marker context
+	 */
 	virtual MarkerContext* getMarkerContext(const string& type) const = 0;
+
+	/**
+	 * Creates and returns the edge for the g2o graph appropriate to the measurement type.
+	 * NOTE: The caller is responsible for destruction of the returned object!
+	 * @param m The measurement for which the edge should be created.
+	 * @param frameImageConverter The instance responsible for projecting from 3D to 2D.
+	 * @param kinematicChain The respective kinematic chain.
+	 * @return The edge for the g2o graph appropriate to the measurement type.
+	 */
 	virtual g2o::OptimizableGraph::Edge* getMeasurementEdge(const measurementData& m,
 			FrameImageConverter* frameImageConverter,
 			KinematicChain* kinematicChain) const = 0;
+
+	/**
+	 * Returns the general options for the calibration.
+	 * @return The general options for the calibration.
+	 */
 	virtual CalibrationOptions getCalibrationOptions() const = 0;
+
+	/**
+	 * Returns the specific options for the data capturing for one kinematic chain.
+	 * @return The specific options for the data capturing for one kinematic chain.
+	 */
+	virtual DataCaptureOptions getDataCaptureOptions() const = 0;
 };
 
+/**
+ * ROS specific context. Gets parameters etc. from the ROS environment.
+ */
 class RosCalibContext: public CalibrationContext {
 public:
 	RosCalibContext();
 	virtual ~RosCalibContext();
 
+	// overridden methods
 	virtual MarkerContext* getMarkerContext(const string& type) const;
 	virtual g2o::OptimizableGraph::Edge* getMeasurementEdge(const measurementData& m,
 			FrameImageConverter* frameImageConverter,
 			KinematicChain* kinematicChain) const;
-	virtual CalibrationOptions getCalibrationOptions() const;
+	virtual DataCaptureOptions getDataCaptureOptions() const;
 
 protected:
 	ros::NodeHandle nh;
@@ -59,6 +99,15 @@ public:
 	bool calibrateCameraTransform;
 	bool calibrateCameraIntrinsics;
 	bool calibrateMarkerTransform;
+};
+
+/**
+ * Container for data capture options.
+ */
+class DataCaptureOptions {
+public:
+	bool findMarker;
+	bool moveMarkerToCorners;
 };
 } /* namespace kinematic_calibration */
 

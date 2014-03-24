@@ -6,6 +6,8 @@ headYaw_step: 1
 headPitch_min: 0
 haedPitch_max: -1
 headPitch_step: 1
+find_marker: false
+move_marker_to_corners: false
 marker_color_r: 255
 marker_color_g: 255
 marker_color_b: 255

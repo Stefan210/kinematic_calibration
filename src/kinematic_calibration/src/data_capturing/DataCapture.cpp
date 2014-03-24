@@ -43,8 +43,8 @@ DataCapture::DataCapture(CalibrationContext& context) :
 		nhPrivate("~"), stiffnessClient(nh, "joint_stiffness_trajectory"), trajectoryClient(
 				nh, "joint_trajectory"), bodyPoseClient(nh, "body_pose"), it(
 				nh), checkerboardFound(false), receivedJointStates(false), receivedImage(
-				false), context(context), headStiffnessRequests(0), chainStiffnessRequests(0)
-	{
+				false), context(context), headStiffnessRequests(0), chainStiffnessRequests(
+				0) {
 	// get parameters
 	nhPrivate.getParam("params/headYaw_min", headYawMin);
 	nhPrivate.getParam("params/headYaw_max", headYawMax);
@@ -111,7 +111,7 @@ DataCapture::~DataCapture() {
 }
 
 void DataCapture::enableHeadStiffness() {
-	if(headStiffnessRequests > 0) {
+	if (headStiffnessRequests > 0) {
 		headStiffnessRequests++;
 		return; // stiffness was set before, nothing to do
 	}
@@ -124,7 +124,7 @@ void DataCapture::enableHeadStiffness() {
 void DataCapture::disableHeadStiffness() {
 	return; // TODO: remove (only for debugging!)
 	headStiffnessRequests--;
-	if(headStiffnessRequests > 0)
+	if (headStiffnessRequests > 0)
 		return; // stiffness requests still exist
 	ROS_INFO("Resetting head stiffness...");
 	disableStiffness(headJointNames);
@@ -174,7 +174,8 @@ void DataCapture::playChainPoses() {
 	int start, end;
 	nhPrivate.getParam("params/start_pose_num", start);
 	nhPrivate.getParam("params/end_pose_num", end);
-	CalibrationOptions options = context.getCalibrationOptions();
+	//CalibrationOptions options = context.getCalibrationOptions();
+	DataCaptureOptions dataCaptureOptions = context.getDataCaptureOptions();
 	enableHeadStiffness();
 	enableChainStiffness();
 	const string& prefix = getPosePrefix();
@@ -190,65 +191,65 @@ void DataCapture::playChainPoses() {
 		// execute next pose
 		stringstream ss;
 		ss << prefix;
-		ss << std::setfill ('0') << std::setw (3);
+		ss << std::setfill('0') << std::setw(3);
 		ss << i;
 		string poseName = ss.str();
 		BodyPoseGoal goal;
 		goal.pose_name = poseName;
 		this->currentPoseName = poseName;
 		enableHeadStiffness();
-		ROS_INFO("Calling pose manager for executing pose %s...", poseName.c_str());
+		ROS_INFO("Calling pose manager for executing pose %s...",
+				poseName.c_str());
 		actionlib::SimpleClientGoalState goalState =
 				bodyPoseClient.sendGoalAndWait(goal);
 		ROS_INFO("Done.");
 
 		// check whether pose could be executed
-		if (goalState != actionlib::SimpleClientGoalState::SUCCEEDED)
+		if (goalState != actionlib::SimpleClientGoalState::SUCCEEDED) {
+			ROS_INFO("Unable to execute the pose! Continue with the next...");
 			continue;
+		}
 
-		// find the checkerboard
-		ROS_INFO("Moving head in order to find the checkerboard...");
-		findCheckerboard();
-		if (!checkerboardFound)
-			continue;
-
-		// only the marker needs to be calibrated
-		if (!options.calibrateCameraIntrinsics
-				&& !options.calibrateCameraTransform
-				&& !options.calibrateJointOffsets) {
-			publishMeasurement();
-			continue;
+		// find the marker
+		if (dataCaptureOptions.findMarker) {
+			ROS_INFO("Moving head in order to find the marker...");
+			findCheckerboard();
+			if (!checkerboardFound)
+				continue;
 		}
 
 		// move the head s.t. the checkerboard is
 		// within the center region of the camera image
-		ROS_INFO("Moving head to CENTER region...");
-		moveCheckerboardToImageRegion(CENTER);
-		if (!checkerboardFound)
-			continue;
+		if (dataCaptureOptions.moveMarkerToCorners) {
+			ROS_INFO("Moving head to CENTER region...");
+			moveCheckerboardToImageRegion(CENTER);
+			if (!checkerboardFound)
+				continue;
 
-		// move the head s.t. the checkerboard is
-		// within the corner regions and publish the data
-		publishMeasurement();
-		ROS_INFO("Moving head to LEFT_TOP region...");
-		setHeadPose(-0.3, 0.15, true, getJointNames(),
-				generateRandomPositions(getJointNames()));
-		publishMeasurement();
-		ROS_INFO("Moving head to LEFT_BOTTOM region...");
-		setHeadPose(0, -0.3, true, getJointNames(),
-				generateRandomPositions(getJointNames()));
-		publishMeasurement();
-		ROS_INFO("Moving head to RIGHT_BOTTOM region...");
-		setHeadPose(0.6, 0, true, getJointNames(),
-				generateRandomPositions(getJointNames()));
-		publishMeasurement();
-		ROS_INFO("Moving head to RIGHT_TOP region...");
-		setHeadPose(0, 0.3, true, getJointNames(),
-				generateRandomPositions(getJointNames()));
-		publishMeasurement();
-		ROS_INFO("Monving back to CENTER region...");
-		setHeadPose(-0.3, -0.15, true);
-		//publishMeasurement();
+			// move the head s.t. the checkerboard is
+			// within the corner regions and publish the data
+			publishMeasurement();
+			ROS_INFO("Moving head to LEFT_TOP region...");
+			setHeadPose(-0.3, 0.15, true, getJointNames(),
+					generateRandomPositions(getJointNames()));
+			publishMeasurement();
+			ROS_INFO("Moving head to LEFT_BOTTOM region...");
+			setHeadPose(0, -0.3, true, getJointNames(),
+					generateRandomPositions(getJointNames()));
+			publishMeasurement();
+			ROS_INFO("Moving head to RIGHT_BOTTOM region...");
+			setHeadPose(0.6, 0, true, getJointNames(),
+					generateRandomPositions(getJointNames()));
+			publishMeasurement();
+			ROS_INFO("Moving head to RIGHT_TOP region...");
+			setHeadPose(0, 0.3, true, getJointNames(),
+					generateRandomPositions(getJointNames()));
+			publishMeasurement();
+			ROS_INFO("Monving back to CENTER region...");
+			setHeadPose(-0.3, -0.15, true);
+		} else {
+			publishMeasurement();
+		}
 	}
 	disableChainStiffness();
 	disableHeadStiffness();
@@ -508,7 +509,7 @@ void DataCapture::updateCheckerboardRobust() {
 			unstable = false;
 		}
 
-		if(++tries > 20) {
+		if (++tries > 20) {
 			// did not find the checkerboard within a specified period
 			checkerboardFound = false;
 			unstable = false;

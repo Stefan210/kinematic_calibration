@@ -9,3 +9,5 @@ headPitch_step: 0.33
 marker_color_r: 255
 marker_color_g: 0
 marker_color_b: 0
+find_marker: false
+move_marker_to_corners: false
