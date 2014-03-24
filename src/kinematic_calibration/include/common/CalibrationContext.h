@@ -83,6 +83,7 @@ public:
 	virtual g2o::OptimizableGraph::Edge* getMeasurementEdge(const measurementData& m,
 			FrameImageConverter* frameImageConverter,
 			KinematicChain* kinematicChain) const;
+	virtual CalibrationOptions getCalibrationOptions() const;
 	virtual DataCaptureOptions getDataCaptureOptions() const;
 
 protected:
