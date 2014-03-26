@@ -54,6 +54,11 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     connect(&qnode, SIGNAL(measurementImageUpdated(QImage*)),
                            this, SLOT(updateMeasurementImage(QImage*)));
 
+    connect(ui.pushButton_startOptimization,
+            SIGNAL(clicked()),
+            &qnode,
+            SLOT(updateIgnoredMeasurementsAndstartOptimization()));
+
     //ui.listView_measurements->setSelectionMode(QAbstractItemView::ExtendedSelection);
     //QObject::connect(&qnode, SIGNAL(measurementReceived()), this, SLOT(updateLoggingView()));
 

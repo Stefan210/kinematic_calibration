@@ -13,11 +13,12 @@
 #include <ros/ros.h>
 #include <ros/callback_queue.h>
 #include <ros/network.h>
+#include <std_msgs/Empty.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/opencv.hpp>
 #include <string>
-#include <std_msgs/String.h>
+#include <std_srvs/Empty.h>
 #include <sstream>
 #include "../include/kinematic_calibration_gui/qnode.hpp"
 
@@ -50,10 +51,10 @@ bool QNode::init() {
 		return false;
 	}
 	ros::start(); // explicitly needed since our nodehandle is going out of scope.
-	ros::NodeHandle n;
+    this->nodeHandle = new ros::NodeHandle();
+
 	// Add your ros communications here.
-	chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
-    measurementSubscriber = n.subscribe("/kinematic_calibration/measurement_data", 1000,
+    measurementSubscriber = nodeHandle->subscribe("/kinematic_calibration/measurement_data", 1000,
                                         &QNode::measurementCb, this);
     connect(&measurements_model,
             SIGNAL(itemChanged(QStandardItem*)),
@@ -187,6 +188,27 @@ void QNode::measurementSelectionChanged(const QModelIndex& index) {
     // create a this newly converted RGB pixel data with a QImage
     QImage* qImg = new QImage((uchar *)imageRGB.data, imageRGB.cols, imageRGB.rows, QImage::Format_RGB888);
     Q_EMIT measurementImageUpdated(qImg);
+}
+
+void QNode::updateIgnoredMeasurements() {
+    std::vector<std::string> ids;
+    QSetIterator<QStandardItem*> i(uncheckedMeasurements);
+    while (i.hasNext()) {
+        QStandardItem* item = i.next();
+        ids.push_back(item->text().toStdString());
+    }
+    this->nodeHandle->setParam("/kinematic_calibration/ignore_measurements", ids);
+}
+
+void QNode::startOptimization() {
+    ros::ServiceClient client = this->nodeHandle->serviceClient<std_srvs::Empty>("/kinematic_calibration/start_optimization");
+    std_srvs::Empty msg;
+    client.call(msg.request, msg.response);
+}
+
+void QNode::updateIgnoredMeasurementsAndstartOptimization() {
+    updateIgnoredMeasurements();
+    startOptimization();
 }
 
 }  // namespace qtest

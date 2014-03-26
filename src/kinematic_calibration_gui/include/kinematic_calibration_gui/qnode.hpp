@@ -70,13 +70,19 @@ public Q_SLOTS:
 
     void measurementSelectionChanged(const QModelIndex& index);
 
+    void updateIgnoredMeasurements();
+
+    void startOptimization();
+
+    void updateIgnoredMeasurementsAndstartOptimization();
+
 protected:
     void measurementCb(const measurementDataConstPtr& msg);
 
 private:
 	int init_argc;
 	char** init_argv;
-	ros::Publisher chatter_publisher;
+    ros::NodeHandle* nodeHandle;
     QStringListModel logging_model;
     ros::Subscriber measurementSubscriber;
     QStandardItemModel measurements_model;
