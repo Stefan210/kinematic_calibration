@@ -24,7 +24,8 @@ public:
 	virtual ~CheckerboardContext();
 
 	virtual MarkerDetection* getMarkerDetectionInstance() {
-		return new CheckerboardDetection();
+		//return new CheckerboardDetection();
+		return new RosCheckerboardDetection(50.0);
 	}
 
 	virtual g2o::OptimizableGraph::Edge* getMeasurementEdge(const measurementData& m,
