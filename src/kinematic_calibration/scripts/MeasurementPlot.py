@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import rospy
 from kinematic_calibration.msg import measurementData
 import numpy as np
