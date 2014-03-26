@@ -80,13 +80,28 @@ public:
  * Class for detecting the position of a 2x2 checker board.
  * Enhanced version, using TF and camera info in order to predict
  * the position of the checkerboard. Accepts only checkerboard
- * position near the predited position.
+ * position near the predicted position.
  */
 class RosCheckerboardDetection: public CheckerboardDetection {
 public:
+	/**
+	 * Constructor.
+	 * @param[in] maxDist Maximum distance of predicted and measured checkerboard position.
+	 */
 	RosCheckerboardDetection(double maxDist);
+
+	/**
+	 * Destructor.
+	 */
 	virtual ~RosCheckerboardDetection();
 
+	/**
+	 * Tries to detect the corner (center) of a 2x2 checker board pattern.
+	 * Checks whether the distance of detected and predicted position is small.
+	 * @param[in] in_msg Image which contains the checker board pattern.
+	 * @param[out] out Contains the position of the detected checker board.
+	 * @return True if the checker board could be detected, false if not.
+	 */
 	bool detect(const sensor_msgs::ImageConstPtr& in_msg, vector<double>& out);
 
 protected:
