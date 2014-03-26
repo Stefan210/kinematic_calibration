@@ -47,6 +47,7 @@ void MeasurementToPoseNode::measurementCb(const measurementDataConstPtr& msg) {
 	ROS_INFO("Message received...");
 	if (find(measurementIds.begin(), measurementIds.end(), msg->id)
 			== measurementIds.end()) {
+		// ignore measurement if not within the list of IDs to be used
 		ROS_INFO("Ignore ID %s...", msg->id.c_str());
 		return;
 	}
