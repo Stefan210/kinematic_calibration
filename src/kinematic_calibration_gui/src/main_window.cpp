@@ -59,6 +59,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
             &qnode,
             SLOT(updateIgnoredMeasurementsAndstartOptimization()));
 
+    ui.tab_manager->setCurrentIndex(2);
     //ui.listView_measurements->setSelectionMode(QAbstractItemView::ExtendedSelection);
     //QObject::connect(&qnode, SIGNAL(measurementReceived()), this, SLOT(updateLoggingView()));
 
