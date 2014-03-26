@@ -210,7 +210,7 @@ target_link_libraries(imagePreprocessingNode ${catkin_LIBRARIES} ${OpenCV_LIBS} 
 
 ### CheckerboardDetection
 add_library(checkerboardDetection src/data_capturing/CheckerboardDetection.cpp src/data_capturing/MarkerDetection.cpp src/data_capturing/SinglePointMarkerDetection.cpp)
-target_link_libraries(checkerboardDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(checkerboardDetection frameImageConverter ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 add_executable(checkerboardDetectionMain src/data_capturing/CheckerboardDetectionMain.cpp)
 target_link_libraries(checkerboardDetectionMain checkerboardDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})

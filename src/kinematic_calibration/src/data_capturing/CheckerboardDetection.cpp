@@ -8,11 +8,17 @@
 #include "../../include/data_capturing/CheckerboardDetection.h"
 
 #include <boost/smart_ptr/shared_ptr.hpp>
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/types_c.h>
+#include <opencv2/opencv.hpp>
+#include <ros/ros.h>
+#include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/Image.h>
+#include <std_msgs/Header.h>
+#include <unistd.h>
+#include <cmath>
 #include <iostream>
-#include <vector>
+
+#include "../../include/common/FrameImageConverter.h"
+#include "../../include/data_capturing/CircleDetection.h"
 
 namespace kinematic_calibration {
 
@@ -27,8 +33,8 @@ CheckerboardDetection::~CheckerboardDetection() {
 	// TODO Auto-generated destructor stub
 }
 
-bool CheckerboardDetection::detect(
-		const sensor_msgs::ImageConstPtr& in_msg, CheckerboardData& out) {
+bool CheckerboardDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
+		CheckerboardData& out) {
 	cv_bridge::CvImageConstPtr cv_ptr;
 
 	// Convert from ROS message to OpenCV image.
@@ -42,9 +48,8 @@ bool CheckerboardDetection::detect(
 	return detect(cv_ptr->image, out);
 }
 
-bool CheckerboardDetection::detect(
-		const cv::Mat& image, CheckerboardData& out) {
-
+bool CheckerboardDetection::detect(const cv::Mat& image,
+		CheckerboardData& out) {
 
 	// Detect corner using OpenCV.
 	cv::Size patternsize(3, 3); //interior number of corners
@@ -60,12 +65,12 @@ bool CheckerboardDetection::detect(
 
 	if (patternfound) {
 		cv::cornerSubPix(gray, corners, cv::Size(11, 11), cv::Size(-1, -1),
-				cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));		
+				cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
 	} else {
 		std::cout << "No pattern found." << std::endl;
 		return false;
 	}
-	
+
 	cv::Point2f position = corners[4];
 	out.x = position.x;
 	out.y = position.y;
@@ -76,10 +81,10 @@ bool CheckerboardDetection::detect(
 bool CheckerboardDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
 		vector<double>& out) {
 	CheckerboardData cb;
-    out.resize(2);
-    if(detect(in_msg, cb)) {
-        savePosition(out);
-        saveImage(in_msg);
+	out.resize(2);
+	if (detect(in_msg, cb)) {
+		savePosition(out);
+		saveImage(in_msg);
 		out[idx_x] = cb.x;
 		out[idx_y] = cb.y;
 		return true;
@@ -87,6 +92,85 @@ bool CheckerboardDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
 	return false;
 }
 
-} /* namespace kinematic_calibration */
+RosCheckerboardDetection::RosCheckerboardDetection(double maxDist) :
+		transformListener(ros::Duration(15, 0)), maxDist(maxDist) {
+	nh.getParam("marker_frame", this->markerFrame);
 
+	// get camera information
+	camerainfoSub = nh.subscribe("/nao_camera/camera_info", 1,
+			&RosCheckerboardDetection::camerainfoCallback, this);
+	cameraInfoSet = false;
+	while (!cameraInfoSet) {
+		ROS_INFO("Waiting for camera info message...");
+		ros::spinOnce();
+	}
+	camerainfoSub.shutdown();
+	ROS_INFO("Done.");
+
+	ROS_INFO("Filling tf buffer...");
+	usleep(1e6);
+	ROS_INFO("Done.");
+}
+
+RosCheckerboardDetection::~RosCheckerboardDetection() {
+	// nothing to do
+}
+
+bool RosCheckerboardDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
+		vector<double>& out) {
+	bool success;
+	success = CheckerboardDetection::detect(in_msg, out);
+
+	if (!success) {
+		// no checkerboard found at all
+		return success;
+	}
+
+	if (markerFrame == "") {
+		// no marker frame given
+		ROS_INFO(
+				"No marker_frame parameter set! No automatic removal of outlier!");
+		return success;
+	}
+
+	// marker frame is given, check distance to predicted position
+	string cameraFrame = in_msg->header.frame_id;
+	ros::Time now = ros::Time::now();
+	tf::StampedTransform transform;
+	cv::Point2d center;
+	// get the transformation via TF
+	if (!transformListener.waitForTransform(cameraFrame, markerFrame, now,
+			ros::Duration(1.0))) {
+		ROS_INFO("No transformation found from %s to %s!", markerFrame.c_str(),
+				cameraFrame.c_str());
+		return success;
+	}
+	transformListener.lookupTransform(cameraFrame, markerFrame, now, transform);
+	// get the projected center
+	FrameImageConverter fic(cameraModel);
+	fic.project(transform, center.x, center.y);
+
+	ROS_INFO("Expecting the checkerboard near %f %f, found it at %f %f",
+			center.x, center.y, out[idx_x], out[idx_y]);
+
+	double deltaX = center.x - out[idx_x];
+	double deltaY = center.y - out[idx_y];
+	double dist = sqrt(deltaX * deltaX - deltaY * deltaY);
+
+	if (dist > maxDist) {
+		ROS_INFO("Too far away, probably an outlier.");
+		return false;
+	}
+
+	return success;
+}
+
+void RosCheckerboardDetection::camerainfoCallback(
+		const sensor_msgs::CameraInfoConstPtr& msg) {
+	cameraModel.fromCameraInfo(msg);
+	ROS_INFO("Camera model set.");
+	cameraInfoSet = true;
+}
+
+} /* namespace kinematic_calibration */
 

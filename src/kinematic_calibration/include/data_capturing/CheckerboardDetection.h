@@ -14,15 +14,17 @@
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/calib3d/calib3d.hpp>
+#include <opencv/cv.h>
 #include <vector>
 #include <string>
+#include <tf/tf.h>
+#include <tf/transform_listener.h>
+#include <image_geometry/pinhole_camera_model.h>
 
 namespace kinematic_calibration {
 
 using namespace std;
+using namespace ros;
 
 class CheckerboardData {
 public:
@@ -69,11 +71,35 @@ public:
 	 */
 	bool detect(const sensor_msgs::ImageConstPtr& in_msg, vector<double>& out);
 
-
-
 	enum Index {
 		idx_x = 0, idx_y = 1
 	};
+};
+
+/**
+ * Class for detecting the position of a 2x2 checker board.
+ * Enhanced version, using TF and camera info in order to predict
+ * the position of the checkerboard. Accepts only checkerboard
+ * position near the predited position.
+ */
+class RosCheckerboardDetection: public CheckerboardDetection {
+public:
+	RosCheckerboardDetection(double maxDist);
+	virtual ~RosCheckerboardDetection();
+
+	bool detect(const sensor_msgs::ImageConstPtr& in_msg, vector<double>& out);
+
+protected:
+	void camerainfoCallback(const sensor_msgs::CameraInfoConstPtr& msg);
+
+private:
+	NodeHandle nh;
+	ros::Subscriber camerainfoSub;
+	string markerFrame;
+	double maxDist;
+	bool cameraInfoSet;
+	image_geometry::PinholeCameraModel cameraModel;
+	tf::TransformListener transformListener;
 };
 
 } /* namespace kinematic_calibration */
