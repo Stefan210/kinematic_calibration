@@ -479,6 +479,8 @@ bool OptimizationNode::measurementOk(const measurementDataConstPtr& msg) {
 void OptimizationNode::removeIgnoredMeasurements() {
 	// get list of IDs to be ignored
 	XmlRpc::XmlRpcValue idList;
+        if (!nh.hasParam("ignore_measurements"))
+           return;
 	nh.getParam("ignore_measurements", idList);
 	ROS_ASSERT(idList.getType() == XmlRpc::XmlRpcValue::TypeArray);
 
