@@ -279,7 +279,7 @@ add_executable(poseSelectionNode
 	src/common/PoseSelectionNode.cpp
 	)
 	
-target_link_libraries(poseSelectionNode errorModel ${catkin_LIBRARIES})
+target_link_libraries(poseSelectionNode errorModel ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
 
 
 ### MeasurementToPose
