@@ -31,6 +31,10 @@ find_package(NAOqi QUIET COMPONENTS
 
 find_package(Boost QUIET COMPONENTS program_options signals)
 
+find_package(LibXML2 REQUIRED)
+include_directories(${LibXML2_INCLUDE_DIR})
+set(XMLLIB ${LibXML2_LIBRARIES})
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -228,6 +232,18 @@ target_link_libraries(circleDetectionMain circleDetection ${catkin_LIBRARIES} ${
 
 catkin_add_gtest(circleDetectionTest test/CircleDetectionTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
 target_link_libraries(circleDetectionTest circleDetection ${catkin_LIBRARIES})
+
+
+### ColorMarkerDetection
+add_library(colorMarkerDetection src/data_capturing/ColorMarkerDetection.cpp src/data_capturing/MarkerDetection.cpp src/data_capturing/SinglePointMarkerDetection.cpp include/data_capturing/color_marker_detection/CMDetect.cpp)
+target_link_libraries(colorMarkerDetection ${catkin_LIBRARIES} ${OpenCV_LIBS} ${XMLLIB})
+
+add_executable(colorMarkerDetectionMain src/data_capturing/ColorMarkerDetectionMain.cpp)
+set_property(TARGET colorMarkerDetectionMain PROPERTY COMPILE_DEFINITIONS PARAMSPATH="${PROJECT_SOURCE_DIR}/include/data_capturing/color_marker_detection/")
+target_link_libraries(colorMarkerDetectionMain colorMarkerDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
+#catkin_add_gtest(colorMarkerDetectionTest test/ColorMarkerDetectionTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
+#target_link_libraries(colorMarkerDetectionTest colorMarkerDetection ${catkin_LIBRARIES})
 
 
 ### KinematicChain

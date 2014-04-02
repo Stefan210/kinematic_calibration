@@ -1,0 +1,228 @@
+<?xml version="1.0"?>
+<root>
+
+<DesignParameters>
+
+<BackgroundImagesFolder>
+./bckgr_images/
+</BackgroundImagesFolder>
+
+<TrainingDataFile>
+forWeb.mat
+</TrainingDataFile>
+
+<BackgroundImageSuffix>
+.png
+</BackgroundImageSuffix>
+
+<Intercept>
+1
+</Intercept>
+
+<SaturatedPointRemoval>
+240
+</SaturatedPointRemoval>
+
+<MarginRatio>
+2
+</MarginRatio>
+
+<GammaPar_a>
+0.000000 0.000000 0.000000
+</GammaPar_a>
+
+<GammaPar_c>
+0.948900 1.140900 1.271200
+</GammaPar_c>
+
+<GammaPar_g>
+0.531500 0.632200 0.587200
+</GammaPar_g>
+
+</DesignParameters>
+
+<ClassifierParameters>
+
+<Classifier id="2">
+<m>5.877502e-01</m>
+<b1>2.903304e+00</b1>
+<b2>-5.581861e+01</b2>
+<t_min_1>27</t_min_1>
+<t_min_2>2</t_min_2>
+<t_max_1>255</t_max_1>
+<t_max_2>119</t_max_2>
+</Classifier>
+
+<Classifier id="3">
+<m>1.930641e+00</m>
+<b1>-1.959289e+02</b1>
+<b2>-2.380151e+02</b2>
+<t_min_1>100</t_min_1>
+<t_min_2>85</t_min_2>
+<t_max_1>255</t_max_1>
+<t_max_2>255</t_max_2>
+</Classifier>
+
+<Classifier id="4">
+<m>1.386228e+00</m>
+<b1>-1.221120e+02</b1>
+<b2>-1.511327e+02</b2>
+<t_min_1>100</t_min_1>
+<t_min_2>70</t_min_2>
+<t_max_1>255</t_max_1>
+<t_max_2>255</t_max_2>
+</Classifier>
+
+<Classifier id="5">
+<m>8.343907e-01</m>
+<b1>-1.359292e+02</b1>
+<b2>-1.625132e+02</b2>
+<t_min_1>100</t_min_1>
+<t_min_2>7</t_min_2>
+<t_max_1>255</t_max_1>
+<t_max_2>135</t_max_2>
+</Classifier>
+
+<Classifier id="7">
+<m>1.345791e+00</m>
+<b1>2.880617e+01</b1>
+<b2>-1.014893e+02</b2>
+<t_min_1>22</t_min_1>
+<t_min_2>15</t_min_2>
+<t_max_1>214</t_max_1>
+<t_max_2>198</t_max_2>
+</Classifier>
+
+<Classifier id="8">
+<m>8.482805e-01</m>
+<b1>1.889077e+01</b1>
+<b2>-7.937482e+01</b2>
+<t_min_1>22</t_min_1>
+<t_min_2>7</t_min_2>
+<t_max_1>214</t_max_1>
+<t_max_2>124</t_max_2>
+</Classifier>
+
+<Classifier id="10">
+<m>4.565814e-01</m>
+<b1>-3.428319e+01</b1>
+<b2>-8.401224e+01</b2>
+<t_min_1>74</t_min_1>
+<t_min_2>2</t_min_2>
+<t_max_1>255</t_max_1>
+<t_max_2>119</t_max_2>
+</Classifier>
+
+<Classifier id="12">
+<m>4.599708e-01</m>
+<b1>-5.167582e+01</b1>
+<b2>-7.143313e+01</b2>
+<t_min_1>85</t_min_1>
+<t_min_2>7</t_min_2>
+<t_max_1>255</t_max_1>
+<t_max_2>135</t_max_2>
+</Classifier>
+
+<Classifier id="13">
+<m>6.248202e-01</m>
+<b1>-1.217506e+01</b1>
+<b2>-1.086784e+02</b2>
+<t_min_1>88</t_min_1>
+<t_min_2>15</t_min_2>
+<t_max_1>255</t_max_1>
+<t_max_2>198</t_max_2>
+</Classifier>
+
+<Classifier id="14">
+<m>3.901073e-01</m>
+<b1>-3.276291e+01</b1>
+<b2>-7.231234e+01</b2>
+<t_min_1>88</t_min_1>
+<t_min_2>7</t_min_2>
+<t_max_1>255</t_max_1>
+<t_max_2>124</t_max_2>
+</Classifier>
+
+<Classifier id="16">
+<m>5.899861e-01</m>
+<b1>-4.986322e+01</b1>
+<b2>-8.333741e+01</b2>
+<t_min_1>70</t_min_1>
+<t_min_2>7</t_min_2>
+<t_max_1>255</t_max_1>
+<t_max_2>135</t_max_2>
+</Classifier>
+
+<Classifier id="17">
+<m>7.791761e-01</m>
+<b1>3.507977e+01</b1>
+<b2>-7.606186e+01</b2>
+<t_min_1>15</t_min_1>
+<t_min_2>7</t_min_2>
+<t_max_1>198</t_max_1>
+<t_max_2>124</t_max_2>
+</Classifier>
+
+<Classifier id="6">
+<m>2.627262e+00</m>
+<b1>1.247476e+02</b1>
+<b2>-1.008813e+02</b2>
+<t_min_1>22</t_min_1>
+<t_min_2>88</t_min_2>
+<t_max_1>214</t_max_1>
+<t_max_2>255</t_max_2>
+</Classifier>
+
+<Classifier id="0">
+<m>1.393493e+00</m>
+<b1>1.225657e+02</b1>
+<b2>1.361489e+01</b2>
+<t_min_1>27</t_min_1>
+<t_min_2>74</t_min_2>
+<t_max_1>255</t_max_1>
+<t_max_2>255</t_max_2>
+</Classifier>
+
+<Classifier id="11">
+<m>6.762332e-01</m>
+<b1>3.861709e+01</b1>
+<b2>1.456123e+01</b2>
+<t_min_1>85</t_min_1>
+<t_min_2>70</t_min_2>
+<t_max_1>255</t_max_1>
+<t_max_2>255</t_max_2>
+</Classifier>
+
+<Classifier id="1">
+<m>Inf</m>
+<b1>NaN</b1>
+<b2>NaN</b2>
+<t_min_1>27</t_min_1>
+<t_min_2>125</t_min_2>
+<t_max_1>255</t_max_1>
+<t_max_2>255</t_max_2>
+</Classifier>
+
+<Classifier id="9">
+<m>Inf</m>
+<b1>NaN</b1>
+<b2>NaN</b2>
+<t_min_1>74</t_min_1>
+<t_min_2>125</t_min_2>
+<t_max_1>255</t_max_1>
+<t_max_2>255</t_max_2>
+</Classifier>
+
+<Classifier id="15">
+<m>Inf</m>
+<b1>NaN</b1>
+<b2>NaN</b2>
+<t_min_1>125</t_min_1>
+<t_min_2>2</t_min_2>
+<t_max_1>255</t_max_1>
+<t_max_2>119</t_max_2>
+</Classifier>
+
+</ClassifierParameters>
+</root>
+
