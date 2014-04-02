@@ -105,7 +105,7 @@ DataCapture::DataCapture(CalibrationContext& context) :
 }
 
 DataCapture::~DataCapture() {
-	disableHeadStiffness();
+	disableStiffness(headJointNames);
 	delete markerDetection;
 	delete markerContext;
 }
