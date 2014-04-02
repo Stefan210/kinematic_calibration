@@ -22,6 +22,8 @@
 #include <iostream>
 #include <vector>
 
+#include <kinematic_calibration/hotJoint.h>
+
 namespace kinematic_calibration {
 
 TemperatureNode::TemperatureNode(boost::shared_ptr<AL::ALBroker> broker,
@@ -32,10 +34,10 @@ TemperatureNode::TemperatureNode(boost::shared_ptr<AL::ALBroker> broker,
 		throw std::exception();
 	}
 
-	if(!nhPrivate.getParam("hotjoint_topic", hotJointFoundTopic)) {
-        hotJointFoundTopic = "nao_temperature/hot_joint_found";
+	if (!nhPrivate.getParam("hotjoint_topic", hotJointFoundTopic)) {
+		hotJointFoundTopic = "nao_temperature/hot_joint_found";
 	}
-    pub = nh.advertise<std_msgs::Bool>(hotJointFoundTopic, 10);
+	pub = nh.advertise<kinematic_calibration::hotJoint>(hotJointFoundTopic, 10);
 
 	dataNamesList.push_back(
 			"Device/SubDeviceList/Battery/Temperature/Sensor/Value");
@@ -100,11 +102,12 @@ void TemperatureNode::run() {
 	ALValue memDataNames(dataNamesList);
 
 	// TODO: parameterize
-    const float criticalUpperTemperature = 75.0;
+	const float criticalUpperTemperature = 75.0;
 
 	bool hotJointFound = false;
 
 	while (ros::ok()) {
+		vector<string> hotJoints;
 		memData = m_memoryProxy->getListData(memDataNames);
 		hotJointFound = false;
 
@@ -123,15 +126,11 @@ void TemperatureNode::run() {
 		for (int i = 0; i < memData.size(); i++) {
 			if (memData[i] > criticalUpperTemperature) {
 				hotJointFound = true;
-				publishHotSensorFound(true);
-				break;
+				hotJoints.push_back(memDataNames[i]);
 			}
 		}
 
-		if (!hotJointFound) {
-			publishHotSensorFound(false);
-		}
-
+		publishHotSensorFound(hotJointFound, hotJoints);
 		usleep(1000 * 1000);
 	}
 }
@@ -153,7 +152,8 @@ bool TemperatureNode::connectProxy() {
 	return true;
 }
 
-void TemperatureNode::publishHotSensorFound(bool found) {
+void TemperatureNode::publishHotSensorFound(bool found,
+		vector<string>& joints) {
 	ROS_INFO("Publish hotSensorFoundMessage: %s", found ? "true" : "false");
 
 	// publish whether a hot joint was found

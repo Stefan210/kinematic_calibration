@@ -9,13 +9,14 @@
 #define PAUSEMANAGER_H_
 
 #include <kinematic_calibration/CmdPauseService.h>
+#include <kinematic_calibration/hotJoint.h>
 #include <ros/callback_queue.h>
 #include <ros/node_handle.h>
 #include <ros/service_server.h>
 #include <ros/subscriber.h>
-#include <std_msgs/Bool.h>
 #include <set>
 #include <string>
+#include <vector>
 
 using namespace ros;
 using namespace std;
@@ -52,7 +53,7 @@ public:
 protected:
 	bool pauseCb(CmdPauseService::Request& req, CmdPauseService::Response& res);
 	bool resumeCb(CmdPauseService::Request& req, CmdPauseService::Response& res);
-	void temperatureCb(std_msgs::BoolConstPtr msg);
+	void temperatureCb(kinematic_calibration::hotJointPtr msg);
 
 private:
 	NodeHandle nh;
@@ -63,6 +64,7 @@ private:
 	Subscriber temperatureSubscriber;
 	string hotJointTopic;
 	set<string> pauseReasons;
+	vector<string> jointNames;
 };
 
 } /* namespace kinematic_calibration */

@@ -7,14 +7,22 @@
 
 #include "../../include/data_capturing/PauseManager.h"
 
+#include <kdl/tree.hpp>
 #include <kinematic_calibration/CmdPauseServiceRequest.h>
+#include <kinematic_calibration/hotJoint.h>
 #include <ros/console.h>
 #include <rosconsole/macros_generated.h>
 #include <unistd.h>
+#include <algorithm>
+#include <vector>
+
+#include "../../include/common/KinematicChain.h"
+#include "../../include/common/ModelLoader.h"
 
 namespace kinematic_calibration {
 
-PauseManager::PauseManager() : nhPrivate("~") {
+PauseManager::PauseManager() :
+		nhPrivate("~") {
 	// set callback queue
 	nh.setCallbackQueue(&this->callbackQueue);
 
@@ -29,12 +37,27 @@ PauseManager::PauseManager() : nhPrivate("~") {
 			&PauseManager::resumeCb, this);
 
 	// get the topic name for publishing
-	if(!nhPrivate.getParam("hotjoint_topic", hotJointTopic)) {
-        hotJointTopic = "/nao_temperature/hot_joint_found";
+	if (!nhPrivate.getParam("hotjoint_topic", hotJointTopic)) {
+		hotJointTopic = "/nao_temperature/hot_joint_found";
 	}
 
-    // subsscribe to temperature topic
-    temperatureSubscriber = nh.subscribe(hotJointTopic, 10, &PauseManager::temperatureCb, this);
+	// subscribe to temperature topic
+	temperatureSubscriber = nh.subscribe(hotJointTopic, 10,
+			&PauseManager::temperatureCb, this);
+
+	// get joint names
+	KDL::Tree kdlTree;
+	ModelLoader modelLoader;
+	modelLoader.initializeFromRos();
+	modelLoader.getKdlTree(kdlTree);
+
+	string chainName, chainRoot, chainTip;
+	nh.getParam("chain_name", chainName);
+	nh.getParam("chain_root", chainRoot);
+	nh.getParam("chain_tip", chainTip);
+	KinematicChain kinematicChain(kdlTree, chainRoot, chainTip, chainName);
+
+	kinematicChain.getJointNames(jointNames);
 }
 
 PauseManager::~PauseManager() {
@@ -55,10 +78,26 @@ bool PauseManager::resumeCb(CmdPauseService::Request& req,
 	return true;
 }
 
-void PauseManager::temperatureCb(std_msgs::BoolConstPtr msg) {
-	if(msg->data) { // hot joint was detected
+void PauseManager::temperatureCb(kinematic_calibration::hotJointPtr msg) {
+	if (msg->hotJointFound) { // hot joint was detected
 		ROS_INFO("Hot joint was detected.");
-		this->pauseReasons.insert("temperature");
+		// check if the hot joint is currently needed
+		vector<string> v1, v2, v3;
+		v1 = msg->jointNames;
+		v2 = this->jointNames;
+
+		sort(v1.begin(), v1.end());
+		sort(v2.begin(), v2.end());
+
+		set_intersection(v1.begin(), v1.end(), v2.begin(), v2.end(),
+				back_inserter(v3));
+
+		if (v3.empty())
+			// hot joints, but no one which is needed
+			this->pauseReasons.erase("temperature");
+		else
+			// at least one used hot joint
+			this->pauseReasons.insert("temperature");
 	} else { // all joints' temperatures are ok
 		ROS_INFO("All joints' temperatures are ok.");
 		this->pauseReasons.erase("temperature");
@@ -73,7 +112,7 @@ bool PauseManager::pauseRequested() {
 
 void PauseManager::pauseIfRequested() {
 	// pause until resume requested.
-	while(pauseRequested()) {
+	while (pauseRequested()) {
 		usleep(0.1 * 1e-6);
 	}
 }

@@ -17,6 +17,7 @@
 #include <ros/ros.h>
 #include <ros/service_client.h>
 #include <string>
+#include <vector>
 
 using namespace AL;
 using namespace ros;
@@ -41,7 +42,7 @@ protected:
 	boost::shared_ptr<AL::ALBroker> m_broker;
 	boost::shared_ptr<AL::ALMemoryProxy> m_memoryProxy;
 	boost::shared_ptr<AL::ALMotionProxy> m_motionProxy;
-	void publishHotSensorFound(bool found);
+	void publishHotSensorFound(bool found, vector<string>& joints);
 
 private:
 	vector<string> dataNamesList;

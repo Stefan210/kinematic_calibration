@@ -73,6 +73,7 @@ add_message_files(
    FILES
    measurementData.msg
    calibrationResult.msg
+   hotJoint.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -314,7 +315,7 @@ add_library(dataCapture
 target_link_libraries(dataCapture checkerboardDetection circleDetection context ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 add_executable(dataCaptureMain src/data_capturing/DataCaptureMain.cpp)
-target_link_libraries(dataCaptureMain dataCapture context ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(dataCaptureMain dataCapture context modelLoader kinematicChain ${catkin_LIBRARIES} ${OpenCV_LIBS} ${orocos_kdl_LIBRARIES})
 
 
 ### OptimizationNode
