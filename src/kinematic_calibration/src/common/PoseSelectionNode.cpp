@@ -68,7 +68,8 @@ void PoseSelectionNode::initializeState() {
 
 	vector<string> jointNames;
 	this->kinematicChainPtr->getJointNames(jointNames);
-	for(vector<string>::const_iterator it = jointNames.begin(); it != jointNames.end(); it++) {
+	for (vector<string>::const_iterator it = jointNames.begin();
+			it != jointNames.end(); it++) {
 		this->initialState->jointOffsets[*it] = 0.0;
 	}
 
@@ -123,14 +124,24 @@ shared_ptr<PoseSet> PoseSelectionNode::getOptimalPoseSet() {
 
 	shared_ptr<PoseSet> resultSet = poseSet;
 
-	// initialize with 30 random poses
+	// initialize with random poses
 	ROS_INFO("Initializing pose set with random poses...");
-	RandomPoseSelectionStrategy intializingStrategy(40);
+	RandomPoseSelectionStrategy intializingStrategy(1);
 	resultSet = intializingStrategy.getOptimalPoseSet(resultSet,
 			observabilityIndex);
 
-	ROS_INFO("Improve by exchange...");
+	// increment by 1
+	IncrementalPoseSelectionStrategy incrementStrategy(1);
 	ExchangePoseSelectionStrategy exStrategy;
+
+	for (int i = 0; i < 50; i++) {
+		ROS_INFO("Improve by exchange...");
+		resultSet = exStrategy.getOptimalPoseSet(resultSet, observabilityIndex);
+		ROS_INFO("Increment pose set size...");
+		resultSet = incrementStrategy.getOptimalPoseSet(resultSet,
+				observabilityIndex);
+	}
+	ROS_INFO("Improve by exchange...");
 	resultSet = exStrategy.getOptimalPoseSet(resultSet, observabilityIndex);
 
 	// add 10 more optimal poses
@@ -171,8 +182,8 @@ shared_ptr<PoseSet> IncrementalPoseSelectionStrategy::getOptimalPoseSet(
 				bestSuccessor = *it;
 			}
 		}
-		cout << "Iteration: " << i << " index value: " << bestIndexValue
-				<< " size: " << bestSuccessor->getNumberOfPoses() << endl;
+		ROS_INFO("Iteration: %d index value: %.20f size: %d", i, bestIndexValue,
+				bestSuccessor->getNumberOfPoses());
 	}
 
 	return bestSuccessor;
@@ -220,7 +231,7 @@ shared_ptr<PoseSet> ExchangePoseSelectionStrategy::getOptimalPoseSet(
 			}
 		}
 
-		ROS_INFO("Index n+1: %f", bestIndexValue);
+		ROS_INFO("Index n+1: %.20f", bestIndexValue);
 
 		// (n+1) -> (n)'
 		bestIndexValue = -1;
@@ -236,9 +247,9 @@ shared_ptr<PoseSet> ExchangePoseSelectionStrategy::getOptimalPoseSet(
 			}
 		}
 
-		ROS_INFO("Index n': %f", bestIndexValue);
+		ROS_INFO("Index n': %.20f", bestIndexValue);
 
-		if (fabs(oldIndexValue - bestIndexValue) < 1e-10) {
+		if (fabs(oldIndexValue - bestIndexValue) < 1e-30) {
 			converged = true;
 		}
 
