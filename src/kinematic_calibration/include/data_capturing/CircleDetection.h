@@ -86,9 +86,12 @@ public:
 	 */
 	bool detect(const cv::Mat& image, vector<cv::Vec3f>& out);
 
-	bool cirlcesHoughTransform(const cv::Mat& image, vector<cv::Vec3f>& out);
+	bool circlesHoughTransform(const cv::Mat& image, vector<cv::Vec3f>& out);
 
-	bool cirlcesRansac(const cv::Mat& image, vector<cv::Vec3f>& out,
+	bool circlesHoughTransformAdaptive(const cv::Mat& image,
+			vector<cv::Vec3f>& out);
+
+	bool circlesRansac(const cv::Mat& image, vector<cv::Vec3f>& out,
 			double canny_threshold, double circle_threshold, int numIterations);
 
 	/**
@@ -133,7 +136,8 @@ public:
 	 * @param[in] in The original image to be processed.
 	 * @param[out] out The processed image, ready for circle detection.
 	 */
-	virtual void processImage(const cv::Mat& in, cv::Mat& out, double cannyTreshold = 150);
+	virtual void processImage(const cv::Mat& in, cv::Mat& out,
+			double cannyTreshold = 150);
 
 protected:
 	/**
@@ -186,7 +190,7 @@ public:
 	/**
 	 * Constructor.
 	 */
-	RosCircleDetection();
+	RosCircleDetection(Type type = HoughTransform);
 
 	/**
 	 * Destructor.

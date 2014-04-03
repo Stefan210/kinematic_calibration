@@ -86,8 +86,8 @@ void CircleDetection::processImage(const cv::Mat& in, cv::Mat& out,
 
 	GaussianBlur(out, out, cv::Size(9, 9), 2, 2);
 
-	double treshold1 = 150; //90
-	double treshold2 = 50; //80
+	double treshold1 = cannyTreshold; //150
+	double treshold2 = cannyTreshold / 2; //50
 	int apertureSize = 3; //7
 	cv::Canny(out, out, treshold1, treshold2, apertureSize);
 	this->cannyImg = out.clone();
@@ -105,16 +105,16 @@ bool CircleDetection::detect(const cv::Mat& image, vector<cv::Vec3f>& out) {
 		nh.param("percentage", percentage, 0.9); // TODO: namespace?!
 		nh.param("iterations", iterations, 1000); // TODO: namespace?!
 		nh.param("canny", canny, 200); // TODO: namespace?!
-		return cirlcesRansac(image, out, canny, percentage, iterations);
-	} else if(type == HoughTransform) {
-		return cirlcesHoughTransform(image, out);
-	} else if(type == HoughTransformAdaptive) {
-		return false;
+		return circlesRansac(image, out, canny, percentage, iterations);
+	} else if (type == HoughTransform) {
+		return circlesHoughTransform(image, out);
+	} else if (type == HoughTransformAdaptive) {
+		return circlesHoughTransformAdaptive(image, out);
 	}
 	return false;
 }
 
-bool CircleDetection::cirlcesHoughTransform(const cv::Mat& image,
+bool CircleDetection::circlesHoughTransform(const cv::Mat& image,
 		vector<cv::Vec3f>& out) {
 	// process image
 	cv::Mat gray;
@@ -133,7 +133,64 @@ bool CircleDetection::cirlcesHoughTransform(const cv::Mat& image,
 	return out.size() > 0;
 }
 
-bool CircleDetection::cirlcesRansac(const cv::Mat& inimg,
+bool CircleDetection::circlesHoughTransformAdaptive(const cv::Mat& image,
+		vector<cv::Vec3f>& out) {
+	for (int cannyTreshold = 50; cannyTreshold < 300; cannyTreshold += 20) {
+		// process image
+		cv::Mat gray;
+		processImage(image, gray, cannyTreshold);
+
+		vector<cv::Vec3f> addOut;
+		for (double param2 = 50; param2 < 150; param2 += 20) {
+			// detect circles
+			double dp = 2;
+			double min_dist = 50;
+			double param1 = cannyTreshold; //70;
+			//double param2 = 70;
+			int min_radius = 20;
+			int max_radius = 100;
+
+
+			vector<cv::Vec3f> tmpOut;
+			cv::HoughCircles(gray, tmpOut, CV_HOUGH_GRADIENT, dp, min_dist,
+					param1, param2, min_radius, max_radius);
+
+			if(tmpOut.size() > 0) {
+				// save current results
+				addOut = tmpOut;
+			} else {
+				// value too high
+				break;
+			}
+
+			if (false) {
+				cout << "Canny: " << cannyTreshold << "\tDetected "
+						<< tmpOut.size() << " circles." << " Total so far: "
+						<< out.size() << std::endl;
+				Mat debugImg;
+				image.copyTo(debugImg);
+				for (unsigned int i = 0; i < tmpOut.size(); ++i) {
+					cv::Point center(cvRound(tmpOut[i][0]),
+							cvRound(tmpOut[i][1]));
+					int radius = cvRound(tmpOut[i][2]);
+					// circle center
+					cv::circle(debugImg, center, 3, cv::Scalar(0, 0, 255), -1,
+							8, 0);
+					// circle outline
+					cv::circle(debugImg, center, radius, cv::Scalar(0, 0, 255),
+							3, 8, 0);
+				}
+				imshow("canny debug", debugImg);
+				waitKey(0);
+			}
+		}
+		// append current results
+		out.insert(out.end(), addOut.begin(), addOut.end());
+	}
+	return out.size() > 0;
+}
+
+bool CircleDetection::circlesRansac(const cv::Mat& inimg,
 		vector<cv::Vec3f>& circles, double canny_threshold,
 		double circle_threshold, int numIterations) {
 	// from https://github.com/pickle27/circleDetector/blob/master/circleDetector.cpp
@@ -411,8 +468,8 @@ bool CircleDetection::findClosestColor(const cv::Mat& image,
 
 }
 
-RosCircleDetection::RosCircleDetection() :
-		transformListener(ros::Duration(15, 0)) {
+RosCircleDetection::RosCircleDetection(Type type) :
+		CircleDetection(type), transformListener(ros::Duration(15, 0)) {
 	double r, g, b;
 	nh.getParam("marker_color_r", r);
 	nh.getParam("marker_color_g", g);
@@ -501,8 +558,8 @@ bool CircleDetection::findClosestRegion(const cv::Mat& image,
 	if (bestIdx == -1)
 		return false;
 
-	//if (sqrt(minDist) > radius)
-	//	return false;
+//if (sqrt(minDist) > radius)
+//	return false;
 
 	out.resize(3);
 	out[idx_x] = circles[bestIdx][0];
@@ -524,10 +581,10 @@ AveragingCircleDetection::AveragingCircleDetection() {
 
 bool AveragingCircleDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
 		vector<double>& out) {
-	// save the current image
+// save the current image
 	images.push_back(in_msg);
 
-	// remove images which are too old
+// remove images which are too old
 	ros::Time timeNew = in_msg->header.stamp;
 	ros::Duration timeSpan(1, 0);
 	while ((images[0]->header.stamp + timeSpan) < timeNew) {
@@ -536,20 +593,20 @@ bool AveragingCircleDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
 		canny.erase(canny.begin());
 	}
 
-	// delegate to the base detect method
-	// which in turn calls our processImage() method
+// delegate to the base detect method
+// which in turn calls our processImage() method
 	return RosCircleDetection::detect(in_msg, out);
 }
 
 void AveragingCircleDetection::processImage(const cv::Mat& in, cv::Mat& out) {
-	// process the new image (gives canny and canny+gauss)
+// process the new image (gives canny and canny+gauss)
 	RosCircleDetection::processImage(in, out);
 
-	// save the processed images
+// save the processed images
 	canny.push_back(RosCircleDetection::getCannyImg());
 	gauss.push_back(RosCircleDetection::getGaussImg());
 
-	// build the average
+// build the average
 	cv::Mat cannyAvg, gaussAvg;
 	assert(canny.size() == gauss.size());
 	int size = canny.size();
@@ -563,11 +620,11 @@ void AveragingCircleDetection::processImage(const cv::Mat& in, cv::Mat& out) {
 	cv::threshold(cannyAvg, cannyAvg, 10, 255, cv::THRESH_BINARY);
 	cv::threshold(gaussAvg, gaussAvg, 10, 255, cv::THRESH_BINARY);
 
-	// save the averaged images
+// save the averaged images
 	this->cannyImg = cannyAvg.clone();
 	this->gaussImg = gaussAvg.clone();
 
-	// return one of the averaged images
+// return one of the averaged images
 	out = gaussImg;
 }
 
