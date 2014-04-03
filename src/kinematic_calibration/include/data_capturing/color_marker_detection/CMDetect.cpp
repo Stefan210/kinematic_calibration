@@ -182,11 +182,11 @@ int CMDetect::ParseUserParsXML()
     xmlFree(content);
 
 //    // reset
-//    currNode = currNode->parent->xmlChildrenNode;
+    currNode = currNode->parent->xmlChildrenNode;
     
     for (int id=0; id<nPerms; id++) {
         // reset
-        currNode = currNode->parent->xmlChildrenNode;
+        // currNode = currNode->parent->xmlChildrenNode;
 
         while ((currNode != NULL) && (xmlStrcmp(currNode->name, (const xmlChar *) "PermutationIndex"))) {
             currNode = currNode->next;

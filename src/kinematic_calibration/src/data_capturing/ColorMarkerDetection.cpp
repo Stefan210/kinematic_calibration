@@ -41,7 +41,7 @@ bool ColorMarkerDetection::detect(const cv::Mat& image, vector<double>& out) {
 
 	// detect
 	cmdetect.AccessImage((uchar*)img2.imageData, img2.width, img2.height, img2.widthStep);
-	if (cmdetect.FindTarget() < 1 && false)
+	if (cmdetect.FindTarget() < 1)
 		return false;
 
 	double x = cmdetect.outValues.center.iX;
