@@ -243,8 +243,9 @@ add_executable(colorMarkerDetectionMain src/data_capturing/ColorMarkerDetectionM
 set_property(TARGET colorMarkerDetectionMain PROPERTY COMPILE_DEFINITIONS PARAMSPATH="${PROJECT_SOURCE_DIR}/include/data_capturing/color_marker_detection/")
 target_link_libraries(colorMarkerDetectionMain colorMarkerDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
-#catkin_add_gtest(colorMarkerDetectionTest test/ColorMarkerDetectionTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
-#target_link_libraries(colorMarkerDetectionTest colorMarkerDetection ${catkin_LIBRARIES})
+catkin_add_gtest(colorMarkerDetectionTest test/ColorMarkerDetectionTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
+set_property(TARGET colorMarkerDetectionTest PROPERTY COMPILE_DEFINITIONS PARAMSPATH="${PROJECT_SOURCE_DIR}/include/data_capturing/color_marker_detection/")
+target_link_libraries(colorMarkerDetectionTest colorMarkerDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 
 ### KinematicChain
