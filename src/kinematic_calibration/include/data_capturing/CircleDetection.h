@@ -31,10 +31,14 @@ namespace kinematic_calibration {
  */
 class CircleDetection {
 public:
+	enum Type {
+		HoughTransform, Ransac, HoughTransformAdaptive
+	};
+
 	/**
 	 * Constructor.
 	 */
-	CircleDetection();
+	CircleDetection(Type type = HoughTransform);
 
 	/**
 	 * Destructor.
@@ -82,6 +86,11 @@ public:
 	 */
 	bool detect(const cv::Mat& image, vector<cv::Vec3f>& out);
 
+	bool cirlcesHoughTransform(const cv::Mat& image, vector<cv::Vec3f>& out);
+
+	bool cirlcesRansac(const cv::Mat& image, vector<cv::Vec3f>& out,
+			double canny_threshold, double circle_threshold, int numIterations);
+
 	/**
 	 * Detects the circle which is closest to the specified center and within
 	 * the specified radius.
@@ -124,7 +133,7 @@ public:
 	 * @param[in] in The original image to be processed.
 	 * @param[out] out The processed image, ready for circle detection.
 	 */
-	virtual void processImage(const cv::Mat& in, cv::Mat& out);
+	virtual void processImage(const cv::Mat& in, cv::Mat& out, double cannyTreshold = 150);
 
 protected:
 	/**
@@ -161,6 +170,11 @@ protected:
 	 * Image after applying the GaussianBlur filter.
 	 */
 	cv::Mat gaussImg;
+
+	/**
+	 * Type of the detection method.
+	 */
+	Type type;
 };
 
 /**
