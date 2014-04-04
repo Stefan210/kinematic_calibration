@@ -86,7 +86,7 @@ void detectFromRosMsg() {
 	image_transport::ImageTransport it(nh);
 
 	sub = it.subscribe("/nao_camera/image_raw", 1, imageCb);
-	cmPub = it.advertise("/circle_detection/circle", 1);
+	cmPub = it.advertise("/color_marker_detection/marker", 1);
 	ros::spin();
 }
 
