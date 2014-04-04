@@ -91,6 +91,33 @@ TemperatureNode::TemperatureNode(boost::shared_ptr<AL::ALBroker> broker,
 			"Device/SubDeviceList/RShoulderRoll/Temperature/Sensor/Value");
 	dataNamesList.push_back(
 			"Device/SubDeviceList/RWristYaw/Temperature/Sensor/Value");
+	
+	jointList.push_back("Battery");
+	jointList.push_back("HeadPitch");
+	jointList.push_back("HeadYaw");
+	jointList.push_back("LAnklePitch");
+	jointList.push_back("LAnkleRoll");
+	jointList.push_back("LElbowRoll");
+	jointList.push_back("LElbowYaw");
+	jointList.push_back("LHand");
+	jointList.push_back("LHipPitch");
+	jointList.push_back("LHipRoll");
+	jointList.push_back("LHipYawPitch");
+	jointList.push_back("LKneePitch");
+	jointList.push_back("LShoulderPitch");
+	jointList.push_back("LShoulderRoll");
+	jointList.push_back("LWristYaw");
+	jointList.push_back("RAnklePitch");
+	jointList.push_back("RAnkleRoll");
+	jointList.push_back("RElbowRoll");
+	jointList.push_back("RElbowYaw");
+	jointList.push_back("RHand");
+	jointList.push_back("RHipPitch");
+	jointList.push_back("RHipRoll");
+	jointList.push_back("RKneePitch");
+	jointList.push_back("RShoulderPitch");
+	jointList.push_back("RShoulderRoll");
+	jointList.push_back("RWristYaw");
 }
 
 TemperatureNode::~TemperatureNode() {
@@ -126,7 +153,7 @@ void TemperatureNode::run() {
 		for (int i = 0; i < memData.size(); i++) {
 			if (memData[i] > criticalUpperTemperature) {
 				hotJointFound = true;
-				hotJoints.push_back(memDataNames[i]);
+				hotJoints.push_back(jointList[i]);
 			}
 		}
 
