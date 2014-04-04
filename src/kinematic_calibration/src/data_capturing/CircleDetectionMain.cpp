@@ -59,9 +59,9 @@ void imageCb(const sensor_msgs::ImageConstPtr& msg, RosCircleDetection* cd) {
 	cv::Point2f center(data[0], data[1]);
     int radius = (int)data[2];
     // circle center
-    cv::circle( image, center, 3, cv::Scalar(255,255,255), -1, 8, 0 );
+    cv::circle( image, center, 3, cv::Scalar(0,255,0), -1, 8, 0 );
     // circle outline
-    cv::circle( image, center, radius, cv::Scalar(255,255,255), 3, 8, 0 );
+    cv::circle( image, center, radius, cv::Scalar(255,0,0), 3, 8, 0 );
 
 
     // publish image after applying the canny filter
@@ -87,7 +87,8 @@ void detectFromRosMsg() {
 	image_transport::Subscriber sub;
 	image_transport::ImageTransport it(nh);
 
-	AveragingCircleDetection cd;
+	//AveragingCircleDetection cd;
+	RosCircleDetection cd(CircleDetection::HoughTransformAdaptive);
 	sub = it.subscribe("/nao_camera/image_raw", 1, boost::bind(imageCb, _1, &cd));
 	circlePub = it.advertise("/circle_detection/circle", 1);
 	cannyPub = it.advertise("/circle_detection/canny", 1);

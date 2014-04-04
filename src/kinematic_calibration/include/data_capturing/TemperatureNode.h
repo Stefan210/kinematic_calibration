@@ -46,6 +46,7 @@ protected:
 
 private:
 	vector<string> dataNamesList;
+	vector<string> jointList;
 	string hotJointFoundTopic;
 
 	NodeHandle nh;

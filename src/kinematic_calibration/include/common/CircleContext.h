@@ -27,7 +27,8 @@ public:
 	virtual ~CircleContext();
 
 	virtual MarkerDetection* getMarkerDetectionInstance() {
-		return new AveragingCircleDetection();
+		return new RosCircleDetection(CircleDetection::HoughTransformAdaptive);
+		//return new AveragingCircleDetection();
 	}
 
 	virtual g2o::OptimizableGraph::Edge* getMeasurementEdge(
