@@ -229,8 +229,18 @@ LikelihoodCircleMeasurementEdge::LikelihoodCircleMeasurementEdge(
 				5.0), m_angle_thresh(25.0), m_search_length_1d(30.0), m_lambda_r(
 				0.5), m_zHit(0.9), m_zRand(0.05), m_zMax(0.05), m_sigmaHit(1.0), m_use_beam_model_likelihood(
 				false) {
-	// TODO: calculate canny image
-	// TODO: calculate orientation image
+	// Convert from ROS message to OpenCV image.
+	CircleDetection circleDetection;
+	circleDetection.msgToImg(
+			boost::shared_ptr<sensor_msgs::Image>(
+					new sensor_msgs::Image(this->measurement.image)),
+			this->measurementImg);
+
+	// Calculate canny image.
+	calculateCannyImg();
+
+	// Calculate orientation image.
+	calculateOrientationImg();
 }
 
 LikelihoodCircleMeasurementEdge::~LikelihoodCircleMeasurementEdge() {
@@ -239,6 +249,72 @@ LikelihoodCircleMeasurementEdge::~LikelihoodCircleMeasurementEdge() {
 
 void LikelihoodCircleMeasurementEdge::setError(tf::Transform cameraToMarker) {
 	// TODO: calculate likelihood and set the error
+	double residual, likelihood;
+	this->compute_likelihood(this->cannyImg, this->orientationImg,
+			cameraToMarker, this->outputImage, likelihood, residual, false);
+}
+
+void LikelihoodCircleMeasurementEdge::calculateCannyImg() {
+	cv::Mat cimg = this->measurementImg;
+	cv::Mat gray(cimg.rows, cimg.cols, CV_8UC1);
+	cv::Mat gray_flt(cimg.rows, cimg.cols, CV_8UC1);
+	cvtColor(cimg, gray, COLOR_BGR2GRAY);
+
+	int canny_low = 40;
+	int canny_high = 90;
+	int canny_kernel = 1;
+	int filter_knl = 5;
+	int filter_type = 0;
+	int canny_blur_size = 0;
+
+	if (filter_type == 0)
+		bilateralFilter(gray, gray_flt, filter_knl, filter_knl * 2,
+				filter_knl / 2);
+	else if (filter_type == 1)
+		medianBlur(gray, gray_flt, filter_knl);
+	else if (filter_type == 2)
+		blur(gray, gray_flt, Size(filter_knl, filter_knl));
+	else {
+		gray_flt = gray;
+	}
+	if (canny_kernel < 1)
+		canny_kernel = 1;
+	cout << "canny_kernel is " << canny_kernel << " " << canny_kernel * 2 + 1
+			<< endl;
+	Canny(gray_flt, cannyImg, canny_low, canny_high, canny_kernel * 2 + 1); // 40, 100 seem good
+
+	Mat Sx;
+	Sobel(gray_flt, Sx, CV_32F, 1, 0, 5);
+
+	Mat Sy;
+	Sobel(gray_flt, Sy, CV_32F, 0, 1, 5);
+
+	Mat mag;
+	magnitude(Sx, Sy, mag);
+
+	//GaussianBlur( cannyImg, cannyImg, Size( 5, 5 ), 0, 0 ); // needed for problems with besenham raycasting (shooting normal through a (perpendicular) non-horizontal/non-vertical line)
+	if (canny_blur_size > 0)
+		blur(cannyImg, cannyImg,
+				Size(canny_blur_size * 2 + 1, 1 + 2 * canny_blur_size));
+
+	// make cannyImg a binary image (255/0)
+	double mag_thresh = 1.0;
+	int canny_thresh = 2;
+
+	for (int i = 0; i < cannyImg.rows; ++i) {
+		for (int j = 0; j < cannyImg.cols; ++j) {
+			if (cannyImg.at<uchar>(i, j) > canny_thresh
+					&& mag.at<float>(i, j) > mag_thresh)
+				cannyImg.at<uchar>(i, j) = 255;
+			else
+				cannyImg.at<uchar>(i, j) = 0;
+		}
+	}
+}
+
+void LikelihoodCircleMeasurementEdge::calculateOrientationImg() {
+	orientation_image(this->measurementImg, this->m_colors,
+			this->orientationImg);
 }
 
 bool LikelihoodCircleMeasurementEdge::compute_likelihood(
@@ -604,25 +680,45 @@ bool test_angle(const cv::Mat & ori, float angle_thresh, Rect & rect,
 }
 
 cv::Mat orientationMap(const cv::Mat& mag, const cv::Mat& ori, double thresh,
-		const std::vector<Vec3b> & colors)
-{
-   Mat oriMap = Mat::zeros(ori.size(), CV_8UC3);
-   Vec3b red(0, 0, 255);
-   Vec3b cyan(255, 255, 0);
-   Vec3b green(0, 255, 0);
-   Vec3b yellow(0, 255, 255);
-   for(int i = 0; i < mag.rows*mag.cols; i++)
-   {
-      float* magPixel = reinterpret_cast<float*>(mag.data + i*sizeof(float));
-      if(*magPixel > thresh)
-      {
-         float* oriPixel = reinterpret_cast<float*>(ori.data + i*sizeof(float));
-         Vec3b* mapPixel = reinterpret_cast<Vec3b*>(oriMap.data + i*3*sizeof(char));
-         *mapPixel = apply_heatmap(colors, 360, *oriPixel);
-      }
-   }
+		const std::vector<Vec3b> & colors) {
+	Mat oriMap = Mat::zeros(ori.size(), CV_8UC3);
+	Vec3b red(0, 0, 255);
+	Vec3b cyan(255, 255, 0);
+	Vec3b green(0, 255, 0);
+	Vec3b yellow(0, 255, 255);
+	for (int i = 0; i < mag.rows * mag.cols; i++) {
+		float* magPixel = reinterpret_cast<float*>(mag.data + i * sizeof(float));
+		if (*magPixel > thresh) {
+			float* oriPixel = reinterpret_cast<float*>(ori.data
+					+ i * sizeof(float));
+			Vec3b* mapPixel = reinterpret_cast<Vec3b*>(oriMap.data
+					+ i * 3 * sizeof(char));
+			*mapPixel = apply_heatmap(colors, 360, *oriPixel);
+		}
+	}
 
-   return oriMap;
+	return oriMap;
+}
+
+void orientation_image(const cv::Mat & cimg,
+		const std::vector<cv::Vec3b> & colors, cv::Mat & outputImg) {
+	cv::Mat bw(cimg.rows, cimg.cols, CV_8UC1);
+	cv::cvtColor(cimg, bw, cv::COLOR_BGR2GRAY);
+	Mat Sx;
+	Sobel(bw, Sx, CV_32F, 1, 0, 3);
+
+	Mat Sy;
+	Sobel(bw, Sy, CV_32F, 0, 1, 3);
+
+	Mat mag, ori;
+	magnitude(Sx, Sy, mag);
+	phase(Sx, Sy, ori, true);
+	outputImg = orientationMap(mag, ori, 1.0, colors);
+	cv::Mat cannyImg;
+	//Canny(bw, cannyImg, 30, 60, 3); // 40, 100 seem good
+	Canny(bw, cannyImg, 35, 70, 3); // 40, 100 seem good
+	outputImg.setTo(0, cannyImg == 0);
+
 }
 
 } /* namespace kinematic_calibration */

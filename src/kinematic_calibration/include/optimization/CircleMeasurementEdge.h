@@ -123,15 +123,29 @@ private:
 
 	double matching_likelihood(double res, double max_range);
 
+	void calculateCannyImg();
+
+	void calculateOrientationImg();
+
 	/**
 	 * Radius of the circle.
 	 */
 	double radius;
 
 	/**
+	 * Original measurement image.
+	 */
+	cv::Mat measurementImg;
+
+	/**
 	 * Measurement image after applying the canny filter.
 	 */
 	cv::Mat cannyImg;
+
+	/**
+	 * Orientation image.
+	 */
+	cv::Mat orientationImg;
 
 	/**
 	 * Output image.
@@ -174,6 +188,9 @@ bool test_angle(const cv::Mat & ori, float angle_thresh, cv::Rect & rect,
 
 void orientation_image(const cv::Mat & cimg,
 		const std::vector<cv::Vec3b> & colors, cv::Mat & outputImg);
+
+cv::Mat orientationMap(const cv::Mat& mag, const cv::Mat& ori, double thresh,
+		const std::vector<cv::Vec3b> & colors);
 
 class Correspondence {
 public:
