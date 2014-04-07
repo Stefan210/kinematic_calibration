@@ -252,6 +252,7 @@ void LikelihoodCircleMeasurementEdge::setError(tf::Transform cameraToMarker) {
 	double residual, likelihood;
 	this->compute_likelihood(this->cannyImg, this->orientationImg,
 			cameraToMarker, this->outputImage, likelihood, residual, false);
+	this->_error[0] = 1 / likelihood; // likelihood is always > 0.0
 }
 
 void LikelihoodCircleMeasurementEdge::calculateCannyImg() {
