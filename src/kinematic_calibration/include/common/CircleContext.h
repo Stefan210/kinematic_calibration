@@ -27,7 +27,8 @@ public:
 	virtual ~CircleContext();
 
 	virtual MarkerDetection* getMarkerDetectionInstance() {
-		return new RosCircleDetection(CircleDetection::HoughTransformAdaptive);
+		return new RosCircleDetection(CircleDetection::Dummy);
+		//return new RosCircleDetection(CircleDetection::HoughTransformAdaptive);
 		//return new AveragingCircleDetection();
 	}
 

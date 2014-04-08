@@ -32,7 +32,7 @@ namespace kinematic_calibration {
 class CircleDetection {
 public:
 	enum Type {
-		HoughTransform, Ransac, HoughTransformAdaptive
+		HoughTransform, Ransac, HoughTransformAdaptive, Dummy
 	};
 
 	/**
@@ -93,6 +93,8 @@ public:
 
 	bool circlesRansac(const cv::Mat& image, vector<cv::Vec3f>& out,
 			double canny_threshold, double circle_threshold, int numIterations);
+
+	bool circlesDummy(const cv::Mat& image, vector<cv::Vec3f>& out);
 
 	/**
 	 * Detects the circle which is closest to the specified center and within
