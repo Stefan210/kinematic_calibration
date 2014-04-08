@@ -180,6 +180,8 @@ void tf_to_opencv(const tf::Transform &pose, cv::Mat_<double> & R3,
 bool ellipse_from_quadric(const Eigen::Matrix3d & CstarI, Vector5d & z,
 		Eigen::Matrix2d & U);
 
+vector<cv::Vec3b> generate_heatmap(bool wrap);
+
 cv::Vec3b apply_heatmap(const std::vector<cv::Vec3b> & colors, int max_val,
 		double val);
 

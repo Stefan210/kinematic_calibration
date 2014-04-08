@@ -226,9 +226,9 @@ LikelihoodCircleMeasurementEdge::LikelihoodCircleMeasurementEdge(
 		KinematicChain* kinematicChain, double radius) :
 		MeasurementEdge<1, LikelihoodCircleMeasurementEdge>(measurement,
 				frameImageConverter, kinematicChain), radius(radius), m_ellipse_sampling_increment(
-				5.0), m_angle_thresh(25.0), m_search_length_1d(30.0), m_lambda_r(
+				5.0), m_angle_thresh(25.0), m_search_length_1d(130.0 /*30.0*/), m_lambda_r(
 				0.5), m_zHit(0.9), m_zRand(0.05), m_zMax(0.05), m_sigmaHit(1.0), m_use_beam_model_likelihood(
-				false) {
+				false), m_colors(generate_heatmap(true)) {
 	// Convert from ROS message to OpenCV image.
 	CircleDetection circleDetection;
 	circleDetection.msgToImg(
@@ -248,11 +248,22 @@ LikelihoodCircleMeasurementEdge::~LikelihoodCircleMeasurementEdge() {
 }
 
 void LikelihoodCircleMeasurementEdge::setError(tf::Transform cameraToMarker) {
-	// TODO: calculate likelihood and set the error
+	bool draw = false;
+	cvtColor(this->cannyImg, this->outputImage, CV_GRAY2BGR);
+
+	//  calculate likelihood and set the error
 	double residual, likelihood;
+	tf::Transform markerToCamera = cameraToMarker.inverse();
 	this->compute_likelihood(this->cannyImg, this->orientationImg,
-			cameraToMarker, this->outputImage, likelihood, residual, false);
-	this->_error[0] = 1 / likelihood; // likelihood is always > 0.0
+			markerToCamera, this->outputImage, likelihood, residual, draw);
+	//cout << "likelihood: " << likelihood << " residual: " << residual << endl;
+	this->_error[0] = residual;
+	//this->_error[0] = 1 / likelihood; // likelihood is always > 0.0
+
+	if(draw) {
+		cv::imshow("outputImage", outputImage);
+		cv::waitKey();
+	}
 }
 
 void LikelihoodCircleMeasurementEdge::calculateCannyImg() {
@@ -636,6 +647,32 @@ bool ellipse_from_quadric(const Eigen::Matrix3d & CstarI, Vector5d & z,
 	return true;
 }
 
+vector<cv::Vec3b> generate_heatmap(bool wrap)
+{
+   vector<cv::Vec3b> colors;
+   Vec3b red(0, 0, 255);
+   Vec3b green(0, 255, 0);
+   Vec3b blue(255, 0, 0);
+   Vec3b yellow(0, 255, 255);
+   Vec3b cyan(255, 255, 0);
+   Vec3b magenta(255, 0, 255);
+   /*
+   colors.push_back( blue );
+   colors.push_back( green );
+   //colors.push_back( yellow);
+   colors.push_back( red );
+   */
+   colors.push_back( red );
+   colors.push_back( cyan );
+   colors.push_back( green );
+   colors.push_back( yellow );
+
+   if(wrap)
+      colors.push_back( colors[0] );
+
+   return colors;
+}
+
 cv::Vec3b apply_heatmap(const std::vector<cv::Vec3b> & colors, int max_val,
 		double val) {
 	cv::Vec3b color(0, 0, 0);
@@ -719,7 +756,6 @@ void orientation_image(const cv::Mat & cimg,
 	//Canny(bw, cannyImg, 30, 60, 3); // 40, 100 seem good
 	Canny(bw, cannyImg, 35, 70, 3); // 40, 100 seem good
 	outputImg.setTo(0, cannyImg == 0);
-
 }
 
 } /* namespace kinematic_calibration */
