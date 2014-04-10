@@ -412,6 +412,14 @@ bool CircleDetection::circlesRansac(const cv::Mat& inimg,
 	return circles.size() > 0;
 }
 
+bool CircleDetection::circlesDummy(const cv::Mat& inimg,
+		vector<cv::Vec3f>& circles) {
+	// fill with dummy values
+	circles.clear();
+	circles.push_back(cv::Vec3f(320,200, 0.1));
+	return true;
+}
+
 void CircleDetection::msgToImg(const sensor_msgs::ImageConstPtr& in_msg,
 		cv::Mat& out_image) {
 	cv_bridge::CvImageConstPtr cv_ptr;
