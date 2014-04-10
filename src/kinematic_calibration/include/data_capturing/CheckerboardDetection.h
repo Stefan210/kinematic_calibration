@@ -25,6 +25,10 @@ namespace kinematic_calibration {
 
 using namespace std;
 using namespace ros;
+using namespace cv;
+
+bool findChessboardCorners( InputArray _image, Size patternSize,
+                            OutputArray corners, int flags );
 
 class CheckerboardData {
 public:

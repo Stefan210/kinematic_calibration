@@ -53,13 +53,14 @@ bool CheckerboardDetection::detect(const cv::Mat& image,
 
 	// Detect corner using OpenCV.
 	cv::Size patternsize(3, 3); //interior number of corners
+	//cv::Size patternsize(1,1);
 	cv::Mat gray;
 	cv::cvtColor(image, gray, CV_BGR2GRAY);
 	std::vector<cv::Point2f> corners; //this will be filled by the detected corners
 
 	//CALIB_CB_FAST_CHECK saves a lot of time on images
 	//that do not contain any chessboard corners
-	bool patternfound = cv::findChessboardCorners(image, patternsize, corners,
+	bool patternfound = kinematic_calibration::findChessboardCorners(image, patternsize, corners,
 			cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE
 					+ cv::CALIB_CB_FAST_CHECK);
 
@@ -72,6 +73,7 @@ bool CheckerboardDetection::detect(const cv::Mat& image,
 	}
 
 	cv::Point2f position = corners[4];
+	//cv::Point2f position = corners[0];
 	out.x = position.x;
 	out.y = position.y;
 
@@ -173,4 +175,5 @@ void RosCheckerboardDetection::camerainfoCallback(
 }
 
 } /* namespace kinematic_calibration */
+
 
