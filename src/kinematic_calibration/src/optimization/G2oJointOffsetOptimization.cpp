@@ -201,7 +201,7 @@ void G2oJointOffsetOptimization::optimize(
 	optimizer.initializeOptimization();
 	optimizer.computeActiveErrors();
 	optimizer.setVerbose(true);
-	optimizer.optimize(10);
+	optimizer.optimize(30);
 
 	// get results:
 
