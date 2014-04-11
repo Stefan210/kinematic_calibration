@@ -521,7 +521,7 @@ bool RosCircleDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
 		ROS_INFO("Looking for the circle near %f %f.", center.x, center.y);
 		radius = 30; // TODO
 		cv::Mat image;
-		msgToImg(in_msg, image);
+		CircleDetection::msgToImg(in_msg, image);
 		success = CircleDetection::detect(image, center, radius, out);
 	} else {
 		success = CircleDetection::detect(in_msg, color, out);

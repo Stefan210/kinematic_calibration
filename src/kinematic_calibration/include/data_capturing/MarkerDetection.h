@@ -52,6 +52,13 @@ protected:
 	 * @param image the last image
 	 */
 	virtual void getImage(cv::Mat& image) = 0;
+
+	/**
+	 * Converts the ROS image message to a OpenCV image.
+	 * @param[in] in_msg The ROS image message to convert.
+	 * @param[out] out_image The resulting OpenCV image.
+	 */
+	void msgToImg(const sensor_msgs::ImageConstPtr& in_msg, cv::Mat& out_image);
 };
 
 } /* namespace kinematic_calibration */
