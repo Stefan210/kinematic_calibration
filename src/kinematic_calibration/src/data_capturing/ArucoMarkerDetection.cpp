@@ -48,9 +48,11 @@ bool ArucoMarkerDetection::detect(const cv::Mat& inImage, vector<double>& out) {
 		return false;
 	}
 
+	// save the image
 	cv::Mat outImage = inImage.clone();
 	saveImage(outImage);
 
+	// calculate the center
 	double x, y;
 	cv::Point2f centerPoint(0.0, 0.0);
 	for(int i = 0; i < 4; i++) {
@@ -59,6 +61,7 @@ bool ArucoMarkerDetection::detect(const cv::Mat& inImage, vector<double>& out) {
 	centerPoint.x = centerPoint.x / 4;
 	centerPoint.y = centerPoint.y / 4;
 
+	// save the detected points
 	out.push_back(centerPoint.x);
 	out.push_back(centerPoint.y);
 	savePosition(out);
@@ -82,7 +85,7 @@ void ArucoMarkerDetection::drawMarker(cv::Mat& image) {
 	SinglePointMarkerDetection::drawMarker(image);
 
 	// draw contour
-	this->currentMarker.draw(image, Scalar(0, 0, 255), 2);
+	this->currentMarker.draw(image, Scalar(0, 0, 255), 2, false);
 }
 
 } /* namespace kinematic_calibration */
