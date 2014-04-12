@@ -40,6 +40,12 @@ set(XMLLIB ${LibXML2_LIBRARIES})
 
 find_package(aruco REQUIRED )
 
+if( ${aruco_FOUND} ) 
+	message(STATUS "ArUco was found.")
+else()
+    message(STATUS "ArUco was NOT found.")
+endif()
+
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
@@ -249,6 +255,17 @@ set_property(TARGET colorMarkerDetectionTest PROPERTY COMPILE_DEFINITIONS PARAMS
 target_link_libraries(colorMarkerDetectionTest colorMarkerDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 
+### ArucoMarkerDetection
+add_library(arucoMarkerDetection src/data_capturing/ArucoMarkerDetection.cpp src/data_capturing/MarkerDetection.cpp src/data_capturing/SinglePointMarkerDetection.cpp)
+target_link_libraries(arucoMarkerDetection ${catkin_LIBRARIES} ${OpenCV_LIBS} ${aruco_LIBS})
+
+#add_executable(arucoMarkerDetectionMain src/data_capturing/ArucoMarkerDetectionMain.cpp)
+#target_link_libraries(arucoMarkerDetectionMain arucoMarkerDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
+catkin_add_gtest(arucoMarkerDetectionTest test/ArucoMarkerDetectionTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
+target_link_libraries(arucoMarkerDetectionTest arucoMarkerDetection ${catkin_LIBRARIES} ${OpenCV_LIBS} ${aruco_LIBS})
+
+
 ### KinematicChain
 add_library(kinematicChain src/common/KinematicChain.cpp) 
 target_link_libraries(kinematicChain ${catkin_LIBRARIES})
@@ -362,7 +379,6 @@ target_link_libraries(updateNode modelLoader ${catkin_LIBRARIES})
 
 catkin_add_gtest(jointUpdateTest test/JointUpdateTest.cpp src/result_publishing/JointUpdate.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
 target_link_libraries(jointUpdateTest modelLoader ${catkin_LIBRARIES})
-
 
 ### Temperature
 if( ${NAOqi_FOUND} ) 
