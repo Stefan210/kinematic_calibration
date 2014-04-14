@@ -41,6 +41,8 @@ bool ArucoMarkerDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
 bool ArucoMarkerDetection::detect(const cv::Mat& inImage, vector<double>& out) {
 	MarkerDetector detector;
 	vector<Marker> markers;
+	out.clear();
+
 	// try to detect
 	detector.detect(inImage, markers);
 	if(markers.size() < 1) {
