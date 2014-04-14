@@ -474,8 +474,8 @@ void DataCapture::updateMarkerRobust() {
 		// update and save data
 		updateMarkerOnce();
 		found.push_back(markerFound);
-		x.push_back(markerData[0]);
-		y.push_back(markerData[1]);
+		x.push_back(markerData.size() > 0 ? markerData[0] : 0);
+		y.push_back(markerData.size() > 0 ? markerData[1] : 0);
 
 		if (found.size() < 3)
 			continue;
