@@ -15,9 +15,19 @@
 
 namespace kinematic_calibration {
 
+/**
+ * Aruco marker context.
+ */
 class ArucoContext: public MarkerContext {
 public:
+	/**
+	 * Constructor.
+	 */
 	ArucoContext();
+
+	/**
+	 * Desctructor.
+	 */
 	virtual ~ArucoContext();
 
 	virtual MarkerDetection* getMarkerDetectionInstance();

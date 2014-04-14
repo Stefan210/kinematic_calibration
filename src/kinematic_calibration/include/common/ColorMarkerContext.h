@@ -20,7 +20,14 @@ namespace kinematic_calibration {
  */
 class ColorMarkerContext: public MarkerContext {
 public:
+	/**
+	 * Constructor.
+	 */
 	ColorMarkerContext();
+
+	/**
+	 * Destructor.
+	 */
 	virtual ~ColorMarkerContext();
 
 	virtual MarkerDetection* getMarkerDetectionInstance();

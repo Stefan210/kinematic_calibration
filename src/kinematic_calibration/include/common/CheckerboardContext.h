@@ -15,12 +15,19 @@
 
 namespace kinematic_calibration {
 
-/*
- *
+/**
+ * Checkerboard marker context.
  */
 class CheckerboardContext: public MarkerContext {
 public:
+	/**
+	 * Constructor.
+	 */
 	CheckerboardContext();
+
+	/**
+	 * Desctructor.
+	 */
 	virtual ~CheckerboardContext();
 
 	virtual MarkerDetection* getMarkerDetectionInstance() {

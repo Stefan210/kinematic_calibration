@@ -17,7 +17,6 @@
 #include "../../include/common/FrameImageConverter.h"
 #include "../../include/common/KinematicChain.h"
 
-
 namespace kinematic_calibration {
 
 using namespace ros;
@@ -55,8 +54,8 @@ public:
 	 * @param kinematicChain Kinematic chain for which the measurement was taken.
 	 * @return edge instance for optimization with a specific marker
 	 */
-	virtual g2o::OptimizableGraph::Edge* getMeasurementEdge(const measurementData& m,
-			FrameImageConverter* frameImageConverter,
+	virtual g2o::OptimizableGraph::Edge* getMeasurementEdge(
+			const measurementData& m, FrameImageConverter* frameImageConverter,
 			KinematicChain* kinematicChain) = 0;
 
 protected:
