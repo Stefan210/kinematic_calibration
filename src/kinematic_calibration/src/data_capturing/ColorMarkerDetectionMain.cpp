@@ -70,13 +70,10 @@ void imageCb(const sensor_msgs::ImageConstPtr& msg) {
 	image = input_bridge->image;
 
 	cv::Point2f center(data[0], data[1]);
-	int radius = (int) data[2];
 	// circle center
 	cv::circle(image, center, 3, cv::Scalar(255, 255, 255), -1, 8, 0);
-	// circle outline
-	cv::circle(image, center, radius, cv::Scalar(255, 255, 255), 3, 8, 0);
 
-	// publish the input image with the detected circle
+	// publish the input image with the detected color marker
 	cmPub.publish(input_bridge->toImageMsg());
 }
 
@@ -112,11 +109,8 @@ void detectFromFile(string filename) {
 	std::cout << "position " << data[0] << " " << data[1] << "\n";
 
 	cv::Point2f center(data[0], data[1]);
-	int radius = (int) data[2];
 	// circle center
 	cv::circle(image, center, 3, cv::Scalar(255, 255, 255), -1, 8, 0);
-	// circle outline
-	cv::circle(image, center, radius, cv::Scalar(255, 255, 255), 3, 8, 0);
 
 	cv::imshow("test", image);
 	cv::waitKey();
