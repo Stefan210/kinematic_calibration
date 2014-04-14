@@ -196,12 +196,17 @@ add_library(context
 	src/common/CircleContext.cpp
 	src/common/ContextFactory.cpp
 	src/common/MarkerContext.cpp
+	src/common/ArucoContext.cpp
+	src/common/ColorMarkerContext.cpp
 	src/optimization/CheckerboardMeasurementEdge.cpp
 	src/optimization/CircleMeasurementEdge.cpp
 	)
+set_property(TARGET context PROPERTY COMPILE_DEFINITIONS PARAMSPATH="${PROJECT_SOURCE_DIR}/include/data_capturing/color_marker_detection/")
 target_link_libraries(context 
 	checkerboardDetection
 	circleDetection
+	arucoMarkerDetection
+	colorMarkerDetection
 	frameImageConverter
 	kinematicChain
 	${G2O_LIBS}
