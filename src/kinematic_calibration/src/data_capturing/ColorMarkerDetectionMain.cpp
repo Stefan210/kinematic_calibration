@@ -60,6 +60,8 @@ void imageCb(const sensor_msgs::ImageConstPtr& msg) {
 
 	if (!cmd.detect(msg, data)) {
 		std::cout << "[main] could not detect the color marker.\n";
+		// publish the input image with the detected color marker
+		cmPub.publish(msg);
 		return;
 	}
 	std::cout << "position " << data[0] << " " << data[1] << "\n";
