@@ -9,6 +9,8 @@
 
 #include "../../include/common/CheckerboardContext.h"
 #include "../../include/common/CircleContext.h"
+#include "../../include/common/ColorMarkerContext.h"
+#include "../../include/common/ArucoContext.h"
 
 namespace kinematic_calibration {
 
@@ -32,8 +34,13 @@ MarkerContext* RosCalibContext::getMarkerContext(const string& type) const {
 		return new CheckerboardContext();
 	} else if ("circle" == type) {
 		return new CircleContext();
+	} else if ("color" == type) {
+		return new ColorMarkerContext();
+	} else if ("aruco" == type) {
+		return new ArucoContext();
 	} else {
 		ROS_ERROR("Unknown marker type: %s", type.c_str());
+		ROS_ERROR("Available types are: checkerboard\naruco\ncircle\ncolor");
 		return NULL;
 	}
 }
