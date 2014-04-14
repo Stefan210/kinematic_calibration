@@ -64,8 +64,8 @@ DataCapture::DataCapture(CalibrationContext& context) :
 	// get camera information
 	camerainfoSub = nh.subscribe("/nao_camera/camera_info", 1,
 			&DataCapture::camerainfoCallback, this);
+	ROS_INFO("Waiting for camera info message...");
 	while (ros::getGlobalCallbackQueue()->isEmpty()) {
-		ROS_INFO("Waiting for camera info message...");
 		//ros::Duration(0.5).sleep();
 	}
 	ros::getGlobalCallbackQueue()->callAvailable();
