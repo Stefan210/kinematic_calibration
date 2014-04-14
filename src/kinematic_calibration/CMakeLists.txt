@@ -261,8 +261,8 @@ if( ${aruco_FOUND} )
 	add_library(arucoMarkerDetection src/data_capturing/ArucoMarkerDetection.cpp src/data_capturing/MarkerDetection.cpp src/data_capturing/SinglePointMarkerDetection.cpp)
 	target_link_libraries(arucoMarkerDetection ${catkin_LIBRARIES} ${OpenCV_LIBS} ${aruco_LIBS})
 	
-	#add_executable(arucoMarkerDetectionMain src/data_capturing/ArucoMarkerDetectionMain.cpp)
-	#target_link_libraries(arucoMarkerDetectionMain arucoMarkerDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
+	add_executable(arucoMarkerDetectionMain src/data_capturing/ArucoMarkerDetectionMain.cpp)
+	target_link_libraries(arucoMarkerDetectionMain arucoMarkerDetection ${catkin_LIBRARIES} ${OpenCV_LIBS})
 	
 	catkin_add_gtest(arucoMarkerDetectionTest test/ArucoMarkerDetectionTest.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
 	target_link_libraries(arucoMarkerDetectionTest arucoMarkerDetection ${catkin_LIBRARIES} ${OpenCV_LIBS} ${aruco_LIBS})
