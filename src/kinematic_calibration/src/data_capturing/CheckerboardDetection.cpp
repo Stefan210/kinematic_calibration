@@ -71,10 +71,29 @@ bool CheckerboardDetection::detect(const cv::Mat& image,
 		return false;
 	}
 
-	cv::Point2f position = corners[4];
-	//cv::Point2f position = corners[0];
-	out.x = position.x;
-	out.y = position.y;
+	/*if (this->patternSize.height == 3 && this->patternSize.width == 3) {
+		// "legacy" case
+		cv::Point2f position = corners[4];
+		out.x = position.x;
+		out.y = position.y;
+	} else*/ if (this->patternSize.height % 2 == 1 && this->patternSize.width % 2 == 1) {
+		// even outer pattern size: take the middle point
+		int index = ((int) (patternSize.height / 2)) * patternSize.width
+				+ ((int) (patternSize.width / 2));
+		cv::Point2f position = corners[index];
+		out.x = position.x;
+		out.y = position.y;
+	} else {
+		// uneven outer pattern size: take the "average" of all points
+		out.x = 0.0;
+		out.y = 0.0;
+		for (int i = 0; i < corners.size(); i++) {
+			out.x += corners[i].x;
+			out.y += corners[i].y;
+		}
+		out.x = out.x / corners.size();
+		out.y = out.y / corners.size();
+	}
 
 	return true;
 }
@@ -100,7 +119,7 @@ bool CheckerboardDetection::setCheckerboardSize(int rows, int columns) {
 
 bool CheckerboardDetection::setCheckerboardInnerSize(int rows, int columns) {
 	// size must be >= 2x2
-	if(rows < 2 || columns < 2)
+	if (rows < 2 || columns < 2)
 		return false;
 
 	this->patternSize = cv::Size(rows, columns);
