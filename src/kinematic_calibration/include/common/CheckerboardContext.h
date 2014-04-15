@@ -30,16 +30,11 @@ public:
 	 */
 	virtual ~CheckerboardContext();
 
-	virtual MarkerDetection* getMarkerDetectionInstance() {
-		return new CheckerboardDetection();
-		//return new RosCheckerboardDetection(50.0);
-	}
+	virtual MarkerDetection* getMarkerDetectionInstance();
 
-	virtual g2o::OptimizableGraph::Edge* getMeasurementEdge(const measurementData& m,
-			FrameImageConverter* frameImageConverter,
-			KinematicChain* kinematicChain) {
-		return new CheckerboardMeasurementEdge(m, frameImageConverter, kinematicChain);
-	}
+	virtual g2o::OptimizableGraph::Edge* getMeasurementEdge(
+			const measurementData& m, FrameImageConverter* frameImageConverter,
+			KinematicChain* kinematicChain);
 };
 
 } /* namespace kinematic_calibration */

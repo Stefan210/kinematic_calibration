@@ -10,12 +10,24 @@
 namespace kinematic_calibration {
 
 CheckerboardContext::CheckerboardContext() {
-	// TODO Auto-generated constructor stub
+	// nothing to do
 
 }
 
 CheckerboardContext::~CheckerboardContext() {
-	// TODO Auto-generated destructor stub
+	// nothing to do
+}
+
+inline MarkerDetection* CheckerboardContext::getMarkerDetectionInstance() {
+	return new CheckerboardDetection();
+	//return new RosCheckerboardDetection(50.0);
+}
+
+inline g2o::OptimizableGraph::Edge* CheckerboardContext::getMeasurementEdge(
+		const measurementData& m, FrameImageConverter* frameImageConverter,
+		KinematicChain* kinematicChain) {
+	return new CheckerboardMeasurementEdge(m, frameImageConverter,
+			kinematicChain);
 }
 
 } /* namespace kinematic_calibration */
