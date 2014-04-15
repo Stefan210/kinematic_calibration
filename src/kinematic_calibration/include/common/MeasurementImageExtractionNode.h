@@ -33,7 +33,7 @@ public:
 	MeasurementImageExtractionNode();
 
 	/**
-	 * Desctructor.
+	 * Destructor.
 	 */
 	virtual ~MeasurementImageExtractionNode();
 
