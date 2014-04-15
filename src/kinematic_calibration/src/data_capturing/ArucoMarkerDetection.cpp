@@ -43,15 +43,17 @@ bool ArucoMarkerDetection::detect(const cv::Mat& inImage, vector<double>& out) {
 	vector<Marker> markers;
 	out.clear();
 
+	// use a copy of the input image
+	cv::Mat outImage = inImage.clone();
+
 	// try to detect
-	detector.detect(inImage, markers);
+	detector.detect(outImage, markers);
 	if(markers.size() < 1) {
 		// no marker found
 		return false;
 	}
 
 	// save the image
-	cv::Mat outImage = inImage.clone();
 	saveImage(outImage);
 
 	// calculate the center

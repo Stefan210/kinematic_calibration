@@ -31,6 +31,9 @@ public:
 
 	bool detect(const cv::Mat& image, vector<double>& out);
 
+protected:
+	void drawMarker(cv::Mat& image);
+
 private:
 	CMDetect cmdetect;
 };

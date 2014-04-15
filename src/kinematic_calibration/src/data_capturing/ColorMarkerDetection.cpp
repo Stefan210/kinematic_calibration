@@ -34,10 +34,8 @@ ColorMarkerDetection::~ColorMarkerDetection() {
 }
 
 bool ColorMarkerDetection::detect(const cv::Mat& image, vector<double>& out) {
-	IplImage img2 = image;
-	int width,height;
-	width = image.cols;
-	height = image.rows;
+	cv::Mat imgCopy = image.clone();
+	IplImage img2 = imgCopy;
 
 	// detect
 	cmdetect.AccessImage((uchar*)img2.imageData, img2.width, img2.height, img2.widthStep);
@@ -55,7 +53,7 @@ bool ColorMarkerDetection::detect(const cv::Mat& image, vector<double>& out) {
 		return false;
 
 	// save detected point
-	saveImage(image);
+	saveImage(image.clone());
 	savePosition(out);
 
 	return true;
@@ -73,6 +71,17 @@ bool ColorMarkerDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
 	cv::Mat image = cv_ptr->image;
 
 	return detect(image, out);
+}
+
+void ColorMarkerDetection::drawMarker(cv::Mat& image) {
+	// again, call the detection method which draws the detected marker into the image
+	IplImage img2 = image;
+	cmdetect.AccessImage((uchar*) img2.imageData, img2.width, img2.height,
+			img2.widthStep);
+	cmdetect.FindTarget();
+
+	// draw the (formerly) detected center point
+	SinglePointMarkerDetection::drawMarker(image);
 }
 
 } /* namespace kinematic_calibration */
