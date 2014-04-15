@@ -78,6 +78,30 @@ public:
 	enum Index {
 		idx_x = 0, idx_y = 1
 	};
+
+	/**
+	 * Sets the size of the checkerboard pattern.
+	 * The size must be >= 3x3.
+	 * @param rows Number of rows.
+	 * @param columns Number of columns.
+	 * @return True if valid values are passed.
+	 */
+	bool setCheckerboardSize(int rows, int columns);
+
+	/**
+	 * Sets the size of the checkerboard pattern in terms of inner corners.
+	 * The size must be >= 2x2.
+	 * @param rows Number of inner corners per row.
+	 * @param columns Number of inner corners per column.
+	 * @return True if valid values are passed.
+	 */
+	bool setCheckerboardInnerSize(int rows, int columns);
+
+protected:
+	/**
+	 * Number of inner corners per a chessboard row and column.
+	 */
+	cv::Size patternSize;
 };
 
 /**

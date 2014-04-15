@@ -25,12 +25,12 @@ namespace kinematic_calibration {
 namespace enc = sensor_msgs::image_encodings;
 
 CheckerboardDetection::CheckerboardDetection() {
-	// TODO Auto-generated constructor stub
-
+	// initialize with default value
+	this->patternSize = cv::Size(3, 3);
 }
 
 CheckerboardDetection::~CheckerboardDetection() {
-	// TODO Auto-generated destructor stub
+	// nothing to do
 }
 
 bool CheckerboardDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
@@ -52,15 +52,14 @@ bool CheckerboardDetection::detect(const cv::Mat& image,
 		CheckerboardData& out) {
 
 	// Detect corner using OpenCV.
-	cv::Size patternsize(3, 3); //interior number of corners
-	//cv::Size patternsize(1,1);
 	cv::Mat gray;
 	cv::cvtColor(image, gray, CV_BGR2GRAY);
 	std::vector<cv::Point2f> corners; //this will be filled by the detected corners
 
 	//CALIB_CB_FAST_CHECK saves a lot of time on images
 	//that do not contain any chessboard corners
-	bool patternfound = kinematic_calibration::findChessboardCorners(image, patternsize, corners,
+	bool patternfound = kinematic_calibration::findChessboardCorners(image,
+			this->patternSize, corners,
 			cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE
 					+ cv::CALIB_CB_FAST_CHECK);
 
@@ -94,6 +93,20 @@ bool CheckerboardDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
 	return false;
 }
 
+bool CheckerboardDetection::setCheckerboardSize(int rows, int columns) {
+	// just delegate...
+	return setCheckerboardInnerSize(rows - 1, columns - 1);
+}
+
+bool CheckerboardDetection::setCheckerboardInnerSize(int rows, int columns) {
+	// size must be >= 2x2
+	if(rows < 2 || columns < 2)
+		return false;
+
+	this->patternSize = cv::Size(rows, columns);
+	return true;
+}
+
 RosCheckerboardDetection::RosCheckerboardDetection(double maxDist) :
 		transformListener(ros::Duration(15, 0)), maxDist(maxDist) {
 	nh.getParam("marker_frame", this->markerFrame);
@@ -102,8 +115,8 @@ RosCheckerboardDetection::RosCheckerboardDetection(double maxDist) :
 	camerainfoSub = nh.subscribe("/nao_camera/camera_info", 1,
 			&RosCheckerboardDetection::camerainfoCallback, this);
 	cameraInfoSet = false;
+	ROS_INFO("Waiting for camera info message...");
 	while (!cameraInfoSet) {
-		ROS_INFO("Waiting for camera info message...");
 		ros::spinOnce();
 	}
 	camerainfoSub.shutdown();
@@ -175,5 +188,3 @@ void RosCheckerboardDetection::camerainfoCallback(
 }
 
 } /* namespace kinematic_calibration */
-
-
