@@ -19,7 +19,14 @@ CheckerboardContext::~CheckerboardContext() {
 }
 
 inline MarkerDetection* CheckerboardContext::getMarkerDetectionInstance() {
-	return new CheckerboardDetection();
+	// get parameter for the checkerboard size (default: 4x4)
+	int rows = 4, columns = 4;
+	nh.param("checkerboard_rows", rows, rows);
+	nh.param("checkerboard_columns", columns, columns);
+	ROS_INFO("Using a %dx%d checkerboard.", rows, columns);
+	CheckerboardDetection* instance = new CheckerboardDetection();
+	instance->setCheckerboardSize(rows, columns);
+	return instance;
 	//return new RosCheckerboardDetection(50.0);
 }
 
