@@ -63,7 +63,7 @@
 #include <stdarg.h>
 #include <cstdio>
 
-#define DEBUG_CHESSBOARD
+//#define DEBUG_CHESSBOARD
 #ifdef DEBUG_CHESSBOARD
 #  include <opencv2/opencv_modules.hpp>
 #  ifdef HAVE_OPENCV_HIGHGUI
