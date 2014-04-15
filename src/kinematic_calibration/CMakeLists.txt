@@ -331,6 +331,14 @@ add_executable(measurementToPoseNode
 target_link_libraries(measurementToPoseNode ${catkin_LIBRARIES})
 
 
+### MeasurementImageExtractionNode
+add_executable(measurementImageExtractionNode
+	src/common/MeasurementImageExtractionNode.cpp
+	)
+	
+target_link_libraries(measurementImageExtractionNode ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
+
 ### DataCapture
 add_library(dataCapture 
 	src/data_capturing/DataCapture.cpp
