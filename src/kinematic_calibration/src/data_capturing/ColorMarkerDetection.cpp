@@ -50,6 +50,10 @@ bool ColorMarkerDetection::detect(const cv::Mat& image, vector<double>& out) {
 	out.push_back(x);
 	out.push_back(y);
 
+	// if one coordinate is (close to) zero, the detection might have failed
+	if(fabs(x) < 1e-9 || fabs(y) < 1e-9)
+		return false;
+
 	// save detected point
 	saveImage(image);
 	savePosition(out);
