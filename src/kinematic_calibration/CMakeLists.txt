@@ -312,6 +312,12 @@ catkin_add_gtest(errorModelTest test/ErrorModelTest.cpp WORKING_DIRECTORY ${PROJ
 target_link_libraries(errorModelTest errorModel ${catkin_LIBRARIES})
 
 
+### PoseSampling
+#add_library(poseSampling src/common/PoseSampling.cpp)
+add_executable(poseSampling src/common/PoseSampling.cpp)
+target_link_libraries(poseSampling errorModel modelLoader frameImageConverter kinematicChain ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
+
+
 ### PoseSelection
 add_executable(poseSelectionNode
 	src/common/PoseSet.cpp
