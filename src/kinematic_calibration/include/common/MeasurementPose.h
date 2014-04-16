@@ -92,6 +92,10 @@ protected:
 private:
 	KinematicChain kinematicChain;
 	sensor_msgs::JointState jointState;
+
+	// vectors for the derivatives for x and y respectively
+	Eigen::RowVectorXd derivativesX, derivativesY;
+	bool derivativesCalculated;
 };
 
 } /* namespace kinematic_calibration */

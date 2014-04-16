@@ -26,11 +26,13 @@ namespace kinematic_calibration {
 
 MeasurementPose::MeasurementPose(KinematicChain kinematicChain,
 		sensor_msgs::JointState jointState) :
-		kinematicChain(kinematicChain), jointState(jointState) {
+		kinematicChain(kinematicChain), jointState(jointState), derivativesCalculated(
+				false) {
 }
 
 MeasurementPose::MeasurementPose() :
-		kinematicChain(KinematicChain()), jointState(sensor_msgs::JointState()) {
+		kinematicChain(KinematicChain()), jointState(sensor_msgs::JointState()), derivativesCalculated(
+				false) {
 }
 
 MeasurementPose& MeasurementPose::operator=(const MeasurementPose& newval) {
@@ -88,40 +90,40 @@ void MeasurementPose::predictImageCoordinates(
 
 void MeasurementPose::getPartialDerivatives(
 		const KinematicCalibrationState& state, Eigen::MatrixXd& derivatives) {
-	// vectors for the derivatives for x and y respectively
-	Eigen::RowVectorXd derivativesX, derivativesY;
+	if (!derivativesCalculated) {
+		// calculate the derivatives
 
-	// calculate the derivatives
+		// initialize delta value
+		double h = 1e-9; //1e-9;
+		vector<double> partialDerivatesVectorX;
+		vector<double> partialDerivatesVectorY;
 
-	// initialize delta value
-	double h = 1e-9; //1e-9;
-	vector<double> partialDerivatesVectorX;
-	vector<double> partialDerivatesVectorY;
+		// camera parameters: fx, fy, cx, cy, d[0-4]
+		calcCameraIntrinsicsDerivatives(state, h, partialDerivatesVectorX,
+				partialDerivatesVectorY);
 
-	// camera parameters: fx, fy, cx, cy, d[0-4]
-	calcCameraIntrinsicsDerivatives(state, h, partialDerivatesVectorX,
-			partialDerivatesVectorY);
+		// camera transform parameters: tx, ty, tz, rr, rp, ry
+		calcCameraTransformDerivatives(state, h, partialDerivatesVectorX,
+				partialDerivatesVectorY);
 
-	// camera transform parameters: tx, ty, tz, rr, rp, ry
-	calcCameraTransformDerivatives(state, h, partialDerivatesVectorX,
-			partialDerivatesVectorY);
+		// joint offsets: from root (head) to tip
+		calcJointOffsetsDerivatives(state, h, partialDerivatesVectorX,
+				partialDerivatesVectorY);
 
-	// joint offsets: from root (head) to tip
-	calcJointOffsetsDerivatives(state, h, partialDerivatesVectorX,
-			partialDerivatesVectorY);
+		// marker transform parameters: tx, ty, tz, rr, rp, ry
+		calcMarkerTransformDerivatives(state, h, partialDerivatesVectorX,
+				partialDerivatesVectorY);
 
-	// marker transform parameters: tx, ty, tz, rr, rp, ry
-	calcMarkerTransformDerivatives(state, h, partialDerivatesVectorX,
-			partialDerivatesVectorY);
-
-	// convert to Eigen vector
-	derivativesX.resize(1,
-			derivativesX.size() + partialDerivatesVectorX.size());
-	derivativesY.resize(1,
-			derivativesY.size() + partialDerivatesVectorY.size());
-	for (int i = 0; i < partialDerivatesVectorX.size(); i++) {
-		derivativesX.col(i) << partialDerivatesVectorX[i];
-		derivativesY.col(i) << partialDerivatesVectorY[i];
+		// convert to Eigen vector
+		derivativesX.resize(1,
+				derivativesX.size() + partialDerivatesVectorX.size());
+		derivativesY.resize(1,
+				derivativesY.size() + partialDerivatesVectorY.size());
+		for (int i = 0; i < partialDerivatesVectorX.size(); i++) {
+			derivativesX.col(i) << partialDerivatesVectorX[i];
+			derivativesY.col(i) << partialDerivatesVectorY[i];
+		}
+		derivativesCalculated = true;
 	}
 
 	// append two rows to the jacobian matrix
