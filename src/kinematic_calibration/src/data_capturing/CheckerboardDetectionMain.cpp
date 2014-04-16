@@ -40,8 +40,15 @@ int main(int argc, char** argv) {
 image_transport::Publisher pub;
 
 void imageCb(const sensor_msgs::ImageConstPtr& msg) {
+	static NodeHandle nh;
 	CheckerboardDetection cbd;
 	CheckerboardData data;
+
+	int rows = 4, columns = 4;
+	nh.param("checkerboard_rows", rows, rows);
+	nh.param("checkerboard_columns", columns, columns);
+	cbd.setCheckerboardSize(rows, columns);
+
 	if (!cbd.detect(msg, data)) {
 		std::cout << "[main] could not detect the checkerboard.\n";
 		return;
