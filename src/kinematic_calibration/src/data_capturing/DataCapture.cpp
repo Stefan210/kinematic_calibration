@@ -166,9 +166,25 @@ void DataCapture::playChainPoses() {
 	nhPrivate.getParam("params/end_pose_num", end);
 	//CalibrationOptions options = context.getCalibrationOptions();
 	DataCaptureOptions dataCaptureOptions = context.getDataCaptureOptions();
-	cout << "find marker: " << dataCaptureOptions.findMarker << endl;
+	
+	// print some info about the settings
+	ROS_INFO("Parameter %s ist set to %s:", "find_marker", dataCaptureOptions.findMarker ? "true" : "false");
+	if(dataCaptureOptions.findMarker)
+		ROS_INFO("If the marker ist not visible to the camera, the head will be moved in order to find the marker.");
+	else
+		ROS_INFO("If the marker ist not visible to the camera, the pose will be skipped.");
+		
+	ROS_INFO("Parameter %s ist set to %s:", "move_marker_to_corners", dataCaptureOptions.moveMarkerToCorners ? "true" : "false");
+	if(dataCaptureOptions.moveMarkerToCorners)
+		ROS_INFO("The measurements will be taken according to the given joint states.");
+	else
+		ROS_INFO("For each pose, the head will be moved s.t. the marker is in the center and the four corners.");
+		
+	// enable stiffness
 	enableHeadStiffness();
 	enableChainStiffness();
+	
+	// start the loop
 	const string& prefix = getPosePrefix();
 	for (int i = start; i <= end; i += 1) {
 		// check for pause requests:
@@ -204,12 +220,15 @@ void DataCapture::playChainPoses() {
 
 		// find the marker
 		if (dataCaptureOptions.findMarker) {
+			// check if the marker is currently visible to the camera
 			updateMarker();
 			if(!markerFound) {
+				// marker is not visible, so find it by moving the head
 				ROS_INFO("Moving head in order to find the marker...");
 				findMarker();
 			}
 			if (!markerFound) {
+				// marker could not be found, skip the pose
 				ROS_INFO("Was not able to find the marker. Continue with the next pose...");
 				continue;
 			}
@@ -248,6 +267,8 @@ void DataCapture::playChainPoses() {
 			publishMeasurement();
 		}
 	}
+	
+	// disable stiffness
 	disableChainStiffness();
 	disableHeadStiffness();
 }
