@@ -23,16 +23,22 @@ b) Adjust the contents of the file "params_general" to your needs:
       marker_transforms_filename_suffix: [string]
       camera_intrnsics_filename: [string]
       
-      The final filenames whill have prepended the name of the robot.
+      The final filenames whil have prepended the name of the robot.
 
 c) For each kinematic chain, create or modify the following three files:
 - params_CHAINNAME_general.yaml (contains general information about the chain):
       chain_name: [string] (identifier of the chain; eg. larm)
       chain_root: [string] (first frame after the camera; eg. HeadPitch_link)
       chain_tip: [string] (last frame of the chain; eg. l_wrist)
-      marker_type: [string] (decides the marker detection strategy; eg. checkerboard, circle)
+      marker_type: [string] (decides the marker detection strategy; eg. checkerboard, circle, aruco, color)
       marker_frame: [string] (eg. LMarker_frame, l_tip)
-      CHAINNAME_marker_radius: [float] (optional; used if marker_type = circle; eg. 0.11)
+      
+      Optional parameters for circle:
+      CHAINNAME_marker_radius: [float] (optional; eg. 0.11)
+      
+      Optional parameters for checkerboard:
+      checkerboard_rows: [int] (default is 4; must be >= 2)
+      checkerboard_columns: [int] (default is 4; must be >= 2)
       
       Only the joint offsets of the non-fixed joints contained in the chain 
       from chain_root to chain_tip will be calibrated.
@@ -50,6 +56,8 @@ c) For each kinematic chain, create or modify the following three files:
       headPitch_min: [float] (for searching the marker)
       haedPitch_max: [float] (for searching the marker)
       headPitch_step: [float] (for searching the marker)
+      find_marker: [boolean] (if the marker is not visible, search the marker in the given head range)
+	  move_marker_to_corners: [boolean] (move the head s.t. the marker is in the center and corners of the image)
       marker_color_r: [integer] (optional; currently only used for marker_type = circle and no radius given)
       marker_color_g: [integer] (optional; currently only used for marker_type = circle and no radius given)
       marker_color_b: [integer] (optional; currently only used for marker_type = circle and no radius given)
@@ -72,13 +80,13 @@ c) For each kinematic chain, create or modify the following three files:
 -------------------------------------------------------------------------------
 a) Start roscore.
 
-b) On the robot:
+b)
 - nao_driver: (publishing /joint_states)
       roslaunch nao_driver nao_driver.launch
-
-c) On the local machine:
+      
 - nao_camera: (publishing /nao_camera/camera_info and /nao_camera/image_raw)
       NAO_IP=ra.local roslaunch nao_driver nao_camera.launch (adjust NAO_IP!)
+      
 - robot model: (publishing /tf and loads the robot model)
       roslaunch nao_description nao_v4_publisher.launch OR
       roslaunch nao_description2 nao_publisher.launch robot:=ra OR
@@ -89,7 +97,8 @@ c) On the local machine:
       roslaunch kinematic_calibration optimization.launch
       
 - update: (waits for /kinematic_calibration/calibration_result)
-      rosrun kinematic_calibration updateNode
+      --> Already started by optimization.launch!
+      (rosrun kinematic_calibration updateNode)
             
       
 3. Step: Capture Data.
