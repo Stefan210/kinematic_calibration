@@ -6,7 +6,7 @@ headYaw_step: 0.4
 headPitch_min: -0.5
 haedPitch_max: 0.2
 headPitch_step: 0.33
-find_marker: false
+find_marker: true
 move_marker_to_corners: false
 marker_color_r: 0
 marker_color_g: 255
