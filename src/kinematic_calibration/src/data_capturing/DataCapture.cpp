@@ -166,6 +166,7 @@ void DataCapture::playChainPoses() {
 	nhPrivate.getParam("params/end_pose_num", end);
 	//CalibrationOptions options = context.getCalibrationOptions();
 	DataCaptureOptions dataCaptureOptions = context.getDataCaptureOptions();
+	cout << "find marker: " << dataCaptureOptions.findMarker << endl;
 	enableHeadStiffness();
 	enableChainStiffness();
 	const string& prefix = getPosePrefix();
@@ -203,10 +204,15 @@ void DataCapture::playChainPoses() {
 
 		// find the marker
 		if (dataCaptureOptions.findMarker) {
-			ROS_INFO("Moving head in order to find the marker...");
-			findMarker();
-			if (!markerFound)
+			updateMarker();
+			if(!markerFound) {
+				ROS_INFO("Moving head in order to find the marker...");
+				findMarker();
+			}
+			if (!markerFound) {
+				ROS_INFO("Was not able to find the marker. Continue with the next pose...");
 				continue;
+			}
 		}
 
 		if (dataCaptureOptions.moveMarkerToCorners) {

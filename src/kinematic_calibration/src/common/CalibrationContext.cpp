@@ -72,8 +72,8 @@ CalibrationOptions RosCalibContext::getCalibrationOptions() const {
 
 DataCaptureOptions RosCalibContext::getDataCaptureOptions() const {
 	DataCaptureOptions options;
-	nh.getParam("find_marker", options.findMarker);
-	nh.getParam("move_marker_to_corners", options.moveMarkerToCorners);
+	nh.getParam("/DataCapture/params/find_marker", options.findMarker);
+	nh.getParam("/DataCapture/params/move_marker_to_corners", options.moveMarkerToCorners);
 	return options;
 }
 
