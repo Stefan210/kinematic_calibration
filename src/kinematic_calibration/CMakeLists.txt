@@ -134,7 +134,6 @@ catkin_package(
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(kinematic_calibration_node kinematic_calibration_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(kinematic_calibration_node
@@ -328,6 +327,7 @@ add_executable(measurementToPoseNode
 	src/common/MeasurementToPoseNode.cpp
 	)
 	
+add_dependencies(measurementToPoseNode ${PROJECT_NAME}_generate_messages_cpp)
 target_link_libraries(measurementToPoseNode ${catkin_LIBRARIES})
 
 
@@ -336,6 +336,7 @@ add_executable(measurementImageExtractionNode
 	src/common/MeasurementImageExtractionNode.cpp
 	)
 	
+  add_dependencies(measurementImageExtractionNode ${PROJECT_NAME}_generate_messages_cpp)
 target_link_libraries(measurementImageExtractionNode ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 
@@ -388,6 +389,7 @@ add_executable(updateNode
 	src/result_publishing/UrdfUpdate.cpp	
 	src/result_publishing/JointUpdate.cpp
 	)
+add_dependencies(updateNode ${PROJECT_NAME}_generate_messages_cpp)
 target_link_libraries(updateNode modelLoader ${catkin_LIBRARIES})
 
 catkin_add_gtest(jointUpdateTest test/JointUpdateTest.cpp src/result_publishing/JointUpdate.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
@@ -407,6 +409,7 @@ if( ${NAOqi_FOUND} )
         ${NAOqi_LIBRARIES}
         ${Boost_LIBRARIES}
 	)
+     add_dependencies(temperatureNode ${PROJECT_SOURCE_DIR}_generate_messages_cpp)
     add_dependencies(temperatureNode ${catkin_EXPORTED_TARGETS})
 
 #    install(TARGETS temperatureNode
