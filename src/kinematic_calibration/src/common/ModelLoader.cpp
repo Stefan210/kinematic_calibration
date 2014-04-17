@@ -21,18 +21,6 @@ ModelLoader::~ModelLoader() {
 	// TODO Auto-generated destructor stub
 }
 
-bool ModelLoader::initializeFromRos() {
-	bool success = true;
-	if (!loadUrdfFromRos())
-		return false;
-
-	if (!loadKdlFromUrdf())
-		return false;
-
-	initialized = true;
-	return true;
-}
-
 bool ModelLoader::initializeFromUrdf(string urdfXml) {
 	this->urdfXml = urdfXml;
 
@@ -98,6 +86,13 @@ void ModelLoader::getUrdfModel(urdf::Model& model) {
 		ROS_ERROR("Model was not initialized!");
 	}
 	model = this->urdfModel;
+}
+
+const string& ModelLoader::getUrdfXml() const {
+	if (!initialized) {
+		ROS_ERROR("Model was not initialized!");
+	}
+	return urdfXml;
 }
 
 } /* namespace kinematic_calibration */

@@ -40,7 +40,17 @@ public:
 	 * Initializes the model by loading the xml string
 	 * from the ROS parameter server.
 	 */
-	bool initializeFromRos();
+	bool initializeFromRos() {
+		bool success = true;
+		if (!loadUrdfFromRos())
+			return false;
+
+		if (!loadKdlFromUrdf())
+			return false;
+
+		initialized = true;
+		return true;
+	}
 
 	/**
 	 * Initializes the model by using the passed xml string.
@@ -60,6 +70,12 @@ public:
 	 * @param[out] model the model as URDF model.
 	 */
 	void getUrdfModel(urdf::Model& model);
+
+	/**
+	 * Returns the urdf xml string.
+	 * @return The urdf xml string.
+	 */
+	const string& getUrdfXml() const;
 
 protected:
 	bool loadUrdfFromRos();
