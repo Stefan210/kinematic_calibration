@@ -118,7 +118,7 @@ void OptimizationNode::startLoop() {
 
 void OptimizationNode::collectData() {
 	collectingData = true;
-	while (collectingData) {
+	while (collectingData && ros::ok()) {
 		ros::spinOnce();
 	}
 	removeIgnoredMeasurements();

@@ -186,7 +186,7 @@ void DataCapture::playChainPoses() {
 	
 	// start the loop
 	const string& prefix = getPosePrefix();
-	for (int i = start; i <= end; i += 1) {
+	for (int i = start; i <= end && ros::ok(); i += 1) {
 		// check for pause requests:
 		// call blocks if pause requested
 		if (pauseManager.pauseRequested()) {

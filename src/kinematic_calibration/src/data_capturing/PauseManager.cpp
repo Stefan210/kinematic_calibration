@@ -112,7 +112,7 @@ bool PauseManager::pauseRequested() {
 
 void PauseManager::pauseIfRequested() {
 	// pause until resume requested.
-	while (pauseRequested()) {
+	while (pauseRequested() && ros::ok()) {
 		usleep(0.1 * 1e-6);
 	}
 }
