@@ -40,17 +40,7 @@ public:
 	 * Initializes the model by loading the xml string
 	 * from the ROS parameter server.
 	 */
-	bool initializeFromRos() {
-		bool success = true;
-		if (!loadUrdfFromRos())
-			return false;
-
-		if (!loadKdlFromUrdf())
-			return false;
-
-		initialized = true;
-		return true;
-	}
+	bool initializeFromRos();
 
 	/**
 	 * Initializes the model by using the passed xml string.

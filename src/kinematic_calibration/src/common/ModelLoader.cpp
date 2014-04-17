@@ -21,6 +21,18 @@ ModelLoader::~ModelLoader() {
 	// TODO Auto-generated destructor stub
 }
 
+bool ModelLoader::initializeFromRos() {
+	bool success = true;
+	if (!loadUrdfFromRos())
+		return false;
+
+	if (!loadKdlFromUrdf())
+		return false;
+
+	initialized = true;
+	return true;
+}
+
 bool ModelLoader::initializeFromUrdf(string urdfXml) {
 	this->urdfXml = urdfXml;
 
