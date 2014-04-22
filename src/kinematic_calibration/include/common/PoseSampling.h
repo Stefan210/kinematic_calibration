@@ -13,6 +13,7 @@
 #include <kdl/tree.hpp>
 #include <ros/node_handle.h>
 #include <ros/subscriber.h>
+#include <ros/publisher.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <urdf/model.h>
 #include <map>
@@ -60,9 +61,16 @@ protected:
 	 */
 	virtual void initializeCamera();
 
+	/**
+	 * Camera info message callback.
+	 * @param[in] msg Camera info message,
+	 */
 	void camerainfoCallback(const sensor_msgs::CameraInfoConstPtr& msg);
 
+	void publishJointState(sensor_msgs::JointState& msg) const;
+
 	shared_ptr<KinematicCalibrationState> initialState;
+
 	boost::shared_ptr<KinematicChain> kinematicChainPtr;
 
 	/**
@@ -74,6 +82,11 @@ protected:
 	 * Subscriber for camera info messages.
 	 */
 	Subscriber cameraInfoSubscriber;
+
+	/**
+	 * Publisher for joint states.
+	 */
+	Publisher jointStatePub;
 
 	/**
 	 * Source for loading the robot model.
