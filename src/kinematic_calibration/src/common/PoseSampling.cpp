@@ -32,6 +32,9 @@
 #include <moveit/rdf_loader/rdf_loader.h>
 #include <moveit/collision_detection/collision_robot.h>
 
+using namespace boost;
+using namespace std;
+
 namespace kinematic_calibration {
 
 PoseSampling::PoseSampling() {
@@ -127,6 +130,8 @@ void PoseSampling::initializeState() {
 }
 
 void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
+
+	// initialize the joint limits of the interesting joints (i.e. that ones of the current chain)
 	vector<string> jointNames;
 	this->kinematicChainPtr->getJointNames(jointNames);
 	for (int i = 0; i < jointNames.size(); i++) {
@@ -137,8 +142,71 @@ void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
 		this->upperLimits[jointName] = upperLimit;
 	}
 
+	// initialize the seed for the random generator
 	srand(time(NULL));
 
+	// prepare the additional link/joint for between camera and marker
+	shared_ptr<urdf::Joint> markerJoint = make_shared<urdf::Joint>();
+	markerJoint->parent_link_name = "CameraBottom_frame";
+	markerJoint->child_link_name = "virtualMarkerLink";
+	markerJoint->name = "virtualMarkerJoint";
+	markerJoint->type = urdf::Joint::FIXED;
+
+	shared_ptr<urdf::Link> markerLink = make_shared<urdf::Link>();
+	markerLink->parent_joint = markerJoint;
+	markerLink->name = "virtualMarkerLink";
+
+	shared_ptr<urdf::Collision> markerLinkCollision = make_shared<
+			urdf::Collision>();
+	shared_ptr<urdf::Cylinder> cylinder = make_shared<urdf::Cylinder>();
+	cylinder->type = urdf::Geometry::CYLINDER;
+	cylinder->radius = 0.01; // TODO: as parameter? determine "right" size?
+	cylinder->length = 0.0; // real length is updated later
+	markerLinkCollision->geometry = cylinder;
+
+	urdf::Pose urdfCollisionPose;
+	markerLinkCollision->origin = urdfCollisionPose;
+
+	// initialize the URDF model
+	ROS_INFO("Initialize the URDF model from ROS...");
+	urdf::Model urdfModel;
+	this->modelLoader.initializeFromRos();
+	this->modelLoader.getUrdfModel(urdfModel);
+
+	// modify the URDF model
+	ROS_INFO("Adding additional (virtual) joint and link from camera to marker frame to the model...");
+	urdfModel.links_["CameraBottom_frame"]->collision = markerLinkCollision;
+	urdfModel.links_["CameraBottom_frame"]->child_joints.push_back(markerJoint);
+	urdfModel.links_["CameraBottom_frame"]->child_links.push_back(markerLink);
+	urdfModel.joints_[markerJoint->name] = markerJoint;
+	urdfModel.links_[markerLink->name] = markerLink;
+	markerLink->setParent(urdfModel.links_["CameraBottom_frame"]);
+
+	// initialize the SRDF model
+	ROS_INFO("Initialize the SRDF model from runtime information...");
+
+	stringstream srdfStringStream;
+	srdfStringStream << "<robot name=\"" << urdfModel.getName() << "\">";
+	srdfStringStream << "<group name=\"current_chain\">";
+	for (int i = 0; i < jointNames.size(); i++) {
+		srdfStringStream << "<joint name=\"" << jointNames[i] << "\"/>";
+	}
+	srdfStringStream << "<joint name=\"" << "CameraBottom" << "\"/>";
+	srdfStringStream << "<link name=\"" << "CameraBottom_frame" << "\"/>";
+	srdfStringStream << "<joint name=\"" << "virtualMarkerJoint" << "\"/>";
+	srdfStringStream << "<link name=\"" << "virtualMarkerLink" << "\"/>";
+	srdfStringStream << "</group>";
+	srdfStringStream << "</robot>";
+	string srdfString = srdfStringStream.str();
+
+	srdf::Model srdfModel;
+	srdfModel.initString(urdfModel, srdfString);
+
+	shared_ptr<const srdf::Model> srdfModelPtr = make_shared<const srdf::Model>(
+			srdfModel);
+
+
+	// sample as much poses as requested
 	while (poses.size() < numOfPoses && ros::ok()) {
 
 		// sample joint states within the allowed limit
@@ -171,12 +239,9 @@ void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
 
 		// check #2: Is the marker is visible to the camera?
 
-		// modify the urdf model
-		ROS_INFO("modify the urdf model");
-		urdf::Model urdfModel;
-		this->modelLoader.initializeFromRos();
-		this->modelLoader.getUrdfModel(urdfModel);
+		// update the URDF model
 
+		// pose of the (virtual) marker joint
 		tf::Transform cameraToMarker;
 		pose.predictEndEffectorPose(*this->initialState, cameraToMarker);
 		cameraToMarker = cameraToMarker.inverse();
@@ -188,73 +253,44 @@ void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
 				cameraToMarker.getOrigin().getZ());
 		urdfJointPose.rotation = urdf::Rotation(0, 0, 0, 1);
 
-		shared_ptr<urdf::Joint> markerJoint = make_shared<urdf::Joint>();
-		markerJoint->parent_link_name = "CameraBottom_frame";
-		markerJoint->child_link_name = "virtualMarkerLink";
-		markerJoint->name = "virtualMarkerJoint";
-		markerJoint->type = urdf::Joint::FIXED;
 		markerJoint->parent_to_joint_origin_transform = urdfJointPose;
-
-		shared_ptr<urdf::Link> markerLink = make_shared<urdf::Link>();
-		markerLink->parent_joint = markerJoint;
-		markerLink->name = "virtualMarkerLink";
-
-		shared_ptr<urdf::Collision> markerLinkCollision = make_shared<
-				urdf::Collision>();
-		shared_ptr<urdf::Cylinder> cylinder = make_shared<urdf::Cylinder>();
-		cylinder->radius = 0.01;
 		cylinder->length = std::max(cameraToMarker.getOrigin().length() - 0.05,
 				0.0);
-		markerLinkCollision->geometry = cylinder;
-		urdf::Pose urdfCollisionPose;
-		urdfCollisionPose.position = urdf::Vector3(0, 0, 0);
-		urdfCollisionPose.rotation = urdf::Rotation(0, 0, 0, 1);
 
-		// collision orientation
+		// collision rotation (relative to the camera frame!)
 		Eigen::Quaternion<double> q;
 		q.setFromTwoVectors(Eigen::Vector3d(0, 0, 1),
 				Eigen::Vector3d(-urdfJointPose.position.x,
 						-urdfJointPose.position.y, -urdfJointPose.position.z));
-		urdfCollisionPose.rotation = urdf::Rotation(q.x(), q.y(), q.z(), q.w());
+		markerLinkCollision->origin.rotation = urdf::Rotation(q.x(), q.y(), q.z(), q.w());
 
-		markerLinkCollision->origin = urdfCollisionPose;
-		//markerLink->collision = markerLinkCollision;
 
-		// set the same collision to the camera link.....
+		// collision origin (relative to the camera frame!)
 		markerLinkCollision->origin.position = urdf::Vector3(
 				urdfJointPose.position.x / 2, urdfJointPose.position.y / 2,
 				urdfJointPose.position.z / 2);
-		urdfModel.links_["CameraBottom_frame"]->collision = markerLinkCollision;
 
-		urdfModel.joints_[markerJoint->name] = markerJoint;
-		urdfModel.links_[markerLink->name] = markerLink;
 
+
+
+		// initialize the moveit model
+		ROS_INFO("initialize the moveit model");
+
+		/*
 		// load the modified model into a string
 		stringstream urdfStringStream;
 		urdfStringStream << *urdf::exportURDF(urdfModel);
 
-		// initialize the moveit model
-		ROS_INFO("initialize the moveit model");
-		stringstream srdfStringStream;
-		srdfStringStream << "<robot name=\"" << urdfModel.getName() << "\">";
-		srdfStringStream << "<group name=\"current_chain\">";
-		for (int i = 0; i < jointNames.size(); i++) {
-			srdfStringStream << "<joint name=\"" << jointNames[i] << "\"/>";
-		}
-		srdfStringStream << "<joint name=\"" << "CameraBottom" << "\"/>";
-		srdfStringStream << "<link name=\"" << "CameraBottom_frame" << "\"/>";
-		srdfStringStream << "<joint name=\"" << "virtualMarkerJoint" << "\"/>";
-		srdfStringStream << "<link name=\"" << "virtualMarkerLink" << "\"/>";
-		srdfStringStream << "</group>";
-		srdfStringStream << "</robot>";
-
 		string urdfString = urdfStringStream.str();
-		string srdfString = srdfStringStream.str();
 		robot_model_loader::RobotModelLoader rml(
 				robot_model_loader::RobotModelLoader::Options(urdfString,
 						srdfString));
 		robot_model::RobotModelPtr kinematic_model = rml.getModel();
-		//kinematic_model->printModelInfo(cout);
+		*/
+
+		shared_ptr<const urdf::Model> urdfModelPtr = make_shared<const urdf::Model>(urdfModel);
+		robot_model::RobotModelPtr kinematic_model = make_shared<robot_model::RobotModel>(urdfModelPtr, srdfModelPtr);
+		kinematic_model->printModelInfo(cout);
 		planning_scene::PlanningScene planning_scene(kinematic_model);
 
 		// get/change state
@@ -276,7 +312,7 @@ void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
 		collision_request.group_name = "current_chain";
 		collision_request.contacts = true;
 		collision_request.max_contacts = 1000;
-		//collision_request.verbose = true;
+		collision_request.verbose = true;
 		planning_scene.checkSelfCollision(collision_request, collision_result);
 		ROS_INFO_STREAM(
 				"Current state is " << (collision_result.collision ? "in" : "not in") << " self collision");
@@ -302,6 +338,9 @@ void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
 		// debug
 		bool debug = false; // TODO: as class variable
 		if (debug) {
+			stringstream urdfStringStream;
+			urdfStringStream << *urdf::exportURDF(urdfModel);
+			string urdfString = urdfStringStream.str();
 			nh.setParam("/robot_description", urdfString);
 			tf::TransformBroadcaster broadcaster;
 			string cameraFrame = markerJoint->parent_link_name;
