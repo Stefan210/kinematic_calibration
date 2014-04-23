@@ -163,10 +163,6 @@ void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
 	markerJoint->child_link_name = "virtualMarkerLink";
 	markerJoint->name = "virtualMarkerJoint";
 	markerJoint->type = urdf::Joint::FIXED;
-	//markerJoint->axis = urdf::Vector3(0, 0, 0);
-	//markerJoint->limits = boost::make_shared<urdf::JointLimits>();
-	//markerJoint->limits->upper = 0.1;
-	//markerJoint->limits->lower = -0.1;
 
 	shared_ptr<urdf::Link> markerLink = make_shared<urdf::Link>();
 	markerLink->parent_joint = markerJoint;
@@ -224,6 +220,7 @@ void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
 	shared_ptr<const srdf::Model> srdfModelPtr = make_shared<const srdf::Model>(
 			srdfModel);
 
+	// initialize the moveit robot model
 	robot_model::RobotModelPtr kinematic_model = make_shared<
 			robot_model::RobotModel>(urdfModelPtr, srdfModelPtr);
 
@@ -244,11 +241,12 @@ void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
 			jointState.position.push_back(currentJointState);
 		}
 
+		// --------------------------------------------------------------------------------
 		// check #1: The predicted coordinates must be within {[0,640],[0,480]}.
+		// --------------------------------------------------------------------------------
 		double x, y;
 		MeasurementPose pose(*this->kinematicChainPtr, jointState);
 		pose.predictImageCoordinates(*this->initialState, x, y);
-		//cout << "Predicted image coordinates: \t" << x << "\t" << y << endl;
 
 		if (0 < x && 640 > x && 0 < y && 480 > y) {
 			if (debug)
@@ -260,9 +258,11 @@ void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
 
 		// TODO: check normals/angle
 
+		// --------------------------------------------------------------------------------
 		// check #2: Is the marker is visible to the camera?
+		// --------------------------------------------------------------------------------
 
-		// update the URDF model
+		// update the URDF model (virtual direct joint/link between camera and marker)
 
 		// pose of the (virtual) marker joint
 		tf::Transform cameraToMarker;
@@ -280,7 +280,7 @@ void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
 		cylinder->length = std::max(cameraToMarker.getOrigin().length() - 0.01,
 				0.01);
 
-		// collision rotation (relative to the camera frame!)
+		// collision object: rotation (relative to the camera frame!)
 		Eigen::Quaternion<double> q;
 		q.setFromTwoVectors(Eigen::Vector3d(0, 0, 1),
 				Eigen::Vector3d(-urdfJointPose.position.x,
@@ -288,12 +288,12 @@ void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
 		markerLinkCollision->origin.rotation = urdf::Rotation(q.x(), q.y(),
 				q.z(), q.w());
 
-		// collision origin (relative to the camera frame!)
+		// collision object: origin (relative to the camera frame!)
 		markerLinkCollision->origin.position = urdf::Vector3(
 				urdfJointPose.position.x / 2, urdfJointPose.position.y / 2,
 				urdfJointPose.position.z / 2);
 
-		// initialize the moveit model
+		// (re-)initialize the moveit model
 		//ROS_INFO("initialize the moveit model");
 		//shared_ptr<const urdf::Model> urdfModelPtr = make_shared<const urdf::Model>(urdfModel);
 		//kinematic_model = make_shared<
@@ -301,24 +301,22 @@ void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
 		if (debug) {
 			kinematic_model->printModelInfo(cout);
 		}
+
+		// get the planning scene
 		planning_scene::PlanningScene planning_scene(kinematic_model);
 
-		// get/change state
-		if (debug)
-			ROS_INFO("get/change state");
+		// get the state
 		robot_state::RobotState& current_state =
 				planning_scene.getCurrentStateNonConst();
 
+		// add the collision shape as attached body
 		std::vector<shapes::ShapeConstPtr> shapes;
 		boost::shared_ptr<shapes::Shape> shape = boost::make_shared<
 				shapes::Cylinder>(cylinder->radius, cylinder->length);
 		shapes.push_back(shape);
 
-		EigenSTL::vector_Affine3d attach_trans;
-		//Eigen::Affine3d trans;
-		//trans.setIdentity();
-		//trans.linear() = q.toRotationMatrix();
-		Eigen::Affine3d trans;
+		EigenSTL::vector_Affine3d attachTrans;
+		Eigen::Affine3d eigenCollisionTrans;
 		tf::transformTFToEigen(
 				tf::Transform(
 						tf::Quaternion(markerLinkCollision->origin.rotation.x,
@@ -328,21 +326,17 @@ void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
 						tf::Vector3(markerLinkCollision->origin.position.x,
 								markerLinkCollision->origin.position.y,
 								markerLinkCollision->origin.position.z)),
-				trans);
-		attach_trans.push_back(trans);
+				eigenCollisionTrans);
+		attachTrans.push_back(eigenCollisionTrans);
 
-		std::set<std::string> touch_links;
-		//touch_links.insert(touch_links.end(), "CameraBottom_frame");
-		std::string link_name = "CameraBottom_frame";
+		std::set<std::string> touchLinks;
+		std::string attachLinkName = "CameraBottom_frame";
+		string attachedBodyName = "marker";
 		current_state.clearAttachedBodies();
-		current_state.enforceBounds(); // TODO: is it necessary?
-		current_state.attachBody("marker", shapes, attach_trans, touch_links,
-				link_name);
+		current_state.attachBody(attachedBodyName, shapes, attachTrans, touchLinks,
+				attachLinkName);
 
-		jointState.name.push_back("CameraBottom");
-		jointState.position.push_back(0.0);
-		jointState.name.push_back(markerJoint->name);
-		jointState.position.push_back(0.0);
+		// set the joint state
 		current_state.setStateValues(jointState.name, jointState.position);
 		if (debug)
 			current_state.printStateInfo(cout);
@@ -367,8 +361,7 @@ void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
 				collision_result.contacts.begin();
 				it != collision_result.contacts.end(); ++it) {
 			// only contacts with the "virtual" link are interesting
-			string linkToCheck = markerLink->name;
-			linkToCheck = "marker";
+			string linkToCheck = attachedBodyName;
 			if (linkToCheck == it->first.first.c_str()
 					|| linkToCheck == it->first.second.c_str()) {
 				if (debug)
@@ -378,11 +371,12 @@ void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
 			}
 		}
 
+		// collision detected
 		if (collision) {
 			continue;
 		}
 
-		// debug
+		// debug: publish the urdf model, moveit state and joint state
 		if (debug) {
 			// urdf
 			stringstream urdfStringStream;
