@@ -135,7 +135,7 @@ void PoseSampling::initializeState() {
 }
 
 void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
-	bool debug = false; // TODO: as class variable
+	bool debug = true; // TODO: as class variable
 
 	ros::Publisher robot_state_publisher;
 	if (debug) {
@@ -376,6 +376,14 @@ void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
 			continue;
 		}
 
+		// add to the pose set
+		poses.push_back(pose);
+
+		// print some info
+		cout << "Number of sampled poses: " << poses.size() << "\t";
+		cout << "Predicted image coordinates: \t" << x << "\t" << y
+				<< endl;
+
 		// debug: publish the urdf model, moveit state and joint state
 		if (debug) {
 			// urdf
@@ -402,13 +410,6 @@ void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
 			}
 		}
 
-		// add to the pose set
-		poses.push_back(pose);
-
-		// print some info
-		cout << "Number of sampled poses: " << poses.size() << "\t";
-		cout << "Predicted image coordinates: \t" << x << "\t" << y
-				<< endl;
 	}
 }
 
