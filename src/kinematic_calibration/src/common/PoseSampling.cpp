@@ -135,7 +135,7 @@ void PoseSampling::initializeState() {
 }
 
 void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
-	bool debug = true; // TODO: as class variable
+	bool debug = false; // TODO: as class variable
 
 	ros::Publisher robot_state_publisher;
 	if (debug) {
@@ -256,8 +256,6 @@ void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
 			continue;
 		}
 
-		// TODO: check normals/angle
-
 		// --------------------------------------------------------------------------------
 		// check #2: Is the marker is visible to the camera?
 		// --------------------------------------------------------------------------------
@@ -376,6 +374,10 @@ void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
 			continue;
 		}
 
+		// --------------------------------------------------------------------------------
+		// TODO: check #3: normals/angle
+		// --------------------------------------------------------------------------------
+
 		// add to the pose set
 		poses.push_back(pose);
 
@@ -431,14 +433,4 @@ void PoseSampling::publishJointState(sensor_msgs::JointState& msg) const {
 
 } /* namespace kinematic_calibration */
 
-using namespace kinematic_calibration;
-
-int main(int argc, char** argv) {
-	stringstream nodeName;
-	ros::init(argc, argv, "PoseSampling");
-	PoseSampling node;
-	std::vector<MeasurementPose> poses;
-	node.getPoses(500, poses);
-	return 0;
-}
 
