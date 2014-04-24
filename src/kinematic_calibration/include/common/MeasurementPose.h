@@ -69,6 +69,13 @@ public:
 		return jointState;
 	}
 
+	/**
+	 * Converts the pose into the pose manager string format.
+	 * @param number The pose number to be used.
+	 * @param stream The string stream to be appended.
+	 */
+	void toPoseManagerString(const int& number, stringstream& stream) const;
+
 protected:
 	void calcCameraIntrinsicsDerivatives(KinematicCalibrationState state,
 			const double& h,

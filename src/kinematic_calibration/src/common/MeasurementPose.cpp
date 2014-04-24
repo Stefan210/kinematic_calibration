@@ -332,4 +332,61 @@ double MeasurementPose::calculateDerivative(const double& plus,
 	return derivative;
 }
 
+void MeasurementPose::toPoseManagerString(
+		const int& number, stringstream& stream) const {
+	vector<string> jointNames;
+	this->kinematicChain.getJointNames(jointNames);
+
+	// print name
+	stringstream ss;
+	ss << this->kinematicChain.getName();
+	ss << std::setfill ('0') << std::setw (3);
+	ss << number;
+	string poseName = ss.str();
+	stream << poseName << ":\n";
+
+	// print joint names
+	stream << "  joint_names: [";
+	int numOfJoints = 0;
+	for (int i = 0; i < this->jointState.name.size(); i++) {
+		const string jointName = this->jointState.name[i];
+		if (find(jointNames.begin(), jointNames.end(), jointName)
+				!= jointNames.end()) {
+			numOfJoints++;
+			// print the joint name
+			stream << "\"" << jointName << "\"";
+			if (numOfJoints != jointNames.size()) {
+				// print comma if not the last
+				stream << ", ";
+			}
+		}
+	}
+	stream << "]\n";
+
+	// print time from start
+	stream << "  time_from_start: 1.0\n";
+
+	// print positions
+	stream << "  positions: [";
+	numOfJoints = 0;
+	for (int i = 0; i < this->jointState.name.size(); i++) {
+		const string jointName = this->jointState.name[i];
+		if (find(jointNames.begin(), jointNames.end(), jointName)
+				!= jointNames.end()) {
+			const double position = this->jointState.position[i];
+			numOfJoints++;
+			// print the position
+			stream << position;
+			if (numOfJoints != jointNames.size()) {
+				// print comma if not the last
+				stream << ", ";
+			}
+		}
+	}
+	stream << "]\n";
+	stream << endl;
+}
+
 } /* namespace kinematic_calibration */
+
+
