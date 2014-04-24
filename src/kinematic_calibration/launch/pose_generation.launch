@@ -25,5 +25,6 @@
       ### "measurement" parameters:
       # (none so far)
     </rosparam>
+    <param name="pose_file" value="poses_$(arg chain_name)_generated.yaml"/>
   </node>  
 </launch>
