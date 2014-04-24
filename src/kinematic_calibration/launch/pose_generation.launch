@@ -8,14 +8,22 @@
       # - "measurement": Generate the pose pool from measurements.
       pose_source: "sampling"
       
-      ### "sampling" parameters:
+      ### "sampling" parameters: 
+      # number of poses which should be generated
       pose_pool_size: 100
+      # name of the camera link / frame
       camera_frame: "CameraBottom_frame"
-      view_cylinder_radius: 0.01
+      # radius of the camera 'view cylinder'
+      view_cylinder_radius: 0.01 
+   
+      # range within which the predicted marker should be:
       xMin: 30
       xMax: 610
       yMin: 30
       yMax: 450
+      
+      ### "measurement" parameters:
+      # (none so far)
     </rosparam>
   </node>  
 </launch>

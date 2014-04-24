@@ -101,8 +101,8 @@ void PoseSelectionNode::initializeCamera() {
 	string topic = "/nao_camera/camera_info";
 	cameraInfoSubscriber = nh.subscribe(topic, 1,
 			&PoseSelectionNode::camerainfoCallback, this);
+	ROS_INFO("Waiting for camera info message...");
 	while (ros::getGlobalCallbackQueue()->isEmpty()) {
-		ROS_INFO("Waiting for camera info message...");
 		//ros::Duration(0.5).sleep();
 	}
 	ros::getGlobalCallbackQueue()->callAvailable();
@@ -403,6 +403,7 @@ int main(int argc, char** argv) {
 	//CalibrationContext* context = new RosCalibContext();
 	string poseSource = "sampling";
 	nhPrivate.param("pose_source", poseSource, poseSource);
+	ROS_INFO("The selected pose source is: %s", poseSource.c_str());
 	if ("measurement" == poseSource) {
 		MeasurementMsgPoseSource* poseSource = new MeasurementMsgPoseSource();
 		PoseSelectionNode node(*poseSource);
@@ -423,6 +424,9 @@ int main(int argc, char** argv) {
 		PoseSamplingPoseSource* poseSource = new PoseSamplingPoseSource();
 		PoseSelectionNode node(*poseSource);
 		shared_ptr<PoseSet> poses = node.getOptimalPoseSet();
+	} else {
+		ROS_ERROR("The specified pose source type '%s' is unknown.",
+				poseSource.c_str());
 	}
 	return 0;
 }
