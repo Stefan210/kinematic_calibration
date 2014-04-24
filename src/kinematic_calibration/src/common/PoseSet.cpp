@@ -8,6 +8,11 @@
 #include "../../include/common/PoseSet.h"
 
 #include <boost/make_shared.hpp>
+#include <sensor_msgs/JointState.h>
+#include <fstream>
+#include <iostream>
+#include <iterator>
+#include <utility>
 
 using namespace boost;
 
@@ -166,5 +171,25 @@ vector<sensor_msgs::JointState> MeasurementPoseSet::getUnusedPoses() const {
 	return poses;
 }
 
+bool MeasurementPoseSet::writeToFile(
+		const string& filename) const {
+	stringstream strStream;
+	ofstream fStream(filename.c_str());
+	int i = 1;
+	for (vector<int>::const_iterator it = this->activePoses.begin();
+			it != this->activePoses.end(); it++, i++) {
+		(*this->poseSet)[*it].toPoseManagerString(i, strStream);
+	}
+	if(!fStream.good()) {
+		return false;
+	}
+
+	fStream << strStream;
+	fStream.flush();
+	fStream.close();
+	return true;
+}
+
 } /* namespace kinematic_calibration */
+
 

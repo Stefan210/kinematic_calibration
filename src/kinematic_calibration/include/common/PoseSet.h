@@ -122,7 +122,14 @@ public:
 	virtual vector< shared_ptr<PoseSet> > removePose() const;
 	virtual int getNumberOfPoses() const;
 	vector<sensor_msgs::JointState> getPoses() const;
-	virtual vector<sensor_msgs::JointState> getUnusedPoses() const ;
+	virtual vector<sensor_msgs::JointState> getUnusedPoses() const;
+
+	/**
+	 * Writes the used poses into a file.
+	 * @param filename The file to be used.
+	 * @return True if successful, false otherwise.
+	 */
+	bool writeToFile(const string& filename) const;
 
 private:
 	/**
