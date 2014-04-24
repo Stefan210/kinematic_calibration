@@ -145,7 +145,6 @@ void PoseSampling::initializeState() {
 
 void PoseSampling::initializeJointLimits() {
 	// initialize the joint limits of the interesting joints (i.e. that ones of the current chain)
-	vector<string> jointNames;
 	this->kinematicChainPtr->getJointNames(jointNames);
 	for (int i = 0; i < jointNames.size(); i++) {
 		string jointName = jointNames[i];
@@ -233,6 +232,7 @@ void PoseSampling::getPoses(const int& numOfPoses,
 			robot_model::RobotModel>(urdfModelPtr, srdfModelPtr);
 
 	// sample as much poses as requested
+	ROS_INFO("Sampling %d poses now...", numOfPoses);
 	while (poses.size() < numOfPoses && ros::ok()) {
 
 		// sample joint states within the allowed limit
@@ -257,11 +257,16 @@ void PoseSampling::getPoses(const int& numOfPoses,
 		MeasurementPose pose(*this->kinematicChainPtr, jointState);
 		pose.predictImageCoordinates(*this->initialState, x, y);
 
+		if (debug) {
+			cout << "Predicted image coordinates: \t" << x << "\t" << y;
+		}
+
 		if (xMin < x && xMax > x && yMin < y && yMax > y) {
-			if (debug)
-				cout << "Predicted image coordinates: \t" << x << "\t" << y
-						<< endl;
+			if(debug)
+				cout << "--> Good!" << endl;
 		} else {
+			if(debug)
+				cout << "--> Not good!" << endl;
 			continue;
 		}
 
