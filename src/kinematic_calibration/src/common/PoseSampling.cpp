@@ -250,7 +250,8 @@ void PoseSampling::getPoses(const int& numOfPoses,
 		}
 
 		// --------------------------------------------------------------------------------
-		// check #1: The predicted coordinates must be within {[0,640],[0,480]}.
+		// check #1: The predicted coordinates must be within
+		// 			[xMin,yMin] and [xMax,yMax], e.g. [0,640]-[0,480].
 		// --------------------------------------------------------------------------------
 		double x, y;
 		MeasurementPose pose(*this->kinematicChainPtr, jointState);
@@ -266,9 +267,11 @@ void PoseSampling::getPoses(const int& numOfPoses,
 
 		// --------------------------------------------------------------------------------
 		// check #2: Is the marker is visible to the camera?
+		//			To check this, add an object (cylinder) between the camera and the
+		//			marker and look for collisions with the robot.
 		// --------------------------------------------------------------------------------
 
-		// update the URDF model (virtual direct joint/link between camera and marker)
+		// a) update the URDF model (virtual direct joint/link between camera and marker)
 
 		// pose of the (virtual) marker joint
 		tf::Transform cameraToMarker;
@@ -298,6 +301,8 @@ void PoseSampling::getPoses(const int& numOfPoses,
 		markerLinkCollision->origin.position = urdf::Vector3(
 				urdfJointPose.position.x / 2, urdfJointPose.position.y / 2,
 				urdfJointPose.position.z / 2);
+
+		// b) insert the collision object into the moveit model/state
 
 		// (re-)initialize the moveit model
 		//ROS_INFO("initialize the moveit model");
@@ -347,7 +352,7 @@ void PoseSampling::getPoses(const int& numOfPoses,
 		if (debug)
 			current_state.printStateInfo(cout);
 
-		// check for self-collisions
+		// c) check for self-collisions
 		if (debug)
 			ROS_INFO("check for self-collisions");
 		collision_detection::CollisionRequest collision_request;
@@ -366,7 +371,7 @@ void PoseSampling::getPoses(const int& numOfPoses,
 		for (collision_detection::CollisionResult::ContactMap::const_iterator it =
 				collision_result.contacts.begin();
 				it != collision_result.contacts.end(); ++it) {
-			// only contacts with the "virtual" link are interesting
+			// only contacts with the "virtual" link (i.e. collision object) are interesting
 			string linkToCheck = attachedBodyName;
 			if (linkToCheck == it->first.first.c_str()
 					|| linkToCheck == it->first.second.c_str()) {
