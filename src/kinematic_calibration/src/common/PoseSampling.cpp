@@ -63,11 +63,22 @@ void PoseSampling::initialize() {
 	this->initializeState();
 	this->initializeJointLimits();
 
-	// TODO: initialize parameter from ROS via nhPrivate or nh
+	// initialize parameter from ROS via nhPrivate or nh
+	nhPrivate.param("xMin", xMin, xMin);
+	nhPrivate.param("xMax", xMax, xMax);
+	nhPrivate.param("yMin", yMin, yMin);
+	nhPrivate.param("yMax", yMax, yMax);
+	nhPrivate.param("camera_frame", cameraFrame, cameraFrame);
+	nhPrivate.param("view_cylinder_radius", viewCylinderRadius, viewCylinderRadius);
+
+	// print some info about the used parameters
+	ROS_INFO("Allowed camera window size: [%.2f, %.2f] - [%.2f, %.2f]", xMin, yMin, xMax, yMax);
+	ROS_INFO("Using camera frame: %s", cameraFrame.c_str());
+	ROS_INFO("Using view cylinder radius: %f", viewCylinderRadius);
 }
 
 void PoseSampling::initializeCamera() {
-	string topic = "/nao_camera/camera_info";
+	string topic = "/nao_camera/camera_info"; // TODO: parameterize!
 	cameraInfoSubscriber = nh.subscribe(topic, 1,
 			&PoseSampling::camerainfoCallback, this);
 	ROS_INFO("Waiting for camera info message...");
