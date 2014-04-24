@@ -399,8 +399,10 @@ int main(int argc, char** argv) {
 	nodeName << "PoseSelectionNode";
 	nodeName << ros::Time::now().nsec;
 	ros::init(argc, argv, nodeName.str().c_str());
+	ros::NodeHandle nhPrivate("~");
 	//CalibrationContext* context = new RosCalibContext();
-	string poseSource = "sampling"; // TODO: as parameter!
+	string poseSource = "sampling";
+	nhPrivate.param("pose_source", poseSource, poseSource);
 	if ("measurement" == poseSource) {
 		MeasurementMsgPoseSource* poseSource = new MeasurementMsgPoseSource();
 		PoseSelectionNode node(*poseSource);
