@@ -24,6 +24,10 @@
       
       ### "measurement" parameters:
       # (none so far)
+      
+      ### Pose selection strategy:
+      # number of poses which should be selected from the pose pool
+      num_of_poses: 50
     </rosparam>
     <param name="pose_file" value="poses_$(arg chain_name)_generated.yaml"/>
   </node>  

@@ -31,7 +31,7 @@ namespace kinematic_calibration {
 using namespace std;
 
 PoseSelectionNode::PoseSelectionNode(PoseSource& poseSource) :
-		poseSource(poseSource) {
+		poseSource(poseSource), nhPrivate("~") {
 	initialize();
 
 	// TODO: inject the following instances:
@@ -111,6 +111,9 @@ void PoseSelectionNode::initializeCamera() {
 
 shared_ptr<PoseSet> PoseSelectionNode::getOptimalPoseSet() {
 	// TODO: parameterize; strategy pattern; ...
+	int maxPoses;
+	nhPrivate.param("num_of_poses", maxPoses, maxPoses);
+	ROS_INFO("Using num_of_poses: %d", maxPoses);
 
 	// initialize the pool of all available poses
 	vector<MeasurementPose> posePool;
@@ -136,7 +139,7 @@ shared_ptr<PoseSet> PoseSelectionNode::getOptimalPoseSet() {
 	IncrementalPoseSelectionStrategy incrementStrategy(1);
 	ExchangePoseSelectionStrategy exStrategy;
 
-	for (int i = 0; i < 50; i++) {
+	for (int i = resultSet->getNumberOfPoses(); i < maxPoses; i++) {
 		ROS_INFO("Improve by exchange...");
 		resultSet = exStrategy.getOptimalPoseSet(resultSet, observabilityIndex);
 		ROS_INFO("Increment pose set size...");

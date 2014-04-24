@@ -107,7 +107,7 @@ private:
 	/**
 	 * NodeHandle instance.
 	 */
-	NodeHandle nh;
+	NodeHandle nh, nhPrivate;
 
 	/**
 	 * Subscriber for camera info messages.
