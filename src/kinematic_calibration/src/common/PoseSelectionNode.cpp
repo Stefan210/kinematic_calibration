@@ -383,7 +383,7 @@ PoseSamplingPoseSource::~PoseSamplingPoseSource() {
 
 void PoseSamplingPoseSource::getPoses(const KinematicChain& kinematicChain,
 		vector<MeasurementPose>& poses) {
-	int posePoolSize;
+	int posePoolSize = 500;
 	nh.param("pose_pool_size", posePoolSize, posePoolSize);
 	PoseSampling poseSampling;
 	poseSampling.getPoses(posePoolSize, poses);
@@ -400,21 +400,28 @@ int main(int argc, char** argv) {
 	nodeName << ros::Time::now().nsec;
 	ros::init(argc, argv, nodeName.str().c_str());
 	//CalibrationContext* context = new RosCalibContext();
-	MeasurementMsgPoseSource* poseSource = new MeasurementMsgPoseSource();
-	PoseSelectionNode node(*poseSource);
-	shared_ptr<PoseSet> poses = node.getOptimalPoseSet();
-	vector<string> ids = poseSource->getPoseIds(poses->getPoses());
-	cout << "Optimized pose ids: " << endl;
-	for (int i = 0; i < ids.size(); i++) {
-		cout << "\"" << ids[i] << "\", ";
+	string poseSource = "sampling"; // TODO: as parameter!
+	if ("measurement" == poseSource) {
+		MeasurementMsgPoseSource* poseSource = new MeasurementMsgPoseSource();
+		PoseSelectionNode node(*poseSource);
+		shared_ptr<PoseSet> poses = node.getOptimalPoseSet();
+		vector<string> ids = poseSource->getPoseIds(poses->getPoses());
+		cout << "Optimized pose ids: " << endl;
+		for (int i = 0; i < ids.size(); i++) {
+			cout << "\"" << ids[i] << "\", ";
+		}
+		cout << endl;
+		ids = poseSource->getPoseIds(poses->getUnusedPoses());
+		cout << "Unused pose ids: " << endl;
+		for (int i = 0; i < ids.size(); i++) {
+			cout << "\"" << ids[i] << "\", ";
+		}
+		cout << endl;
+	} else if ("sampling" == poseSource) {
+		PoseSamplingPoseSource* poseSource = new PoseSamplingPoseSource();
+		PoseSelectionNode node(*poseSource);
+		shared_ptr<PoseSet> poses = node.getOptimalPoseSet();
 	}
-	cout << endl;
-	ids = poseSource->getPoseIds(poses->getUnusedPoses());
-	cout << "Unused pose ids: " << endl;
-	for (int i = 0; i < ids.size(); i++) {
-		cout << "\"" << ids[i] << "\", ";
-	}
-	cout << endl;
 	return 0;
 }
 
