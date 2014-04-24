@@ -10,7 +10,7 @@
       
       ### "sampling" parameters: 
       # number of poses which should be generated
-      pose_pool_size: 100
+      pose_pool_size: 500
       # name of the camera link / frame
       camera_frame: "CameraBottom_frame"
       # radius of the camera 'view cylinder'
