@@ -7,6 +7,8 @@
 
 #include "../../include/common/PoseSelectionNode.h"
 
+#include "../../include/common/PoseSampling.h"
+
 #include <boost/smart_ptr/make_shared.hpp>
 //#include <kdl/kdl.hpp>
 #include <kdl/tree.hpp>
@@ -371,6 +373,22 @@ vector<string> MeasurementMsgPoseSource::getPoseIds(
 	return ids;
 }
 
+PoseSamplingPoseSource::PoseSamplingPoseSource() {
+	// nothing to do
+}
+
+PoseSamplingPoseSource::~PoseSamplingPoseSource() {
+	// nothing to do
+}
+
+void PoseSamplingPoseSource::getPoses(const KinematicChain& kinematicChain,
+		vector<MeasurementPose>& poses) {
+	int posePoolSize;
+	nh.param("pose_pool_size", posePoolSize, posePoolSize);
+	PoseSampling poseSampling;
+	poseSampling.getPoses(posePoolSize, poses);
+}
+
 } /* namespace kinematic_calibration */
 
 using namespace kinematic_calibration;
@@ -399,3 +417,4 @@ int main(int argc, char** argv) {
 	cout << endl;
 	return 0;
 }
+
