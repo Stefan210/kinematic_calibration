@@ -85,6 +85,13 @@ public:
 
 	virtual vector<sensor_msgs::JointState> getUnusedPoses() const = 0;
 
+	/**
+	 * Writes the used poses into a file.
+	 * @param filename The file to be used.
+	 * @return True if successful, false otherwise.
+	 */
+	virtual bool writeToFile(const string& filename) const = 0;
+
 };
 
 class MeasurementPoseSet: public PoseSet {

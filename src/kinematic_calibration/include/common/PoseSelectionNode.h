@@ -254,7 +254,7 @@ public:
 			vector<MeasurementPose>& poses);
 
 private:
-	NodeHandle nh;
+	NodeHandle nhPrivate;
 };
 
 class PoseSelectionStrategy {

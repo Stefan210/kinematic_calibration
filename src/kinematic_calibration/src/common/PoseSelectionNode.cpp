@@ -373,7 +373,8 @@ vector<string> MeasurementMsgPoseSource::getPoseIds(
 	return ids;
 }
 
-PoseSamplingPoseSource::PoseSamplingPoseSource() {
+PoseSamplingPoseSource::PoseSamplingPoseSource() :
+		nhPrivate("~") {
 	// nothing to do
 }
 
@@ -384,7 +385,7 @@ PoseSamplingPoseSource::~PoseSamplingPoseSource() {
 void PoseSamplingPoseSource::getPoses(const KinematicChain& kinematicChain,
 		vector<MeasurementPose>& poses) {
 	int posePoolSize = 500;
-	nh.param("pose_pool_size", posePoolSize, posePoolSize);
+	nhPrivate.param("pose_pool_size", posePoolSize, posePoolSize);
 	PoseSampling poseSampling;
 	poseSampling.getPoses(posePoolSize, poses);
 }
@@ -394,6 +395,7 @@ void PoseSamplingPoseSource::getPoses(const KinematicChain& kinematicChain,
 using namespace kinematic_calibration;
 
 int main(int argc, char** argv) {
+	// initialize the node
 	stringstream nodeName;
 	ros::Time::init();
 	nodeName << "PoseSelectionNode";
@@ -401,9 +403,15 @@ int main(int argc, char** argv) {
 	ros::init(argc, argv, nodeName.str().c_str());
 	ros::NodeHandle nhPrivate("~");
 	//CalibrationContext* context = new RosCalibContext();
+
+	// initialize the pose source
 	string poseSource = "sampling";
 	nhPrivate.param("pose_source", poseSource, poseSource);
 	ROS_INFO("The selected pose source is: %s", poseSource.c_str());
+
+	// output filename
+	string fileName = "poses_generated.yaml";
+	nhPrivate.param("pose_file", fileName, fileName);
 	if ("measurement" == poseSource) {
 		MeasurementMsgPoseSource* poseSource = new MeasurementMsgPoseSource();
 		PoseSelectionNode node(*poseSource);
@@ -424,6 +432,7 @@ int main(int argc, char** argv) {
 		PoseSamplingPoseSource* poseSource = new PoseSamplingPoseSource();
 		PoseSelectionNode node(*poseSource);
 		shared_ptr<PoseSet> poses = node.getOptimalPoseSet();
+		poses->writeToFile(fileName);
 	} else {
 		ROS_ERROR("The specified pose source type '%s' is unknown.",
 				poseSource.c_str());

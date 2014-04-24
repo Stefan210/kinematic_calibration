@@ -184,7 +184,7 @@ bool MeasurementPoseSet::writeToFile(
 		return false;
 	}
 
-	fStream << strStream;
+	fStream << strStream.str();
 	fStream.flush();
 	fStream.close();
 	return true;
