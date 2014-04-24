@@ -43,11 +43,10 @@ using namespace std;
 namespace kinematic_calibration {
 
 PoseSampling::PoseSampling() :
-		debug(false) {
+		debug(false), nhPrivate("~"), xMin(20), xMax(620), yMin(20), yMax(460), cameraFrame(
+				"CameraBottom_frame") {
 	// initialize stuff
-	this->initializeCamera();
-	this->initializeKinematicChain();
-	this->initializeState();
+	this->initialize();
 
 	// register the joint state publisher
 	this->jointStatePub = nh.advertise<sensor_msgs::JointState>("/joint_states",
@@ -56,6 +55,15 @@ PoseSampling::PoseSampling() :
 
 PoseSampling::~PoseSampling() {
 
+}
+
+void PoseSampling::initialize() {
+	this->initializeCamera();
+	this->initializeKinematicChain();
+	this->initializeState();
+	this->initializeJointLimits();
+
+	// TODO: initialize parameter from ROS via nhPrivate or nh
 }
 
 void PoseSampling::initializeCamera() {
@@ -135,14 +143,7 @@ void PoseSampling::initializeState() {
 	}
 }
 
-void PoseSampling::getPoses(const int& numOfPoses,
-		vector<MeasurementPose>& poses) {
-	ros::Publisher robot_state_publisher;
-	if (debug) {
-		robot_state_publisher = nh.advertise<moveit_msgs::DisplayRobotState>(
-				"moveit_robot_state", 1);
-	}
-
+void PoseSampling::initializeJointLimits() {
 	// initialize the joint limits of the interesting joints (i.e. that ones of the current chain)
 	vector<string> jointNames;
 	this->kinematicChainPtr->getJointNames(jointNames);
@@ -153,13 +154,22 @@ void PoseSampling::getPoses(const int& numOfPoses,
 		this->lowerLimits[jointName] = lowerLimit;
 		this->upperLimits[jointName] = upperLimit;
 	}
+}
+
+void PoseSampling::getPoses(const int& numOfPoses,
+		vector<MeasurementPose>& poses) {
+	ros::Publisher robot_state_publisher;
+	if (debug) {
+		robot_state_publisher = nh.advertise<moveit_msgs::DisplayRobotState>(
+				"moveit_robot_state", 1);
+	}
 
 	// initialize the seed for the random generator
 	srand(time(NULL));
 
 	// prepare the additional link/joint for between camera and marker
 	shared_ptr<urdf::Joint> markerJoint = make_shared<urdf::Joint>();
-	markerJoint->parent_link_name = "CameraBottom_frame";
+	markerJoint->parent_link_name = cameraFrame;
 	markerJoint->child_link_name = "virtualMarkerLink";
 	markerJoint->name = "virtualMarkerJoint";
 	markerJoint->type = urdf::Joint::FIXED;
@@ -188,14 +198,12 @@ void PoseSampling::getPoses(const int& numOfPoses,
 	// modify the URDF model
 	ROS_INFO(
 			"Adding additional (virtual) joint and link from camera to marker frame to the model...");
-	//urdfModelPtr->links_["CameraBottom_frame"]->collision = markerLinkCollision;
-	urdfModelPtr->links_["CameraBottom_frame"]->child_joints.push_back(
-			markerJoint);
-	urdfModelPtr->links_["CameraBottom_frame"]->child_links.push_back(
-			markerLink);
+	//urdfModelPtr->links_[cameraFrame]->collision = markerLinkCollision;
+	urdfModelPtr->links_[cameraFrame]->child_joints.push_back(markerJoint);
+	urdfModelPtr->links_[cameraFrame]->child_links.push_back(markerLink);
 	urdfModelPtr->joints_[markerJoint->name] = markerJoint;
 	urdfModelPtr->links_[markerLink->name] = markerLink;
-	markerLink->setParent(urdfModelPtr->links_["CameraBottom_frame"]);
+	markerLink->setParent(urdfModelPtr->links_[cameraFrame]);
 
 	// initialize the SRDF model
 	ROS_INFO("Initialize the SRDF model from runtime information...");
@@ -207,7 +215,7 @@ void PoseSampling::getPoses(const int& numOfPoses,
 		srdfStringStream << "<joint name=\"" << jointNames[i] << "\"/>";
 	}
 	srdfStringStream << "<joint name=\"" << "CameraBottom" << "\"/>";
-	srdfStringStream << "<link name=\"" << "CameraBottom_frame" << "\"/>";
+	srdfStringStream << "<link name=\"" << cameraFrame << "\"/>";
 	srdfStringStream << "<joint name=\"" << "virtualMarkerJoint" << "\"/>";
 	srdfStringStream << "<link name=\"" << "virtualMarkerLink" << "\"/>";
 	srdfStringStream << "</group>";
@@ -248,7 +256,7 @@ void PoseSampling::getPoses(const int& numOfPoses,
 		MeasurementPose pose(*this->kinematicChainPtr, jointState);
 		pose.predictImageCoordinates(*this->initialState, x, y);
 
-		if (0 < x && 640 > x && 0 < y && 480 > y) {
+		if (xMin < x && xMax > x && yMin < y && yMax > y) {
 			if (debug)
 				cout << "Predicted image coordinates: \t" << x << "\t" << y
 						<< endl;
@@ -328,7 +336,7 @@ void PoseSampling::getPoses(const int& numOfPoses,
 		attachTrans.push_back(eigenCollisionTrans);
 
 		std::set<std::string> touchLinks;
-		std::string attachLinkName = "CameraBottom_frame";
+		std::string attachLinkName = cameraFrame;
 		string attachedBodyName = "marker";
 		current_state.clearAttachedBodies();
 		current_state.attachBody(attachedBodyName, shapes, attachTrans,

@@ -75,6 +75,13 @@ public:
 		this->debug = debugMode;
 	}
 
+	/**
+	 * Initializes all necessary components.
+	 * Is already called by the constructor.
+	 * Manual call is only necessary for re-initialization
+	 */
+	virtual void initialize();
+
 protected:
 	/**
 	 * Initializes the kinematic chain for which the poses should be selected.
@@ -90,6 +97,11 @@ protected:
 	 * Initializes the camera model.
 	 */
 	virtual void initializeCamera();
+
+	/**
+	 * Initializes the joint limits.
+	 */
+	virtual void initializeJointLimits();
 
 	/**
 	 * Camera info message callback.
@@ -117,6 +129,11 @@ protected:
 	 * NodeHandle instance.
 	 */
 	NodeHandle nh;
+
+	/**
+	 * Private NodeHandle instance;
+	 */
+	NodeHandle nhPrivate;
 
 	/**
 	 * Subscriber for camera info messages.
@@ -162,6 +179,17 @@ protected:
 	 * The joint names.
 	 */
 	vector<string> jointNames;
+
+	/**
+	 * Name of the camera frame.
+	 */
+	string cameraFrame;
+
+	/**
+	 * Define a rectangle within which the predicted
+	 * marker position of the sampled poses should be.
+	 */
+	double xMin, xMax, yMin, yMax;
 
 	/**
 	 * Flag which indicates whether we are in debug mode.
