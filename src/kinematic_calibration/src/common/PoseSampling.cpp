@@ -44,7 +44,7 @@ namespace kinematic_calibration {
 
 PoseSampling::PoseSampling() :
 		debug(false), nhPrivate("~"), xMin(20), xMax(620), yMin(20), yMax(460), cameraFrame(
-				"CameraBottom_frame") {
+				"CameraBottom_frame"), viewCylinderRadius(0.01) {
 	// initialize stuff
 	this->initialize();
 
@@ -182,7 +182,7 @@ void PoseSampling::getPoses(const int& numOfPoses,
 			urdf::Collision>();
 	shared_ptr<urdf::Cylinder> cylinder = make_shared<urdf::Cylinder>();
 	cylinder->type = urdf::Geometry::CYLINDER;
-	cylinder->radius = 0.01; // TODO: as parameter? determine "right" size?
+	cylinder->radius = viewCylinderRadius;
 	cylinder->length = 0.0; // real length is updated later
 	markerLinkCollision->geometry = cylinder;
 

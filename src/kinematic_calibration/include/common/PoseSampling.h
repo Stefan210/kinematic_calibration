@@ -192,6 +192,11 @@ protected:
 	double xMin, xMax, yMin, yMax;
 
 	/**
+	 * Radius of the "view cylinder".
+	 */
+	double viewCylinderRadius;
+
+	/**
 	 * Flag which indicates whether we are in debug mode.
 	 */
 	bool debug;
