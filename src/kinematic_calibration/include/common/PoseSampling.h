@@ -40,10 +40,40 @@ using namespace boost;
  */
 class PoseSampling {
 public:
+	/**
+	 * Constructor.
+	 */
 	PoseSampling();
+
+	/**
+	 * Desctructor.
+	 */
 	virtual ~PoseSampling();
 
-	void getPoses(int numOfPoses, vector<MeasurementPose> poses);
+	/**
+	 * Samples poses and returns as soon as the number of requested poses is reached.
+	 * @param[in] numOfPoses The number of requested poses.
+	 * @param[out] poses The collection of sampled poses.
+	 */
+	void getPoses(const int& numOfPoses, vector<MeasurementPose>& poses);
+
+	/**
+	 * Returns whether we are in debug mode.
+	 * @return Whether we are in debug mode.
+	 */
+	bool isDebug() const {
+		return debug;
+	}
+
+	/**
+	 * Enables or disables the debug mode.
+	 * If set to 'true', prints out some info
+	 * and publishes the first valid pose (joint states, tf, urdf, moveit state)
+	 * @param debugMode
+	 */
+	void setDebug(bool debugMode) {
+		this->debug = debugMode;
+	}
 
 protected:
 	/**
@@ -67,10 +97,20 @@ protected:
 	 */
 	void camerainfoCallback(const sensor_msgs::CameraInfoConstPtr& msg);
 
+	/**
+	 * Publishes the joint state. Sets the current timestamp before.
+	 * @param msg The joint state to be published.
+	 */
 	void publishJointState(sensor_msgs::JointState& msg) const;
 
+	/**
+	 * Pointer to the initial/current calibration state.
+	 */
 	shared_ptr<KinematicCalibrationState> initialState;
 
+	/**
+	 * Pointer to the kinematic chain currently used.
+	 */
 	boost::shared_ptr<KinematicChain> kinematicChainPtr;
 
 	/**
@@ -122,6 +162,11 @@ protected:
 	 * The joint names.
 	 */
 	vector<string> jointNames;
+
+	/**
+	 * Flag which indicates whether we are in debug mode.
+	 */
+	bool debug;
 };
 
 } /* namespace kinematic_calibration */

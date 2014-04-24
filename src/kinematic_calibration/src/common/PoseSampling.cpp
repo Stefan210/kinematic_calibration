@@ -42,7 +42,8 @@ using namespace std;
 
 namespace kinematic_calibration {
 
-PoseSampling::PoseSampling() {
+PoseSampling::PoseSampling() :
+		debug(false) {
 	// initialize stuff
 	this->initializeCamera();
 	this->initializeKinematicChain();
@@ -134,9 +135,8 @@ void PoseSampling::initializeState() {
 	}
 }
 
-void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
-	bool debug = false; // TODO: as class variable
-
+void PoseSampling::getPoses(const int& numOfPoses,
+		vector<MeasurementPose>& poses) {
 	ros::Publisher robot_state_publisher;
 	if (debug) {
 		robot_state_publisher = nh.advertise<moveit_msgs::DisplayRobotState>(
@@ -331,8 +331,8 @@ void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
 		std::string attachLinkName = "CameraBottom_frame";
 		string attachedBodyName = "marker";
 		current_state.clearAttachedBodies();
-		current_state.attachBody(attachedBodyName, shapes, attachTrans, touchLinks,
-				attachLinkName);
+		current_state.attachBody(attachedBodyName, shapes, attachTrans,
+				touchLinks, attachLinkName);
 
 		// set the joint state
 		current_state.setStateValues(jointState.name, jointState.position);
@@ -383,8 +383,7 @@ void PoseSampling::getPoses(int numOfPoses, vector<MeasurementPose> poses) {
 
 		// print some info
 		cout << "Number of sampled poses: " << poses.size() << "\t";
-		cout << "Predicted image coordinates: \t" << x << "\t" << y
-				<< endl;
+		cout << "Predicted image coordinates: \t" << x << "\t" << y << endl;
 
 		// debug: publish the urdf model, moveit state and joint state
 		if (debug) {
@@ -432,5 +431,4 @@ void PoseSampling::publishJointState(sensor_msgs::JointState& msg) const {
 }
 
 } /* namespace kinematic_calibration */
-
 
