@@ -620,6 +620,7 @@ void DataCapture::publishMeasurement() {
 	nh.getParam("chain_name", data.chain_name);
 	nh.getParam("chain_root", data.chain_root);
 	nh.getParam("chain_tip", data.chain_tip);
+	nh.getParam("marker_frame", data.marker_frame);
 	data.marker_type = this->markerType;
 	data.header.stamp = this->curTime;
 	data.image = this->image;
