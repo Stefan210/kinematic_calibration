@@ -106,6 +106,7 @@ private:
 	void setStiffness(const vector<string>& jointNames, double stiffness);
 	void enableStiffness(const vector<string>& jointNames);
 	void disableStiffness(const vector<string>& jointNames);
+	void disableStiffnessSlowly(const vector<string>& jointNames);
 	void imageCallback(const sensor_msgs::ImageConstPtr& msg);
 	void camerainfoCallback(const sensor_msgs::CameraInfoConstPtr& msg);
 	void jointStatesCallback(const sensor_msgs::JointStateConstPtr& msg);

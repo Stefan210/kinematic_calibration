@@ -128,8 +128,8 @@ void DataCapture::enableChainStiffness() {
 }
 
 void DataCapture::disableChainStiffness() {
-	ROS_INFO("Resetting chain stiffness...");
-	disableStiffness(getJointNames());
+	ROS_INFO("Resetting chain stiffness stepwise...");
+	disableStiffnessSlowly(getJointNames());
 	ROS_INFO("Done.");
 }
 
@@ -158,6 +158,18 @@ void DataCapture::enableStiffness(const vector<string>& jointNames) {
 
 void DataCapture::disableStiffness(const vector<string>& jointNames) {
 	setStiffness(jointNames, 0.0000001);
+}
+
+void DataCapture::disableStiffnessSlowly(const vector<string>& jointNames) {
+	double value;
+	value = 0.1;
+	ROS_INFO("Stiffness: %f", value);
+	setStiffness(jointNames, value);
+	
+	usleep(3e6);
+	value = 0.0;
+	ROS_INFO("Stiffness: %f", value);
+	setStiffness(jointNames, value);	
 }
 
 void DataCapture::playChainPoses() {
