@@ -23,3 +23,6 @@ float64[] marker_data
 
 # camera image
 sensor_msgs/Image image
+
+# marker frame
+string marker_frame
