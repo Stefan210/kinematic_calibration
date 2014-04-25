@@ -421,9 +421,15 @@ void OptimizationNode::measurementCb(const measurementDataConstPtr& msg) {
 			this->kinematicChains.push_back(kinematicChain);
 			ROS_INFO("Receive data for chain %s.", chainName.c_str());
 			// try to get the current transformation from chain tip to marker frame
-			if (nh.hasParam("marker_frame")) {
-				string markerFrame;
+			string markerFrame = "";
+			if("" != msg->marker_frame) {
+				// message should contain the info about the marker frame
+				markerFrame = msg->marker_frame;
+			} else if(nh.hasParam("marker_frame")) {
+				// fallback mechanism
 				nh.getParam("marker_frame", markerFrame);
+			}
+			if (markerFrame.length() > 0) {
 				KinematicChain markerChain(kdlTree, chainTip, markerFrame,
 						"marker");
 				tf::Transform markerTransform;
