@@ -110,6 +110,8 @@ bool CircleDetection::detect(const cv::Mat& image, vector<cv::Vec3f>& out) {
 		return circlesHoughTransform(image, out);
 	} else if (type == HoughTransformAdaptive) {
 		return circlesHoughTransformAdaptive(image, out);
+	} else if (type == Dummy) {
+		return circlesDummy(image, out);
 	}
 	return false;
 }
