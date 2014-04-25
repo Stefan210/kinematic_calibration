@@ -385,7 +385,7 @@ bool LikelihoodCircleMeasurementEdge::compute_likelihood(
 	cv::Point2d center(ep(0), ep(1));
 	double thetar = ep(4);
 	double theta = (ep(4) * 180.0 / M_PI); // theta < 0 means that the ellipse is rotated counter-clockwise in the image (because y points downwards)
-	if (draw)
+	if (draw || debug)
 		cv::ellipse(outputImage, center, cv::Size(ep(2), ep(3)), theta, 0, 360,
 				cv::Scalar(255, 0, 0), 2, 8);
 
@@ -424,7 +424,7 @@ bool LikelihoodCircleMeasurementEdge::compute_likelihood(
 		cv::Scalar color = Scalar(0, 255, 0);
 		color = Scalar(apply_heatmap(m_colors, 360, nori));
 		//cout << ori << ": " << color << endl;
-		if (draw) {
+		if (draw || debug) {
 			circle(outputImage, p, 3, color, -1, 1);
 			//cout << "drawing " << nori << " in " << color << endl;
 		}
@@ -487,7 +487,7 @@ bool LikelihoodCircleMeasurementEdge::compute_likelihood(
 								search_length_1d));
 			else
 				rbar2 += search_length_1d;
-			if (draw)
+			if (draw || debug)
 				line(outputImage, pn1, pn2, Scalar(0, 0, 255), 1, 8); // red
 
 		}
@@ -496,7 +496,7 @@ bool LikelihoodCircleMeasurementEdge::compute_likelihood(
 	rbar2 /= n_sampled_points;
 
 	// draw
-	if (draw) {
+	if (draw || debug) {
 		for (uint ci = 0; ci < correspondences.size(); ++ci) {
 			Correspondence & c = correspondences[ci];
 			Point2d & p1 = c.point2d_to_point2d.first;
@@ -504,9 +504,10 @@ bool LikelihoodCircleMeasurementEdge::compute_likelihood(
 			line(outputImage, p1, p2, Scalar(0, 255, 0), 1, 8); // green
 			//line(outputImage, c.point2d_to_point2d.first, c.point2d_to_point2d.second, Scalar(255,0,0),1,8);
 		}
-		ROS_INFO("Managed to match %zu / %d sample points",
-				correspondences.size(), n_sampled_points);
-		if (true) {
+
+		if (draw) {
+			ROS_INFO("Managed to match %zu / %d sample points",
+					correspondences.size(), n_sampled_points);
 			cout << "[";
 			for (uint ci = 0; ci < correspondences.size(); ++ci) {
 				cout << correspondences[ci].point2d_to_point2d.first;
