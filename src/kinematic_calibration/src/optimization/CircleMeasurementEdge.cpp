@@ -227,8 +227,7 @@ LikelihoodCircleMeasurementEdge::LikelihoodCircleMeasurementEdge(
 		MeasurementEdge<1, LikelihoodCircleMeasurementEdge>(measurement,
 				frameImageConverter, kinematicChain), radius(radius), m_ellipse_sampling_increment(
 				5.0), m_angle_thresh(25.0), m_search_length_1d(130.0 /*30.0*/), m_lambda_r(
-				0.5), m_zHit(0.9), m_zRand(0.05), m_zMax(0.05), m_sigmaHit(1.0), m_use_beam_model_likelihood(
-				false), m_colors(generate_heatmap(true)) {
+				0.5), m_zHit(0.9), m_zRand(0.05), m_zMax(0.05), m_sigmaHit(1.0), m_use_beam_model_likelihood( false), m_colors(generate_heatmap(true)) {
 	// Convert from ROS message to OpenCV image.
 	CircleDetection circleDetection;
 	circleDetection.msgToImg(
@@ -236,11 +235,9 @@ LikelihoodCircleMeasurementEdge::LikelihoodCircleMeasurementEdge(
 					new sensor_msgs::Image(this->measurement.image)),
 			this->measurementImg);
 
-	// Calculate canny image.
-	calculateCannyImg();
 
-	// Calculate orientation image.
-	calculateOrientationImg();
+        // Calculate canny and orientation image.
+	calculateCannyAndOrientationImg();
 }
 
 LikelihoodCircleMeasurementEdge::~LikelihoodCircleMeasurementEdge() {
@@ -270,7 +267,7 @@ void LikelihoodCircleMeasurementEdge::setError(tf::Transform cameraToMarker) {
 	}
 }
 
-void LikelihoodCircleMeasurementEdge::calculateCannyImg() {
+void LikelihoodCircleMeasurementEdge::calculateCannyAndOrientationImg() {
 	cv::Mat cimg = this->measurementImg;
 	cv::Mat gray(cimg.rows, cimg.cols, CV_8UC1);
 	cv::Mat gray_flt(cimg.rows, cimg.cols, CV_8UC1);
@@ -308,6 +305,10 @@ void LikelihoodCircleMeasurementEdge::calculateCannyImg() {
 	Mat mag;
 	magnitude(Sx, Sy, mag);
 
+        phase(Sx, Sy, this->orientationImg, true);
+        
+
+
 	//GaussianBlur( cannyImg, cannyImg, Size( 5, 5 ), 0, 0 ); // needed for problems with besenham raycasting (shooting normal through a (perpendicular) non-horizontal/non-vertical line)
 	if (canny_blur_size > 0)
 		blur(cannyImg, cannyImg,
@@ -327,15 +328,15 @@ void LikelihoodCircleMeasurementEdge::calculateCannyImg() {
 		}
 	}
 
+        this->outputImage = orientationMap( mag, this->orientationImg, mag_thresh, m_colors);
+        this->outputImage.setTo(0, cannyImg==0);
+
 	if (debug) {
 		string filename = "/tmp/" + this->measurement.id + "-canny.jpg";
-		cv::imwrite(filename, cannyImg);
+		cv::imwrite(filename, this->cannyImg);
+		filename = "/tmp/" + this->measurement.id + "-ori.jpg";
+		cv::imwrite(filename, this->outputImage);
 	}
-}
-
-void LikelihoodCircleMeasurementEdge::calculateOrientationImg() {
-	orientation_image(this->measurementImg, this->m_colors,
-			this->orientationImg);
 }
 
 bool LikelihoodCircleMeasurementEdge::compute_likelihood(
@@ -747,25 +748,6 @@ cv::Mat orientationMap(const cv::Mat& mag, const cv::Mat& ori, double thresh,
 	return oriMap;
 }
 
-void orientation_image(const cv::Mat & cimg,
-		const std::vector<cv::Vec3b> & colors, cv::Mat & outputImg) {
-	cv::Mat bw(cimg.rows, cimg.cols, CV_8UC1);
-	cv::cvtColor(cimg, bw, cv::COLOR_BGR2GRAY);
-	Mat Sx;
-	Sobel(bw, Sx, CV_32F, 1, 0, 3);
-
-	Mat Sy;
-	Sobel(bw, Sy, CV_32F, 0, 1, 3);
-
-	Mat mag, ori;
-	magnitude(Sx, Sy, mag);
-	phase(Sx, Sy, ori, true);
-	outputImg = orientationMap(mag, ori, 1.0, colors);
-	cv::Mat cannyImg;
-	//Canny(bw, cannyImg, 30, 60, 3); // 40, 100 seem good
-	Canny(bw, cannyImg, 35, 70, 3); // 40, 100 seem good
-	outputImg.setTo(0, cannyImg == 0);
-}
 
 } /* namespace kinematic_calibration */
 
