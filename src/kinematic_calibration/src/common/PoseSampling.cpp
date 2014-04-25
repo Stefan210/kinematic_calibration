@@ -25,7 +25,6 @@
 #include <ctime>
 #include <iostream>
 #include <iterator>
-
 #include <moveit/planning_scene/planning_scene.h>
 #include <moveit/robot_model/robot_model.h>
 #include <moveit/robot_model_loader/robot_model_loader.h>
@@ -34,6 +33,11 @@
 #include <moveit/collision_detection/collision_robot.h>
 #include <moveit_msgs/DisplayRobotState.h>
 #include <moveit/robot_state/conversions.h>
+#include <moveit/version.h>
+#if ROS_VERSION_MINIMUM(1,10,2)
+#include <urdf_parser/urdf_parser.h>
+#endif
+
 
 #include <tf_conversions/tf_eigen.h>
 
@@ -364,7 +368,11 @@ void PoseSampling::getPoses(const int& numOfPoses,
 				touchLinks, attachLinkName);
 
 		// set the joint state
+#if MOVEIT_VERSION_MINOR >= 5 && MOVEIT_VERSION_PATCH >= 8 // moveit from hydro and newer
+		current_state.setVariablePositions(jointState.name, jointState.position);
+#else  // moveit from groovy and below
 		current_state.setStateValues(jointState.name, jointState.position);
+#endif
 		if (debug)
 			current_state.printStateInfo(cout);
 
