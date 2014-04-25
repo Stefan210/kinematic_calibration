@@ -260,9 +260,13 @@ void LikelihoodCircleMeasurementEdge::setError(tf::Transform cameraToMarker) {
 	this->_error[0] = residual;
 	//this->_error[0] = 1 / likelihood; // likelihood is always > 0.0
 
-	if(draw) {
+	if (draw) {
 		cv::imshow("outputImage", outputImage);
 		cv::waitKey();
+	}
+	if (debug) {
+		string filename = "/tmp/" + this->measurement.id + "-error.jpg";
+		cv::imwrite(filename, outputImage);
 	}
 }
 
@@ -321,6 +325,11 @@ void LikelihoodCircleMeasurementEdge::calculateCannyImg() {
 			else
 				cannyImg.at<uchar>(i, j) = 0;
 		}
+	}
+
+	if (debug) {
+		string filename = "/tmp/" + this->measurement.id + "-canny.jpg";
+		cv::imwrite(filename, cannyImg);
 	}
 }
 
@@ -647,30 +656,29 @@ bool ellipse_from_quadric(const Eigen::Matrix3d & CstarI, Vector5d & z,
 	return true;
 }
 
-vector<cv::Vec3b> generate_heatmap(bool wrap)
-{
-   vector<cv::Vec3b> colors;
-   Vec3b red(0, 0, 255);
-   Vec3b green(0, 255, 0);
-   Vec3b blue(255, 0, 0);
-   Vec3b yellow(0, 255, 255);
-   Vec3b cyan(255, 255, 0);
-   Vec3b magenta(255, 0, 255);
-   /*
-   colors.push_back( blue );
-   colors.push_back( green );
-   //colors.push_back( yellow);
-   colors.push_back( red );
-   */
-   colors.push_back( red );
-   colors.push_back( cyan );
-   colors.push_back( green );
-   colors.push_back( yellow );
+vector<cv::Vec3b> generate_heatmap(bool wrap) {
+	vector<cv::Vec3b> colors;
+	Vec3b red(0, 0, 255);
+	Vec3b green(0, 255, 0);
+	Vec3b blue(255, 0, 0);
+	Vec3b yellow(0, 255, 255);
+	Vec3b cyan(255, 255, 0);
+	Vec3b magenta(255, 0, 255);
+	/*
+	 colors.push_back( blue );
+	 colors.push_back( green );
+	 //colors.push_back( yellow);
+	 colors.push_back( red );
+	 */
+	colors.push_back(red);
+	colors.push_back(cyan);
+	colors.push_back(green);
+	colors.push_back(yellow);
 
-   if(wrap)
-      colors.push_back( colors[0] );
+	if (wrap)
+		colors.push_back(colors[0]);
 
-   return colors;
+	return colors;
 }
 
 cv::Vec3b apply_heatmap(const std::vector<cv::Vec3b> & colors, int max_val,

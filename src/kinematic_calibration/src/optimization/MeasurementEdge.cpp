@@ -141,4 +141,14 @@ void MeasurementEdge<D, Derived>::setKinematicChain(
 	this->kinematicChain = kinematicChain;
 }
 
+template<int D, class Derived>
+bool MeasurementEdge<D, Derived>::isDebug() const {
+	return debug;
+}
+
+template<int D, class Derived>
+void MeasurementEdge<D, Derived>::setDebug(bool debug) {
+	this->debug = debug;
+}
+
 } /* namespace kinematic_calibration */

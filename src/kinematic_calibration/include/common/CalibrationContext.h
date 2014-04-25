@@ -124,6 +124,7 @@ public:
 class OptimizationOptions {
 public:
 	int maxIterations;
+	bool debug;
 };
 } /* namespace kinematic_calibration */
 
