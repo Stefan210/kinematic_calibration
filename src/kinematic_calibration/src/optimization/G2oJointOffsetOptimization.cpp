@@ -79,6 +79,7 @@ void G2oJointOffsetOptimization::optimize(
 
 	// get the options
 	CalibrationOptions options = context.getCalibrationOptions();
+	OptimizationOptions optOptions = context.getOptimizationOptions();
 
 	int id = 0;
 
@@ -201,7 +202,7 @@ void G2oJointOffsetOptimization::optimize(
 	optimizer.initializeOptimization();
 	optimizer.computeActiveErrors();
 	optimizer.setVerbose(true);
-	optimizer.optimize(30);
+	optimizer.optimize(optOptions.maxIterations);
 
 	// get results:
 

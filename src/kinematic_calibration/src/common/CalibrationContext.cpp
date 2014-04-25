@@ -77,5 +77,11 @@ DataCaptureOptions RosCalibContext::getDataCaptureOptions() const {
 	return options;
 }
 
+OptimizationOptions RosCalibContext::getOptimizationOptions() const {
+	OptimizationOptions options;
+	nh.getParam("max_iterations", options.maxIterations);
+	return options;
+}
+
 } /* namespace kinematic_calibration */
 

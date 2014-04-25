@@ -20,6 +20,7 @@ namespace kinematic_calibration {
 // forward declarations
 class CalibrationOptions;
 class DataCaptureOptions;
+class OptimizationOptions;
 
 /**
  * Abstract class containing factory methods for a specific calibration context.
@@ -68,6 +69,12 @@ public:
 	 * @return The specific options for the data capturing for one kinematic chain.
 	 */
 	virtual DataCaptureOptions getDataCaptureOptions() const = 0;
+
+	/**
+	 * Returns the options for the optimization.
+	 * @return The options for the optimization.
+	 */
+	virtual OptimizationOptions getOptimizationOptions() const = 0;
 };
 
 /**
@@ -85,12 +92,12 @@ public:
 			KinematicChain* kinematicChain) const;
 	virtual CalibrationOptions getCalibrationOptions() const;
 	virtual DataCaptureOptions getDataCaptureOptions() const;
+	virtual OptimizationOptions getOptimizationOptions() const;
 
 protected:
 	ros::NodeHandle nh;
 };
 
-// TODO: move into own file?!
 /**
  * Container for calibration options.
  */
@@ -109,6 +116,14 @@ class DataCaptureOptions {
 public:
 	bool findMarker;
 	bool moveMarkerToCorners;
+};
+
+/**
+ * Container for optimization options.
+ */
+class OptimizationOptions {
+public:
+	int maxIterations;
 };
 } /* namespace kinematic_calibration */
 

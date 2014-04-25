@@ -15,3 +15,6 @@ camera_transform_filename_suffix: calibration_camera_transform.xacro
 urdf_filename_suffix: robot_model_calibrated.xml
 marker_transforms_filename_suffix: calibration_marker_transformations.xacro
 camera_intrnsics_filename: nao_bottom_640x480.yaml
+
+# Number of iterations for the optimization algorithm:
+max_iterations: 30
