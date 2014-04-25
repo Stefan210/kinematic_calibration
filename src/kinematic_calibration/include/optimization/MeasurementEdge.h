@@ -88,6 +88,18 @@ public:
 	 */
 	void setKinematicChain(KinematicChain* kinematicChain);
 
+	/**
+	 * Gets the debug flag.
+	 * @return The debug flag.
+	 */
+	bool isDebug() const;
+
+	/**
+	 * Sets the debug flag.
+	 * @param debug The debug flag.
+	 */
+	void setDebug(bool debug);
+
 protected:
 	/**
 	 * Kinematic chain for which the joint offsets should be converted.
@@ -120,6 +132,11 @@ protected:
 	 * @return map of joint frames
 	 */
 	map<string, KDL::Frame> getJointFrames();
+
+	/**
+	 * Flag that indicates if the debug mode is on.
+	 */
+	bool debug;
 };
 
 } /* namespace kinematic_calibration */

@@ -44,9 +44,14 @@ public:
 			ROS_WARN("No parameter set for %s. Using default value %f.",
 					parameterName.c_str(), radius);
 		/*return new CircleMeasurementEdge(m, frameImageConverter, kinematicChain,
-				radius);*/
-		return new LikelihoodCircleMeasurementEdge(m, frameImageConverter, kinematicChain,
-				radius);
+		 radius);*/
+		LikelihoodCircleMeasurementEdge* edge =
+				new LikelihoodCircleMeasurementEdge(m, frameImageConverter,
+						kinematicChain, radius);
+		bool debug;
+		nh.param("debug_optimization", debug, false);
+		edge->setDebug(debug);
+		return edge;
 	}
 };
 

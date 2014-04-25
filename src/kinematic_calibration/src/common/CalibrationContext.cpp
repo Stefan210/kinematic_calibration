@@ -80,6 +80,7 @@ DataCaptureOptions RosCalibContext::getDataCaptureOptions() const {
 OptimizationOptions RosCalibContext::getOptimizationOptions() const {
 	OptimizationOptions options;
 	nh.getParam("max_iterations", options.maxIterations);
+	nh.param("debug_optimization", options.debug, false);
 	return options;
 }
 
