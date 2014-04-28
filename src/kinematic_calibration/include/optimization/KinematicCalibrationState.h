@@ -17,7 +17,6 @@
 
 #include "../common/KinematicChain.h"
 
-
 using namespace std;
 
 namespace kinematic_calibration {
@@ -27,6 +26,10 @@ namespace kinematic_calibration {
  */
 class KinematicCalibrationState {
 public:
+	enum TransformSource {
+		ROSPARAM_URDF, TF
+	};
+
 	/**
 	 * Default constructor.
 	 */
@@ -77,7 +80,8 @@ public:
 	 * @param root Root frame name.
 	 * @param tip Tip frame name.
 	 */
-	void addMarker(const string name, const string root, const string tip);
+	void addMarker(const string name, const string root, const string tip,
+			TransformSource source = ROSPARAM_URDF);
 
 	/**
 	 * Current joint offsets.

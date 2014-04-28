@@ -11,6 +11,7 @@
 #include <ros/node_handle.h>
 #include <ros/subscriber.h>
 #include <tf/tf.h>
+#include <tf/transform_listener.h>
 #include <urdf/model.h>
 #include <urdf_model/joint.h>
 #include <urdf_model/pose.h>
@@ -87,18 +88,41 @@ void KinematicCalibrationState::addKinematicChain(const string name,
 	this->addKinematicChain(kinematicChain);
 }
 
-void KinematicCalibrationState::addKinematicChain(const KinematicChain& kinematicChain) {
+void KinematicCalibrationState::addKinematicChain(
+		const KinematicChain& kinematicChain) {
 	// initialize the joint offsets
 	vector<string> joints;
 	kinematicChain.getJointNames(joints);
-	for(vector<string>::iterator it = joints.begin(); it != joints.end(); it++) {
+	for (vector<string>::iterator it = joints.begin(); it != joints.end();
+			it++) {
 		this->jointOffsets[*it] = 0.0;
 	}
 }
 
 void KinematicCalibrationState::addMarker(const string name, const string root,
-		const string tip) {
-	// TODO
+		const string tip, TransformSource source) {
+	tf::Transform markerTransform;
+	if (TF == source) {
+		tf::TransformListener transformListener;
+		ros::Time now = ros::Time::now();
+		tf::StampedTransform transform;
+		transformListener.waitForTransform(root, tip, now, ros::Duration(1.0));
+		transformListener.lookupTransform(root, tip, now, transform);
+		markerTransform.setRotation(transform.getRotation());
+		markerTransform.setOrigin(transform.getOrigin());
+	} else if (ROSPARAM_URDF == source) {
+		KinematicChain markerChain;
+		markerChain.initializeFromRos(root, tip, "marker");
+		KDL::Frame kdlFrame;
+		markerChain.getRootToTip(map<string, double>(), kdlFrame);
+		tf::transformKDLToTF(kdlFrame, markerTransform);
+	}
+	this->markerTransformations[name] = markerTransform;
+	ROS_INFO("Initial transform for marker of chain %s (%s -> %s): %f %f %f",
+			name.c_str(), root.c_str(), tip.c_str(),
+			markerTransform.getOrigin().getX(),
+			markerTransform.getOrigin().getY(),
+			markerTransform.getOrigin().getZ());
 }
 
 } /* namespace kinematic_calibration */
