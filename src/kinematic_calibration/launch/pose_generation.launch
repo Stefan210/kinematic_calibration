@@ -1,5 +1,6 @@
 <launch>
   <arg name="chain_name" />
+  <param name="/robot_description_semantic" textfile="$(find kinematic_calibration)/config/ra.srdf" type="str"/>
   <rosparam file="$(find kinematic_calibration)/config/params_$(arg chain_name)_general.yaml" command="load"/>
   <node pkg="kinematic_calibration" type="poseSelectionNode" name="poseSelectionNode" output="screen" >
     <rosparam>
@@ -14,13 +15,13 @@
       # name of the camera link / frame
       camera_frame: "CameraBottom_frame"
       # radius of the camera 'view cylinder'
-      view_cylinder_radius: 0.01 
+      view_cylinder_radius: 0.03 
    
       # range within which the predicted marker should be:
-      xMin: 30
-      xMax: 610
-      yMin: 30
-      yMax: 450
+      xMin: 150
+      xMax: 490
+      yMin: 150
+      yMax: 330
       
       ### "measurement" parameters:
       # (none so far)

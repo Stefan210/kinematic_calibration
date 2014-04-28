@@ -38,7 +38,6 @@
 #include <urdf_parser/urdf_parser.h>
 #endif
 
-
 #include <tf_conversions/tf_eigen.h>
 
 using namespace boost;
@@ -73,10 +72,12 @@ void PoseSampling::initialize() {
 	nhPrivate.param("yMin", yMin, yMin);
 	nhPrivate.param("yMax", yMax, yMax);
 	nhPrivate.param("camera_frame", cameraFrame, cameraFrame);
-	nhPrivate.param("view_cylinder_radius", viewCylinderRadius, viewCylinderRadius);
+	nhPrivate.param("view_cylinder_radius", viewCylinderRadius,
+			viewCylinderRadius);
 
 	// print some info about the used parameters
-	ROS_INFO("Allowed camera window size: [%.2f, %.2f] - [%.2f, %.2f]", xMin, yMin, xMax, yMax);
+	ROS_INFO("Allowed camera window size: [%.2f, %.2f] - [%.2f, %.2f]", xMin,
+			yMin, xMax, yMax);
 	ROS_INFO("Using camera frame: %s", cameraFrame.c_str());
 	ROS_INFO("Using view cylinder radius: %f", viewCylinderRadius);
 }
@@ -170,6 +171,63 @@ void PoseSampling::initializeJointLimits() {
 	}
 }
 
+void PoseSampling::initializeUrdf() {
+	this->urdfModelPtr = make_shared<urdf::Model>();
+	this->modelLoader.initializeFromRos();
+	this->modelLoader.getUrdfModel(*urdfModelPtr);
+}
+
+void PoseSampling::initializeSrdf(const string& robotName,
+		const vector<string>& joints, const vector<string>& links) {
+	string srdfString;
+	const string robotNamePlaceholder = "ROBOTNAME";
+	const string groupPlaceholder = "CURRENTCHAINGROUP";
+
+	if (nh.hasParam("robot_description_semantic")) {
+		// get the SRDF string from the parameter server
+		nh.getParam("robot_description_semantic", srdfString);
+	} else {
+		// as fallback, create an empty srdf
+		stringstream srdfStringStream;
+		srdfStringStream << "<robot name=\"" << robotNamePlaceholder << "\">";
+		srdfStringStream << "CURRENTCHAINGROUP" << "\n";
+		srdfStringStream << "</robot>";
+		srdfString = srdfStringStream.str();
+	}
+
+	if(debug) {
+		cout << "SRDF (unmodified): \n" << srdfString << endl;
+	}
+
+	// replace the ROBOT placeholder
+	int namePos = srdfString.find(robotNamePlaceholder);
+	srdfString.replace(namePos, robotNamePlaceholder.length(), robotName);
+
+	// insert the interesting joints/links as group
+	stringstream currentChainStream;
+	currentChainStream << "<group name=\"current_chain\">";
+	for (int i = 0; i < joints.size(); i++) {
+		currentChainStream << "<joint name=\"" << joints[i] << "\"/>";
+	}
+	for (int i = 0; i < links.size(); i++) {
+		currentChainStream << "<link name=\"" << links[i] << "\"/>";
+	}
+	currentChainStream << "</group>";
+	string currentChainString = currentChainStream.str();
+	int groupPos = srdfString.find(groupPlaceholder);
+	srdfString.replace(groupPos, groupPlaceholder.length(), currentChainString);
+
+	if(debug) {
+		cout << "SRDF (modified): \n" << srdfString << endl;
+	}
+
+	// initialize the SRDF model object from the string
+	srdf::Model srdfModel;
+	srdfModel.initString(*urdfModelPtr, srdfString);
+	this->srdfModelPtr = make_shared<const srdf::Model>(srdfModel);
+
+}
+
 void PoseSampling::getPoses(const int& numOfPoses,
 		vector<MeasurementPose>& poses) {
 	ros::Publisher robot_state_publisher;
@@ -205,42 +263,25 @@ void PoseSampling::getPoses(const int& numOfPoses,
 
 	// initialize the URDF model
 	ROS_INFO("Initialize the URDF model from ROS...");
-	shared_ptr<urdf::Model> urdfModelPtr = make_shared<urdf::Model>();
-	this->modelLoader.initializeFromRos();
-	this->modelLoader.getUrdfModel(*urdfModelPtr);
+	initializeUrdf();
 
 	// modify the URDF model
 	ROS_INFO(
 			"Adding additional (virtual) joint and link from camera to marker frame to the model...");
 	//urdfModelPtr->links_[cameraFrame]->collision = markerLinkCollision;
-	urdfModelPtr->links_[cameraFrame]->child_joints.push_back(markerJoint);
-	urdfModelPtr->links_[cameraFrame]->child_links.push_back(markerLink);
-	urdfModelPtr->joints_[markerJoint->name] = markerJoint;
-	urdfModelPtr->links_[markerLink->name] = markerLink;
+	this->urdfModelPtr->links_[cameraFrame]->child_joints.push_back(markerJoint);
+	this->urdfModelPtr->links_[cameraFrame]->child_links.push_back(markerLink);
+	this->urdfModelPtr->joints_[markerJoint->name] = markerJoint;
+	this->urdfModelPtr->links_[markerLink->name] = markerLink;
 	markerLink->setParent(urdfModelPtr->links_[cameraFrame]);
 
 	// initialize the SRDF model
 	ROS_INFO("Initialize the SRDF model from runtime information...");
-
-	stringstream srdfStringStream;
-	srdfStringStream << "<robot name=\"" << urdfModelPtr->getName() << "\">";
-	srdfStringStream << "<group name=\"current_chain\">";
-	for (int i = 0; i < jointNames.size(); i++) {
-		srdfStringStream << "<joint name=\"" << jointNames[i] << "\"/>";
-	}
-	srdfStringStream << "<joint name=\"" << "CameraBottom" << "\"/>";
-	srdfStringStream << "<link name=\"" << cameraFrame << "\"/>";
-	srdfStringStream << "<joint name=\"" << "virtualMarkerJoint" << "\"/>";
-	srdfStringStream << "<link name=\"" << "virtualMarkerLink" << "\"/>";
-	srdfStringStream << "</group>";
-	srdfStringStream << "</robot>";
-	string srdfString = srdfStringStream.str();
-
-	srdf::Model srdfModel;
-	srdfModel.initString(*urdfModelPtr, srdfString);
-
-	shared_ptr<const srdf::Model> srdfModelPtr = make_shared<const srdf::Model>(
-			srdfModel);
+	vector<string> groupJoints, groupLinks;
+	groupJoints = this->jointNames;
+	groupJoints.push_back("CameraBottom");
+	groupLinks.push_back(cameraFrame);
+	initializeSrdf(urdfModelPtr->getName(), groupJoints, groupLinks);
 
 	// initialize the moveit robot model
 	robot_model::RobotModelPtr kinematic_model = make_shared<
@@ -277,10 +318,10 @@ void PoseSampling::getPoses(const int& numOfPoses,
 		}
 
 		if (xMin < x && xMax > x && yMin < y && yMax > y) {
-			if(debug)
+			if (debug)
 				cout << "--> Good!" << endl;
 		} else {
-			if(debug)
+			if (debug)
 				cout << "--> Not good!" << endl;
 			continue;
 		}

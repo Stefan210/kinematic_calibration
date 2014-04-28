@@ -16,6 +16,7 @@
 #include <ros/publisher.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <urdf/model.h>
+#include <srdfdom/model.h>
 #include <map>
 #include <string>
 #include <vector>
@@ -104,6 +105,20 @@ protected:
 	virtual void initializeJointLimits();
 
 	/**
+	 * Initializes the URDF from ROS parameter.
+	 */
+	virtual void initializeUrdf();
+
+	/**
+	 * Initializes the SRDF from ROS parameter and modifies it.
+	 * @param robotName The robot name (replaces the robot name from the SRDF at the ROS parameter server).
+	 * @param joints The joint names of the current kinematic chain.
+	 * @param links The link names of the current kinematic chain.
+	 */
+	virtual void initializeSrdf(const string& robotName,
+			const vector<string>& joints, const vector<string>& links);
+
+	/**
 	 * Camera info message callback.
 	 * @param[in] msg Camera info message,
 	 */
@@ -164,6 +179,16 @@ protected:
 	 * The KDL tree of the robot model.
 	 */
 	KDL::Tree kdlTree;
+
+	/**
+	 * Pointer to the URDF model.
+	 */
+	shared_ptr<urdf::Model> urdfModelPtr;
+
+	/**
+	 * Pointer to the SRDF model.
+	 */
+	shared_ptr<const srdf::Model> srdfModelPtr;
 
 	/**
 	 * Lower joint limits.

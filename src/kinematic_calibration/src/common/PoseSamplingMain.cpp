@@ -13,6 +13,7 @@ int main(int argc, char** argv) {
 	ros::init(argc, argv, "PoseSampling");
 	PoseSampling node;
 	std::vector<MeasurementPose> poses;
+	node.setDebug(true);
 	node.getPoses(500, poses);
 	return 0;
 }
