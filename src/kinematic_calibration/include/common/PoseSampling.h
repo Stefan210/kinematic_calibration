@@ -191,6 +191,14 @@ protected:
 	shared_ptr<const srdf::Model> srdfModelPtr;
 
 	/**
+	 * Flag that indicates whether a SRDF model is available.
+	 * If true, collision checking is enabled for the whole chain,
+	 * expecting that the loaded SRDF model contains information about
+	 * the collisions that can be ignored.
+	 */
+	bool srdfAvailable;
+
+	/**
 	 * Lower joint limits.
 	 */
 	map<string, double> lowerLimits;

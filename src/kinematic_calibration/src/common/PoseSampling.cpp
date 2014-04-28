@@ -47,7 +47,7 @@ namespace kinematic_calibration {
 
 PoseSampling::PoseSampling() :
 		debug(false), nhPrivate("~"), xMin(20), xMax(620), yMin(20), yMax(460), cameraFrame(
-				"CameraBottom_frame"), viewCylinderRadius(0.01) {
+				"CameraBottom_frame"), viewCylinderRadius(0.01), srdfAvailable(false) {
 	// initialize stuff
 	this->initialize();
 
@@ -186,6 +186,7 @@ void PoseSampling::initializeSrdf(const string& robotName,
 	if (nh.hasParam("robot_description_semantic")) {
 		// get the SRDF string from the parameter server
 		nh.getParam("robot_description_semantic", srdfString);
+		this->srdfAvailable = true;
 	} else {
 		// as fallback, create an empty srdf
 		stringstream srdfStringStream;
@@ -225,7 +226,6 @@ void PoseSampling::initializeSrdf(const string& robotName,
 	srdf::Model srdfModel;
 	srdfModel.initString(*urdfModelPtr, srdfString);
 	this->srdfModelPtr = make_shared<const srdf::Model>(srdfModel);
-
 }
 
 void PoseSampling::getPoses(const int& numOfPoses,
@@ -438,7 +438,7 @@ void PoseSampling::getPoses(const int& numOfPoses,
 				it != collision_result.contacts.end(); ++it) {
 			// only contacts with the "virtual" link (i.e. collision object) are interesting
 			string linkToCheck = attachedBodyName;
-			if (linkToCheck == it->first.first.c_str()
+			if (this->srdfAvailable || linkToCheck == it->first.first.c_str()
 					|| linkToCheck == it->first.second.c_str()) {
 				if (debug)
 					ROS_INFO("Contact between: %s and %s",
