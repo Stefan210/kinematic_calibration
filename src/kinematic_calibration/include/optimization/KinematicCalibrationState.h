@@ -65,6 +65,12 @@ public:
 			const string tip);
 
 	/**
+	 * Initializes the joint offsets from the given kinematic chain.
+	 * @param kinematicChain The given kinematic chain.
+	 */
+	void addKinematicChain(const KinematicChain& kinematicChain);
+
+	/**
 	 * Initializes the marker transformation.
 	 * @param name Name of the kinematic chain.
 	 * @param root Root frame name.

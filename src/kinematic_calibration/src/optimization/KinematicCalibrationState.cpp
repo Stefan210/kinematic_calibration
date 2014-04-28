@@ -79,7 +79,21 @@ void KinematicCalibrationState::camerainfoCallback(
 
 void KinematicCalibrationState::addKinematicChain(const string name,
 		const string root, const string tip) {
-	// TODO
+	// initialize the kinematic chain from ROS
+	KinematicChain kinematicChain;
+	kinematicChain.initializeFromRos(root, tip, name);
+
+	// delegate
+	this->addKinematicChain(kinematicChain);
+}
+
+void KinematicCalibrationState::addKinematicChain(const KinematicChain& kinematicChain) {
+	// initialize the joint offsets
+	vector<string> joints;
+	kinematicChain.getJointNames(joints);
+	for(vector<string>::iterator it = joints.begin(); it != joints.end(); it++) {
+		this->jointOffsets[*it] = 0.0;
+	}
 }
 
 void KinematicCalibrationState::addMarker(const string name, const string root,

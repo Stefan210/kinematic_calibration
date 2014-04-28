@@ -51,10 +51,6 @@ bool KinematicChain::initialize(const KDL::Tree& tree, std::string root,
 }
 
 bool KinematicChain::initializeFromRos() {
-	ModelLoader modelLoader;
-	modelLoader.initializeFromRos();
-	modelLoader.getKdlTree(tree);
-
 	// instantiate the kinematic chain
 	string chainName, chainRoot, chainTip;
 	ros::NodeHandle nh;
@@ -62,7 +58,19 @@ bool KinematicChain::initializeFromRos() {
 	nh.getParam("chain_root", chainRoot);
 	nh.getParam("chain_tip", chainTip);
 
-	return this->initialize(tree, chainRoot, chainTip, chainName);
+	// delegate
+	return this->initializeFromRos(chainRoot, chainTip, chainName);
+}
+
+bool KinematicChain::initializeFromRos(std::string root, std::string tip,
+		std::string name) {
+	// instantiate the KDL tree
+	ModelLoader modelLoader;
+	modelLoader.initializeFromRos();
+	modelLoader.getKdlTree(tree);
+
+	// delegate
+	return this->initialize(tree, root, tip, name);
 }
 
 void KinematicChain::getRootToTip(const map<string, double>& joint_positions,
@@ -81,45 +89,6 @@ void KinematicChain::getRootToTip(const map<string, double>& joint_positions,
 		// Note: Frame F_A_C = F_A_B * F_B_C;
 		// (see http://www.orocos.org/kdl/usermanual/geometric-primitives#toc20)
 		rootToTip = rootToTip * segment.pose(position);
-
-		// TODO: remove!
-		/*
-		 cout << "position: " << position << endl;
-
-		 double tx, ty, tz;
-		 tx = segment.pose(position).p[0];
-		 ty = segment.pose(position).p[1];
-		 tz = segment.pose(position).p[2];
-		 cout << segment.getJoint().getName() << "Tx = " << tx << ";" << endl;
-		 cout << segment.getJoint().getName() << "Ty = " << ty << ";" << endl;
-		 cout << segment.getJoint().getName() << "Tz = " << tz << ";" << endl;
-
-		 double rr, rp, ry;
-		 segment.pose(position).M.GetRPY(rr, rp, ry);
-		 cout << segment.getJoint().getName() << "Rr = " << rr;
-		 if (fabs(segment.getJoint().JointAxis().x()) > 0) {
-		 cout << " + " << segment.getJoint().getName() << "Offset * "
-		 << segment.getJoint().JointAxis().x();
-		 cout << " + " << segment.getJoint().getName() << "Position * "
-		 << segment.getJoint().JointAxis().x();
-		 }
-		 cout << ";" << endl << segment.getJoint().getName() << "Rp = " << rp;
-		 if (fabs(segment.getJoint().JointAxis().y()) > 0) {
-		 cout << " + " << segment.getJoint().getName() << "Offset * "
-		 << segment.getJoint().JointAxis().y();
-		 cout << " + " << segment.getJoint().getName() << "Position * "
-		 << segment.getJoint().JointAxis().y();
-		 }
-		 cout << ";" << endl << segment.getJoint().getName() << "Ry = " << ry;
-		 if (fabs(segment.getJoint().JointAxis().z()) > 0) {
-		 cout << " + " << segment.getJoint().getName() << "Offset * "
-		 << segment.getJoint().JointAxis().z();
-		 cout << " + " << segment.getJoint().getName() << "Position * "
-		 << segment.getJoint().JointAxis().z();
-		 }
-		 cout << ";" << endl;
-		 cout << segment.pose(position).M << endl;
-		 */
 	}
 	out = rootToTip.Inverse();
 }

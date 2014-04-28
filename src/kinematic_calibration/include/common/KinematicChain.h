@@ -48,6 +48,16 @@ public:
 	bool initializeFromRos();
 
 	/**
+	 * Initializes the kinematic chain using avaliable
+	 * information from the ROS parameter server.
+	 * @param root Root element name of the chain.
+	 * @param tip Tip element name of the chain.
+	 * @param name The name of the chain.
+	 * @return True if successful, false otherwise.
+	 */
+	bool initializeFromRos(std::string root, std::string tip, std::string name);
+
+	/**
 	 * Calculates the transform from the root to the tip of the frame.
 	 * @param joint_positions Contains the positions of the joints.
 	 * @param out Will contain the calculated transform.
