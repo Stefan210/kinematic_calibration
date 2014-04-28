@@ -135,20 +135,8 @@ void OptimizationNode::optimize() {
 	KinematicCalibrationState initialState = this->initialState;
 
 	// initialize transform from camera to head
-	urdf::Model model;
-	this->modelLoader.getUrdfModel(model);
-	urdf::Joint cameraJoint = *model.getJoint(cameraJointName);
-	urdf::Pose headPitchToCameraPose =
-			cameraJoint.parent_to_joint_origin_transform;
-	tf::Transform headToCamera = tf::Transform(
-			tf::Quaternion(headPitchToCameraPose.rotation.x,
-					headPitchToCameraPose.rotation.y,
-					headPitchToCameraPose.rotation.z,
-					headPitchToCameraPose.rotation.w),
-			tf::Vector3(headPitchToCameraPose.position.x,
-					headPitchToCameraPose.position.y,
-					headPitchToCameraPose.position.z));
-	initialState.cameraToHeadTransformation = headToCamera;
+	initialState.cameraJointName = cameraJointName;
+	initialState.initializeCameraTransform();
 
 	// initialize the camera intrinsics
 	initialState.cameraInfo = cameraModel.cameraInfo();

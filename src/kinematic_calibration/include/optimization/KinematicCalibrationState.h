@@ -8,32 +8,18 @@
 #ifndef CALIBRATIONSTATE_H_
 #define CALIBRATIONSTATE_H_
 
+#include <sensor_msgs/CameraInfo.h>
 #include <tf/tf.h>
+#include <iostream>
 #include <map>
 #include <string>
+#include <utility>
 
-#include "../../include/optimization/CameraIntrinsicsVertex.h"
+//#include "../../include/optimization/CameraIntrinsicsVertex.h"
 
 using namespace std;
 
 namespace kinematic_calibration {
-/*
- // stream operators for tf::Vector3
- ostream &operator<<(ostream &output, const tf::Vector3 &v) {
- output << " " << v[0] << " " << v[1] << " " << v[2];
- return output;
- }
-
- // stream operators for tf::Quaternion
- ostream &operator<<(ostream &output, const tf::Quaternion &q) {
- output << " " << q.x() << " " << q.y() << " " << q.z() << " " << q.w();
- return output;
- }
- // stream operators for tf::Transform
- ostream &operator<<(ostream &output, const tf::Transform &t) {
- output << " " << t.getOrigin() << " " << t.getRotation();
- return output;
- }*/
 
 /**
  * Represents a calibration state.
@@ -60,6 +46,33 @@ public:
 	virtual ~KinematicCalibrationState();
 
 	/**
+	 * Initializes the camera transformation from the KDL model loaded at the ROS parameter server.
+	 */
+	void initializeCameraTransform();
+
+	/**
+	 * Initializes the camera information from ROS.
+	 */
+	void initializeCameraInfo();
+
+	/**
+	 * Initializes the joint offsets from the given kinematic chain.
+	 * @param name Name of the kinematic chain.
+	 * @param root Root frame name.
+	 * @param tip Tip frame name.
+	 */
+	void addKinematicChain(const string name, const string root,
+			const string tip);
+
+	/**
+	 * Initializes the marker transformation.
+	 * @param name Name of the kinematic chain.
+	 * @param root Root frame name.
+	 * @param tip Tip frame name.
+	 */
+	void addMarker(const string name, const string root, const string tip);
+
+	/**
 	 * Current joint offsets.
 	 */
 	map<string, double> jointOffsets;
@@ -83,6 +96,11 @@ public:
 	 * Estimations for the joint transformations.
 	 */
 	map<string, tf::Transform> jointTransformations;
+
+	/**
+	 * Name of the camera joint.
+	 */
+	string cameraJointName;
 
 	friend ostream& operator<<(ostream& output,
 			const KinematicCalibrationState& state) {
@@ -122,6 +140,9 @@ public:
 		return output;
 	}
 
+private:
+	void camerainfoCallback(const sensor_msgs::CameraInfoConstPtr& msg);
+	bool cameraInfoInitialized;
 };
 
 } /* namespace kinematic_calibration */
