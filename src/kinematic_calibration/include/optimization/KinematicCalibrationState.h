@@ -15,7 +15,8 @@
 #include <string>
 #include <utility>
 
-//#include "../../include/optimization/CameraIntrinsicsVertex.h"
+#include "../common/KinematicChain.h"
+
 
 using namespace std;
 
