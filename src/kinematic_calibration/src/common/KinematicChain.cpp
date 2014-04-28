@@ -62,8 +62,8 @@ bool KinematicChain::initializeFromRos() {
 	return this->initializeFromRos(chainRoot, chainTip, chainName);
 }
 
-bool KinematicChain::initializeFromRos(std::string root, std::string tip,
-		std::string name) {
+bool KinematicChain::initializeFromRos(const std::string root, const std::string tip,
+		const std::string name) {
 	// instantiate the KDL tree
 	ModelLoader modelLoader;
 	modelLoader.initializeFromRos();

@@ -55,7 +55,8 @@ public:
 	 * @param name The name of the chain.
 	 * @return True if successful, false otherwise.
 	 */
-	bool initializeFromRos(std::string root, std::string tip, std::string name);
+	bool initializeFromRos(const std::string root, const std::string tip,
+			const std::string name);
 
 	/**
 	 * Calculates the transform from the root to the tip of the frame.
