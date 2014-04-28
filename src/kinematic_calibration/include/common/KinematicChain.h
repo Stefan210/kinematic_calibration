@@ -35,9 +35,17 @@ public:
 	KinematicChain(const KDL::Tree& tree, std::string root, std::string tip,
 			std::string name = "");
 
-	KinematicChain() {}
+	KinematicChain() {
+	}
 
 	virtual ~KinematicChain();
+
+	/**
+	 * Initializes the kinematic chain using avaliable
+	 * information from the ROS parameter server.
+	 * @return True if successful, false otherwise.
+	 */
+	bool initializeFromRos();
 
 	/**
 	 * Calculates the transform from the root to the tip of the frame.
@@ -136,7 +144,12 @@ public:
 		return tip;
 	}
 
+protected:
+	bool initialize(const KDL::Tree& tree, std::string root, std::string tip,
+			std::string name);
+
 private:
+	KDL::Tree tree;
 	KDL::Chain chain;
 	string root;
 	string tip;
