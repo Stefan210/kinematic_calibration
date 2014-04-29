@@ -107,6 +107,7 @@ void KinematicCalibrationState::addMarker(const string name, const string root,
 	if (TF == source) {
 		sourceString = "TF";
 		tf::TransformListener transformListener;
+		usleep(1e6); // fill buffer
 		ros::Time now = ros::Time::now();
 		tf::StampedTransform transform;
 		transformListener.waitForTransform(root, tip, now, ros::Duration(1.0));
