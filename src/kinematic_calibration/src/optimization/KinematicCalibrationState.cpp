@@ -45,6 +45,7 @@ KinematicCalibrationState::~KinematicCalibrationState() {
 void KinematicCalibrationState::initializeCameraTransform() {
 	urdf::Model model;
 	ModelLoader modelLoader;
+	modelLoader.initializeFromRos();
 	modelLoader.getUrdfModel(model);
 	urdf::Joint cameraJoint = *model.getJoint(cameraJointName);
 	urdf::Pose headPitchToCameraPose =
