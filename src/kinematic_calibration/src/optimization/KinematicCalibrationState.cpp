@@ -102,7 +102,9 @@ void KinematicCalibrationState::addKinematicChain(
 void KinematicCalibrationState::addMarker(const string name, const string root,
 		const string tip, TransformSource source) {
 	tf::Transform markerTransform;
+	string sourceString = "";
 	if (TF == source) {
+		sourceString = "TF";
 		tf::TransformListener transformListener;
 		ros::Time now = ros::Time::now();
 		tf::StampedTransform transform;
@@ -111,6 +113,7 @@ void KinematicCalibrationState::addMarker(const string name, const string root,
 		markerTransform.setRotation(transform.getRotation());
 		markerTransform.setOrigin(transform.getOrigin());
 	} else if (ROSPARAM_URDF == source) {
+		sourceString = "ROSPARAM_URDF";
 		KinematicChain markerChain;
 		markerChain.initializeFromRos(root, tip, "marker");
 		KDL::Frame kdlFrame;
@@ -118,11 +121,12 @@ void KinematicCalibrationState::addMarker(const string name, const string root,
 		tf::transformKDLToTF(kdlFrame, markerTransform);
 	}
 	this->markerTransformations[name] = markerTransform;
-	ROS_INFO("Initial transform for marker of chain %s (%s -> %s): %f %f %f",
+	ROS_INFO(
+			"Initial transform for marker of chain %s (%s -> %s): %f %f %f (source: %s)",
 			name.c_str(), root.c_str(), tip.c_str(),
 			markerTransform.getOrigin().getX(),
 			markerTransform.getOrigin().getY(),
-			markerTransform.getOrigin().getZ());
+			markerTransform.getOrigin().getZ(), sourceString.c_str());
 }
 
 } /* namespace kinematic_calibration */

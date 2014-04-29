@@ -4,3 +4,5 @@ chain_tip: r_stick
 marker_type: circle
 marker_frame: r_tip
 xylo_rarm_marker_radius: 0.011
+
+marker_transform_source: tf   # 'tf' or 'urdf' (optional; if not set, default is 'urdf')
