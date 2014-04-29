@@ -40,7 +40,7 @@ bool KinematicChain::initialize(const KDL::Tree& tree, std::string root,
 	this->root = root;
 	this->tip = tip;
 	this->name = name;
-	this->tree = tree;
+	this->tree = KDL::Tree(tree);
 
 	ROS_INFO("Extracting chain from %s to %s...", root.c_str(), tip.c_str());
 	if (!tree.getChain(root, tip, this->chain)) {
