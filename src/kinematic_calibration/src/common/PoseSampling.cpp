@@ -47,7 +47,8 @@ namespace kinematic_calibration {
 
 PoseSampling::PoseSampling() :
 		debug(false), nhPrivate("~"), xMin(20), xMax(620), yMin(20), yMax(460), cameraFrame(
-				"CameraBottom_frame"), viewCylinderRadius(0.01), srdfAvailable(false) {
+				"CameraBottom_frame"), viewCylinderRadius(0.01), srdfAvailable(
+				false) {
 	// initialize stuff
 	this->initialize();
 
@@ -111,29 +112,14 @@ void PoseSampling::initializeKinematicChain() {
 
 void PoseSampling::initializeState() {
 	this->initialState = boost::make_shared<KinematicCalibrationState>();
+	this->modelLoader.getUrdfModel(this->robotModel);
 
-	vector<string> jointNames;
-	this->kinematicChainPtr->getJointNames(jointNames);
-	for (vector<string>::const_iterator it = jointNames.begin();
-			it != jointNames.end(); it++) {
-		this->initialState->jointOffsets[*it] = 0.0;
-	}
+	// initialize the joint offsets (with 0.0)
+	this->initialState->addKinematicChain(*this->kinematicChainPtr);
 
 	// initialize transform from camera to head
-	string cameraJointName = "CameraBottom"; // todo: parameterize!
-	this->modelLoader.getUrdfModel(this->robotModel);
-	urdf::Joint cameraJoint = *robotModel.getJoint(cameraJointName);
-	urdf::Pose headPitchToCameraPose =
-			cameraJoint.parent_to_joint_origin_transform;
-	tf::Transform headToCamera = tf::Transform(
-			tf::Quaternion(headPitchToCameraPose.rotation.x,
-					headPitchToCameraPose.rotation.y,
-					headPitchToCameraPose.rotation.z,
-					headPitchToCameraPose.rotation.w),
-			tf::Vector3(headPitchToCameraPose.position.x,
-					headPitchToCameraPose.position.y,
-					headPitchToCameraPose.position.z));
-	initialState->cameraToHeadTransformation = headToCamera;
+	this->initialState->cameraJointName = "CameraBottom";
+	this->initialState->initializeCameraTransform();
 
 	// initialize the camera intrinsics
 	initialState->cameraInfo = cameraModel.cameraInfo();
@@ -142,17 +128,9 @@ void PoseSampling::initializeState() {
 	if (nh.hasParam("marker_frame")) {
 		string markerFrame;
 		nh.getParam("marker_frame", markerFrame);
-		KinematicChain markerChain(kdlTree, this->kinematicChainPtr->getTip(),
-				markerFrame, "marker");
-		tf::Transform markerTransform;
-		KDL::Frame kdlFrame;
-		markerChain.getRootToTip(map<string, double>(), kdlFrame);
-		tf::transformKDLToTF(kdlFrame, markerTransform);
-		this->initialState->markerTransformations[this->kinematicChainPtr->getName()] =
-				markerTransform;
-		cout << markerTransform.getOrigin().getX() << " "
-				<< markerTransform.getOrigin().getY() << " "
-				<< markerTransform.getOrigin().getZ() << " " << endl;
+		this->initialState->addMarker(this->kinematicChainPtr->getName(),
+				this->kinematicChainPtr->getTip(), markerFrame,
+				KinematicCalibrationState::ROSPARAM_URDF);
 	} else {
 		ROS_WARN(
 				"No initialization for marker frame transformation available!");
@@ -196,7 +174,7 @@ void PoseSampling::initializeSrdf(const string& robotName,
 		srdfString = srdfStringStream.str();
 	}
 
-	if(debug) {
+	if (debug) {
 		cout << "SRDF (unmodified): \n" << srdfString << endl;
 	}
 
@@ -218,7 +196,7 @@ void PoseSampling::initializeSrdf(const string& robotName,
 	int groupPos = srdfString.find(groupPlaceholder);
 	srdfString.replace(groupPos, groupPlaceholder.length(), currentChainString);
 
-	if(debug) {
+	if (debug) {
 		cout << "SRDF (modified): \n" << srdfString << endl;
 	}
 
@@ -269,7 +247,8 @@ void PoseSampling::getPoses(const int& numOfPoses,
 	ROS_INFO(
 			"Adding additional (virtual) joint and link from camera to marker frame to the model...");
 	//urdfModelPtr->links_[cameraFrame]->collision = markerLinkCollision;
-	this->urdfModelPtr->links_[cameraFrame]->child_joints.push_back(markerJoint);
+	this->urdfModelPtr->links_[cameraFrame]->child_joints.push_back(
+			markerJoint);
 	this->urdfModelPtr->links_[cameraFrame]->child_links.push_back(markerLink);
 	this->urdfModelPtr->joints_[markerJoint->name] = markerJoint;
 	this->urdfModelPtr->links_[markerLink->name] = markerLink;
