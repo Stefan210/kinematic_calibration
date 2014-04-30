@@ -89,6 +89,11 @@ void PoseSampling::initialize() {
 	ROS_INFO("Using view cylinder radius: %f", viewCylinderRadius);
 	ROS_INFO("Pose stability WILL %s tested.",
 			testPoseStability ? "BE" : "NOT BE");
+
+	if (testPoseStability) {
+		this->testStabilityPtr = boost::make_shared<
+				hrl_kinematics::TestStability>();
+	}
 }
 
 void PoseSampling::initializeCamera() {
@@ -244,8 +249,7 @@ void PoseSampling::initializeInitialPose() {
 		this->initialPoseAvailable = false;
 		ROS_WARN("Initial pose '%s' found, but something is wrong with it.",
 				initialPoseName.c_str());
-		ROS_WARN(
-				"The pose shoud be under the namespace 'poses'"
+		ROS_WARN("The pose shoud be under the namespace 'poses'"
 				" and should have two arrays name 'joint_names' "
 				"and 'positions' of the same size.");
 		return;
@@ -481,8 +485,12 @@ void PoseSampling::getPoses(const int& numOfPoses,
 		}
 
 		// --------------------------------------------------------------------------------
-		// TODO: check #3: normals/angle
+		// check #3: pose stability (optional)
 		// --------------------------------------------------------------------------------
+		if (this->testPoseStability) {
+			bool poseStable = false;
+			poseStable = isPoseStable(jointState);
+		}
 
 		// add to the pose set
 		poses.push_back(pose);
@@ -518,6 +526,27 @@ void PoseSampling::getPoses(const int& numOfPoses,
 		}
 
 	}
+}
+
+bool PoseSampling::isPoseStable(const sensor_msgs::JointState& msg) const {
+	// "merge": initialPose + msg -> poseToCheck
+	map<string, double> jointPositions;
+	for (int i = 0; i < initialPose.name.size(); i++) {
+		jointPositions[initialPose.name[i]] = initialPose.position[i];
+	}
+	for (int i = 0; i < msg.name.size(); i++) {
+		jointPositions[msg.name[i]] = msg.position[i];
+	}
+
+	// delegate stability test
+	bool stable = this->testStabilityPtr->isPoseStable(jointPositions,
+			hrl_kinematics::TestStability::SUPPORT_DOUBLE);
+
+	if(debug) {
+		ROS_INFO("Pose is %s!", stable ? "STABLE" : "UNSTABLE");
+	}
+
+	return stable;
 }
 
 void PoseSampling::camerainfoCallback(

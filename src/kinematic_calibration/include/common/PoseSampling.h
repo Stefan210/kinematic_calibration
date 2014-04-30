@@ -21,6 +21,8 @@
 #include <string>
 #include <vector>
 
+#include <hrl_kinematics/TestStability.h>
+
 #include "../optimization/KinematicCalibrationState.h"
 #include "KinematicChain.h"
 #include "MeasurementPose.h"
@@ -136,6 +138,13 @@ protected:
 	void publishJointState(sensor_msgs::JointState& msg) const;
 
 	/**
+	 * Checks whether the initial pose and the given joint state is stable.
+	 * @param msg The joint state of the pose to check.
+	 * @return True if the pose is stable, false otherwise.
+	 */
+	bool isPoseStable(const sensor_msgs::JointState& msg) const;
+
+	/**
 	 * Pointer to the initial/current calibration state.
 	 */
 	shared_ptr<KinematicCalibrationState> initialState;
@@ -144,6 +153,11 @@ protected:
 	 * Pointer to the kinematic chain currently used.
 	 */
 	boost::shared_ptr<KinematicChain> kinematicChainPtr;
+
+	/**
+	 * Pointer to the stability test instance.
+	 */
+	boost::shared_ptr<hrl_kinematics::TestStability> testStabilityPtr;
 
 	/**
 	 * NodeHandle instance.

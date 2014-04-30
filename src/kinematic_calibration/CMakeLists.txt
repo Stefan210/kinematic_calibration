@@ -4,7 +4,7 @@ project(kinematic_calibration)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED roscpp cv_bridge image_transport urdf kdl_parser tf tf_conversions nao_msgs actionlib image_geometry message_generation eigen_conversions camera_calibration_parsers moveit_core moveit_ros_planning)
+find_package(catkin REQUIRED roscpp cv_bridge image_transport urdf kdl_parser tf tf_conversions nao_msgs actionlib image_geometry message_generation eigen_conversions camera_calibration_parsers moveit_core moveit_ros_planning hrl_kinematics)
 find_package(orocos_kdl REQUIRED)
 find_package(OpenCV REQUIRED)
 

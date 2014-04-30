@@ -14,6 +14,8 @@
       pose_pool_size: 500
       # name of the camera link / frame
       camera_frame: "CameraBottom_frame"
+      # name of the torso link / frame
+      torso_frame: "torso"
       # radius of the camera 'view cylinder'
       view_cylinder_radius: 0.03 
    
@@ -23,12 +25,29 @@
       yMin: 150
       yMax: 330
       
+      # should the stability be tested? requires an initial pose!
+      test_pose_stability: true
+      
+      # should the poses sampled s.t. the end effector is fixed?
+      # requires an initial pose - its transformation from torso to tip will be kept.
+      # this option is useful for generating poses for the feets (in combination with test_pose_stability)
+      #keep_end_effector_pose: false
+      
+      # name of the initial pose (optional; needed for testing the pose stability)
+      initial_pose_name: "standing"
+
+      
       ### "measurement" parameters:
       # (none so far)
       
       ### Pose selection strategy:
       # number of poses which should be selected from the pose pool
       num_of_poses: 50
+    </rosparam>
+    <rosparam ns="poses">
+      standing:
+        joint_names: ['HeadYaw', 'HeadPitch', 'LShoulderPitch', 'LShoulderRoll', 'LElbowYaw', 'LElbowRoll', 'LWristYaw', 'LHand', 'LHipYawPitch', 'LHipRoll', 'LHipPitch', 'LKneePitch', 'LAnklePitch', 'LAnkleRoll', 'RHipYawPitch', 'RHipRoll', 'RHipPitch', 'RKneePitch', 'RAnklePitch', 'RAnkleRoll', 'RShoulderPitch', 'RShoulderRoll', 'RElbowYaw', 'RElbowRoll', 'RWristYaw', 'RHand']
+        positions: [0.0,0.0, 1.39, 0.34, -1.39, -1.04, 0.0, 0.0, 0.0, 0.0, -0.43, 0.69, -0.34, 0.0, 0.0, 0.0, -0.43, 0.69, -0.34, 0.0, 1.39, -0.34, 1.39, 1.04, 0.0, 0.0]
     </rosparam>
     <param name="pose_file" value="poses_$(arg chain_name)_generated.yaml"/>
   </node>  
