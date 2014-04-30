@@ -119,6 +119,11 @@ protected:
 			const vector<string>& joints, const vector<string>& links);
 
 	/**
+	 * Load the initial pose from the ROS parameter if given.
+	 */
+	virtual void initializeInitialPose();
+
+	/**
 	 * Camera info message callback.
 	 * @param[in] msg Camera info message,
 	 */
@@ -219,6 +224,11 @@ protected:
 	string cameraFrame;
 
 	/**
+	 * Name of the torso frame.
+	 */
+	string torsoFrame;
+
+	/**
 	 * Define a rectangle within which the predicted
 	 * marker position of the sampled poses should be.
 	 */
@@ -228,6 +238,25 @@ protected:
 	 * Radius of the "view cylinder".
 	 */
 	double viewCylinderRadius;
+
+	/**
+	 * Flag that indicates whether an initial pose is available.
+	 */
+	bool initialPoseAvailable;
+
+	/**
+	 * Initial pose. If given:
+	 * - initialPoseAvailable = true
+	 * - stability test can be done
+	 * - poses can be sampled which preserve the end effector position
+	 */
+	sensor_msgs::JointState initialPose;
+
+	/**
+	 * Flag that indicates whether the stability of the sampled pose should be tested.
+	 * Requires that in initial pose is given.
+	 */
+	bool testPoseStability;
 
 	/**
 	 * Flag which indicates whether we are in debug mode.

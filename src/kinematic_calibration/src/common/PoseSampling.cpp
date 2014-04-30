@@ -48,6 +48,7 @@ namespace kinematic_calibration {
 PoseSampling::PoseSampling() :
 		debug(false), nhPrivate("~"), xMin(20), xMax(620), yMin(20), yMax(460), cameraFrame(
 				"CameraBottom_frame"), viewCylinderRadius(0.01), srdfAvailable(
+				false), torsoFrame("torso"), initialPoseAvailable(false), testPoseStability(
 				false) {
 	// initialize stuff
 	this->initialize();
@@ -66,6 +67,7 @@ void PoseSampling::initialize() {
 	this->initializeKinematicChain();
 	this->initializeState();
 	this->initializeJointLimits();
+	this->initializeInitialPose();
 
 	// initialize parameter from ROS via nhPrivate or nh
 	nhPrivate.param("xMin", xMin, xMin);
@@ -73,14 +75,20 @@ void PoseSampling::initialize() {
 	nhPrivate.param("yMin", yMin, yMin);
 	nhPrivate.param("yMax", yMax, yMax);
 	nhPrivate.param("camera_frame", cameraFrame, cameraFrame);
+	nhPrivate.param("torso_frame", torsoFrame, torsoFrame);
 	nhPrivate.param("view_cylinder_radius", viewCylinderRadius,
 			viewCylinderRadius);
+	nhPrivate.param("test_pose_stability", testPoseStability,
+			testPoseStability);
 
 	// print some info about the used parameters
 	ROS_INFO("Allowed camera window size: [%.2f, %.2f] - [%.2f, %.2f]", xMin,
 			yMin, xMax, yMax);
 	ROS_INFO("Using camera frame: %s", cameraFrame.c_str());
+	ROS_INFO("Using torso frame: %s", torsoFrame.c_str());
 	ROS_INFO("Using view cylinder radius: %f", viewCylinderRadius);
+	ROS_INFO("Pose stability WILL %s tested.",
+			testPoseStability ? "BE" : "NOT BE");
 }
 
 void PoseSampling::initializeCamera() {
@@ -204,6 +212,47 @@ void PoseSampling::initializeSrdf(const string& robotName,
 	srdf::Model srdfModel;
 	srdfModel.initString(*urdfModelPtr, srdfString);
 	this->srdfModelPtr = make_shared<const srdf::Model>(srdfModel);
+}
+
+void PoseSampling::initializeInitialPose() {
+	// get the name of the initial pose
+	string initialPoseName;
+	if (!nhPrivate.hasParam("initial_pose_name")) {
+		// no pose name given
+		this->initialPoseAvailable = false;
+		return;
+	}
+	nhPrivate.getParam("initial_pose_name", initialPoseName);
+
+	// check whether this pose actually exists
+	if (!nhPrivate.hasParam("poses/" + initialPoseName)) {
+		// pose not available
+		this->initialPoseAvailable = false;
+		ROS_WARN("Initial pose name '%s' given, but no such pose found!",
+				initialPoseName.c_str());
+		return;
+	}
+
+	// get the initial pose
+	nhPrivate.param("poses/" + initialPoseName + "/joint_names",
+			this->initialPose.name, this->initialPose.name);
+	nhPrivate.param("poses/" + initialPoseName + "/positions",
+			this->initialPose.position, this->initialPose.position);
+
+	if (this->initialPose.name.size() == 0
+			|| this->initialPose.position.size() == 0) {
+		this->initialPoseAvailable = false;
+		ROS_WARN("Initial pose '%s' found, but something is wrong with it.",
+				initialPoseName.c_str());
+		ROS_WARN(
+				"The pose shoud be under the namespace 'poses'"
+				" and should have two arrays name 'joint_names' "
+				"and 'positions' of the same size.");
+		return;
+	}
+
+	ROS_INFO("Initial pose successfully loaded.");
+	this->initialPoseAvailable = true;
 }
 
 void PoseSampling::getPoses(const int& numOfPoses,
