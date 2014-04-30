@@ -319,6 +319,10 @@ void PoseSampling::getPoses(const int& numOfPoses,
 	robot_model::RobotModelPtr kinematic_model = make_shared<
 			robot_model::RobotModel>(urdfModelPtr, srdfModelPtr);
 
+	if (debug) {
+		kinematic_model->printModelInfo(cout);
+	}
+
 	// sample as much poses as requested
 	ROS_INFO("Sampling %d poses now...", numOfPoses);
 	while (poses.size() < numOfPoses && ros::ok()) {
@@ -396,15 +400,6 @@ void PoseSampling::getPoses(const int& numOfPoses,
 				urdfJointPose.position.z / 2);
 
 		// b) insert the collision object into the moveit model/state
-
-		// (re-)initialize the moveit model
-		//ROS_INFO("initialize the moveit model");
-		//shared_ptr<const urdf::Model> urdfModelPtr = make_shared<const urdf::Model>(urdfModel);
-		//kinematic_model = make_shared<
-		//		robot_model::RobotModel>(urdfModelPtr, srdfModelPtr);
-		if (debug) {
-			kinematic_model->printModelInfo(cout);
-		}
 
 		// get the planning scene
 		planning_scene::PlanningScene planning_scene(kinematic_model);
