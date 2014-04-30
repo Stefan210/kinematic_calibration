@@ -485,6 +485,8 @@ void PoseSampling::getPoses(const int& numOfPoses,
 		if (this->testPoseStability) {
 			bool poseStable = false;
 			poseStable = isPoseStable(jointState);
+			if(!poseStable)
+				continue;
 		}
 
 		// add to the pose set
