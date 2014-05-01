@@ -376,7 +376,8 @@ void PoseSampling::getPoses(const int& numOfPoses,
 		if (this->keepEndEffectorPose) {
 			// initialize the IK solver (TODO: only once, in own method)
 			KDL::Chain chain;
-			this->kdlTree.getChain(this->torsoFrame, this->kinematicChainPtr->getTip(), chain);
+			this->kdlTree.getChain(this->torsoFrame,
+					this->kinematicChainPtr->getTip(), chain);
 			unsigned int nj = chain.getNrOfJoints();
 
 			KDL::JntArray q_min(nj);
@@ -392,23 +393,37 @@ void PoseSampling::getPoses(const int& numOfPoses,
 			KDL::ChainFkSolverPos_recursive fkSolverPos(chain);	//Forward position solver
 			KDL::ChainIkSolverVel_pinv ikSolverVel(chain);//Inverse velocity solver
 			KDL::ChainIkSolverPos_NR_JL ikSolver(chain, q_min, q_max,
-					fkSolverPos, ikSolverVel);
+					fkSolverPos, ikSolverVel, 10000, 0.01);
 
 			// seed state
 			KDL::JntArray seedState(nj);
+
+			// initialize with initial pose
+			for (int i = 0; i < nj; i++) {
+				string currentJoint = chain.getSegment(i).getJoint().getName();
+				for (int j = 0; j < initialPose.name.size(); j++) {
+					if (currentJoint == initialPose.name[j]) {
+						seedState(i) = initialPose.position[j];
+					}
+				}
+			}
+
+			// use this as target
+			KDL::Frame frame;
+			fkSolverPos.JntToCart(seedState, frame);
+
+			// add random values
 			for (int i = 0; i < nj; i++) {
 				string currentJoint = chain.getSegment(i).getJoint().getName();
 				for (int j = 0; j < jointState.name.size(); j++) {
 					if (currentJoint == jointState.name[j]) {
-						seedState(i) = jointState.position[j];
+						seedState(i) += 0.1 * jointState.position[j];
 					}
 				}
 			}
 
 			// inverse kinematics
 			KDL::JntArray targetState(nj);
-			KDL::Frame frame;
-			tf::TransformTFToKDL(this->endEffectorState, frame);
 			int ikSuccess = ikSolver.CartToJnt(seedState, frame, targetState);
 
 			if (debug) {
@@ -421,10 +436,25 @@ void PoseSampling::getPoses(const int& numOfPoses,
 				for (int i = 0; i < nj; i++)
 					cout << targetState(i) << ", ";
 				cout << endl;
+				cout << "target transformation: " << frame.p[0] << " " << frame.p[1]
+						<< " " << frame.p[2] << endl;
+				fkSolverPos.JntToCart(targetState, frame);
+				cout << "IK transformation: " << frame.p[0] << " " << frame.p[1]
+						<< " " << frame.p[2] << endl;
 			}
 
-			if(ikSuccess < 0)
+			if (ikSuccess < 0)
 				continue;
+
+			// save the results
+			for (int i = 0; i < nj; i++) {
+				string currentJoint = chain.getSegment(i).getJoint().getName();
+				for (int j = 0; j < jointState.name.size(); j++) {
+					if (currentJoint == jointState.name[j]) {
+						jointState.position[j] = targetState(i);
+					}
+				}
+			}
 		}
 
 		// --------------------------------------------------------------------------------
