@@ -126,6 +126,11 @@ protected:
 	virtual void initializeInitialPose();
 
 	/**
+	 * Initializes the IK request.
+	 */
+	virtual void initializeEndEffectorState();
+
+	/**
 	 * Camera info message callback.
 	 * @param[in] msg Camera info message,
 	 */
@@ -210,6 +215,11 @@ protected:
 	shared_ptr<const srdf::Model> srdfModelPtr;
 
 	/**
+	 * String containing the SRDF model.
+	 */
+	string srdfString;
+
+	/**
 	 * Flag that indicates whether a SRDF model is available.
 	 * If true, collision checking is enabled for the whole chain,
 	 * expecting that the loaded SRDF model contains information about
@@ -268,9 +278,20 @@ protected:
 
 	/**
 	 * Flag that indicates whether the stability of the sampled pose should be tested.
-	 * Requires that in initial pose is given.
+	 * Requires that an initial pose is given.
 	 */
 	bool testPoseStability;
+
+	/**
+	 * Flag that indicates whether the poses should be sampled s.t. the end effector is fixed.
+	 * Requires that an initial pose is given.
+	 */
+	bool keepEndEffectorPose;
+
+	/**
+	 * State of the end effector (i.e. torso -> tip)
+	 */
+	tf::Transform endEffectorState;
 
 	/**
 	 * Flag which indicates whether we are in debug mode.

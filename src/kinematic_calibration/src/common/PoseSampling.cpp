@@ -10,6 +10,9 @@
 #include <boost/smart_ptr/make_shared.hpp>
 #include <image_geometry/pinhole_camera_model.h>
 #include <kdl/tree.hpp>
+#include <kdl/chainiksolverpos_nr_jl.hpp>
+#include <kdl/chainiksolvervel_pinv.hpp>
+#include <kdl/chainfksolverpos_recursive.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/operations.hpp>
 #include <ros/callback_queue.h>
@@ -19,6 +22,8 @@
 #include <sensor_msgs/JointState.h>
 #include <tf/tf.h>
 #include <tf/transform_broadcaster.h>
+#include <tf_conversions/tf_kdl.h>
+#include <tf_conversions/tf_eigen.h>
 #include <urdf_model/joint.h>
 #include <urdf_model/pose.h>
 #include <cstdlib>
@@ -38,8 +43,6 @@
 #include <urdf_parser/urdf_parser.h>
 #endif
 
-#include <tf_conversions/tf_eigen.h>
-
 using namespace boost;
 using namespace std;
 
@@ -49,7 +52,7 @@ PoseSampling::PoseSampling() :
 		debug(false), nhPrivate("~"), xMin(20), xMax(620), yMin(20), yMax(460), cameraFrame(
 				"CameraBottom_frame"), viewCylinderRadius(0.01), srdfAvailable(
 				false), torsoFrame("torso"), initialPoseAvailable(false), testPoseStability(
-				false) {
+				false), keepEndEffectorPose(false) {
 	// initialize stuff
 	this->initialize();
 
@@ -80,6 +83,8 @@ void PoseSampling::initialize() {
 			viewCylinderRadius);
 	nhPrivate.param("test_pose_stability", testPoseStability,
 			testPoseStability);
+	nhPrivate.param("keep_end_effector_pose", keepEndEffectorPose,
+			keepEndEffectorPose);
 
 	// print some info about the used parameters
 	ROS_INFO("Allowed camera window size: [%.2f, %.2f] - [%.2f, %.2f]", xMin,
@@ -89,10 +94,17 @@ void PoseSampling::initialize() {
 	ROS_INFO("Using view cylinder radius: %f", viewCylinderRadius);
 	ROS_INFO("Pose stability WILL %s tested.",
 			testPoseStability ? "BE" : "NOT BE");
+	ROS_INFO("End effector WILL %s fixed.",
+			keepEndEffectorPose ? "BE" : "NOT BE");
 
 	if (testPoseStability) {
 		this->testStabilityPtr = boost::make_shared<
 				hrl_kinematics::TestStability>();
+	}
+
+	if (keepEndEffectorPose) {
+		// initialize the IK request
+		initializeEndEffectorState();
 	}
 }
 
@@ -170,7 +182,7 @@ void PoseSampling::initializeUrdf() {
 
 void PoseSampling::initializeSrdf(const string& robotName,
 		const vector<string>& joints, const vector<string>& links) {
-	string srdfString;
+	srdfString = "";
 	const string robotNamePlaceholder = "ROBOTNAME";
 	const string groupPlaceholder = "CURRENTCHAINGROUP";
 
@@ -259,6 +271,20 @@ void PoseSampling::initializeInitialPose() {
 	this->initialPoseAvailable = true;
 }
 
+void PoseSampling::initializeEndEffectorState() {
+	// initialize the kinematic chain from torso to tip
+	KinematicChain torsoToTip;
+	torsoToTip.initializeFromRos(this->torsoFrame,
+			this->kinematicChainPtr->getTip(), "torsoToTip");
+
+	map<string, double> jointPositions;
+	for (int i = 0; i < initialPose.name.size(); i++) {
+		jointPositions[initialPose.name[i]] = initialPose.position[i];
+	}
+
+	torsoToTip.getRootToTip(jointPositions, this->endEffectorState);
+}
+
 void PoseSampling::getPoses(const int& numOfPoses,
 		vector<MeasurementPose>& poses) {
 	ros::Publisher robot_state_publisher;
@@ -316,8 +342,13 @@ void PoseSampling::getPoses(const int& numOfPoses,
 	initializeSrdf(urdfModelPtr->getName(), groupJoints, groupLinks);
 
 	// initialize the moveit robot model
-	robot_model::RobotModelPtr kinematic_model = make_shared<
-			robot_model::RobotModel>(urdfModelPtr, srdfModelPtr);
+	robot_model_loader::RobotModelLoader::Options options(
+			this->modelLoader.getUrdfXml(), srdfString);
+	robot_model_loader::RobotModelLoader robot_model_loader(options);
+	robot_model_loader.loadKinematicsSolvers();
+	robot_model::RobotModelPtr kinematic_model = robot_model_loader.getModel();
+	//robot_model::RobotModelPtr kinematic_model = make_shared<
+	//		robot_model::RobotModel>(urdfModelPtr, srdfModelPtr);
 
 	if (debug) {
 		kinematic_model->printModelInfo(cout);
@@ -339,6 +370,61 @@ void PoseSampling::getPoses(const int& numOfPoses,
 									/ (upperLimit - lowerLimit)));
 			jointState.name.push_back(jointName);
 			jointState.position.push_back(currentJointState);
+		}
+
+		// use IK to generate a pose, using the sampled pose as seed state
+		if (this->keepEndEffectorPose) {
+			// initialize the IK solver (TODO: only once, in own method)
+			KDL::Chain chain;
+			this->kdlTree.getChain(this->torsoFrame, this->kinematicChainPtr->getTip(), chain);
+			unsigned int nj = chain.getNrOfJoints();
+
+			KDL::JntArray q_min(nj);
+			KDL::JntArray q_max(nj);
+			for (int i = 0; i < nj; i++) {
+				q_min(i) =
+						this->lowerLimits[chain.getSegment(i).getJoint().getName()];
+				q_max(i) =
+						this->upperLimits[chain.getSegment(i).getJoint().getName()];
+			}
+			this->kdlTree.getChain(this->torsoFrame,
+					this->kinematicChainPtr->getTip(), chain);
+			KDL::ChainFkSolverPos_recursive fkSolverPos(chain);	//Forward position solver
+			KDL::ChainIkSolverVel_pinv ikSolverVel(chain);//Inverse velocity solver
+			KDL::ChainIkSolverPos_NR_JL ikSolver(chain, q_min, q_max,
+					fkSolverPos, ikSolverVel);
+
+			// seed state
+			KDL::JntArray seedState(nj);
+			for (int i = 0; i < nj; i++) {
+				string currentJoint = chain.getSegment(i).getJoint().getName();
+				for (int j = 0; j < jointState.name.size(); j++) {
+					if (currentJoint == jointState.name[j]) {
+						seedState(i) = jointState.position[j];
+					}
+				}
+			}
+
+			// inverse kinematics
+			KDL::JntArray targetState(nj);
+			KDL::Frame frame;
+			tf::TransformTFToKDL(this->endEffectorState, frame);
+			int ikSuccess = ikSolver.CartToJnt(seedState, frame, targetState);
+
+			if (debug) {
+				cout << "ikSuccess: " << ikSuccess << endl;
+				cout << "seed state: ";
+				for (int i = 0; i < nj; i++)
+					cout << seedState(i) << ", ";
+				cout << endl;
+				cout << "target state: ";
+				for (int i = 0; i < nj; i++)
+					cout << targetState(i) << ", ";
+				cout << endl;
+			}
+
+			if(ikSuccess < 0)
+				continue;
 		}
 
 		// --------------------------------------------------------------------------------
@@ -485,7 +571,7 @@ void PoseSampling::getPoses(const int& numOfPoses,
 		if (this->testPoseStability) {
 			bool poseStable = false;
 			poseStable = isPoseStable(jointState);
-			if(!poseStable)
+			if (!poseStable)
 				continue;
 		}
 
@@ -539,7 +625,7 @@ bool PoseSampling::isPoseStable(const sensor_msgs::JointState& msg) const {
 	bool stable = this->testStabilityPtr->isPoseStable(jointPositions,
 			hrl_kinematics::TestStability::SUPPORT_DOUBLE);
 
-	if(debug) {
+	if (debug) {
 		ROS_INFO("Pose is %s!", stable ? "STABLE" : "UNSTABLE");
 	}
 
