@@ -1,6 +1,6 @@
 chain_name: lleg
 chain_root: HeadPitch_link
-chain_tip: l_ankle
+chain_tip: l_sole
 marker_type: aruco              # checkerboard, aruco, circle, color
 marker_frame: LLegMarker_frame
 
