@@ -1,0 +1,11 @@
+chain_name: rleg
+chain_root: HeadPitch_link
+chain_tip: r_ankle
+marker_type: aruco              # checkerboard, aruco, circle, color
+marker_frame: RLegMarker_frame
+
+marker_transform_source: urdf   # 'tf' or 'urdf' (optional; if not set, default is 'urdf')
+
+# checkerboard specific parameters
+checkerboard_rows: 4            # optional; if not set, default is 4
+checkerboard_columns: 4         # optional; if not set, default is 4
