@@ -31,6 +31,8 @@ int main(int argc, char** argv) {
 		dataCapture = new LeftArmDataCapture(*context);
 	} else if ("rarm" == chainName || "xylo_rarm" == chainName) {
 		dataCapture = new RightArmDataCapture(*context);
+	} else if ("lleg" == chainName || "rleg" == chainName) {
+		dataCapture = new LegDataCapture(*context);
 	} else {
 		ROS_FATAL("No parameter was set for the chain type!");
 		exit(0);
