@@ -1,300 +1,250 @@
-### generated from rarm010-1389614194
 rarm001:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.94652, -0.092082, 0.254686, -1.1214, -0.474048, 1.33002, 0.389594]
+  positions: [-0.326166, -0.138471, 0.0584105, -0.191637, 0.361994, 0.895718, -0.410924]
 
-### generated from rarm016-1389614252
 rarm002:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-1.24565, -0.266958, 0.228608, -1.09225, -0.489388, 1.29014, 0.486236]
+  positions: [-0.158075, 0.200451, 0.305652, 0.25282, 0.0518579, 0.656635, 0.0728446]
 
-### generated from rarm019-1389614281
 rarm003:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.651992, -0.211734, 0.323716, -0.865218, -0.414222, 1.34229, 0.523052]
+  positions: [-0.368643, -0.574901, 0.696955, -0.414336, 1.59607, 1.15601, -0.849082]
 
-### generated from rarm019-1389614284
 rarm004:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.651992, 0.079726, 0.322182, -0.865218, -0.414222, 1.34076, 0.529188]
+  positions: [0.122366, -0.59549, 1.23725, -0.0577785, 1.42616, 1.18415, -0.89668]
 
-### generated from rarm022-1389614317
 rarm005:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-1.09685, 0.0966001, 0.517, -0.799256, -0.398882, 0.975666, 0.52612]
+  positions: [-0.116886, -0.689383, 1.08627, -0.466985, 1.06538, 1.16229, -0.425841]
 
-### generated from rarm022-1389614320
 rarm006:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-1.10452, -0.181054, 0.515466, -0.819198, -0.415756, 1.00021, 0.52612]
+  positions: [-0.50864, -0.854618, 0.786064, -0.693442, 1.60239, 1.28008, -0.495684]
 
-### generated from rarm022-1389614323
 rarm007:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.53234, -0.181054, 0.515466, -0.829936, -0.449504, 0.998676, 0.527654]
+  positions: [-0.616493, -0.53923, -0.961555, -0.568059, -0.922082, 1.50921, 0.756649]
 
-### generated from rarm025-1389614343
 rarm008:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-1.15361, 0.0919981, 0.4403, -0.83914, -0.444902, 1.126, 0.573674]
+  positions: [-0.498155, -0.857479, 0.265705, -1.19805, 0.27138, 1.48628, 0.405863]
 
-### generated from rarm025-1389614346
 rarm009:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-1.15975, -0.193326, 0.444902, -0.80846, -0.443368, 1.10912, 0.54913]
+  positions: [-0.500449, -0.912931, 0.0534393, -0.820821, 0.513459, 1.11897, -0.164435]
 
-### generated from rarm028-1389614363
 rarm010:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.857548, 0.0137641, 0.37127, -0.77011, -0.728692, 1.09072, 0.475498]
+  positions: [-0.381748, -0.478826, -0.384807, -0.524068, -0.341516, 1.27821, 0.0223979]
 
-### generated from rarm043-1389614472
 rarm011:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.610574, -0.280764, -0.139552, -0.0521979, 0.184038, 0.719488, 0.401866]
+  positions: [-0.165467, -0.828083, 1.04404, -0.714224, 1.15886, 1.16989, -0.471747]
 
-### generated from rarm043-1389614474
 rarm012:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.619778, -0.487854, -0.25767, -0.139636, 0.260738, 0.638186, 0.401866]
+  positions: [-0.517355, -0.95706, 0.345654, 0.00453155, 1.82695, 1.50829, -0.990036]
 
-### generated from rarm052-1389615003
 rarm013:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.650458, -0.380474, -0.108872, -0.00771189, 0.75622, 0.25622, -0.105888]
+  positions: [-0.211582, -0.640147, 0.368715, -0.960505, 0.420433, 1.2028, -0.34862]
 
-### generated from rarm055-1389615041
 rarm014:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [0.0413761, -0.37127, -0.02757, 0.291418, 0.454022, 0.717954, -0.139636]
+  positions: [-0.657174, -0.957671, -0.792557, -1.01717, -0.747136, 1.43036, 0.308147]
 
-### generated from rarm073-1389615707
 rarm015:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.159578, -0.314512, 0.214802, 0.145688, 0.576742, 0.702614, -0.17185]
+  positions: [-0.599301, -0.85429, -0.587748, -1.1244, -0.165356, 1.41432, 0.0358614]
 
-### generated from rarm073-1389615712
 rarm016:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.443368, -0.191792, 0.237812, 0.113474, 0.62583, 0.734828, -0.151908]
+  positions: [-0.494571, -0.722032, 0.00203915, -1.02827, -0.0624675, 1.18481, 0.355598]
 
-### generated from rarm085-1389616254
 rarm017:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.366668, -0.559952, -0.0475121, 0.300622, 1.90672, 0.467912, -1.14287]
+  positions: [-0.577067, -1.26362, -0.20606, -1.2624, 0.317198, 1.35181, -0.31626]
 
-### generated from rarm085-1389616258
 rarm018:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.650458, -0.451038, -0.107338, 0.302156, 1.94047, 0.49399, -1.14287]
+  positions: [-0.200873, -0.569426, 0.443315, -0.648998, 0.662698, 1.32595, -0.299593]
 
-### generated from rarm085-1389616261
 rarm019:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.659662, -0.529272, -0.107338, 0.300622, 1.97115, 0.492456, -1.14287]
+  positions: [-0.280177, -0.503405, 0.533211, -0.203433, 0.845289, 0.841426, -0.593408]
 
-### generated from rarm085-1389616264
 rarm020:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.0752079, -0.671952, -0.107338, 0.300622, 2.00643, 0.541544, -1.14287]
+  positions: [-0.272189, -0.874473, -0.309746, -1.1488, -0.861376, 1.49169, 0.483193]
 
-### generated from rarm011-1389617357
 rarm021:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-1.21037, -0.019984, 0.27156, -1.15208, -0.54768, 1.39752, 0.61816]
+  positions: [-0.165259, -0.718879, 0.707917, -0.243326, 0.883902, 1.12309, -0.00875881]
 
-### generated from rarm011-1389617360
 rarm022:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-1.21957, -0.314512, 0.27923, -1.15054, -0.477116, 1.41592, 0.605888]
+  positions: [-0.185572, -0.836475, 0.62706, -1.19308, 0.609006, 1.45336, -0.269606]
 
-### generated from rarm014-1389617379
 rarm023:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.958792, -0.096684, 0.288434, -1.12446, -0.49399, 1.34689, 0.440216]
+  positions: [-0.358339, -0.424457, 0.428883, -0.180695, 1.08714, 0.915547, -0.555722]
 
-### generated from rarm014-1389617384
 rarm024:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-1.23798, 0.029104, 0.234744, -1.04623, -0.497058, 1.34843, 0.443284]
+  positions: [-0.584493, -0.64245, 0.424786, -0.262267, 1.46618, 1.21142, -0.490175]
 
-### generated from rarm014-1389617396
 rarm025:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.668866, 0.029104, 0.285366, -0.995608, -0.61671, 1.31008, 0.41107]
+  positions: [0.00023448, -0.350358, 0.89862, 0.275299, 1.1157, 0.838174, -0.681948]
 
-### generated from rarm017-1389617413
 rarm026:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-1.2165, 0.0429101, 0.312978, -0.863684, -0.521602, 1.29474, 0.558334]
+  positions: [-0.671401, -1.92672, 1.98044, -1.16737, -1.87917, 1.5401, 0.119198]
 
-### generated from rarm020-1389617448
 rarm027:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.633584, 0.11194, 0.515466, -0.803858, -0.32525, 1.31468, 0.423342]
+  positions: [-0.655676, -2.01662, -1.90175, -1.30162, 0.767604, 1.44248, -0.914341]
 
-### generated from rarm023-1389617460
 rarm028:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.903568, -0.024586, 0.53234, -0.737896, -0.35593, 0.872888, 0.429478]
+  positions: [-0.0607932, -0.790777, 1.24035, -0.328742, 1.95745, 1.44533, -0.846854]
 
-### generated from rarm023-1389617472
 rarm029:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.615176, -0.196394, 0.452572, -0.645856, -0.553816, 0.73176, 0.427944]
+  positions: [0.470745, -2.0047, 1.87069, -0.335319, -0.323451, 1.26921, -0.0527394]
 
-### generated from rarm023-1389617475
 rarm030:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.613642, 0.0950661, 0.452572, -0.595234, -0.569156, 0.651992, 0.452488]
+  positions: [0.266795, -0.462509, 1.22735, -0.0426742, 1.31013, 1.11455, -0.870213]
 
-### generated from rarm026-1389617488
 rarm031:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.883626, 0.0229681, 0.444902, -0.856014, -0.598302, 1.25946, 0.5568]
+  positions: [-0.412531, -0.836809, 0.678727, -0.912872, 1.38899, 1.19271, -0.245601]
 
-### generated from rarm038-1389617564
 rarm032:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.937316, 0.05825, 0.0307219, -0.372804, -0.633584, 0.575292, 0.608956]
+  positions: [0.243912, -0.493997, 1.27675, -0.363702, 1.01588, 1.02617, -0.680617]
 
-### generated from rarm038-1389617571
 rarm033:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.944986, -0.237812, 0.069072, -0.438766, -0.638186, 0.513932, 0.60282]
+  positions: [-0.52618, -0.878592, 1.11606, -1.14263, 1.47317, 1.40374, 0.208986]
 
-### generated from rarm044-1389618403
 rarm034:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.449504, -0.460242, -0.118076, -0.0383921, 0.0919981, 0.553816, 0.401866]
+  positions: [-0.435259, -0.975867, 0.889105, -0.459647, 1.82586, 1.44303, -0.908152]
 
-### generated from rarm044-1389618413
 rarm035:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.15651, -0.628982, -0.179436, 0.0966001, -0.00924587, 0.56302, 0.489304]
+  positions: [0.0336729, -0.638674, 0.88616, -0.647885, 0.829928, 1.14924, -0.438895]
 
-### generated from rarm062-1389619388
 rarm036:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.337522, -0.602904, -0.230058, 0.151824, 0.559868, 0.512398, -0.138102]
+  positions: [-0.0313934, -0.683404, 0.985112, -0.00740479, 1.60125, 1.31877, -1.08223]
 
-### generated from rarm062-1389619414
 rarm037:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.047596, -0.411154, -0.185572, 0.0935321, 0.604354, 0.444902, -0.15651]
+  positions: [-0.140271, -0.774705, 0.0494561, -0.825898, -0.363119, 1.41639, 0.487851]
 
-### generated from rarm071-1389619471
 rarm038:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.329852, -0.188724, 0.216336, 0.294486, 0.684122, 0.733294, -0.139636]
+  positions: [-0.421969, -0.927501, 1.29229, -0.875922, 1.73188, 1.40327, -0.174618]
 
-### generated from rarm071-1389619480
 rarm039:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.33292, -0.446436, 0.214802, 0.294486, 0.685656, 0.687274, -0.14117]
+  positions: [-0.646234, -1.89726, -1.83513, -1.19903, 0.681954, 1.46561, -0.209836]
 
-### generated from rarm074-1389619505
 rarm040:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.521602, -0.552282, 0.00771189, 0.131882, 0.645772, 0.604438, -0.150374]
+  positions: [0.371481, -0.661873, 1.76929, -0.383891, 1.00356, 1.35679, -0.584587]
 
-### generated from rarm077-1389619541
 rarm041:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.0644701, -0.411154, 0.090548, 0.21165, 1.15353, 0.843742, -0.483252]
+  positions: [-0.300489, -0.776407, 0.587804, -0.514646, 0.55031, 1.1203, -0.137495]
 
-### generated from rarm086-1389620553
 rarm042:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.073674, -0.651992, -0.116542, 0.245398, 1.90058, 0.328318, -1.17815]
+  positions: [-0.511874, -0.878148, 0.20633, -0.87144, 0.946025, 1.08271, -0.395388]
 
-### generated from rarm093-1389696817
 rarm043:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.046062, -0.489388, -0.185572, 0.161028, -0.046062, 1.11526, 0.71787]
+  positions: [-0.65428, -1.856, -0.915209, -1.28476, 1.74535, 1.53293, -0.853726]
 
-### generated from rarm093-1389696822
 rarm044:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.328318, -0.589098, -0.205514, 0.101202, -0.0798099, 1.18429, 0.719404]
+  positions: [-0.197595, -0.757724, 0.862051, -0.370847, 1.16472, 1.06528, -0.610398]
 
-### generated from rarm095-1389696863
 rarm045:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.0567999, -0.165714, 0.167248, 0.299088, -0.684206, 0.443368, 1.28392]
+  positions: [-0.599851, -0.679102, -0.138916, -0.876716, -0.0280673, 1.45133, 0.545879]
 
-### generated from rarm095-1389696874
 rarm046:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [0.233126, -0.042994, 0.151908, 0.297554, -0.79312, 0.421892, 1.31766]
+  positions: [-0.480738, -0.610869, 0.277386, -0.759199, 0.24094, 1.13325, 0.462247]
 
-### generated from rarm091-1389696976
 rarm047:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.971064, -0.196394, 0.874422, -0.544612, 1.30999, 0.474048, -0.3636]
+  positions: [-0.447194, -0.854189, 0.812843, -0.404141, 1.81704, 1.53814, -0.885761]
 
-### generated from rarm091-1389696979
 rarm048:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-1.24412, -0.0859461, 0.911238, -0.544612, 1.23329, 0.474048, -0.3636]
+  positions: [-0.530191, -1.09013, -0.89015, -1.15901, -0.863629, 1.49038, 0.674087]
 
-### generated from rarm096-1389697089
 rarm049:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [0.246932, -0.17952, 0.047596, 0.29602, -0.559952, 0.72409, 0.998592]
+  positions: [-0.63926, -1.07983, 0.211014, -0.482266, 1.52963, 1.0778, -0.699265]
 
-### generated from rarm097-1389697097
 rarm050:
-  joint_names: ["HeadYaw", "HeadPitch", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
   time_from_start: 1.0
-  positions: [-0.0322559, 0.00455999, 0.319114, 0.29602, 0.205514, 0.76244, 0.381924]
+  positions: [-0.512548, -1.19065, 0.62071, -0.881142, 1.1527, 1.2281, -0.0312021]
 
