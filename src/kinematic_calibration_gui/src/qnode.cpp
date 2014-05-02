@@ -197,7 +197,7 @@ void QNode::updateIgnoredMeasurements() {
         QStandardItem* item = i.next();
         ids.push_back(item->text().toStdString());
     }
-    this->nodeHandle->setParam("/kinematic_calibration/ignore_measurements", ids);
+    this->nodeHandle->setParam("ignore_measurements", ids);
 }
 
 void QNode::startOptimization() {

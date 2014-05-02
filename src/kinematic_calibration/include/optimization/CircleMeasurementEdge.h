@@ -123,9 +123,8 @@ private:
 
 	double matching_likelihood(double res, double max_range);
 
-	void calculateCannyImg();
-
-	void calculateOrientationImg();
+        // calculates the canny and orientation image for the circle likelihood function
+	void calculateCannyAndOrientationImg();
 
 	/**
 	 * Radius of the circle.

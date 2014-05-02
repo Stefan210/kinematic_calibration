@@ -73,7 +73,7 @@ bool ModelLoader::loadKdlFromUrdf() {
 		ROS_ERROR("Could not initialize tree object");
 		return false;
 	}
-	ROS_INFO("KDL tree has %ul joints and %ul segments.", kdlTree.getNrOfJoints(), kdlTree.getNrOfSegments());
+	ROS_DEBUG("KDL tree has %ul joints and %ul segments.", kdlTree.getNrOfJoints(), kdlTree.getNrOfSegments());
 	return true;
 }
 
@@ -82,7 +82,7 @@ bool ModelLoader::urdfStringToModel() {
 		ROS_ERROR("Could not initialize robot model");
 		return false;
 	}
-	ROS_INFO("Urdf tree has %i joints and %i links.", urdfModel.joints_.size(), urdfModel.links_.size());
+	ROS_DEBUG("Urdf tree has %i joints and %i links.", urdfModel.joints_.size(), urdfModel.links_.size());
 	return true;
 }
 

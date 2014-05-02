@@ -10,6 +10,9 @@
 #include <boost/smart_ptr/make_shared.hpp>
 #include <image_geometry/pinhole_camera_model.h>
 #include <kdl/tree.hpp>
+#include <kdl/chainiksolverpos_nr_jl.hpp>
+#include <kdl/chainiksolvervel_pinv.hpp>
+#include <kdl/chainfksolverpos_recursive.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/operations.hpp>
 #include <ros/callback_queue.h>
@@ -19,6 +22,8 @@
 #include <sensor_msgs/JointState.h>
 #include <tf/tf.h>
 #include <tf/transform_broadcaster.h>
+#include <tf_conversions/tf_kdl.h>
+#include <tf_conversions/tf_eigen.h>
 #include <urdf_model/joint.h>
 #include <urdf_model/pose.h>
 #include <cstdlib>
@@ -38,9 +43,6 @@
 #include <urdf_parser/urdf_parser.h>
 #endif
 
-
-#include <tf_conversions/tf_eigen.h>
-
 using namespace boost;
 using namespace std;
 
@@ -48,7 +50,9 @@ namespace kinematic_calibration {
 
 PoseSampling::PoseSampling() :
 		debug(false), nhPrivate("~"), xMin(20), xMax(620), yMin(20), yMax(460), cameraFrame(
-				"CameraBottom_frame"), viewCylinderRadius(0.01) {
+				"CameraBottom_frame"), viewCylinderRadius(0.01), srdfAvailable(
+				false), torsoFrame("torso"), initialPoseAvailable(false), testPoseStability(
+				false), keepEndEffectorPose(false) {
 	// initialize stuff
 	this->initialize();
 
@@ -66,6 +70,7 @@ void PoseSampling::initialize() {
 	this->initializeKinematicChain();
 	this->initializeState();
 	this->initializeJointLimits();
+	this->initializeInitialPose();
 
 	// initialize parameter from ROS via nhPrivate or nh
 	nhPrivate.param("xMin", xMin, xMin);
@@ -73,12 +78,34 @@ void PoseSampling::initialize() {
 	nhPrivate.param("yMin", yMin, yMin);
 	nhPrivate.param("yMax", yMax, yMax);
 	nhPrivate.param("camera_frame", cameraFrame, cameraFrame);
-	nhPrivate.param("view_cylinder_radius", viewCylinderRadius, viewCylinderRadius);
+	nhPrivate.param("torso_frame", torsoFrame, torsoFrame);
+	nhPrivate.param("view_cylinder_radius", viewCylinderRadius,
+			viewCylinderRadius);
+	nhPrivate.param("test_pose_stability", testPoseStability,
+			testPoseStability);
+	nhPrivate.param("keep_end_effector_pose", keepEndEffectorPose,
+			keepEndEffectorPose);
 
 	// print some info about the used parameters
-	ROS_INFO("Allowed camera window size: [%.2f, %.2f] - [%.2f, %.2f]", xMin, yMin, xMax, yMax);
+	ROS_INFO("Allowed camera window size: [%.2f, %.2f] - [%.2f, %.2f]", xMin,
+			yMin, xMax, yMax);
 	ROS_INFO("Using camera frame: %s", cameraFrame.c_str());
+	ROS_INFO("Using torso frame: %s", torsoFrame.c_str());
 	ROS_INFO("Using view cylinder radius: %f", viewCylinderRadius);
+	ROS_INFO("Pose stability WILL %s tested.",
+			testPoseStability ? "BE" : "NOT BE");
+	ROS_INFO("End effector WILL %s fixed.",
+			keepEndEffectorPose ? "BE" : "NOT BE");
+
+	if (testPoseStability) {
+		this->testStabilityPtr = boost::make_shared<
+				hrl_kinematics::TestStability>();
+	}
+
+	if (keepEndEffectorPose) {
+		// initialize the IK request
+		initializeEndEffectorState();
+	}
 }
 
 void PoseSampling::initializeCamera() {
@@ -110,29 +137,14 @@ void PoseSampling::initializeKinematicChain() {
 
 void PoseSampling::initializeState() {
 	this->initialState = boost::make_shared<KinematicCalibrationState>();
+	this->modelLoader.getUrdfModel(this->robotModel);
 
-	vector<string> jointNames;
-	this->kinematicChainPtr->getJointNames(jointNames);
-	for (vector<string>::const_iterator it = jointNames.begin();
-			it != jointNames.end(); it++) {
-		this->initialState->jointOffsets[*it] = 0.0;
-	}
+	// initialize the joint offsets (with 0.0)
+	this->initialState->addKinematicChain(*this->kinematicChainPtr);
 
 	// initialize transform from camera to head
-	string cameraJointName = "CameraBottom"; // todo: parameterize!
-	this->modelLoader.getUrdfModel(this->robotModel);
-	urdf::Joint cameraJoint = *robotModel.getJoint(cameraJointName);
-	urdf::Pose headPitchToCameraPose =
-			cameraJoint.parent_to_joint_origin_transform;
-	tf::Transform headToCamera = tf::Transform(
-			tf::Quaternion(headPitchToCameraPose.rotation.x,
-					headPitchToCameraPose.rotation.y,
-					headPitchToCameraPose.rotation.z,
-					headPitchToCameraPose.rotation.w),
-			tf::Vector3(headPitchToCameraPose.position.x,
-					headPitchToCameraPose.position.y,
-					headPitchToCameraPose.position.z));
-	initialState->cameraToHeadTransformation = headToCamera;
+	this->initialState->cameraJointName = "CameraBottom";
+	this->initialState->initializeCameraTransform();
 
 	// initialize the camera intrinsics
 	initialState->cameraInfo = cameraModel.cameraInfo();
@@ -141,17 +153,9 @@ void PoseSampling::initializeState() {
 	if (nh.hasParam("marker_frame")) {
 		string markerFrame;
 		nh.getParam("marker_frame", markerFrame);
-		KinematicChain markerChain(kdlTree, this->kinematicChainPtr->getTip(),
-				markerFrame, "marker");
-		tf::Transform markerTransform;
-		KDL::Frame kdlFrame;
-		markerChain.getRootToTip(map<string, double>(), kdlFrame);
-		tf::transformKDLToTF(kdlFrame, markerTransform);
-		this->initialState->markerTransformations[this->kinematicChainPtr->getName()] =
-				markerTransform;
-		cout << markerTransform.getOrigin().getX() << " "
-				<< markerTransform.getOrigin().getY() << " "
-				<< markerTransform.getOrigin().getZ() << " " << endl;
+		this->initialState->addMarker(this->kinematicChainPtr->getName(),
+				this->kinematicChainPtr->getTip(), markerFrame,
+				KinematicCalibrationState::ROSPARAM_URDF);
 	} else {
 		ROS_WARN(
 				"No initialization for marker frame transformation available!");
@@ -168,6 +172,117 @@ void PoseSampling::initializeJointLimits() {
 		this->lowerLimits[jointName] = lowerLimit;
 		this->upperLimits[jointName] = upperLimit;
 	}
+}
+
+void PoseSampling::initializeUrdf() {
+	this->urdfModelPtr = make_shared<urdf::Model>();
+	this->modelLoader.initializeFromRos();
+	this->modelLoader.getUrdfModel(*urdfModelPtr);
+}
+
+void PoseSampling::initializeSrdf(const string& robotName,
+		const vector<string>& joints, const vector<string>& links) {
+	srdfString = "";
+	const string robotNamePlaceholder = "ROBOTNAME";
+	const string groupPlaceholder = "CURRENTCHAINGROUP";
+
+	if (nh.hasParam("robot_description_semantic")) {
+		// get the SRDF string from the parameter server
+		nh.getParam("robot_description_semantic", srdfString);
+		this->srdfAvailable = true;
+	} else {
+		// as fallback, create an empty srdf
+		stringstream srdfStringStream;
+		srdfStringStream << "<robot name=\"" << robotNamePlaceholder << "\">";
+		srdfStringStream << "CURRENTCHAINGROUP" << "\n";
+		srdfStringStream << "</robot>";
+		srdfString = srdfStringStream.str();
+	}
+
+	if (debug) {
+		cout << "SRDF (unmodified): \n" << srdfString << endl;
+	}
+
+	// replace the ROBOT placeholder
+	int namePos = srdfString.find(robotNamePlaceholder);
+	srdfString.replace(namePos, robotNamePlaceholder.length(), robotName);
+
+	// insert the interesting joints/links as group
+	stringstream currentChainStream;
+	currentChainStream << "<group name=\"current_chain\">";
+	for (int i = 0; i < joints.size(); i++) {
+		currentChainStream << "<joint name=\"" << joints[i] << "\"/>";
+	}
+	for (int i = 0; i < links.size(); i++) {
+		currentChainStream << "<link name=\"" << links[i] << "\"/>";
+	}
+	currentChainStream << "</group>";
+	string currentChainString = currentChainStream.str();
+	int groupPos = srdfString.find(groupPlaceholder);
+	srdfString.replace(groupPos, groupPlaceholder.length(), currentChainString);
+
+	if (debug) {
+		cout << "SRDF (modified): \n" << srdfString << endl;
+	}
+
+	// initialize the SRDF model object from the string
+	srdf::Model srdfModel;
+	srdfModel.initString(*urdfModelPtr, srdfString);
+	this->srdfModelPtr = make_shared<const srdf::Model>(srdfModel);
+}
+
+void PoseSampling::initializeInitialPose() {
+	// get the name of the initial pose
+	string initialPoseName;
+	if (!nhPrivate.hasParam("initial_pose_name")) {
+		// no pose name given
+		this->initialPoseAvailable = false;
+		return;
+	}
+	nhPrivate.getParam("initial_pose_name", initialPoseName);
+
+	// check whether this pose actually exists
+	if (!nhPrivate.hasParam("poses/" + initialPoseName)) {
+		// pose not available
+		this->initialPoseAvailable = false;
+		ROS_WARN("Initial pose name '%s' given, but no such pose found!",
+				initialPoseName.c_str());
+		return;
+	}
+
+	// get the initial pose
+	nhPrivate.param("poses/" + initialPoseName + "/joint_names",
+			this->initialPose.name, this->initialPose.name);
+	nhPrivate.param("poses/" + initialPoseName + "/positions",
+			this->initialPose.position, this->initialPose.position);
+
+	if (this->initialPose.name.size() == 0
+			|| this->initialPose.position.size() == 0) {
+		this->initialPoseAvailable = false;
+		ROS_WARN("Initial pose '%s' found, but something is wrong with it.",
+				initialPoseName.c_str());
+		ROS_WARN("The pose shoud be under the namespace 'poses'"
+				" and should have two arrays name 'joint_names' "
+				"and 'positions' of the same size.");
+		return;
+	}
+
+	ROS_INFO("Initial pose successfully loaded.");
+	this->initialPoseAvailable = true;
+}
+
+void PoseSampling::initializeEndEffectorState() {
+	// initialize the kinematic chain from torso to tip
+	KinematicChain torsoToTip;
+	torsoToTip.initializeFromRos(this->torsoFrame,
+			this->kinematicChainPtr->getTip(), "torsoToTip");
+
+	map<string, double> jointPositions;
+	for (int i = 0; i < initialPose.name.size(); i++) {
+		jointPositions[initialPose.name[i]] = initialPose.position[i];
+	}
+
+	torsoToTip.getRootToTip(jointPositions, this->endEffectorState);
 }
 
 void PoseSampling::getPoses(const int& numOfPoses,
@@ -205,46 +320,39 @@ void PoseSampling::getPoses(const int& numOfPoses,
 
 	// initialize the URDF model
 	ROS_INFO("Initialize the URDF model from ROS...");
-	shared_ptr<urdf::Model> urdfModelPtr = make_shared<urdf::Model>();
-	this->modelLoader.initializeFromRos();
-	this->modelLoader.getUrdfModel(*urdfModelPtr);
+	initializeUrdf();
 
 	// modify the URDF model
 	ROS_INFO(
 			"Adding additional (virtual) joint and link from camera to marker frame to the model...");
 	//urdfModelPtr->links_[cameraFrame]->collision = markerLinkCollision;
-	urdfModelPtr->links_[cameraFrame]->child_joints.push_back(markerJoint);
-	urdfModelPtr->links_[cameraFrame]->child_links.push_back(markerLink);
-	urdfModelPtr->joints_[markerJoint->name] = markerJoint;
-	urdfModelPtr->links_[markerLink->name] = markerLink;
+	this->urdfModelPtr->links_[cameraFrame]->child_joints.push_back(
+			markerJoint);
+	this->urdfModelPtr->links_[cameraFrame]->child_links.push_back(markerLink);
+	this->urdfModelPtr->joints_[markerJoint->name] = markerJoint;
+	this->urdfModelPtr->links_[markerLink->name] = markerLink;
 	markerLink->setParent(urdfModelPtr->links_[cameraFrame]);
 
 	// initialize the SRDF model
 	ROS_INFO("Initialize the SRDF model from runtime information...");
-
-	stringstream srdfStringStream;
-	srdfStringStream << "<robot name=\"" << urdfModelPtr->getName() << "\">";
-	srdfStringStream << "<group name=\"current_chain\">";
-	for (int i = 0; i < jointNames.size(); i++) {
-		srdfStringStream << "<joint name=\"" << jointNames[i] << "\"/>";
-	}
-	srdfStringStream << "<joint name=\"" << "CameraBottom" << "\"/>";
-	srdfStringStream << "<link name=\"" << cameraFrame << "\"/>";
-	srdfStringStream << "<joint name=\"" << "virtualMarkerJoint" << "\"/>";
-	srdfStringStream << "<link name=\"" << "virtualMarkerLink" << "\"/>";
-	srdfStringStream << "</group>";
-	srdfStringStream << "</robot>";
-	string srdfString = srdfStringStream.str();
-
-	srdf::Model srdfModel;
-	srdfModel.initString(*urdfModelPtr, srdfString);
-
-	shared_ptr<const srdf::Model> srdfModelPtr = make_shared<const srdf::Model>(
-			srdfModel);
+	vector<string> groupJoints, groupLinks;
+	groupJoints = this->jointNames;
+	groupJoints.push_back("CameraBottom");
+	groupLinks.push_back(cameraFrame);
+	initializeSrdf(urdfModelPtr->getName(), groupJoints, groupLinks);
 
 	// initialize the moveit robot model
-	robot_model::RobotModelPtr kinematic_model = make_shared<
-			robot_model::RobotModel>(urdfModelPtr, srdfModelPtr);
+	robot_model_loader::RobotModelLoader::Options options(
+			this->modelLoader.getUrdfXml(), srdfString);
+	robot_model_loader::RobotModelLoader robot_model_loader(options);
+	robot_model_loader.loadKinematicsSolvers();
+	robot_model::RobotModelPtr kinematic_model = robot_model_loader.getModel();
+	//robot_model::RobotModelPtr kinematic_model = make_shared<
+	//		robot_model::RobotModel>(urdfModelPtr, srdfModelPtr);
+
+	if (debug) {
+		kinematic_model->printModelInfo(cout);
+	}
 
 	// sample as much poses as requested
 	ROS_INFO("Sampling %d poses now...", numOfPoses);
@@ -264,6 +372,91 @@ void PoseSampling::getPoses(const int& numOfPoses,
 			jointState.position.push_back(currentJointState);
 		}
 
+		// use IK to generate a pose, using the sampled pose as seed state
+		if (this->keepEndEffectorPose) {
+			// initialize the IK solver (TODO: only once, in own method)
+			KDL::Chain chain;
+			this->kdlTree.getChain(this->torsoFrame,
+					this->kinematicChainPtr->getTip(), chain);
+			unsigned int nj = chain.getNrOfJoints();
+
+			KDL::JntArray q_min(nj);
+			KDL::JntArray q_max(nj);
+			for (int i = 0; i < nj; i++) {
+				q_min(i) =
+						this->lowerLimits[chain.getSegment(i).getJoint().getName()];
+				q_max(i) =
+						this->upperLimits[chain.getSegment(i).getJoint().getName()];
+			}
+			this->kdlTree.getChain(this->torsoFrame,
+					this->kinematicChainPtr->getTip(), chain);
+			KDL::ChainFkSolverPos_recursive fkSolverPos(chain);	//Forward position solver
+			KDL::ChainIkSolverVel_pinv ikSolverVel(chain);//Inverse velocity solver
+			KDL::ChainIkSolverPos_NR_JL ikSolver(chain, q_min, q_max,
+					fkSolverPos, ikSolverVel, 10000, 0.01);
+
+			// seed state
+			KDL::JntArray seedState(nj);
+
+			// initialize with initial pose
+			for (int i = 0; i < nj; i++) {
+				string currentJoint = chain.getSegment(i).getJoint().getName();
+				for (int j = 0; j < initialPose.name.size(); j++) {
+					if (currentJoint == initialPose.name[j]) {
+						seedState(i) = initialPose.position[j];
+					}
+				}
+			}
+
+			// use this as target
+			KDL::Frame frame;
+			fkSolverPos.JntToCart(seedState, frame);
+
+			// add random values
+			for (int i = 0; i < nj; i++) {
+				string currentJoint = chain.getSegment(i).getJoint().getName();
+				for (int j = 0; j < jointState.name.size(); j++) {
+					if (currentJoint == jointState.name[j]) {
+						seedState(i) += 0.1 * jointState.position[j];
+					}
+				}
+			}
+
+			// inverse kinematics
+			KDL::JntArray targetState(nj);
+			int ikSuccess = ikSolver.CartToJnt(seedState, frame, targetState);
+
+			if (debug) {
+				cout << "ikSuccess: " << ikSuccess << endl;
+				cout << "seed state: ";
+				for (int i = 0; i < nj; i++)
+					cout << seedState(i) << ", ";
+				cout << endl;
+				cout << "target state: ";
+				for (int i = 0; i < nj; i++)
+					cout << targetState(i) << ", ";
+				cout << endl;
+				cout << "target transformation: " << frame.p[0] << " " << frame.p[1]
+						<< " " << frame.p[2] << endl;
+				fkSolverPos.JntToCart(targetState, frame);
+				cout << "IK transformation: " << frame.p[0] << " " << frame.p[1]
+						<< " " << frame.p[2] << endl;
+			}
+
+			if (ikSuccess < 0)
+				continue;
+
+			// save the results
+			for (int i = 0; i < nj; i++) {
+				string currentJoint = chain.getSegment(i).getJoint().getName();
+				for (int j = 0; j < jointState.name.size(); j++) {
+					if (currentJoint == jointState.name[j]) {
+						jointState.position[j] = targetState(i);
+					}
+				}
+			}
+		}
+
 		// --------------------------------------------------------------------------------
 		// check #1: The predicted coordinates must be within
 		// 			[xMin,yMin] and [xMax,yMax], e.g. [0,640]-[0,480].
@@ -277,10 +470,10 @@ void PoseSampling::getPoses(const int& numOfPoses,
 		}
 
 		if (xMin < x && xMax > x && yMin < y && yMax > y) {
-			if(debug)
+			if (debug)
 				cout << "--> Good!" << endl;
 		} else {
-			if(debug)
+			if (debug)
 				cout << "--> Not good!" << endl;
 			continue;
 		}
@@ -323,15 +516,6 @@ void PoseSampling::getPoses(const int& numOfPoses,
 				urdfJointPose.position.z / 2);
 
 		// b) insert the collision object into the moveit model/state
-
-		// (re-)initialize the moveit model
-		//ROS_INFO("initialize the moveit model");
-		//shared_ptr<const urdf::Model> urdfModelPtr = make_shared<const urdf::Model>(urdfModel);
-		//kinematic_model = make_shared<
-		//		robot_model::RobotModel>(urdfModelPtr, srdfModelPtr);
-		if (debug) {
-			kinematic_model->printModelInfo(cout);
-		}
 
 		// get the planning scene
 		planning_scene::PlanningScene planning_scene(kinematic_model);
@@ -397,7 +581,7 @@ void PoseSampling::getPoses(const int& numOfPoses,
 				it != collision_result.contacts.end(); ++it) {
 			// only contacts with the "virtual" link (i.e. collision object) are interesting
 			string linkToCheck = attachedBodyName;
-			if (linkToCheck == it->first.first.c_str()
+			if (this->srdfAvailable || linkToCheck == it->first.first.c_str()
 					|| linkToCheck == it->first.second.c_str()) {
 				if (debug)
 					ROS_INFO("Contact between: %s and %s",
@@ -412,8 +596,14 @@ void PoseSampling::getPoses(const int& numOfPoses,
 		}
 
 		// --------------------------------------------------------------------------------
-		// TODO: check #3: normals/angle
+		// check #3: pose stability (optional)
 		// --------------------------------------------------------------------------------
+		if (this->testPoseStability) {
+			bool poseStable = false;
+			poseStable = isPoseStable(jointState);
+			if (!poseStable)
+				continue;
+		}
 
 		// add to the pose set
 		poses.push_back(pose);
@@ -449,6 +639,27 @@ void PoseSampling::getPoses(const int& numOfPoses,
 		}
 
 	}
+}
+
+bool PoseSampling::isPoseStable(const sensor_msgs::JointState& msg) const {
+	// "merge": initialPose + msg -> poseToCheck
+	map<string, double> jointPositions;
+	for (int i = 0; i < initialPose.name.size(); i++) {
+		jointPositions[initialPose.name[i]] = initialPose.position[i];
+	}
+	for (int i = 0; i < msg.name.size(); i++) {
+		jointPositions[msg.name[i]] = msg.position[i];
+	}
+
+	// delegate stability test
+	bool stable = this->testStabilityPtr->isPoseStable(jointPositions,
+			hrl_kinematics::TestStability::SUPPORT_DOUBLE);
+
+	if (debug) {
+		ROS_INFO("Pose is %s!", stable ? "STABLE" : "UNSTABLE");
+	}
+
+	return stable;
 }
 
 void PoseSampling::camerainfoCallback(

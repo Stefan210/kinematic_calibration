@@ -7,12 +7,15 @@
 
 #include "../../include/common/KinematicChain.h"
 
+#include "../../include/common/ModelLoader.h"
+
 #include <kdl/chain.hpp>
 #include <kdl/frames.hpp>
 #include <kdl/joint.hpp>
 #include <kdl/segment.hpp>
 #include <kdl/frames_io.hpp>
 #include <ros/console.h>
+#include <ros/node_handle.h>
 #include <rosconsole/macros_generated.h>
 #include <utility>
 #include <vector>
@@ -25,16 +28,49 @@ namespace kinematic_calibration {
 KinematicChain::KinematicChain(const KDL::Tree& tree, std::string root,
 		std::string tip, std::string name) :
 		root(root), tip(tip), name(name) {
-	ROS_INFO("Extracting chain from %s to %s...", root.c_str(), tip.c_str());
-	if (!tree.getChain(root, tip, this->chain)) {
-		ROS_ERROR("Could not extract the chain!");
-	}
-	//ROS_INFO("Extracted kinematic chain with %u segments and %u joints.",
-	//		this->chain.getNrOfSegments(), this->chain.getNrOfJoints());
+	initialize(tree, root, tip, name);
 }
 
 KinematicChain::~KinematicChain() {
 
+}
+
+bool KinematicChain::initialize(const KDL::Tree& tree, std::string root,
+		std::string tip, std::string name) {
+	this->root = root;
+	this->tip = tip;
+	this->name = name;
+	this->tree = KDL::Tree(tree);
+
+	ROS_INFO("Extracting chain from %s to %s...", root.c_str(), tip.c_str());
+	if (!tree.getChain(root, tip, this->chain)) {
+		ROS_ERROR("Could not extract the chain!");
+		return false;
+	}
+	return true;
+}
+
+bool KinematicChain::initializeFromRos() {
+	// instantiate the kinematic chain
+	string chainName, chainRoot, chainTip;
+	ros::NodeHandle nh;
+	nh.getParam("chain_name", chainName);
+	nh.getParam("chain_root", chainRoot);
+	nh.getParam("chain_tip", chainTip);
+
+	// delegate
+	return this->initializeFromRos(chainRoot, chainTip, chainName);
+}
+
+bool KinematicChain::initializeFromRos(const std::string root, const std::string tip,
+		const std::string name) {
+	// instantiate the KDL tree
+	ModelLoader modelLoader;
+	modelLoader.initializeFromRos();
+	modelLoader.getKdlTree(tree);
+
+	// delegate
+	return this->initialize(tree, root, tip, name);
 }
 
 void KinematicChain::getRootToTip(const map<string, double>& joint_positions,
@@ -53,45 +89,6 @@ void KinematicChain::getRootToTip(const map<string, double>& joint_positions,
 		// Note: Frame F_A_C = F_A_B * F_B_C;
 		// (see http://www.orocos.org/kdl/usermanual/geometric-primitives#toc20)
 		rootToTip = rootToTip * segment.pose(position);
-
-		// TODO: remove!
-		/*
-		cout << "position: " << position << endl;
-
-		double tx, ty, tz;
-		tx = segment.pose(position).p[0];
-		ty = segment.pose(position).p[1];
-		tz = segment.pose(position).p[2];
-		cout << segment.getJoint().getName() << "Tx = " << tx << ";" << endl;
-		cout << segment.getJoint().getName() << "Ty = " << ty << ";" << endl;
-		cout << segment.getJoint().getName() << "Tz = " << tz << ";" << endl;
-
-		double rr, rp, ry;
-		segment.pose(position).M.GetRPY(rr, rp, ry);
-		cout << segment.getJoint().getName() << "Rr = " << rr;
-		if (fabs(segment.getJoint().JointAxis().x()) > 0) {
-			cout << " + " << segment.getJoint().getName() << "Offset * "
-					<< segment.getJoint().JointAxis().x();
-			cout << " + " << segment.getJoint().getName() << "Position * "
-					<< segment.getJoint().JointAxis().x();
-		}
-		cout << ";" << endl << segment.getJoint().getName() << "Rp = " << rp;
-		if (fabs(segment.getJoint().JointAxis().y()) > 0) {
-			cout << " + " << segment.getJoint().getName() << "Offset * "
-					<< segment.getJoint().JointAxis().y();
-			cout << " + " << segment.getJoint().getName() << "Position * "
-					<< segment.getJoint().JointAxis().y();
-		}
-		cout << ";" << endl << segment.getJoint().getName() << "Ry = " << ry;
-		if (fabs(segment.getJoint().JointAxis().z()) > 0) {
-			cout << " + " << segment.getJoint().getName() << "Offset * "
-					<< segment.getJoint().JointAxis().z();
-			cout << " + " << segment.getJoint().getName() << "Position * "
-					<< segment.getJoint().JointAxis().z();
-		}
-		cout << ";" << endl;
-		cout << segment.pose(position).M << endl;
-		*/
 	}
 	out = rootToTip.Inverse();
 }

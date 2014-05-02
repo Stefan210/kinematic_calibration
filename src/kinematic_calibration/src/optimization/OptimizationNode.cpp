@@ -135,67 +135,55 @@ void OptimizationNode::optimize() {
 	KinematicCalibrationState initialState = this->initialState;
 
 	// initialize transform from camera to head
-	urdf::Model model;
-	this->modelLoader.getUrdfModel(model);
-	urdf::Joint cameraJoint = *model.getJoint(cameraJointName);
-	urdf::Pose headPitchToCameraPose =
-			cameraJoint.parent_to_joint_origin_transform;
-	tf::Transform headToCamera = tf::Transform(
-			tf::Quaternion(headPitchToCameraPose.rotation.x,
-					headPitchToCameraPose.rotation.y,
-					headPitchToCameraPose.rotation.z,
-					headPitchToCameraPose.rotation.w),
-			tf::Vector3(headPitchToCameraPose.position.x,
-					headPitchToCameraPose.position.y,
-					headPitchToCameraPose.position.z));
-	initialState.cameraToHeadTransformation = headToCamera;
+	initialState.cameraJointName = cameraJointName;
+	initialState.initializeCameraTransform();
 
 	// initialize the camera intrinsics
 	initialState.cameraInfo = cameraModel.cameraInfo();
 
 	// optimization instance
-/*
-	CalibrationOptions options;
-	nh.getParam("calibrate_joint_offsets", options.calibrateJointOffsets);
-	nh.getParam("calibrate_camera_transform", options.calibrateCameraTransform);
-	nh.getParam("calibrate_camera_intrinsics",
-			options.calibrateCameraIntrinsics);
-	nh.getParam("calibrate_marker_transform", options.calibrateMarkerTransform);
+	/*
+	 CalibrationOptions options;
+	 nh.getParam("calibrate_joint_offsets", options.calibrateJointOffsets);
+	 nh.getParam("calibrate_camera_transform", options.calibrateCameraTransform);
+	 nh.getParam("calibrate_camera_intrinsics",
+	 options.calibrateCameraIntrinsics);
+	 nh.getParam("calibrate_marker_transform", options.calibrateMarkerTransform);
 
-	nh.setParam("calibrate_joint_offsets", false);
-	nh.setParam("calibrate_camera_transform", false);
-	nh.setParam("calibrate_camera_intrinsics",
-			false);
-	nh.setParam("calibrate_marker_transform", true);
-	G2oJointOffsetOptimization optimization1(*context, measurements,
-			kinematicChains, frameImageConverter, initialState);
-	optimization1.optimize(result);
+	 nh.setParam("calibrate_joint_offsets", false);
+	 nh.setParam("calibrate_camera_transform", false);
+	 nh.setParam("calibrate_camera_intrinsics",
+	 false);
+	 nh.setParam("calibrate_marker_transform", true);
+	 G2oJointOffsetOptimization optimization1(*context, measurements,
+	 kinematicChains, frameImageConverter, initialState);
+	 optimization1.optimize(result);
 
-	nh.setParam("calibrate_joint_offsets", true);
-	nh.setParam("calibrate_camera_transform", false);
-	nh.setParam("calibrate_camera_intrinsics",
-			false);
-	nh.setParam("calibrate_marker_transform", true);
-	G2oJointOffsetOptimization optimization2(*context, measurements,
-			kinematicChains, frameImageConverter, result);
-	optimization2.optimize(result);
+	 nh.setParam("calibrate_joint_offsets", true);
+	 nh.setParam("calibrate_camera_transform", false);
+	 nh.setParam("calibrate_camera_intrinsics",
+	 false);
+	 nh.setParam("calibrate_marker_transform", true);
+	 G2oJointOffsetOptimization optimization2(*context, measurements,
+	 kinematicChains, frameImageConverter, result);
+	 optimization2.optimize(result);
 
-	nh.setParam("calibrate_joint_offsets", true);
-	nh.setParam("calibrate_camera_transform", true);
-	nh.setParam("calibrate_camera_intrinsics",
-			true);
-	nh.setParam("calibrate_marker_transform", true);
-	G2oJointOffsetOptimization optimization3(*context, measurements,
-			kinematicChains, frameImageConverter, result);
-	optimization3.optimize(result);
-*/
+	 nh.setParam("calibrate_joint_offsets", true);
+	 nh.setParam("calibrate_camera_transform", true);
+	 nh.setParam("calibrate_camera_intrinsics",
+	 true);
+	 nh.setParam("calibrate_marker_transform", true);
+	 G2oJointOffsetOptimization optimization3(*context, measurements,
+	 kinematicChains, frameImageConverter, result);
+	 optimization3.optimize(result);
+	 */
 
-/*
+	/*
 	 HCJointOffsetOptimization optimization(*context, measurements,
 	 kinematicChains, frameImageConverter, initialState);
-*/
-  	G2oJointOffsetOptimization optimization(*context, measurements,
-		kinematicChains, frameImageConverter, initialState);
+	 */
+	G2oJointOffsetOptimization optimization(*context, measurements,
+			kinematicChains, frameImageConverter, initialState);
 	optimization.optimize(result);
 }
 
@@ -422,25 +410,24 @@ void OptimizationNode::measurementCb(const measurementDataConstPtr& msg) {
 			ROS_INFO("Receive data for chain %s.", chainName.c_str());
 			// try to get the current transformation from chain tip to marker frame
 			string markerFrame = "";
-			if("" != msg->marker_frame) {
+			if ("" != msg->marker_frame) {
 				// message should contain the info about the marker frame
 				markerFrame = msg->marker_frame;
-			} else if(nh.hasParam("marker_frame")) {
+			} else if (nh.hasParam("marker_frame")) {
 				// fallback mechanism
 				nh.getParam("marker_frame", markerFrame);
 			}
 			if (markerFrame.length() > 0) {
-				KinematicChain markerChain(kdlTree, chainTip, markerFrame,
-						"marker");
-				tf::Transform markerTransform;
-				KDL::Frame kdlFrame;
-				markerChain.getRootToTip(map<string, double>(), kdlFrame);
-				tf::transformKDLToTF(kdlFrame, markerTransform);
-				this->initialState.markerTransformations[chainName] =
-						markerTransform;
-				cout << markerTransform.getOrigin().getX() << " "
-						<< markerTransform.getOrigin().getY() << " "
-						<< markerTransform.getOrigin().getZ() << " " << endl;
+				// determine the source (default is from URDF)
+				KinematicCalibrationState::TransformSource source =
+						KinematicCalibrationState::ROSPARAM_URDF;
+				string sourceString;
+				nh.param("marker_transform_source", sourceString,
+						sourceString);
+				if("tf" == sourceString)
+					source = KinematicCalibrationState::TF;
+				// delegate the initialization
+				this->initialState.addMarker(chainName, chainTip, markerFrame, source);
 			}
 		}
 		// save data
@@ -485,8 +472,8 @@ bool OptimizationNode::measurementOk(const measurementDataConstPtr& msg) {
 void OptimizationNode::removeIgnoredMeasurements() {
 	// get list of IDs to be ignored
 	XmlRpc::XmlRpcValue idList;
-        if (!nh.hasParam("ignore_measurements"))
-           return;
+	if (!nh.hasParam("ignore_measurements"))
+		return;
 	nh.getParam("ignore_measurements", idList);
 	ROS_ASSERT(idList.getType() == XmlRpc::XmlRpcValue::TypeArray);
 

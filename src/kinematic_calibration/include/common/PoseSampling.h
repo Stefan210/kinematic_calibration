@@ -16,9 +16,12 @@
 #include <ros/publisher.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <urdf/model.h>
+#include <srdfdom/model.h>
 #include <map>
 #include <string>
 #include <vector>
+
+#include <hrl_kinematics/TestStability.h>
 
 #include "../optimization/KinematicCalibrationState.h"
 #include "KinematicChain.h"
@@ -104,6 +107,30 @@ protected:
 	virtual void initializeJointLimits();
 
 	/**
+	 * Initializes the URDF from ROS parameter.
+	 */
+	virtual void initializeUrdf();
+
+	/**
+	 * Initializes the SRDF from ROS parameter and modifies it.
+	 * @param robotName The robot name (replaces the robot name from the SRDF at the ROS parameter server).
+	 * @param joints The joint names of the current kinematic chain.
+	 * @param links The link names of the current kinematic chain.
+	 */
+	virtual void initializeSrdf(const string& robotName,
+			const vector<string>& joints, const vector<string>& links);
+
+	/**
+	 * Load the initial pose from the ROS parameter if given.
+	 */
+	virtual void initializeInitialPose();
+
+	/**
+	 * Initializes the IK request.
+	 */
+	virtual void initializeEndEffectorState();
+
+	/**
 	 * Camera info message callback.
 	 * @param[in] msg Camera info message,
 	 */
@@ -116,6 +143,13 @@ protected:
 	void publishJointState(sensor_msgs::JointState& msg) const;
 
 	/**
+	 * Checks whether the initial pose and the given joint state is stable.
+	 * @param msg The joint state of the pose to check.
+	 * @return True if the pose is stable, false otherwise.
+	 */
+	bool isPoseStable(const sensor_msgs::JointState& msg) const;
+
+	/**
 	 * Pointer to the initial/current calibration state.
 	 */
 	shared_ptr<KinematicCalibrationState> initialState;
@@ -124,6 +158,11 @@ protected:
 	 * Pointer to the kinematic chain currently used.
 	 */
 	boost::shared_ptr<KinematicChain> kinematicChainPtr;
+
+	/**
+	 * Pointer to the stability test instance.
+	 */
+	boost::shared_ptr<hrl_kinematics::TestStability> testStabilityPtr;
 
 	/**
 	 * NodeHandle instance.
@@ -166,6 +205,29 @@ protected:
 	KDL::Tree kdlTree;
 
 	/**
+	 * Pointer to the URDF model.
+	 */
+	shared_ptr<urdf::Model> urdfModelPtr;
+
+	/**
+	 * Pointer to the SRDF model.
+	 */
+	shared_ptr<const srdf::Model> srdfModelPtr;
+
+	/**
+	 * String containing the SRDF model.
+	 */
+	string srdfString;
+
+	/**
+	 * Flag that indicates whether a SRDF model is available.
+	 * If true, collision checking is enabled for the whole chain,
+	 * expecting that the loaded SRDF model contains information about
+	 * the collisions that can be ignored.
+	 */
+	bool srdfAvailable;
+
+	/**
 	 * Lower joint limits.
 	 */
 	map<string, double> lowerLimits;
@@ -186,6 +248,11 @@ protected:
 	string cameraFrame;
 
 	/**
+	 * Name of the torso frame.
+	 */
+	string torsoFrame;
+
+	/**
 	 * Define a rectangle within which the predicted
 	 * marker position of the sampled poses should be.
 	 */
@@ -195,6 +262,36 @@ protected:
 	 * Radius of the "view cylinder".
 	 */
 	double viewCylinderRadius;
+
+	/**
+	 * Flag that indicates whether an initial pose is available.
+	 */
+	bool initialPoseAvailable;
+
+	/**
+	 * Initial pose. If given:
+	 * - initialPoseAvailable = true
+	 * - stability test can be done
+	 * - poses can be sampled which preserve the end effector position
+	 */
+	sensor_msgs::JointState initialPose;
+
+	/**
+	 * Flag that indicates whether the stability of the sampled pose should be tested.
+	 * Requires that an initial pose is given.
+	 */
+	bool testPoseStability;
+
+	/**
+	 * Flag that indicates whether the poses should be sampled s.t. the end effector is fixed.
+	 * Requires that an initial pose is given.
+	 */
+	bool keepEndEffectorPose;
+
+	/**
+	 * State of the end effector (i.e. torso -> tip)
+	 */
+	tf::Transform endEffectorState;
 
 	/**
 	 * Flag which indicates whether we are in debug mode.
