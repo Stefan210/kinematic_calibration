@@ -27,16 +27,26 @@ int main(int argc, char** argv) {
 	string chainName;
 	nh.getParam("chain_name", chainName);
 	DataCapture* dataCapture;
-	if("larm" == chainName || "xylo_larm" == chainName) {
+	if ("larm" == chainName || "xylo_larm" == chainName) {
 		dataCapture = new LeftArmDataCapture(*context);
-	} else if("rarm" == chainName || "xylo_rarm" == chainName) {
+	} else if ("rarm" == chainName || "xylo_rarm" == chainName) {
 		dataCapture = new RightArmDataCapture(*context);
 	} else {
 		ROS_FATAL("No parameter was set for the chain type!");
 		exit(0);
 	}
-    //dataCapture.findCheckerboard();
-    dataCapture->playChainPoses();
 
-    delete context;
+	bool manual;
+	nh.param("manual_data_capturing", manual, false);
+
+	if (manual) {
+		ROS_INFO("Starting manual data capturing.");
+		ROS_INFO("Every time the marker is visible and "
+				"the joint state is stable, a measurement "
+				"message will be published.");
+		dataCapture->publishMeasurementLoop();
+	} else {
+		dataCapture->playChainPoses();
+	}
+	delete context;
 }
