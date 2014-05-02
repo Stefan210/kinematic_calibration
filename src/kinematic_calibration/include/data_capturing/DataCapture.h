@@ -61,6 +61,8 @@ public:
 
 	void playChainPoses();
 
+	void publishMeasurementLoop();
+
 	void setHeadPose(double headYaw, double headPitch, bool relative = false,
 			vector<string> additionalJoints = vector<string>(),
 			vector<double> additionalPositions = vector<double>());
@@ -144,6 +146,18 @@ protected:
 
 private:
 	vector<string> jointNames;
+};
+
+class LegDataCapture: public DataCapture {
+public:
+	LegDataCapture(CalibrationContext& context);
+	virtual ~LegDataCapture();
+
+protected:
+	virtual const vector<string>& getJointNames();
+
+private:
+	vector<string> jointNamesLeft, jointNamesRight, jointNames;
 };
 
 } /* namespace kinematic_calibration */
