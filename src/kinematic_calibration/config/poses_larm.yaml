@@ -1,357 +1,250 @@
-
-### generated from 1389606680
 larm001:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.299088, 0.055182, 0.371186, 0.636568, 0.0337059, -1.03387, -0.257754]
+  positions: [-0.668659, 1.30245, 0.784796, 0.666461, -1.79309, -1.45566, 0.205519]
 
-
-### generated from 1389606700
 larm002:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.714802, -0.067538, 0.378856, 0.862066, -0.0353239, -0.934164, -0.222472]
+  positions: [0.338201, 0.179776, 0.770689, 0.21731, -0.105433, -1.34058, -0.574378]
 
-
-### generated from 1389606725
 larm003:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.857464, -0.069072, 0.409536, 1.0845, -0.0399261, -0.95564, -0.213268]
+  positions: [0.506674, 0.8587, 0.818405, 0.647115, 0.1937, -1.47444, 0.0793509]
 
-
-### generated from 1389606742
 larm004:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [1.13819, -0.231676, 0.461692, 1.23636, -0.23321, -1.05842, -0.227074]
+  positions: [0.286827, -0.00784091, 0.982156, -0.166022, -0.237538, -1.38757, -0.575966]
 
-
-### generated from 1389606744
 larm005:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [1.13819, 0.0597839, 0.539926, 1.23943, -0.293036, -1.12285, -0.24088]
+  positions: [-0.66313, 0.252345, 0.101215, 0.191742, -0.852223, -1.02074, 0.277943]
 
-
-### generated from 1389606772
 larm006:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.598218, -0.595234, 0.08126, 1.03387, -0.382008, -0.974048, -0.231676]
+  positions: [-0.56856, 0.101556, -0.0157793, -0.296631, -0.263369, -1.24723, -0.690148]
 
-
-### generated from 1389606787
 larm007:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.900416, -0.434164, -0.0583339, 1.10137, -0.250084, -0.969446, -0.191792]
+  positions: [-0.581219, 0.369898, 0.308087, 0.00282423, -1.26081, -1.24642, 0.2502]
 
-
-### generated from 1389606791
 larm008:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.612024, -0.31758, -0.0583339, 1.06302, -0.162646, -0.905018, -0.253152]
+  positions: [-0.414324, 0.878897, 0.7362, 0.302275, -1.02852, -1.29533, -0.153522]
 
-
-### generated from 1389606890
 larm009:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.659578, -0.161112, -0.200996, 1.14586, 0.516916, -1.42351, -0.220938]
+  positions: [-0.521418, 0.786679, 0.927132, 0.779272, -1.60513, -1.3106, 0.10816]
 
-
-### generated from 1389606930
 larm010:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.972514, -0.280764, -0.191792, 1.15506, 0.490838, -1.34221, -0.630516]
+  positions: [-0.597558, 0.859573, 0.442867, 1.07071, -0.986752, -1.26608, 0.348192]
 
-
-### generated from 1389606938
 larm011:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.681054, -0.428028, -0.11816, 1.15966, 0.501576, -1.31306, -0.687274]
+  positions: [0.0199034, 0.579183, 1.05503, 0.177434, -1.04833, -1.35347, 0.729978]
 
-
-### generated from 1389606943
 larm012:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [1.25324, -0.158044, -0.227074, 1.15659, 0.446352, -1.22869, -0.61671]
+  positions: [-0.589978, 0.948084, 0.820473, 1.04967, -1.38118, -1.53018, -0.00704488]
 
-
-### generated from 1389606956
 larm013:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.693326, -0.154976, -0.273094, 1.0845, 0.530722, -1.32073, -0.836072]
+  positions: [-0.490784, 0.958023, -0.853421, 1.27049, 0.549004, -1.45224, -0.0575977]
 
-
-### generated from 1389606979
 larm014:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.704064, -0.420358, -0.150374, 1.18881, 0.31903, -1.29772, -0.56302]
+  positions: [-0.620383, 1.30989, 0.952514, 0.993648, -1.68768, -1.48553, 0.557575]
 
-
-### generated from 1389607074
 larm015:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [1.14586, -0.398882, -0.2102, 0.989388, 0.736278, -1.27011, -0.521602]
+  positions: [-0.422975, 0.529632, 0.6484, 0.606854, -0.990388, -1.24221, 0.0973426]
 
-
-### generated from 1389607087
 larm016:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.791502, -0.15651, -0.00310993, 0.791502, 0.437148, -1.33147, -0.56302]
+  positions: [-0.4956, 0.976383, 1.24079, 1.24062, -1.73149, -1.54339, 0.29978]
 
-
-### generated from 1389607091
 larm017:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.504644, -0.0399261, -0.0107799, 0.759288, 0.516916, -1.39897, -0.558418]
+  positions: [-0.576732, 0.798545, 0.262043, 0.977228, -0.43407, -1.31281, -0.18851]
 
-
-### generated from 1389607116
 larm018:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.512314, -0.319114, -0.128898, 0.716336, 0.368118, -1.2379, -0.567622]
+  positions: [-0.527654, 0.278214, -0.0582645, 0.386668, -0.170589, -1.1189, 0.210087]
 
-
-### generated from 1389607183
 larm019:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.500042, -0.303774, -0.474048, 0.71787, 0.378856, -0.918824, -0.521602]
+  positions: [-0.659367, 0.650008, -0.645453, 0.987158, 0.396899, -1.34598, -0.556059]
 
-
-### generated from 1389607206
 larm020:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.507712, -0.375872, -0.527738, 0.759288, 0.478566, -0.777696, -0.62438]
+  positions: [0.272595, 0.0505544, 0.574014, 0.0351473, 0.043573, -1.12787, -0.17854]
 
-
-### generated from 1389607210
 larm021:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.506178, -0.62438, -0.527738, 0.860532, 0.443284, -0.743948, -0.62438]
+  positions: [-0.251157, 0.815355, 0.928267, 0.563029, -1.11227, -1.43704, 0.125205]
 
-
-### generated from 1389607213
 larm022:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [1.05842, -0.4403, -0.610574, 0.946436, 0.512314, -0.68719, -0.62438]
+  positions: [-0.652542, 1.39943, 0.429955, 0.859779, -1.75688, -1.43544, 0.148618]
 
-
-### generated from 1389607234
 larm023:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [1.06609, -0.438766, -0.449504, 0.91729, 0.394196, -0.96331, -0.625914]
+  positions: [-0.617197, 0.856781, 0.324105, 1.11374, -1.14201, -1.53384, 0.229223]
 
-
-### generated from 1389607273
 larm024:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.504644, -0.335988, -0.446436, 0.71787, 0.624296, -1.38976, -0.664264]
+  positions: [-0.516483, 0.806666, 0.76326, 0.52514, -1.4706, -1.26704, 0.58241]
 
-
-### generated from 1389607344
 larm025:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.82525, -0.29457, -0.438766, 0.773094, 0.92496, -0.90962, -0.604438]
+  positions: [-0.564777, 0.805422, 0.640378, 0.36947, -1.77434, -1.40848, 0.952254]
 
-
-### generated from 1389607455
 larm026:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.839056, -0.151908, -0.0767419, 0.236194, 0.888144, -1.07836, -0.843742]
+  positions: [-0.663412, 0.902051, 0.248724, 1.27695, -0.777802, -1.33241, -0.23048]
 
-
-### generated from 1389607469
 larm027:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.276078, -0.14117, -0.200996, 0.283748, 0.747016, -0.76389, -0.995608]
+  positions: [0.263061, 0.463312, 1.13102, 0.0617498, -0.627178, -1.30563, -0.166853]
 
-
-### generated from 1389607475
 larm028:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.846726, -0.398882, -0.262356, 0.25767, 0.898882, -0.739346, -0.998676]
+  positions: [-0.624361, 0.623906, 0.110439, 0.868135, -0.737918, -1.09055, 0.33421]
 
-
-### generated from 1389607658
 larm029:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.592082, -0.104354, 0.167164, 0.306758, 0.849794, -0.54913, -0.811528]
+  positions: [-0.398505, 1.03909, 0.754746, 0.652635, -1.55713, -1.46873, 0.222336]
 
-
-### generated from 1389607689
 larm030:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.888144, -0.265424, 0.167164, 0.308292, 0.849794, -0.54913, -0.811528]
+  positions: [-0.365515, 0.703761, 0.531208, 0.195885, -1.40399, -1.45378, 0.999925]
 
-
-### generated from 1389607691
 larm031:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.888144, 0.024502, 0.167164, 0.308292, 0.84826, -0.54913, -0.811528]
+  positions: [-0.615347, 0.55389, -0.296335, 0.78449, -0.125713, -1.14982, -0.375077]
 
-
-### generated from 1389607711
 larm032:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.898882, -0.265424, 0.167164, 0.306758, 0.84826, -0.54913, -0.811528]
+  positions: [0.464532, 0.196572, 1.26251, 0.0598274, -1.00382, -1.04056, 0.702555]
 
-
-### generated from 1389607746
 larm033:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.631966, -0.112024, 0.167164, 0.306758, 0.84826, -0.54913, -0.809994]
+  positions: [-0.517167, 0.745619, -0.637065, 0.478687, 0.440427, -1.45073, -0.266803]
 
-
-### generated from 1389607754
 larm034:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.91729, -0.265424, 0.167164, 0.308292, 0.849794, -0.54913, -0.811528]
+  positions: [-0.644276, 0.949248, 0.587104, 1.12263, -0.902902, -1.50431, -0.472248]
 
-
-### generated from 1389607757
 larm035:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.91729, 0.0229681, 0.167164, 0.308292, 0.849794, -0.54913, -0.811528]
+  positions: [-0.516014, 1.05579, 0.807255, 0.860978, -1.80767, -1.52181, 0.762653]
 
-
-### generated from 1389607768
 larm036:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.642704, -0.11049, 0.167164, 0.308292, 0.849794, -0.54913, -0.811528]
+  positions: [-0.479569, 0.769288, 0.501627, 0.347942, -1.67964, -1.3851, 1.00842]
 
-
-### generated from 1389607779
 larm037:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.92496, 0.0229681, 0.167164, 0.308292, 0.849794, -0.54913, -0.811528]
+  positions: [0.370498, 0.0987268, 1.49065, -0.208981, -1.38044, -1.21715, 0.822437]
 
-
-### generated from 1389607793
 larm038:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.361982, 0.0229681, 0.167164, 0.308292, 0.849794, -0.54913, -0.811528]
+  positions: [-0.0212051, 0.178568, 0.586343, 0.341354, -0.288714, -0.994276, -0.0597929]
 
-
-### generated from 1389607799
 larm039:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.93263, -0.265424, 0.167164, 0.308292, 0.83292, -0.561402, -0.780848]
+  positions: [-0.263669, 0.721511, 1.03625, 0.431397, -1.36003, -1.4155, 0.0870433]
 
-
-### generated from 1389607802
 larm040:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.93263, 0.0214341, 0.147222, 0.306758, 0.826784, -0.550664, -0.727158]
+  positions: [0.128562, 0.265174, 1.16291, -0.0203923, -1.27067, -1.15699, 0.492187]
 
-
-### generated from 1389607877
 larm041:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.245398, -0.216336, 0.269942, 0.0628521, -0.0844119, -0.361982, -0.412688]
+  positions: [-0.409524, 0.703398, 0.589505, 0.812896, -0.453702, -1.52145, -0.547269]
 
-
-### generated from 1389607928
 larm042:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.598218, -0.116626, 0.23466, -0.0521979, -0.069072, -0.41107, -0.523136]
+  positions: [-0.456781, 0.790791, 0.468199, 0.856467, -0.905, -1.13065, 0.172498]
 
-
-### generated from 1389610122
 larm043:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.490838, -0.285366, 0.3267, -0.0798099, -0.52467, -0.481634, 0.115008]
+  positions: [-0.361025, 0.87929, -0.324432, 0.957133, 0.242168, -1.52666, -0.290951]
 
-
-### generated from 1389610222
 larm044:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.536858, -0.153442, 0.406468, 0.00455999, -0.45564, -0.561402, -0.50933]
+  positions: [-0.0630398, 0.483893, 0.463985, 0.389951, -0.553961, -1.06579, 0.378266]
 
-
-### generated from 1389610842
 larm045:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [-0.0813439, 0.222388, 0.589014, -0.147306, -0.497058, -0.697928, 0.177902]
+  positions: [-0.312749, 0.572314, 0.634352, 0.643524, -0.886381, -1.52463, -0.0775326]
 
-
-### generated from 1389611034
 larm046:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.559868, -0.613642, 0.167164, -0.0844119, -1.24565, -0.90195, 0.098134]
+  positions: [-0.585287, 1.03115, 0.519341, 0.908995, -1.35844, -1.48534, 0.516453]
 
-
-### generated from 1389611060
 larm047:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.570606, -0.599836, 0.10427, -0.0813439, -1.02782, -0.612024, 0.443284]
+  positions: [-0.174559, 0.410673, 0.952941, -0.226769, -1.42535, -1.42243, 1.16227]
 
-
-### generated from 1389611666
 larm048:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.59515, -0.592166, 0.0459781, -0.067538, -1.19196, -0.77923, 0.96331]
+  positions: [-0.468326, 0.521198, 0.376091, 0.0116548, -0.915856, -1.10046, 0.201231]
 
-
-### generated from 1389611737
 larm049:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.138018, -0.360532, 0.15796, -0.2869, -1.5095, -0.736278, 1.19341]
+  positions: [0.0842513, 0.603828, 1.27387, -0.285618, -1.51829, -1.43912, 0.840631]
 
-
-### generated from 1389611773
 larm050:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+  joint_names: ["HeadPitch", "HeadYaw", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
   time_from_start: 1.0
-  positions: [0.443284, -0.497058, 0.0935321, -0.253152, -1.73039, -0.74088, 1.19034]
-
-
-### generated from 1389611806
-larm051:
-  joint_names: ["HeadYaw", "HeadPitch", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
-  time_from_start: 1.0
-  positions: [0.177902, -0.34826, 0.153358, -0.283832, -1.92061, -0.199378, 1.175]
+  positions: [-0.152633, 0.312071, 0.762973, 0.268139, -0.759641, -1.18657, 0.200777]
 
