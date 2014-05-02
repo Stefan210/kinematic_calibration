@@ -165,11 +165,11 @@ void DataCapture::disableStiffnessSlowly(const vector<string>& jointNames) {
 	value = 0.1;
 	ROS_INFO("Stiffness: %f", value);
 	setStiffness(jointNames, value);
-	
+
 	usleep(3e6);
 	value = 0.0;
 	ROS_INFO("Stiffness: %f", value);
-	setStiffness(jointNames, value);	
+	setStiffness(jointNames, value);
 }
 
 void DataCapture::playChainPoses() {
@@ -178,24 +178,30 @@ void DataCapture::playChainPoses() {
 	nhPrivate.getParam("params/end_pose_num", end);
 	//CalibrationOptions options = context.getCalibrationOptions();
 	DataCaptureOptions dataCaptureOptions = context.getDataCaptureOptions();
-	
+
 	// print some info about the settings
-	ROS_INFO("Parameter %s ist set to %s:", "find_marker", dataCaptureOptions.findMarker ? "true" : "false");
-	if(dataCaptureOptions.findMarker)
-		ROS_INFO("If the marker ist not visible to the camera, the head will be moved in order to find the marker.");
+	ROS_INFO("Parameter %s ist set to %s:", "find_marker",
+			dataCaptureOptions.findMarker ? "true" : "false");
+	if (dataCaptureOptions.findMarker)
+		ROS_INFO(
+				"If the marker ist not visible to the camera, the head will be moved in order to find the marker.");
 	else
-		ROS_INFO("If the marker ist not visible to the camera, the pose will be skipped.");
-		
-	ROS_INFO("Parameter %s ist set to %s:", "move_marker_to_corners", dataCaptureOptions.moveMarkerToCorners ? "true" : "false");
-	if(dataCaptureOptions.moveMarkerToCorners)
-		ROS_INFO("The measurements will be taken according to the given joint states.");
+		ROS_INFO(
+				"If the marker ist not visible to the camera, the pose will be skipped.");
+
+	ROS_INFO("Parameter %s ist set to %s:", "move_marker_to_corners",
+			dataCaptureOptions.moveMarkerToCorners ? "true" : "false");
+	if (dataCaptureOptions.moveMarkerToCorners)
+		ROS_INFO(
+				"The measurements will be taken according to the given joint states.");
 	else
-		ROS_INFO("For each pose, the head will be moved s.t. the marker is in the center and the four corners.");
-		
+		ROS_INFO(
+				"For each pose, the head will be moved s.t. the marker is in the center and the four corners.");
+
 	// enable stiffness
 	enableHeadStiffness();
 	enableChainStiffness();
-	
+
 	// start the loop
 	const string& prefix = getPosePrefix();
 	for (int i = start; i <= end && ros::ok(); i += 1) {
@@ -234,14 +240,15 @@ void DataCapture::playChainPoses() {
 		if (dataCaptureOptions.findMarker) {
 			// check if the marker is currently visible to the camera
 			updateMarker();
-			if(!markerFound) {
+			if (!markerFound) {
 				// marker is not visible, so find it by moving the head
 				ROS_INFO("Moving head in order to find the marker...");
 				findMarker();
 			}
 			if (!markerFound) {
 				// marker could not be found, skip the pose
-				ROS_INFO("Was not able to find the marker. Continue with the next pose...");
+				ROS_INFO(
+						"Was not able to find the marker. Continue with the next pose...");
 				continue;
 			}
 		}
@@ -279,10 +286,16 @@ void DataCapture::playChainPoses() {
 			publishMeasurement();
 		}
 	}
-	
+
 	// disable stiffness
 	disableChainStiffness();
 	disableHeadStiffness();
+}
+
+void DataCapture::publishMeasurementLoop() {
+	while (ros::ok()) {
+		publishMeasurement();
+	}
 }
 
 void DataCapture::moveMarkerToImageRegion(Region region) {
@@ -698,6 +711,36 @@ RightArmDataCapture::~RightArmDataCapture() {
 }
 
 const vector<string>& RightArmDataCapture::getJointNames() {
+	return jointNames;
+}
+
+LegDataCapture::LegDataCapture(CalibrationContext& context) :
+		DataCapture(context) {
+	// left
+	jointNamesLeft.push_back("LHipYawPitch");
+	jointNamesLeft.push_back("LHipRoll");
+	jointNamesLeft.push_back("LHipPitch");
+	jointNamesLeft.push_back("LKneePitch");
+	jointNamesLeft.push_back("LAnklePitch");
+	jointNamesLeft.push_back("LAnkleRoll");
+
+	// right
+	jointNamesRight.push_back("RHipYawPitch");
+	jointNamesRight.push_back("RHipRoll");
+	jointNamesRight.push_back("RHipPitch");
+	jointNamesRight.push_back("RKneePitch");
+	jointNamesRight.push_back("RAnklePitch");
+	jointNamesRight.push_back("RAnkleRoll");
+
+	// both
+	jointNames.insert(jointNames.end(), jointNamesLeft.begin(), jointNamesLeft.end());
+	jointNames.insert(jointNames.end(), jointNamesRight.begin(), jointNamesRight.end());
+}
+
+LegDataCapture::~LegDataCapture() {
+}
+
+const vector<string>& LegDataCapture::getJointNames() {
 	return jointNames;
 }
 
