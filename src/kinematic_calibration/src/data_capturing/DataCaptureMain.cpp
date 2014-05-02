@@ -19,7 +19,7 @@ using namespace kinematic_calibration;
 
 int main(int argc, char** argv) {
 	ros::init(argc, argv, "dataCapture");
-	ros::NodeHandle nh;
+	ros::NodeHandle nh, nhPrivate("~");
 
 	// create the context object
 	CalibrationContext* context = ContextFactory::getRosContext();
@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
 	}
 
 	bool manual;
-	nh.param("manual_data_capturing", manual, false);
+	nhPrivate.param("manual_data_capturing", manual, false);
 
 	if (manual) {
 		ROS_INFO("Starting manual data capturing.");
