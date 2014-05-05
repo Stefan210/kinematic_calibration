@@ -29,6 +29,39 @@ using namespace std;
 
 namespace kinematic_calibration {
 
+class Plot2D {
+public:
+	Plot2D(string title = "") {
+		gnuplotPipe = popen("gnuplot ", "w");
+		fprintf(gnuplotPipe,
+				"set autoscale;\n set xzeroaxis\n set yzeroaxis\n");
+		fprintf(gnuplotPipe,
+				"plot '-' with points pt 1 lc rgb 'green' title '%s' \n",
+				title.c_str());
+	}
+
+	virtual ~Plot2D() {
+		closePlot();
+	}
+
+	void addPoint(double x, double y) {
+		fprintf(gnuplotPipe, "%f %f \n", x, y);
+	}
+
+	void showPlot() {
+		fprintf(gnuplotPipe, "e ,\n ");
+		fflush(gnuplotPipe);
+	}
+
+	void closePlot() {
+		//fprintf(gnuplotPipe, "exit");
+		fclose(gnuplotPipe);
+	}
+
+private:
+	FILE * gnuplotPipe;
+};
+
 /**
  * Node for collecting data and executing the optimization.
  */
@@ -87,6 +120,7 @@ private:
 	vector<KinematicChain> kinematicChains;
 	CalibrationContext* context;
 	KinematicCalibrationState initialState;
+	Plot2D plotterDiff;
 
 	bool collectingData;
 

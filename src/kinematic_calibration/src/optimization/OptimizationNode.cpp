@@ -31,30 +31,6 @@
 
 namespace kinematic_calibration {
 
-class Plot2D {
-public:
-	Plot2D(string title = "") {
-		gnuplotPipe = popen("gnuplot -persistent", "w");
-		fprintf(gnuplotPipe,
-				"set autoscale;\n set xzeroaxis\n set yzeroaxis\n");
-		fprintf(gnuplotPipe,
-				"plot '-' with points pt 1 lc rgb 'green' title '%s' \n",
-				title.c_str());
-	}
-
-	void addPoint(double x, double y) {
-		fprintf(gnuplotPipe, "%f %f \n", x, y);
-	}
-
-	void showPlot() {
-		fprintf(gnuplotPipe, "e ,\n ");
-		fclose(gnuplotPipe);
-	}
-
-private:
-	FILE * gnuplotPipe;
-};
-
 class Plot3D {
 public:
 	Plot3D(string title = "") {
@@ -246,7 +222,6 @@ void OptimizationNode::printPoints() {
 	// instantiate the frame image converter
 	FrameImageConverter frameImageConverter(cameraModel);
 
-	Plot2D plotterDiff;
 	Plot3D plotEndp;
 
 	// update kinematic chains
@@ -509,6 +484,7 @@ int main(int argc, char** argv) {
 	CalibrationContext* context = new RosCalibContext();
 	OptimizationNode node(context);
 	node.startLoop();
+	while(ros::ok());
 	delete context;
 	return 0;
 }
