@@ -299,6 +299,72 @@ protected:
 	bool debug;
 };
 
+/**
+ * Abstract base class for generating random numbers in the specified range.
+ */
+class RandomNumberGenerator {
+public:
+	/// Constructor.
+	RandomNumberGenerator() {
+	}
+
+	/// Destructor.
+	virtual ~RandomNumberGenerator() {
+	}
+
+	/**
+	 * Strategy method which returns a random number within the specified range.
+	 * @param[in] min Specifies the lower limit of the range (including).
+	 * @param[in] max Specifies the upper limit of the range (including)
+	 * @return A random number within the specified range.
+	 */
+	virtual double getRandom(const double min, const double max) = 0;
+
+	/**
+	 * Plots the distribution using the specified number of samples.
+	 * @param[in] min Specifies the lower limit of the range (including).
+	 * @param[in] max Specifies the upper limit of the range (including)
+	 * @param[in] numOfSamples Number of samples to be used for plotting.
+	 */
+	void plot(const double min, const double max, const int numOfSamples);
+};
+
+/**
+ * Uniform random number generator.
+ * Uses the rand() function from the stdlib.
+ */
+class UniformRNG: public RandomNumberGenerator {
+public:
+	/// Constructor.
+	UniformRNG();
+
+	/// Destructor.
+	virtual ~UniformRNG() {
+	}
+	virtual double getRandom(const double min, const double max);
+};
+
+/**
+ * Samples a random number from a distribution which behaves linear
+ * at the margins and uniform in the "middle" range.
+ */
+class MarginDiscriminatingUniformRNG: public RandomNumberGenerator {
+public:
+	/// Constructor.
+	MarginDiscriminatingUniformRNG() {
+	}
+	/// Destructor.
+	virtual ~MarginDiscriminatingUniformRNG() {
+	}
+	virtual double getRandom(const double min, const double max);
+
+protected:
+	/**
+	 * The underlying uniform RNG.
+	 */
+	UniformRNG uniformRng;
+};
+
 } /* namespace kinematic_calibration */
 
 #endif /* POSESAMPLING_H_ */

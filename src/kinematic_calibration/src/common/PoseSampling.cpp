@@ -436,8 +436,8 @@ void PoseSampling::getPoses(const int& numOfPoses,
 				for (int i = 0; i < nj; i++)
 					cout << targetState(i) << ", ";
 				cout << endl;
-				cout << "target transformation: " << frame.p[0] << " " << frame.p[1]
-						<< " " << frame.p[2] << endl;
+				cout << "target transformation: " << frame.p[0] << " "
+						<< frame.p[1] << " " << frame.p[2] << endl;
 				fkSolverPos.JntToCart(targetState, frame);
 				cout << "IK transformation: " << frame.p[0] << " " << frame.p[1]
 						<< " " << frame.p[2] << endl;
@@ -676,6 +676,98 @@ void PoseSampling::camerainfoCallback(
 void PoseSampling::publishJointState(sensor_msgs::JointState& msg) const {
 	msg.header.stamp = ros::Time::now();
 	this->jointStatePub.publish(msg);
+}
+
+void RandomNumberGenerator::plot(const double min, const double max,
+		const int numOfSamples) {
+	FILE * gnuplotPipe;
+	gnuplotPipe = popen("gnuplot -persistent", "w");
+	fprintf(gnuplotPipe, "n=100;\n");
+	fprintf(gnuplotPipe, "max=%f;\n", max);
+	fprintf(gnuplotPipe, "min=%f;\n", min);
+	fprintf(gnuplotPipe, "width=(max-min)/n;\n");
+	fprintf(gnuplotPipe, "hist(x,width)=width*floor(x/width)+width/2.0;\n");
+	fprintf(gnuplotPipe, "set term png;\n");
+	fprintf(gnuplotPipe, "set output \"histogram.png\";\n");
+	fprintf(gnuplotPipe, "set xrange [min:max];\n");
+	fprintf(gnuplotPipe, "set yrange [0:];\n");
+	fprintf(gnuplotPipe, "set offset graph 0.05,0.05,0.05,0.0;\n");
+	fprintf(gnuplotPipe, "set xtics min,(max-min)/5,max;\n", min, max, min,
+			max);
+	fprintf(gnuplotPipe, "set boxwidth width*0.9;\n");
+	fprintf(gnuplotPipe, "set style fill solid 0.5;\n");
+	fprintf(gnuplotPipe, "set tics out nomirror;\n");
+	fprintf(gnuplotPipe, "set xlabel \"x\";\n");
+	fprintf(gnuplotPipe, "set ylabel \"Frequency\";\n");
+	fprintf(gnuplotPipe,
+			"plot '-'  u (hist($1,width)):(1.0) smooth freq w boxes lc rgb\"green\" notitle\n");
+
+	double p;
+	for (int i = 0; i < numOfSamples; i++) {
+		p = getRandom(min, max);
+		//cout << p << endl;
+		fprintf(gnuplotPipe, "%f \n", p);
+	}
+
+	fprintf(gnuplotPipe, "e ,\n ");
+	fclose(gnuplotPipe);
+}
+
+UniformRNG::UniformRNG() {
+	// initialize the seed
+	srand(time(NULL));
+}
+
+double UniformRNG::getRandom(const double min, const double max) {
+	double randValue = min
+			+ static_cast<double>(rand())
+					/ (static_cast<double>(RAND_MAX / (max - min)));
+	return randValue;
+}
+
+double MarginDiscriminatingUniformRNG::getRandom(const double min,
+		const double max) {
+	// how much is the function "shifted" from the symmetric function?
+	double shift = (max + min) / 2;
+
+	// shifted margins s.t. the probability function is symmetric
+	double margin = (fabs(max) + fabs(min)) / 2;
+
+	// width of linear part at the margins
+	double linear = 0.1; // TODO: injection!
+
+	// const probability of the uniform part
+	double pMax = 1 / (2 * margin - linear);
+
+	// m = dy / dx
+	const double m = pMax / linear;
+
+	// rejection sampling
+	double x, y, p;
+	do {
+		x = this->uniformRng.getRandom(-margin, margin);
+		y = this->uniformRng.getRandom(0.0, pMax);
+
+		// calculate the probablity at x i.e. p(x)
+		if (-margin <= x && x < (-margin + linear)) {
+			// left linear part
+			p = m * (x + margin);
+		} else if ((-margin + linear) <= x && x <= (margin - linear)) {
+			// uniform part
+			p = pMax;
+		} else if ((margin - linear) < x && x < margin) {
+			// right linear part
+			p = -m * (x - margin);
+		} else {
+			// zero
+			p = 0.0;
+		}
+	} while (!(y < p));
+
+	// re-shift
+	x = x + shift;
+
+	return x;
 }
 
 } /* namespace kinematic_calibration */
