@@ -38,6 +38,11 @@ using namespace ros;
 using namespace KDL;
 using namespace boost;
 
+// forward declarations (complete declarations at the end of the file)
+class RandomNumberGenerator;
+class UniformRNG;
+class MarginDiscriminatingUniformRNG;
+
 /**
  * Class for sampling poses.
  */
@@ -294,6 +299,11 @@ protected:
 	tf::Transform endEffectorState;
 
 	/**
+	 * Pointer to a random number generator.
+	 */
+	boost::shared_ptr<RandomNumberGenerator> rng;
+
+	/**
 	 * Flag which indicates whether we are in debug mode.
 	 */
 	bool debug;
@@ -351,18 +361,30 @@ public:
 class MarginDiscriminatingUniformRNG: public RandomNumberGenerator {
 public:
 	/// Constructor.
-	MarginDiscriminatingUniformRNG() {
-	}
+	MarginDiscriminatingUniformRNG(double linearWidth = 0.3);
+
 	/// Destructor.
 	virtual ~MarginDiscriminatingUniformRNG() {
 	}
 	virtual double getRandom(const double min, const double max);
+
+	/**
+	 * Sets the width of the linear part.
+	 * @param[in] linearWidth The width of the linear part.
+	 */
+	void setLinearWidth(double linearWidth);
 
 protected:
 	/**
 	 * The underlying uniform RNG.
 	 */
 	UniformRNG uniformRng;
+
+private:
+	/**
+	 * Width of the linear parts at the margins.
+	 */
+	double linearWidth;
 };
 
 } /* namespace kinematic_calibration */

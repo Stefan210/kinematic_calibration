@@ -106,6 +106,9 @@ void PoseSampling::initialize() {
 		// initialize the IK request
 		initializeEndEffectorState();
 	}
+
+	// initialize the RNG
+	this->rng = boost::make_shared<MarginDiscriminatingUniformRNG>(0.3);
 }
 
 void PoseSampling::initializeCamera() {
@@ -293,9 +296,6 @@ void PoseSampling::getPoses(const int& numOfPoses,
 				"moveit_robot_state", 1);
 	}
 
-	// initialize the seed for the random generator
-	srand(time(NULL));
-
 	// prepare the additional link/joint for between camera and marker
 	shared_ptr<urdf::Joint> markerJoint = make_shared<urdf::Joint>();
 	markerJoint->parent_link_name = cameraFrame;
@@ -364,10 +364,7 @@ void PoseSampling::getPoses(const int& numOfPoses,
 			string jointName = jointNames[i];
 			double lowerLimit = lowerLimits[jointName];
 			double upperLimit = upperLimits[jointName];
-			double currentJointState = lowerLimit
-					+ static_cast<double>(rand())
-							/ (static_cast<double>(RAND_MAX
-									/ (upperLimit - lowerLimit)));
+			double currentJointState = this->rng->getRandom(lowerLimit, upperLimit);
 			jointState.name.push_back(jointName);
 			jointState.position.push_back(currentJointState);
 		}
@@ -725,19 +722,25 @@ double UniformRNG::getRandom(const double min, const double max) {
 	return randValue;
 }
 
+MarginDiscriminatingUniformRNG::MarginDiscriminatingUniformRNG(
+		double linearWidth) :
+		linearWidth(linearWidth) {
+	// nothing to do
+}
+
 double MarginDiscriminatingUniformRNG::getRandom(const double min,
 		const double max) {
 	// how much is the function "shifted" from the symmetric function?
-	double shift = (max + min) / 2;
+	const double shift = (max + min) / 2;
 
 	// shifted margins s.t. the probability function is symmetric
-	double margin = (fabs(max) + fabs(min)) / 2;
+	const double margin = (fabs(max) + fabs(min)) / 2;
 
 	// width of linear part at the margins
-	double linear = 0.1; // TODO: injection!
+	const double linear = this->linearWidth;
 
 	// const probability of the uniform part
-	double pMax = 1 / (2 * margin - linear);
+	const double pMax = 1 / (2 * margin - linear);
 
 	// m = dy / dx
 	const double m = pMax / linear;
@@ -762,12 +765,16 @@ double MarginDiscriminatingUniformRNG::getRandom(const double min,
 			// zero
 			p = 0.0;
 		}
-	} while (!(y < p));
+	} while (!(y <= p));
 
 	// re-shift
 	x = x + shift;
 
 	return x;
+}
+
+void MarginDiscriminatingUniformRNG::setLinearWidth(double linearWidth) {
+	this->linearWidth = linearWidth;
 }
 
 } /* namespace kinematic_calibration */
