@@ -93,12 +93,12 @@ protected:
 	void publishResults();
 
 	bool putToImage(const string& id, const double& x, const double& y);
-
+	bool putToImage(const measurementData& data, const double& x,
+			const double& y);
 
 	void measurementCb(const measurementDataConstPtr& msg);
 	void camerainfoCallback(const sensor_msgs::CameraInfoConstPtr& msg);
-	bool startOptizationCallback(
-			std_srvs::Empty::Request& request,
+	bool startOptizationCallback(std_srvs::Empty::Request& request,
 			std_srvs::Empty::Response& response);
 
 	bool measurementOk(const measurementDataConstPtr& msg);

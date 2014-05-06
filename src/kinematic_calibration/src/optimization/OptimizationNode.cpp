@@ -21,6 +21,8 @@
 #include <utility>
 #include <string>
 #include <urdf_model/model.h>
+#include <cv_bridge/cv_bridge.h>
+#include <sensor_msgs/image_encodings.h>
 
 #include "../../include/common/FrameImageConverter.h"
 #include "../../include/common/KinematicChain.h"
@@ -233,7 +235,8 @@ void OptimizationNode::printPoints() {
 	// print out the measured position and the transformed position
 	for (int i = 0; i < measurements.size(); i++) {
 		measurementData current = measurements[i];
-		cout << i << " measured(x,y): " << current.marker_data[0] << "  "
+		cout << current.id;
+		cout << " measured(x,y): " << current.marker_data[0] << "  "
 				<< current.marker_data[1];
 
 		// get transformation from end effector to camera
@@ -273,7 +276,7 @@ void OptimizationNode::printPoints() {
 		frameImageConverter.project(cameraToMarker.inverse(), x, y);
 
 		// write into image (if available)
-		putToImage(current.id, x, y);
+		putToImage(current, x, y);
 
 		// calculate distance between camera and marker
 		tf::Vector3 origin = cameraToMarker.getOrigin();
@@ -328,6 +331,30 @@ bool OptimizationNode::putToImage(const string& id, const double& x,
 	// write the image into a new file
 	stringstream newname;
 	newname << "/tmp/" << id << "_calibrated." << extension;
+	return cv::imwrite(newname.str(), image);
+}
+
+bool OptimizationNode::putToImage(const measurementData& data, const double& x,
+		const double& y) {
+	// Convert from ROS message to OpenCV image.
+	cv_bridge::CvImageConstPtr cv_ptr;
+	cv_ptr = cv_bridge::toCvCopy(data.image, sensor_msgs::image_encodings::BGR8);
+	cv::Mat image = cv_ptr->image;
+
+	// put a cross and a circle to the measured position
+	std::vector<cv::Point2f> corners;
+	corners.push_back(cv::Point2f(data.marker_data[0], data.marker_data[1]));
+	cv::drawChessboardCorners(image, cv::Size(1, 1), corners, true);
+
+	// put a cross to the optimized/calibrated position
+	cv::line(image, cv::Point(x - 3, y - 3), cv::Point(x + 3, y + 3),
+			CV_RGB(0, 255, 0));
+	cv::line(image, cv::Point(x - 3, y + 3), cv::Point(x + 3, y - 3),
+			CV_RGB(0, 255, 0));
+
+	// write the image into a new file
+	stringstream newname;
+	newname << "/tmp/" << data.id << "_calibrated.jpg";
 	return cv::imwrite(newname.str(), image);
 }
 
