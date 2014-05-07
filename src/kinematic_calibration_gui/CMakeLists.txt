@@ -17,10 +17,10 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 # Since the default here is to produce only a binary, we don't worry about
 # exporting anything. 
 
-#generate_messages(
-#  DEPENDENCIES
-#  kinematic_calibration
-#)
+generate_messages(
+  DEPENDENCIES
+  kinematic_calibration
+)
 
 catkin_package(
   CATKIN_DEPENDS kinematic_calibration

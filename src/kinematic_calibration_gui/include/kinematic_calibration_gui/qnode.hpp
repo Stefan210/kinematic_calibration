@@ -59,6 +59,11 @@ public:
     QStandardItemModel* measurementsModel() { return &measurements_model; }
 	void log( const LogLevel &level, const std::string &msg);
 
+    void executePose(int pos) {
+        // TODO
+        std::cout << "pos: " << pos << std::endl;
+    }
+
 Q_SIGNALS:
 	void loggingUpdated();
     void rosShutdown();
@@ -75,6 +80,8 @@ public Q_SLOTS:
     void startOptimization();
 
     void updateIgnoredMeasurementsAndstartOptimization();
+
+    void clearMeasurements();
 
 protected:
     void measurementCb(const measurementDataConstPtr& msg);

@@ -46,7 +46,7 @@ QNode::~QNode() {
 }
 
 bool QNode::init() {
-    ros::init(init_argc,init_argv,"qtest"); std::cout << "111" << std::endl;
+    ros::init(init_argc,init_argv,"qtest");
 	if ( ! ros::master::check() ) {
 		return false;
 	}
@@ -75,7 +75,6 @@ void QNode::run() {
 	ros::Rate loop_rate(1);
 	int count = 0;
 	while ( ros::ok() ) {
-        std::cout << "run" << std::endl;
         ros::getGlobalCallbackQueue()->callAvailable();
         loop_rate.sleep();
 
@@ -209,6 +208,14 @@ void QNode::startOptimization() {
 void QNode::updateIgnoredMeasurementsAndstartOptimization() {
     updateIgnoredMeasurements();
     startOptimization();
+}
+
+void QNode::clearMeasurements() {
+    this->checkedMeasurements.clear(); // checked list
+    this->uncheckedMeasurements.clear(); // unchecked lsit
+    this->measurements.clear(); // measurement object list
+    this->measurements_model.clear(); // measurement model/view list
+    Q_EMIT measurementReceived();
 }
 
 }  // namespace qtest
