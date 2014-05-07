@@ -1,0 +1,305 @@
+rleg000:
+  joint_names: ['HeadYaw', 'HeadPitch', 'LShoulderPitch', 'LShoulderRoll', 'LElbowYaw', 'LElbowRoll', 'LWristYaw', 'LHand', 'LHipYawPitch', 'LHipRoll', 'LHipPitch', 'LKneePitch', 'LAnklePitch', 'LAnkleRoll', 'RHipYawPitch', 'RHipRoll', 'RHipPitch', 'RKneePitch', 'RAnklePitch', 'RAnkleRoll', 'RShoulderPitch', 'RShoulderRoll', 'RElbowYaw', 'RElbowRoll', 'RWristYaw', 'RHand']
+  time_from_start: 1.0
+  positions: [0.2592041492462158, -0.2654240131378174, 1.333004117012024, 0.10273600369691849, 0.9633100032806396, -0.038308143615722656, -0.7609059810638428, 0.012400031089782715, 0.4432840347290039, -0.19792795181274414, 1.6367360353469849, -0.8758721351623535, -0.7546861171722412, 0.038308143615722656, 0.4432840347290039, -0.36206603050231934, 0.8882279396057129, -2.112546443939209, 1.186300277709961, 0.10120201110839844, 1.3821759223937988, -0.21786999702453613, 1.0323400497436523, 0.49245595932006836, 0.38345813751220703, 0.24239999055862427]
+  time_from_start: 1.0
+rleg001:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [0.35593, 0.475498, -0.582962, 0.00455999, 0.803774, -0.21932, -0.612024,
+    0.216252]
+  time_from_start: 1.0
+rleg002:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [0.090548, 0.51078, -0.428028, 0.116542, 1.40817, 0.0752079, -0.585946,
+    -0.12583]
+  time_from_start: 1.0
+rleg003:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [0.090548, 0.51078, -0.429562, 0.115008, 1.4097, 0.073674, -0.590548,
+    -0.12583]
+  time_from_start: 1.0
+rleg004:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [0.090548, 0.51078, -0.429562, 0.115008, 1.41277, 0.073674, -0.590548,
+    -0.12583]
+  time_from_start: 1.0
+rleg005:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [0.090548, 0.51078, -0.428028, 0.113474, 1.41277, 0.073674, -0.590548,
+    -0.12583]
+  time_from_start: 1.0
+rleg006:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [0.0337899, 0.513848, -0.538476, 0.078192, 1.41891, 0.073674, -0.708666,
+    -0.12583]
+  time_from_start: 1.0
+rleg007:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [0.0353239, 0.513848, -0.538476, 0.078192, 1.41891, 0.0752079, -0.708666,
+    -0.12583]
+  time_from_start: 1.0
+rleg008:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [0.096684, 0.0229681, -0.495524, 0.00609398, 1.47413, 0.0752079, -0.888144,
+    -0.0399261]
+  time_from_start: 1.0
+rleg009:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [0.042994, 0.225456, -0.191792, 0.220854, 1.35601, -0.00455999, -0.46476,
+    -0.168782]
+  time_from_start: 1.0
+rleg010:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.217786, 0.21165, 0.131882, 0.197844, 1.68429, -1.27778, -0.354312,
+    -0.196394]
+  time_from_start: 1.0
+rleg011:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.217786, 0.21165, 0.133416, 0.197844, 1.68429, -1.27778, -0.354312,
+    -0.196394]
+  time_from_start: 1.0
+rleg012:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.11961, 0.217786, 0.18864, 0.197844, 1.68582, -1.29005, -0.355846,
+    -0.227074]
+  time_from_start: 1.0
+rleg013:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [0.107422, 0.024502, 0.199378, 0.202446, 1.68736, -1.29005, -0.355846,
+    -0.227074]
+  time_from_start: 1.0
+rleg014:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.14262, 0.4034, 0.202446, 0.202446, 1.68889, -1.29159, -0.355846,
+    -0.228608]
+  time_from_start: 1.0
+rleg015:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.14262, 0.4034, 0.202446, 0.20398, 1.68736, -1.29159, -0.355846,
+    -0.227074]
+  time_from_start: 1.0
+rleg016:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.14262, 0.4034, 0.202446, 0.20398, 1.68736, -1.29159, -0.354312,
+    -0.227074]
+  time_from_start: 1.0
+rleg017:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [4.19617e-05, 0.164096, 0.115008, 0.216252, 1.35601, -0.452488, -0.64117,
+    -0.0153821]
+  time_from_start: 1.0
+rleg018:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.082794, 0.00762796, 0.118076, 0.151824, 1.5585, -0.452488, -0.846726,
+    -0.0583339]
+  time_from_start: 1.0
+rleg019:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.708666, 0.00762796, 0.128814, 0.151824, 1.60299, -0.469362, -0.85593,
+    -0.0583339]
+  time_from_start: 1.0
+rleg020:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.276078, 0.00455999, 0.122678, 0.141086, 1.59839, -0.469362, -0.857464,
+    -0.0583339]
+  time_from_start: 1.0
+rleg021:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [0.224006, 0.170232, 0.113474, 0.141086, 1.6398, -0.469362, -0.860532,
+    -0.0583339]
+  time_from_start: 1.0
+rleg022:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [0.222472, 0.170232, 0.113474, 0.14262, 1.64134, -0.469362, -0.860532,
+    -0.0598679]
+  time_from_start: 1.0
+rleg023:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.12728, -0.382008, 0.116542, 0.14262, 1.66742, -0.469362, -0.865134,
+    -0.0583339]
+  time_from_start: 1.0
+rleg024:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.205514, -0.11816, 0.34971, -0.47098, 1.66588, -0.345108, -0.90195,
+    0.191708]
+  time_from_start: 1.0
+rleg025:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.759288, 0.116542, 0.35738, -0.47098, 1.66588, -0.346642, -0.905018,
+    0.193242]
+  time_from_start: 1.0
+rleg026:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.760822, 0.116542, 0.35738, -0.469446, 1.66588, -0.345108, -0.905018,
+    0.193242]
+  time_from_start: 1.0
+rleg027:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.110406, -0.44797, 0.391128, -0.469446, 1.66588, -0.345108, -0.920358,
+    0.193242]
+  time_from_start: 1.0
+rleg028:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.184038, -0.019984, 0.147222, -0.266958, 1.62907, -0.690258, -0.64884,
+    0.236194]
+  time_from_start: 1.0
+rleg029:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.161028, 0.0183661, 0.171766, -0.268492, 1.63367, -0.690258, -0.688724,
+    0.233126]
+  time_from_start: 1.0
+rleg030:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.161028, 0.0183661, 0.194776, -0.280764, 1.63674, -0.636568, -0.799172,
+    0.220854]
+  time_from_start: 1.0
+rleg031:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.159494, 0.0183661, 0.194776, -0.280764, 1.63674, -0.6335, -0.811444,
+    0.217786]
+  time_from_start: 1.0
+rleg032:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.346642, -0.0107799, 0.29602, -0.27923, 1.64287, -0.581344, -0.889678,
+    0.191708]
+  time_from_start: 1.0
+rleg033:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.346642, -0.0123138, 0.29602, -0.27923, 1.64287, -0.581344, -0.889678,
+    0.191708]
+  time_from_start: 1.0
+rleg034:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.343574, -0.00771189, 0.366584, -0.266958, 1.64441, -0.544528, -0.922581,
+    0.191708]
+  time_from_start: 1.0
+rleg035:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.331302, 0.00609398, 0.274544, -0.093616, 1.63367, -0.593616, -0.88661,
+    0.184038]
+  time_from_start: 1.0
+rleg036:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.331302, 0.00609398, 0.225456, 0.325166, 1.6981, -0.450954, -0.793036,
+    -0.113558]
+  time_from_start: 1.0
+rleg037:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.329768, 0.00609398, 0.225456, 0.3267, 1.6981, -0.450954, -0.79457,
+    -0.113558]
+  time_from_start: 1.0
+rleg038:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.329768, 0.00609398, 0.225456, 0.325166, 1.69963, -0.450954, -0.793036,
+    -0.113558]
+  time_from_start: 1.0
+rleg039:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.329768, 0.00609398, 0.225456, 0.325166, 1.69963, -0.450954, -0.793036,
+    -0.113558]
+  time_from_start: 1.0
+rleg040:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.329768, 0.00609398, 0.225456, 0.325166, 1.69963, -0.450954, -0.79457,
+    -0.113558]
+  time_from_start: 1.0
+rleg041:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.15029, -0.283832, 0.225456, 0.323632, 1.70423, -0.450954, -0.793036,
+    -0.113558]
+  time_from_start: 1.0
+rleg042:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.332836, 0.139552, 0.225456, 0.323632, 1.70423, -0.44942, -0.79457,
+    -0.113558]
+  time_from_start: 1.0
+rleg043:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.332836, 0.156426, 0.225456, 0.323632, 1.70423, -0.450954, -0.793036,
+    -0.113558]
+  time_from_start: 1.0
+rleg044:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.332836, 0.164096, 0.230058, 0.325166, 1.68889, -0.450954, -0.79457,
+    -0.115092]
+  time_from_start: 1.0
+rleg045:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.91729, 0.171766, 0.30369, 0.230058, 1.69043, -0.990922, -0.524586,
+    -0.127364]
+  time_from_start: 1.0
+rleg046:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.443284, -0.17185, 0.305224, 0.23466, 1.69503, -0.981718, -0.527654,
+    -0.144238]
+  time_from_start: 1.0
+rleg047:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.719404, -0.17952, 0.306758, 0.23466, 1.69503, -0.981718, -0.527654,
+    -0.144238]
+  time_from_start: 1.0
+rleg048:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.306758, 0.0413761, 0.305224, 0.23466, 1.69503, -0.977116, -0.52612,
+    -0.139636]
+  time_from_start: 1.0
+rleg049:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.306758, 0.0413761, 0.306758, 0.236194, 1.69503, -0.977116, -0.52612,
+    -0.139636]
+  time_from_start: 1.0
+rleg050:
+  joint_names: [HeadYaw, HeadPitch, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch,
+    RAnklePitch, RAnkleRoll]
+  positions: [-0.306758, 0.0367742, 0.412604, -0.216336, 1.60299, -0.992456, -0.536858,
+    -0.101286]
+  time_from_start: 1.0
