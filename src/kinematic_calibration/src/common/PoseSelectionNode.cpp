@@ -404,7 +404,7 @@ int main(int argc, char** argv) {
 	nodeName << "PoseSelectionNode";
 	nodeName << ros::Time::now().nsec;
 	ros::init(argc, argv, nodeName.str().c_str());
-	ros::NodeHandle nhPrivate("~");
+	ros::NodeHandle nhPrivate("~"), nh;
 	//CalibrationContext* context = new RosCalibContext();
 
 	// initialize the pose source
@@ -413,7 +413,9 @@ int main(int argc, char** argv) {
 	ROS_INFO("The selected pose source is: %s", poseSource.c_str());
 
 	// output filename
-	string fileName = "poses_generated.yaml";
+	string chainName;
+	nh.getParam("chain_name", chainName);
+	string fileName = "poses_" + chainName + "_generated.yaml";
 	nhPrivate.param("pose_file", fileName, fileName);
 	if ("measurement" == poseSource) {
 		MeasurementMsgPoseSource* poseSource = new MeasurementMsgPoseSource();
