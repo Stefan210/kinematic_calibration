@@ -1,7 +1,7 @@
 chain_name: rarm
 chain_root: HeadPitch_link
 chain_tip: r_wrist
-marker_type: checkerboard       # checkerboard, aruco, circle, color
+marker_type: aruco       # checkerboard, aruco, circle, color
 marker_frame: RMarker_frame
 
 marker_transform_source: urdf   # 'tf' or 'urdf' (optional; if not set, default is 'urdf')

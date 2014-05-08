@@ -18,6 +18,6 @@ camera_intrnsics_filename: nao_bottom_640x480.yaml
 
 ### Optimization parameters:
 # Number of iterations for the optimization algorithm:
-max_iterations: 30
+max_iterations: 150
 # debug flag:
 debug_optimization: true

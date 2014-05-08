@@ -7,5 +7,5 @@ marker_frame: LMarker_frame
 marker_transform_source: urdf   # 'tf' or 'urdf' (optional; if not set, default is 'urdf')
 
 # checkerboard specific parameters
-checkerboard_rows: 4            # optional; if not set, default is 4
-checkerboard_columns: 4         # optional; if not set, default is 4
+checkerboard_rows: 3            # optional; if not set, default is 4
+checkerboard_columns: 3         # optional; if not set, default is 4
