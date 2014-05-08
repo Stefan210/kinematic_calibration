@@ -21,7 +21,7 @@ namespace kinematic_calibration {
 /**
  * Class that represents the vertex for the joint offsets.
  */
-class JointOffsetVertex: public g2o::BaseVertex<12, map<string, double> > {
+class JointOffsetVertex: public g2o::BaseVertex<30, map<string, double> > {
 public:
 	/**
 	 * Default constructor.
