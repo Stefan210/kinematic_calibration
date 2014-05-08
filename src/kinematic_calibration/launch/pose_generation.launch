@@ -26,7 +26,7 @@
       yMax: 330
       
       # should the stability be tested? requires an initial pose!
-      test_pose_stability: true
+      test_pose_stability: false
       
       # should the poses sampled s.t. the end effector is fixed?
       # requires an initial pose - its transformation from torso to tip will be kept.
