@@ -694,7 +694,7 @@ void PoseSampling::publishJointState(sensor_msgs::JointState& msg) const {
 void RandomNumberGenerator::plot(const double min, const double max,
 		const int numOfSamples) {
 	FILE * gnuplotPipe;
-	gnuplotPipe = popen("gnuplot -persistent", "w");
+	gnuplotPipe = popen("gnuplot -p", "w");
 	fprintf(gnuplotPipe, "n=100;\n");
 	fprintf(gnuplotPipe, "max=%f;\n", max);
 	fprintf(gnuplotPipe, "min=%f;\n", min);
@@ -723,6 +723,7 @@ void RandomNumberGenerator::plot(const double min, const double max,
 	}
 
 	fprintf(gnuplotPipe, "e ,\n ");
+	fflush(gnuplotPipe);
 	fclose(gnuplotPipe);
 }
 
