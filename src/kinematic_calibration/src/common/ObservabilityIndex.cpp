@@ -26,7 +26,8 @@ ObservabilityIndex::~ObservabilityIndex() {
 
 VectorXd kinematic_calibration::ObservabilityIndex::getSingularValues(
 		const PoseSet& poseSet) {
-	MatrixXd jacobian = poseSet.getJacobian();
+	MatrixXd jacobian;
+	poseSet.getJacobian(jacobian);
 	JacobiSVD<MatrixXd> svd(jacobian);
 	return svd.singularValues();
 }

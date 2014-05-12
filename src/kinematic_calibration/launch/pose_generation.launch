@@ -2,7 +2,7 @@
   <arg name="chain_name" />
   <param name="/robot_description_semantic" textfile="$(find kinematic_calibration)/config/ra.srdf" type="str"/>
   <rosparam file="$(find kinematic_calibration)/config/params_$(arg chain_name)_general.yaml" command="load"/>
-  <node pkg="kinematic_calibration" type="poseSelectionNode" name="poseSelectionNode" output="screen" >
+  <node pkg="kinematic_calibration" type="poseSelectionNode" name="poseSelectionNode" output="screen">
     <rosparam>
       ### Select the pose source: 
       # - "sampling": Sample poses according to the specified parameters (see below).
@@ -17,7 +17,7 @@
       # name of the torso link / frame
       torso_frame: "torso"
       # radius of the camera 'view cylinder'
-      view_cylinder_radius: 0.03 
+      view_cylinder_radius: 0.01 
    
       # range within which the predicted marker should be:
       xMin: 150

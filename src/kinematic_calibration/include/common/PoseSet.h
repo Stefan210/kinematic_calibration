@@ -41,9 +41,9 @@ public:
 
 	/**
 	 * Calculates the identification jacobian matrix of the active pose set.
-	 * @return The identification jacobian matrix of the active pose set.
+	 * @param[out] jacobian The identification jacobian matrix of the active pose set.
 	 */
-	virtual Eigen::MatrixXd getJacobian() const = 0;
+	virtual void getJacobian(Eigen::MatrixXd& jacobian) const = 0;
 
 	/**
 	 * Initializes the active pose set by selecting randomly n poses.
@@ -123,7 +123,7 @@ public:
 	void addMeasurementPoses(vector<MeasurementPose> measurementPoses);
 
 	// overridden methods
-	virtual Eigen::MatrixXd getJacobian() const;
+	virtual void getJacobian(Eigen::MatrixXd& jacobian) const;
 	virtual void initializePoseSet(const int& n);
 	virtual vector< shared_ptr<PoseSet> > addPose() const;
 	virtual vector< shared_ptr<PoseSet> > removePose() const;

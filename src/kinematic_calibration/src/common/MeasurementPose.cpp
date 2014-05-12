@@ -126,8 +126,8 @@ void MeasurementPose::getPartialDerivatives(
 		derivativesCalculated = true;
 	}
 
-	// append two rows to the jacobian matrix
-	derivatives.conservativeResize(derivatives.rows() + 2, derivativesX.cols());
+	// write two rows to the jacobian matrix
+	derivatives.resize(derivatives.rows() + 2, derivativesX.cols());
 	derivatives.row(derivatives.rows() - 2) << derivativesX;
 	derivatives.row(derivatives.rows() - 1) << derivativesY;
 }

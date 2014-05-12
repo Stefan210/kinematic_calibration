@@ -54,9 +54,8 @@ void MeasurementPoseSet::addMeasurementPoses(vector<MeasurementPose> poses) {
 	}
 }
 
-Eigen::MatrixXd MeasurementPoseSet::getJacobian() const {
+void MeasurementPoseSet::getJacobian(Eigen::MatrixXd& jacobian) const {
 	// calculate all derivative vectors and store all of them in a list
-	Eigen::MatrixXd jacobian;
 	int rows = 0;
 	int cols = 0;
 	std::vector<Eigen::MatrixXd> derivativesList;
@@ -67,7 +66,6 @@ Eigen::MatrixXd MeasurementPoseSet::getJacobian() const {
 		derivativesList.push_back(derivativesVector);
 		rows += derivativesVector.rows();
 		cols = derivativesVector.cols();
-
 	}
 
 	// grow the jacobian matrix size and fill it rowwise with the derivative vectors
@@ -79,7 +77,6 @@ Eigen::MatrixXd MeasurementPoseSet::getJacobian() const {
 			currentRow++;
 		}
 	}
-	return jacobian;
 }
 
 void MeasurementPoseSet::initializePoseSet(const int& n) {
