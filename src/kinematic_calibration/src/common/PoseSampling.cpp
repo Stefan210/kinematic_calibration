@@ -52,7 +52,8 @@ PoseSampling::PoseSampling() :
 		debug(false), nhPrivate("~"), xMin(20), xMax(620), yMin(20), yMax(460), cameraFrame(
 				"CameraBottom_frame"), viewCylinderRadius(0.01), srdfAvailable(
 				false), torsoFrame("torso"), initialPoseAvailable(false), testPoseStability(
-				false), keepEndEffectorPose(false) {
+				false), keepEndEffectorPose(false), jointLimitsDistance(0.1), jointLimitsLinearWidth(
+				0.3) {
 	// initialize stuff
 	this->initialize();
 
@@ -85,6 +86,10 @@ void PoseSampling::initialize() {
 			testPoseStability);
 	nhPrivate.param("keep_end_effector_pose", keepEndEffectorPose,
 			keepEndEffectorPose);
+	nhPrivate.param("joint_limits_distance", jointLimitsDistance,
+			jointLimitsDistance);
+	nhPrivate.param("joint_limits_linear_width", jointLimitsLinearWidth,
+			jointLimitsLinearWidth);
 
 	// print some info about the used parameters
 	ROS_INFO("Allowed camera window size: [%.2f, %.2f] - [%.2f, %.2f]", xMin,
@@ -96,6 +101,8 @@ void PoseSampling::initialize() {
 			testPoseStability ? "BE" : "NOT BE");
 	ROS_INFO("End effector WILL %s fixed.",
 			keepEndEffectorPose ? "BE" : "NOT BE");
+	ROS_INFO("joint_limits_distance is %f", jointLimitsDistance);
+	ROS_INFO("joint_limits_linear_width is %f", jointLimitsLinearWidth);
 
 	if (testPoseStability) {
 		this->testStabilityPtr = boost::make_shared<
@@ -108,7 +115,8 @@ void PoseSampling::initialize() {
 	}
 
 	// initialize the RNG
-	this->rng = boost::make_shared<MarginDiscriminatingUniformRNG>(0.3);
+	this->rng = boost::make_shared<MarginDiscriminatingUniformRNG>(
+			jointLimitsLinearWidth);
 }
 
 void PoseSampling::initializeCamera() {
@@ -172,8 +180,15 @@ void PoseSampling::initializeJointLimits() {
 		string jointName = jointNames[i];
 		double upperLimit = this->robotModel.getJoint(jointName)->limits->upper;
 		double lowerLimit = this->robotModel.getJoint(jointName)->limits->lower;
-		this->lowerLimits[jointName] = lowerLimit;
-		this->upperLimits[jointName] = upperLimit;
+		this->lowerLimits[jointName] = lowerLimit + jointLimitsDistance;
+		this->upperLimits[jointName] = upperLimit - jointLimitsDistance;
+		if (this->lowerLimits[jointName] >= this->upperLimits[jointName]) {
+			ROS_FATAL(
+					"Joint range of %s is empty: Make sure that the limits given "
+							"in the URDF are valid and the specified parameter"
+							"'joint_limits_distance' is not too big!",
+					jointName.c_str());
+		}
 	}
 }
 
@@ -364,7 +379,8 @@ void PoseSampling::getPoses(const int& numOfPoses,
 			string jointName = jointNames[i];
 			double lowerLimit = lowerLimits[jointName];
 			double upperLimit = upperLimits[jointName];
-			double currentJointState = this->rng->getRandom(lowerLimit, upperLimit);
+			double currentJointState = this->rng->getRandom(lowerLimit,
+					upperLimit);
 			jointState.name.push_back(jointName);
 			jointState.position.push_back(currentJointState);
 		}

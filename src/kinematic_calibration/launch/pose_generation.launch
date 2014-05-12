@@ -17,13 +17,20 @@
       # name of the torso link / frame
       torso_frame: "torso"
       # radius of the camera 'view cylinder'
-      view_cylinder_radius: 0.01 
+      view_cylinder_radius: 0.03 
    
       # range within which the predicted marker should be:
       xMin: 150
       xMax: 490
       yMin: 150
       yMax: 330
+      
+      # specifies the minimum distance from the joint limits  
+      joint_limits_distance: 0.3
+      
+      # specifies the width of the joint limits range within which the probability 
+      # distribution is linear increasing / decreasing (the distribution is uniform in the middle)
+      joint_limits_linear_width: 0.3
       
       # should the stability be tested? requires an initial pose!
       test_pose_stability: false

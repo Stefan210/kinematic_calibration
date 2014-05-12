@@ -294,6 +294,17 @@ protected:
 	bool keepEndEffectorPose;
 
 	/**
+	 * The minimum distance from the joint limits.
+	 */
+	double jointLimitsDistance;
+
+	/**
+	 * Width of the joint limits range within which the probability
+     * distribution is linear increasing / decreasing.
+	 */
+	double jointLimitsLinearWidth;
+
+	/**
 	 * State of the end effector (i.e. torso -> tip)
 	 */
 	tf::Transform endEffectorState;
