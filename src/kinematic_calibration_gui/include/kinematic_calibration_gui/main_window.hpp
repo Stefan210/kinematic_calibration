@@ -49,6 +49,7 @@ public Q_SLOTS:
     *******************************************/
     void updateLoggingView(); // no idea why this can't connect automatically
     void updateMeasurementImage(QImage* image);
+    void updateMeasruementInformation(MeasurementInformation information);
 
 private:
 	Ui::MainWindowDesign ui;

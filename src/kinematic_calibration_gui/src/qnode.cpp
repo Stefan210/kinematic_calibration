@@ -21,6 +21,7 @@
 #include <std_srvs/Empty.h>
 #include <sstream>
 #include "../include/kinematic_calibration_gui/qnode.hpp"
+#include <kdl_parser/kdl_parser.hpp>
 
 /*****************************************************************************
 ** Namespaces
@@ -61,11 +62,8 @@ bool QNode::init() {
             this,
             SLOT(measurementItemChanged(QStandardItem*)));
 
-//    connect(selectionModel(),
-//            SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
-//            this,
-//            SLOT(measurementSelectionChanged(QItemSelection)));
-
+    this->robotModel.initParam("/robot_description");
+    kdl_parser::treeFromUrdfModel(this->robotModel, this->robotTree);
 
 	start();
 	return true;
@@ -187,6 +185,28 @@ void QNode::measurementSelectionChanged(const QModelIndex& index) {
     // create a this newly converted RGB pixel data with a QImage
     QImage* qImg = new QImage((uchar *)imageRGB.data, imageRGB.cols, imageRGB.rows, QImage::Format_RGB888);
     Q_EMIT measurementImageUpdated(qImg);
+
+    // update information
+    MeasurementInformation information;
+    information.chainName = QString::fromUtf8(md.chain_name.c_str());
+    information.chainRoot = QString::fromUtf8(md.chain_root.c_str());
+    information.chainTip = QString::fromUtf8(md.chain_tip.c_str());
+
+    KDL::Chain currentChain;
+    this->robotTree.getChain(md.chain_root, md.chain_tip, currentChain);
+    for(int i = 0; i < currentChain.getNrOfSegments(); i++) {
+        if(currentChain.getSegment(i).getJoint().getType() == KDL::Joint::None)
+            continue;
+        std::string jointName = currentChain.getSegment(i).getJoint().getName();
+        double lower = this->robotModel.getJoint(jointName)->limits->lower;
+        double upper = this->robotModel.getJoint(jointName)->limits->upper;
+        double value = md.jointState.position[std::find(md.jointState.name.begin(),md.jointState.name.end(), jointName) - md.jointState.name.begin()];
+        std::stringstream ss;
+        ss << jointName << ": " << value << " (" << lower  << "/" << upper << ")";
+        information.jointStates.push_back(tr(ss.str().c_str()));
+    }
+
+    Q_EMIT measurementInformationUpdated(information);
 }
 
 void QNode::updateIgnoredMeasurements() {

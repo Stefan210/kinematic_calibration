@@ -23,6 +23,8 @@
 #include <QStandardItemModel>
 #include <QSet>
 #include <kinematic_calibration/measurementData.h>
+#include <urdf/model.h>
+#include <kdl/tree.hpp>
 
 /*****************************************************************************
 ** Namespaces
@@ -31,6 +33,17 @@
 namespace kinematic_calibration_gui {
 
 using namespace kinematic_calibration;
+
+struct MeasurementInformation {
+    QString chainName;
+    QString chainRoot;
+    QString chainTip;
+    // joint names
+    // joint lower limits
+    // joint upper limits
+    // joint values
+    std::vector<QString> jointStates;
+};
 
 /*****************************************************************************
 ** Class
@@ -69,6 +82,7 @@ Q_SIGNALS:
     void rosShutdown();
     void measurementReceived();
     void measurementImageUpdated(QImage* image);
+    void measurementInformationUpdated(MeasurementInformation);
 
 public Q_SLOTS:
     void measurementItemChanged(QStandardItem * item);
@@ -95,6 +109,8 @@ private:
     QStandardItemModel measurements_model;
     QSet<QStandardItem*> checkedMeasurements, uncheckedMeasurements;
     std::vector<measurementData> measurements;
+    urdf::Model robotModel;
+    KDL::Tree robotTree;
 };
 
 }  // namespace qtest

@@ -54,6 +54,9 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     connect(&qnode, SIGNAL(measurementImageUpdated(QImage*)),
                            this, SLOT(updateMeasurementImage(QImage*)));
 
+    connect(&qnode, SIGNAL(measurementInformationUpdated(MeasurementInformation)),
+                           this, SLOT(updateMeasruementInformation(MeasurementInformation)));
+
     connect(ui.pushButton_startOptimization,
             SIGNAL(clicked()),
             &qnode,
@@ -107,6 +110,16 @@ void MainWindow::updateMeasurementImage(QImage *image) {
     //scene->render(&p);
     ui.graphicsView->setScene(scene);
     ui.graphicsView->show();
+}
+
+void MainWindow::updateMeasruementInformation(MeasurementInformation information) {
+    ui.label_chain_name_info->setText(information.chainName);
+    ui.label_chain_root_info->setText(information.chainRoot);
+    ui.label_chain_tip_info->setText(information.chainTip);
+    ui.listWidget_joints->clear();
+    for(int i = 0; i < information.jointStates.size(); i++) {
+        new QListWidgetItem(information.jointStates[i], ui.listWidget_joints); std::cout << "oak" << std::endl;
+    }
 }
 
 /*****************************************************************************
