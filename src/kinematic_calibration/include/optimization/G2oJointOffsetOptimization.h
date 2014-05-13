@@ -10,6 +10,7 @@
 
 #include <g2o/core/base_vertex.h>
 #include <g2o/types/slam3d/vertex_se3.h>
+#include <g2o/core/batch_stats.h>
 #include <kinematic_calibration/measurementData.h>
 #include <iostream>
 #include <map>
@@ -56,6 +57,8 @@ public:
 protected:
 	void tfToEigen(const tf::Transform& tfTransformation,
 			Eigen::Isometry3d& eigenIsometry) const;
+
+	void plotStatistics(const BatchStatisticsContainer& statistics) const;
 };
 
 }

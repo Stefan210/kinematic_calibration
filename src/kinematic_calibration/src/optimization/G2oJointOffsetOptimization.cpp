@@ -10,6 +10,7 @@
 #include <tf/tf.h>
 #include <tf_conversions/tf_eigen.h>
 #include <eigen_conversions/eigen_kdl.h>
+#include <cstdio>
 
 #include "kinematic_calibration/measurementData.h"
 #include "../../include/optimization/JointOffsetOptimization.h"
@@ -81,6 +82,9 @@ void G2oJointOffsetOptimization::optimize(
 	CalibrationOptions options = context.getCalibrationOptions();
 	OptimizationOptions optOptions = context.getOptimizationOptions();
 
+	// compute statistics
+	optimizer.setComputeBatchStatistics(true); // TODO: as parameter?
+
 	int id = 0;
 
 	// build the graph:
@@ -117,7 +121,8 @@ void G2oJointOffsetOptimization::optimize(
 		optimizer.addVertex(markerTransformationVertex);
 		KinematicChain currentChain = kinematicChains[i];
 		Eigen::Isometry3d markerEigen;
-		tfToEigen(initialState.markerTransformations[currentChain.getName()], markerEigen);
+		tfToEigen(initialState.markerTransformations[currentChain.getName()],
+				markerEigen);
 		markerTransformationVertex->setEstimate(markerEigen);
 		markerTransformationVertices.insert(
 				make_pair(currentChain.getName(), markerTransformationVertex));
@@ -240,14 +245,37 @@ void G2oJointOffsetOptimization::optimize(
 		jointTransformations[it->first] = tfTransform;
 	}
 	optimizedState.jointTransformations = jointTransformations;
+
+	// plot the error optimization
+	BatchStatisticsContainer statistics = optimizer.batchStatistics();
+	this->plotStatistics(statistics);
 }
 
-void G2oJointOffsetOptimization::tfToEigen(const tf::Transform& tfTransformation,
+void G2oJointOffsetOptimization::tfToEigen(
+		const tf::Transform& tfTransformation,
 		Eigen::Isometry3d& eigenIsometry) const {
 	Eigen::Affine3d eigenAffine;
 	tf::transformTFToEigen(tfTransformation, eigenAffine);
 	eigenIsometry.translation() = eigenAffine.translation();
 	eigenIsometry.linear() = eigenAffine.rotation();
+}
+
+void G2oJointOffsetOptimization::plotStatistics(
+		const BatchStatisticsContainer& statistics) const {
+	FILE * gnuplotPipe;
+	gnuplotPipe = popen("gnuplot -persistent", "w");
+	fprintf(gnuplotPipe,
+			"set terminal svg size 350,262 fname 'Verdana' fsize 10\n");
+	fprintf(gnuplotPipe, "set output 'chi2.svg'\n");
+	fprintf(gnuplotPipe, "set autoscale;\n set xzeroaxis\n set yzeroaxis\n");
+	fprintf(gnuplotPipe,
+			"plot '-' with linespoints pt 1 lc rgb 'red' title 'chi2' smooth csplines \n"); ;
+	for (int i = 0; i < statistics.size(); i++) {
+		fprintf(gnuplotPipe, "%i %f \n", statistics[i].iteration,
+				statistics[i].chi2);
+	}
+	fprintf(gnuplotPipe, "e ,\n ");
+	fclose(gnuplotPipe);
 }
 
 } /* namespace kinematic_calibration */
