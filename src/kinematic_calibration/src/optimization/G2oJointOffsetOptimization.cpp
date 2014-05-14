@@ -134,20 +134,20 @@ void G2oJointOffsetOptimization::optimize(
 	TransformationVertex* cameraToHeadTransformationVertex =
 			new TransformationVertex();
 	cameraToHeadTransformationVertex->setId(++id);
-	cameraToHeadTransformationVertex->setFixed(
-			!options.calibrateCameraTransform);
 	Eigen::Isometry3d initialCameraToHeadIsometry;
 	tfToEigen(this->initialState.cameraToHeadTransformation,
 			initialCameraToHeadIsometry);
 	cameraToHeadTransformationVertex->setEstimate(initialCameraToHeadIsometry);
+	cameraToHeadTransformationVertex->setFixed(
+			!options.calibrateCameraTransform);
 	optimizer.addVertex(cameraToHeadTransformationVertex);
 
 	// instantiate the vertex for the camera intrinsics
 	CameraIntrinsicsVertex* cameraIntrinsicsVertex = new CameraIntrinsicsVertex(
 			frameImageConverter.getCameraModel().cameraInfo());
 	cameraIntrinsicsVertex->setId(++id);
-	cameraIntrinsicsVertex->setFixed(!options.calibrateCameraIntrinsics);
 	cameraIntrinsicsVertex->setToOrigin();
+	cameraIntrinsicsVertex->setFixed(!options.calibrateCameraIntrinsics);
 	optimizer.addVertex(cameraIntrinsicsVertex);
 
 	// instantiate the vertices for the joint 6D transformations
@@ -208,6 +208,7 @@ void G2oJointOffsetOptimization::optimize(
 	optimizer.computeActiveErrors();
 	optimizer.setVerbose(true);
 	optimizer.optimize(optOptions.maxIterations);
+	ROS_INFO("Done!");
 
 	// get results:
 
@@ -247,6 +248,7 @@ void G2oJointOffsetOptimization::optimize(
 	optimizedState.jointTransformations = jointTransformations;
 
 	// plot the error optimization
+	ROS_INFO("Writing chi2 plot...");
 	BatchStatisticsContainer statistics = optimizer.batchStatistics();
 	this->plotStatistics(statistics);
 }
@@ -275,6 +277,7 @@ void G2oJointOffsetOptimization::plotStatistics(
 				statistics[i].chi2);
 	}
 	fprintf(gnuplotPipe, "e ,\n ");
+	fflush(gnuplotPipe);
 	fclose(gnuplotPipe);
 }
 
