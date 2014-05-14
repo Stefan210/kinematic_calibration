@@ -19,6 +19,7 @@
 #include "../../include/optimization/CameraIntrinsicsVertex.h"
 #include "../../include/optimization/JointOffsetVertex.h"
 #include "../../include/optimization/CheckerboardMeasurementEdge.h"
+#include "../../include/optimization/TransformationVertex.h"
 
 #include <g2o/core/sparse_optimizer.h>
 #include <g2o/core/block_solver.h>
@@ -40,6 +41,9 @@
 using namespace std;
 
 namespace kinematic_calibration {
+
+typedef TransformationVertex MarkerTransformationVertex;
+typedef TransformationVertex CameraTransformationVertex;
 
 G2oJointOffsetOptimization::G2oJointOffsetOptimization(
 		CalibrationContext& context, vector<measurementData>& measurements,
@@ -120,10 +124,8 @@ void G2oJointOffsetOptimization::optimize(
 		markerTransformationVertex->setFixed(!options.calibrateMarkerTransform);
 		optimizer.addVertex(markerTransformationVertex);
 		KinematicChain currentChain = kinematicChains[i];
-		Eigen::Isometry3d markerEigen;
-		tfToEigen(initialState.markerTransformations[currentChain.getName()],
-				markerEigen);
-		markerTransformationVertex->setEstimate(markerEigen);
+		markerTransformationVertex->setEstimateFromTfTransform(
+				initialState.markerTransformations[currentChain.getName()]);
 		markerTransformationVertices.insert(
 				make_pair(currentChain.getName(), markerTransformationVertex));
 		kinematicChainsMap.insert(
@@ -131,13 +133,11 @@ void G2oJointOffsetOptimization::optimize(
 	}
 
 	// instantiate the vertex for the camera transformation
-	TransformationVertex* cameraToHeadTransformationVertex =
-			new TransformationVertex();
+	CameraTransformationVertex* cameraToHeadTransformationVertex =
+			new CameraTransformationVertex();
 	cameraToHeadTransformationVertex->setId(++id);
-	Eigen::Isometry3d initialCameraToHeadIsometry;
-	tfToEigen(this->initialState.cameraToHeadTransformation,
-			initialCameraToHeadIsometry);
-	cameraToHeadTransformationVertex->setEstimate(initialCameraToHeadIsometry);
+	cameraToHeadTransformationVertex->setEstimateFromTfTransform(
+			this->initialState.cameraToHeadTransformation);
 	cameraToHeadTransformationVertex->setFixed(
 			!options.calibrateCameraTransform);
 	optimizer.addVertex(cameraToHeadTransformationVertex);
@@ -220,17 +220,13 @@ void G2oJointOffsetOptimization::optimize(
 	for (map<string, MarkerTransformationVertex*>::iterator it =
 			markerTransformationVertices.begin();
 			it != markerTransformationVertices.end(); it++) {
-		Eigen::Isometry3d eigenTransform = it->second->estimate();
-		tf::Transform tfTransform;
-		tf::transformEigenToTF(eigenTransform, tfTransform);
-		optimizedState.markerTransformations[it->first] = tfTransform;
+		optimizedState.markerTransformations[it->first] =
+				it->second->estimateAsTfTransform();
 	}
 
 	// camera transformation
-	Eigen::Isometry3d eigenTransform =
-			cameraToHeadTransformationVertex->estimate();
-	tf::transformEigenToTF(eigenTransform,
-			optimizedState.cameraToHeadTransformation);
+	optimizedState.cameraToHeadTransformation =
+			cameraToHeadTransformationVertex->estimateAsTfTransform();
 
 	// camera intrinsics
 	optimizedState.cameraInfo = cameraIntrinsicsVertex->estimate();
@@ -239,11 +235,8 @@ void G2oJointOffsetOptimization::optimize(
 	map<string, tf::Transform> jointTransformations;
 	for (map<string, g2o::HyperGraph::Vertex*>::iterator it =
 			jointFrameVertices.begin(); it != jointFrameVertices.end(); it++) {
-		Eigen::Isometry3d eigenTransform =
-				static_cast<TransformationVertex*>(it->second)->estimate();
-		tf::Transform tfTransform;
-		tf::transformEigenToTF(eigenTransform, tfTransform);
-		jointTransformations[it->first] = tfTransform;
+		jointTransformations[it->first] =
+				static_cast<TransformationVertex*>(it->second)->estimateAsTfTransform();
 	}
 	optimizedState.jointTransformations = jointTransformations;
 
@@ -251,15 +244,6 @@ void G2oJointOffsetOptimization::optimize(
 	ROS_INFO("Writing chi2 plot...");
 	BatchStatisticsContainer statistics = optimizer.batchStatistics();
 	this->plotStatistics(statistics);
-}
-
-void G2oJointOffsetOptimization::tfToEigen(
-		const tf::Transform& tfTransformation,
-		Eigen::Isometry3d& eigenIsometry) const {
-	Eigen::Affine3d eigenAffine;
-	tf::transformTFToEigen(tfTransformation, eigenAffine);
-	eigenIsometry.translation() = eigenAffine.translation();
-	eigenIsometry.linear() = eigenAffine.rotation();
 }
 
 void G2oJointOffsetOptimization::plotStatistics(
@@ -271,7 +255,8 @@ void G2oJointOffsetOptimization::plotStatistics(
 	fprintf(gnuplotPipe, "set output 'chi2.svg'\n");
 	fprintf(gnuplotPipe, "set autoscale;\n set xzeroaxis\n set yzeroaxis\n");
 	fprintf(gnuplotPipe,
-			"plot '-' with linespoints pt 1 lc rgb 'red' title 'chi2' smooth csplines \n"); ;
+			"plot '-' with linespoints pt 1 lc rgb 'red' title 'chi2' smooth csplines \n");
+	;
 	for (int i = 0; i < statistics.size(); i++) {
 		fprintf(gnuplotPipe, "%i %f \n", statistics[i].iteration,
 				statistics[i].chi2);

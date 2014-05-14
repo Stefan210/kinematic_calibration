@@ -25,9 +25,6 @@ using namespace g2o;
 
 namespace kinematic_calibration {
 
-typedef VertexSE3 MarkerTransformationVertex;
-typedef VertexSE3 TransformationVertex;
-
 /**
  * Class that optimizes the joint offsets using g2o.
  */
@@ -55,9 +52,6 @@ public:
 	void optimize(KinematicCalibrationState& optimizedState);
 
 protected:
-	void tfToEigen(const tf::Transform& tfTransformation,
-			Eigen::Isometry3d& eigenIsometry) const;
-
 	void plotStatistics(const BatchStatisticsContainer& statistics) const;
 };
 
