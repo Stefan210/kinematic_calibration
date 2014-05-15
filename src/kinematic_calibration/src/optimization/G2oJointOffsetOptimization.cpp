@@ -187,7 +187,9 @@ void G2oJointOffsetOptimization::optimize(
 				&frameImageConverter,
 				&kinematicChainsMap.find(current.chain_name)->second);
 		edge->setId(++id);
-		//edge->setRobustKernel(rk);
+		if(optOptions.useRobustKernel) {
+			edge->setRobustKernel(rk);
+		}
 		edge->vertices()[0] = markerTransformationVertices[current.chain_name];
 		edge->vertices()[1] = jointOffsetVertex;
 		edge->vertices()[2] = cameraToHeadTransformationVertex;

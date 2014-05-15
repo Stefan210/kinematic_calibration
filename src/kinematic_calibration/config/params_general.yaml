@@ -18,6 +18,8 @@ camera_intrnsics_filename: nao_bottom_640x480.yaml
 
 ### Optimization parameters:
 # Number of iterations for the optimization algorithm:
-max_iterations: 150
+max_iterations: 50
+# use a robust kernel?
+use_robust_kernel: true
 # debug flag:
 debug_optimization: true

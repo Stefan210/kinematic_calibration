@@ -125,6 +125,7 @@ class OptimizationOptions {
 public:
 	int maxIterations;
 	bool debug;
+	bool useRobustKernel;
 };
 } /* namespace kinematic_calibration */
 
