@@ -31,8 +31,14 @@ namespace kinematic_calibration {
 
 class Plot2D {
 public:
-	Plot2D(string title = "") {
+	enum OutputType {
+		WINDOW, SVG
+	};
+
+	Plot2D(string title = "", OutputType type = WINDOW) :
+			title(title), type(type) {
 		gnuplotPipe = popen("gnuplot ", "w");
+		setTerm();
 		fprintf(gnuplotPipe,
 				"set autoscale;\n set xzeroaxis\n set yzeroaxis\n");
 		fprintf(gnuplotPipe,
@@ -58,8 +64,27 @@ public:
 		fclose(gnuplotPipe);
 	}
 
+	void setTerm() {
+		// TODO: use strategy pattern!
+		switch (type) {
+		case WINDOW:
+			// do nothing (default)
+			break;
+		case SVG:
+			fprintf(gnuplotPipe,
+					"set terminal svg size 350,262 fname 'Verdana' fsize 10\n");
+			fprintf(gnuplotPipe, "set output '%s.svg'\n", title.c_str());
+			break;
+		default:
+			// do nothing
+			break;
+		}
+	}
+
 private:
 	FILE * gnuplotPipe;
+	OutputType type;
+	string title;
 };
 
 /**
