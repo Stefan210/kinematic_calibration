@@ -20,6 +20,7 @@
 #include <map>
 #include <utility>
 #include <string>
+#include <fstream>
 #include <urdf_model/model.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
@@ -225,6 +226,13 @@ void OptimizationNode::printPoints() {
 	FrameImageConverter frameImageConverter(cameraModel);
 
 	Plot3D plotEndp;
+	ofstream csvFile("optimization_points.csv");
+	if (!csvFile.good()) {
+		ROS_WARN("Could not write the CSV file!");
+	}
+
+	// generate the csv header
+	csvFile << "ID\tXMEASURED\tYMEASURED\tXOPTIMIZED\tYOPTIMIZED\tERROR\n";
 
 	// update kinematic chains
 	for (int i = 0; i < this->kinematicChains.size(); i++) {
@@ -285,14 +293,18 @@ void OptimizationNode::printPoints() {
 		double currentX = current.marker_data[0];
 		double currentY = current.marker_data[1];
 
+		double error = (fabs(currentX - x) * fabs(currentX - x)
+				+ fabs(currentY - y) * fabs(currentY - y));
+
 		cout << "\toptimized(x,y): " << x << " " << y;
 		cout << "\tdifference(x,y): " << (currentX - x) << " "
 				<< (currentY - y);
-		cout << "\terror: "
-				<< (fabs(currentX - x) * fabs(currentX - x)
-						+ fabs(currentY - y) * fabs(currentY - y));
+		cout << "\terror: " << error;
 		cout << "\tdist: " << dist;
 		cout << "\n";
+
+		csvFile << current.id << "\t" << currentX << "\t" << currentY << "\t"
+				<< x << "\t" << y << "\t" << error << "\n";
 
 		// add difference to plot
 		plotterDiff.addPoint((currentX - x), (currentY - y));
@@ -301,6 +313,10 @@ void OptimizationNode::printPoints() {
 
 	// show difference plot
 	plotterDiff.showPlot();
+
+	// write the csv file
+	csvFile.flush();
+	csvFile.close();
 }
 
 bool OptimizationNode::putToImage(const string& id, const double& x,
