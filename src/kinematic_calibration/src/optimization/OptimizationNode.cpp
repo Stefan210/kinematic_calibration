@@ -288,7 +288,9 @@ void OptimizationNode::printPoints() {
 		cout << "\toptimized(x,y): " << x << " " << y;
 		cout << "\tdifference(x,y): " << (currentX - x) << " "
 				<< (currentY - y);
-		cout << "\tsum: " << (fabs(currentX - x) + fabs(currentY - y));
+		cout << "\terror: "
+				<< (fabs(currentX - x) * fabs(currentX - x)
+						+ fabs(currentY - y) * fabs(currentY - y));
 		cout << "\tdist: " << dist;
 		cout << "\n";
 
@@ -338,7 +340,8 @@ bool OptimizationNode::putToImage(const measurementData& data, const double& x,
 		const double& y) {
 	// Convert from ROS message to OpenCV image.
 	cv_bridge::CvImageConstPtr cv_ptr;
-	cv_ptr = cv_bridge::toCvCopy(data.image, sensor_msgs::image_encodings::BGR8);
+	cv_ptr = cv_bridge::toCvCopy(data.image,
+			sensor_msgs::image_encodings::BGR8);
 	cv::Mat image = cv_ptr->image;
 
 	// put a cross and a circle to the measured position
@@ -424,12 +427,12 @@ void OptimizationNode::measurementCb(const measurementDataConstPtr& msg) {
 				KinematicCalibrationState::TransformSource source =
 						KinematicCalibrationState::ROSPARAM_URDF;
 				string sourceString;
-				nh.param("marker_transform_source", sourceString,
-						sourceString);
-				if("tf" == sourceString)
+				nh.param("marker_transform_source", sourceString, sourceString);
+				if ("tf" == sourceString)
 					source = KinematicCalibrationState::TF;
 				// delegate the initialization
-				this->initialState.addMarker(chainName, chainTip, markerFrame, source);
+				this->initialState.addMarker(chainName, chainTip, markerFrame,
+						source);
 			}
 		}
 		// save data
@@ -511,7 +514,8 @@ int main(int argc, char** argv) {
 	CalibrationContext* context = new RosCalibContext();
 	OptimizationNode node(context);
 	node.startLoop();
-	while(ros::ok());
+	while (ros::ok())
+		;
 	delete context;
 	return 0;
 }
