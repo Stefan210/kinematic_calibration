@@ -371,6 +371,7 @@ add_executable(optimizationNode
 	#src/optimization/CircleMeasurementEdge.cpp
 	src/optimization/LocOptKinCalState.cpp
 	src/optimization/LocOptJointOffsetOptimization.cpp
+	src/common/MeasurementPose.cpp
 	)
 target_link_libraries(optimizationNode 
 	frameImageConverter

@@ -114,6 +114,7 @@ protected:
 	void printResult();
 
 	void printPoints();
+	void plotPointErrorHistogram();
 
 	void publishResults();
 

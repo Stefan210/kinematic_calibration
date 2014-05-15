@@ -31,6 +31,7 @@
 #include "../../include/optimization/G2oJointOffsetOptimization.h"
 #include "../../include/common/CalibrationContext.h"
 #include "../../include/optimization/LocOptJointOffsetOptimization.h"
+#include "../../include/common/MeasurementPose.h"
 
 namespace kinematic_calibration {
 
@@ -92,6 +93,7 @@ void OptimizationNode::startLoop() {
 	ROS_INFO("Publishing results...");
 	printPoints();
 	printResult();
+	plotPointErrorHistogram();
 	publishResults();
 }
 
@@ -232,7 +234,7 @@ void OptimizationNode::printPoints() {
 	}
 
 	// generate the csv header
-	csvFile << "ID\tXMEASURED\tYMEASURED\tXOPTIMIZED\tYOPTIMIZED\tERROR\n";
+	csvFile << "ID;XMEASURED;YMEASURED;XOPTIMIZED;YOPTIMIZED;ERROR\n";
 
 	// update kinematic chains
 	for (int i = 0; i < this->kinematicChains.size(); i++) {
@@ -303,8 +305,8 @@ void OptimizationNode::printPoints() {
 		cout << "\tdist: " << dist;
 		cout << "\n";
 
-		csvFile << current.id << "\t" << currentX << "\t" << currentY << "\t"
-				<< x << "\t" << y << "\t" << error << "\n";
+		csvFile << current.id << ";" << currentX << ";" << currentY << ";" << x
+				<< ";" << y << ";" << error << "\n";
 
 		// add difference to plot
 		plotterDiff.addPoint((currentX - x), (currentY - y));
@@ -317,6 +319,70 @@ void OptimizationNode::printPoints() {
 	// write the csv file
 	csvFile.flush();
 	csvFile.close();
+}
+
+void OptimizationNode::plotPointErrorHistogram() {
+	// find the maximum error
+	double max = 0;
+	for (int i = 0; i < measurements.size(); i++) {
+		double error, x, y;
+		measurementData md = measurements[i];
+		for (int j = 0; j < this->kinematicChains.size(); j++) {
+			if (kinematicChains[j].getName() == md.chain_name) {
+				MeasurementPose mp(kinematicChains[j], md.jointState);
+				mp.predictImageCoordinates(this->result, x, y);
+				error = (md.marker_data[0] - x) * (md.marker_data[0] - x)
+						+ (md.marker_data[1] - y) * (md.marker_data[1] - y);
+				max = (error > max) ? error : max;
+				break;
+			}
+		}
+	}
+
+	// prepare the gnulpot pipe
+	FILE * gnuplotPipe;
+	gnuplotPipe = popen("gnuplot -p", "w");
+	fprintf(gnuplotPipe, "n=100;\n");
+	fprintf(gnuplotPipe, "max=%f;\n", max);
+	fprintf(gnuplotPipe, "min=%f;\n", 0.0);
+	fprintf(gnuplotPipe, "width=(max-min)/n;\n");
+	fprintf(gnuplotPipe, "hist(x,width)=width*floor(x/width)+width/2.0;\n");
+	fprintf(gnuplotPipe,
+			"set terminal svg size 600,400 fname 'Verdana' fsize 10\n");
+	fprintf(gnuplotPipe, "set output \"optimization_error_histogram.svg\";\n");
+	fprintf(gnuplotPipe, "set xrange [min:max];\n");
+	fprintf(gnuplotPipe, "set yrange [0:];\n");
+	fprintf(gnuplotPipe, "set offset graph 0.05,0.05,0.05,0.0;\n");
+	fprintf(gnuplotPipe, "set xtics min,(max-min)/5,max;\n");
+	fprintf(gnuplotPipe, "set boxwidth width*0.9;\n");
+	fprintf(gnuplotPipe, "set style fill solid 0.5;\n");
+	fprintf(gnuplotPipe, "set tics out nomirror;\n");
+	fprintf(gnuplotPipe, "set xlabel \"Error\";\n");
+	fprintf(gnuplotPipe, "set ylabel \"Frequency\";\n");
+	fprintf(gnuplotPipe,
+			"plot '-'  u (hist($1,width)):(1.0) smooth freq w boxes lc rgb\"green\" notitle\n");
+
+	// add data to the histogram
+	for (int i = 0; i < measurements.size(); i++) {
+		double error, x, y;
+		measurementData md = measurements[i];
+		for (int j = 0; j < this->kinematicChains.size(); j++) {
+			if (kinematicChains[j].getName() == md.chain_name) {
+				MeasurementPose mp(kinematicChains[j], md.jointState);
+				mp.predictImageCoordinates(this->result, x, y);
+				error = (md.marker_data[0] - x) * (md.marker_data[0] - x)
+						+ (md.marker_data[1] - y) * (md.marker_data[1] - y);
+				fprintf(gnuplotPipe, "%f \n", error);
+				break;
+			}
+		}
+
+	}
+
+	// plot it
+	fprintf(gnuplotPipe, "e ,\n ");
+	fflush(gnuplotPipe);
+	fclose(gnuplotPipe);
 }
 
 bool OptimizationNode::putToImage(const string& id, const double& x,
