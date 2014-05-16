@@ -160,12 +160,7 @@ void G2oJointOffsetOptimization::optimize(
 	for (map<string, KDL::Frame>::iterator it = framesToTip.begin();
 			it != framesToTip.end(); it++) {
 		TransformationVertex* vertex = new TransformationVertex();
-		Eigen::Affine3d eigenAffine;
-		tf::transformKDLToEigen(it->second, eigenAffine);
-		Eigen::Isometry3d eigenIsometry;
-		eigenIsometry.translation() = eigenAffine.translation();
-		eigenIsometry.linear() = eigenAffine.rotation();
-		vertex->setEstimate(eigenIsometry);
+		vertex->setEstimateFromTfTransform(it->second);
 		vertex->setId(++id);
 		vertex->setFixed(true); // TODO: parameterize!
 		jointFrameVertices[it->first] = vertex;
