@@ -24,7 +24,8 @@ namespace kinematic_calibration {
 
 namespace enc = sensor_msgs::image_encodings;
 
-CheckerboardDetection::CheckerboardDetection() {
+CheckerboardDetection::CheckerboardDetection() :
+		squareLength(-1.0) {
 	// initialize with default value
 	this->patternSize = cv::Size(3, 3);
 }
@@ -54,7 +55,7 @@ bool CheckerboardDetection::detect(const cv::Mat& image,
 	// Detect corner using OpenCV.
 	cv::Mat gray;
 	cv::cvtColor(image, gray, CV_BGR2GRAY);
-	std::vector<cv::Point2f> corners; //this will be filled by the detected corners
+	corners.clear(); //this will be filled by the detected corners
 
 	//CALIB_CB_FAST_CHECK saves a lot of time on images
 	//that do not contain any chessboard corners
@@ -72,11 +73,12 @@ bool CheckerboardDetection::detect(const cv::Mat& image,
 	}
 
 	/*if (this->patternSize.height == 3 && this->patternSize.width == 3) {
-		// "legacy" case
-		cv::Point2f position = corners[4];
-		out.x = position.x;
-		out.y = position.y;
-	} else*/ if (this->patternSize.height % 2 == 1 && this->patternSize.width % 2 == 1) {
+	 // "legacy" case
+	 cv::Point2f position = corners[4];
+	 out.x = position.x;
+	 out.y = position.y;
+	 } else*/if (this->patternSize.height % 2 == 1
+			&& this->patternSize.width % 2 == 1) {
 		// even outer pattern size: take the middle point
 		int index = ((int) (patternSize.height / 2)) * patternSize.width
 				+ ((int) (patternSize.width / 2));
@@ -101,12 +103,19 @@ bool CheckerboardDetection::detect(const cv::Mat& image,
 bool CheckerboardDetection::detect(const sensor_msgs::ImageConstPtr& in_msg,
 		vector<double>& out) {
 	CheckerboardData cb;
-	out.resize(2);
+	out.resize(4);
 	if (detect(in_msg, cb)) {
 		savePosition(out);
 		saveImage(in_msg);
 		out[idx_x] = cb.x;
 		out[idx_y] = cb.y;
+		out[idx_rows] = this->patternSize.height;
+		out[idx_cols] = this->patternSize.width;
+		for (int i = 0; i < corners.size(); i++) {
+			out.push_back(corners[i].x);
+			out.push_back(corners[i].y);
+		}
+		out.push_back(this->squareLength); // square length
 		return true;
 	}
 	return false;
@@ -124,6 +133,10 @@ bool CheckerboardDetection::setCheckerboardInnerSize(int rows, int columns) {
 
 	this->patternSize = cv::Size(rows, columns);
 	return true;
+}
+
+void CheckerboardDetection::setSquareLength(const double& squareLength) {
+	this->squareLength = squareLength;
 }
 
 RosCheckerboardDetection::RosCheckerboardDetection(double maxDist) :

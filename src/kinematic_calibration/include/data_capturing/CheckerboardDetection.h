@@ -76,7 +76,7 @@ public:
 	bool detect(const sensor_msgs::ImageConstPtr& in_msg, vector<double>& out);
 
 	enum Index {
-		idx_x = 0, idx_y = 1
+		idx_x = 0, idx_y = 1, idx_rows = 2, idx_cols = 3
 	};
 
 	/**
@@ -97,11 +97,27 @@ public:
 	 */
 	bool setCheckerboardInnerSize(int rows, int columns);
 
+	/**
+	 * Sets the side length of one square of the checkerboard pattern.
+	 * @param squareLength The side length of one square of the checkerboard pattern.
+	 */
+	void setSquareLength(const double& squareLength);
+
 protected:
 	/**
 	 * Number of inner corners per a chessboard row and column.
 	 */
 	cv::Size patternSize;
+
+	/**
+	 * Array of detected corners.
+	 */
+	std::vector<cv::Point2f> corners;
+
+	/**
+	 * Denotes the side length of one square of the checkerboard pattern.
+	 */
+	double squareLength;
 };
 
 /**

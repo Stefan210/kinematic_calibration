@@ -18,14 +18,18 @@ CheckerboardContext::~CheckerboardContext() {
 	// nothing to do
 }
 
-inline MarkerDetection* CheckerboardContext::getMarkerDetectionInstance() {
+MarkerDetection* CheckerboardContext::getMarkerDetectionInstance() {
 	// get parameter for the checkerboard size (default: 4x4)
 	int rows = 4, columns = 4;
+	double squarelength = -1.0;
 	nh.param("checkerboard_rows", rows, rows);
 	nh.param("checkerboard_columns", columns, columns);
-	ROS_INFO("Using a %dx%d checkerboard.", rows, columns);
+	nh.param("checkerboard_squarelength", squarelength, squarelength);
+	ROS_INFO("Using a %dx%d checkerboard with square length %f (-1.0 if not set).",
+			rows, columns, squarelength);
 	CheckerboardDetection* instance = new CheckerboardDetection();
 	instance->setCheckerboardSize(rows, columns);
+	instance->setSquareLength(squarelength);
 	return instance;
 	//return new RosCheckerboardDetection(50.0);
 }
