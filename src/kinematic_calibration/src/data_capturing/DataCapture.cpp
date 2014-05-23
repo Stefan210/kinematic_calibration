@@ -501,7 +501,7 @@ void DataCapture::updateMarker() {
 
 void DataCapture::updateMarkerOnce() {
 	receivedImage = false;
-	usleep(0.1 * 1000 * 1000);
+	usleep(0.01 * 1000 * 1000);
 	ROS_INFO("Waiting for image message...");
 	while (ros::getGlobalCallbackQueue()->isEmpty())
 		;
@@ -562,7 +562,7 @@ void DataCapture::updateJointStates() {
 
 void DataCapture::updateJointStatesOnce() {
 	receivedJointStates = false;
-	usleep(0.1 * 1000 * 1000);
+	usleep(0.01 * 1000 * 1000);
 	ROS_INFO("Waiting for joint state message...");
 	while (jointStatesQueue.isEmpty())
 		;
@@ -725,7 +725,7 @@ LegDataCapture::LegDataCapture(CalibrationContext& context) :
 	jointNamesLeft.push_back("LAnkleRoll");
 
 	// right
-	jointNamesRight.push_back("RHipYawPitch");
+	jointNamesRight.push_back("LHipYawPitch");
 	jointNamesRight.push_back("RHipRoll");
 	jointNamesRight.push_back("RHipPitch");
 	jointNamesRight.push_back("RKneePitch");
