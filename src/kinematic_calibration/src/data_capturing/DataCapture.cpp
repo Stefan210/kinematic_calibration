@@ -733,8 +733,10 @@ LegDataCapture::LegDataCapture(CalibrationContext& context) :
 	jointNamesRight.push_back("RAnkleRoll");
 
 	// both
-	jointNames.insert(jointNames.end(), jointNamesLeft.begin(), jointNamesLeft.end());
-	jointNames.insert(jointNames.end(), jointNamesRight.begin(), jointNamesRight.end());
+	jointNames.insert(jointNames.end(), jointNamesLeft.begin(),
+			jointNamesLeft.end());
+	jointNames.insert(jointNames.end(), jointNamesRight.begin(),
+			jointNamesRight.end());
 }
 
 LegDataCapture::~LegDataCapture() {
@@ -744,5 +746,26 @@ const vector<string>& LegDataCapture::getJointNames() {
 	return jointNames;
 }
 
-} /* namespace kinematic_calibration */
+LeftLegDataCapture::LeftLegDataCapture(CalibrationContext& context) :
+		LegDataCapture(context) {
+}
 
+LeftLegDataCapture::~LeftLegDataCapture() {
+}
+
+const vector<string>& LeftLegDataCapture::getJointNames() {
+	return jointNamesLeft;
+}
+
+RightLegDataCapture::RightLegDataCapture(CalibrationContext& context) :
+		LegDataCapture(context) {
+}
+
+RightLegDataCapture::~RightLegDataCapture() {
+}
+
+const vector<string>& RightLegDataCapture::getJointNames() {
+	return jointNamesRight;
+}
+
+} /* namespace kinematic_calibration */

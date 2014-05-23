@@ -155,9 +155,25 @@ public:
 
 protected:
 	virtual const vector<string>& getJointNames();
-
-private:
 	vector<string> jointNamesLeft, jointNamesRight, jointNames;
+};
+
+class LeftLegDataCapture: public LegDataCapture {
+public:
+	LeftLegDataCapture(CalibrationContext& context);
+	virtual ~LeftLegDataCapture();
+
+protected:
+	virtual const vector<string>& getJointNames();
+};
+
+class RightLegDataCapture: public LegDataCapture {
+public:
+	RightLegDataCapture(CalibrationContext& context);
+	virtual ~RightLegDataCapture();
+
+protected:
+	virtual const vector<string>& getJointNames();
 };
 
 } /* namespace kinematic_calibration */
