@@ -22,7 +22,8 @@ using namespace std;
 using namespace cv;
 using namespace aruco;
 
-ArucoMarkerDetection::ArucoMarkerDetection() {
+ArucoMarkerDetection::ArucoMarkerDetection() :
+		markerSize(-1.0) {
 	// nothing to do
 }
 
@@ -48,7 +49,7 @@ bool ArucoMarkerDetection::detect(const cv::Mat& inImage, vector<double>& out) {
 
 	// try to detect
 	detector.detect(outImage, markers);
-	if(markers.size() < 1) {
+	if (markers.size() < 1) {
 		// no marker found
 		return false;
 	}
@@ -59,7 +60,7 @@ bool ArucoMarkerDetection::detect(const cv::Mat& inImage, vector<double>& out) {
 	// calculate the center
 	double x, y;
 	cv::Point2f centerPoint(0.0, 0.0);
-	for(int i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++) {
 		centerPoint += markers[0][i];
 	}
 	centerPoint.x = centerPoint.x / 4;
@@ -71,15 +72,14 @@ bool ArucoMarkerDetection::detect(const cv::Mat& inImage, vector<double>& out) {
 	savePosition(out);
 	this->currentMarker = markers[0];
 
-	//for each marker, draw info and its boundaries in the image
-	/*
-	for (unsigned int i = 0; i < markers.size(); i++) {
-		cout << markers[i] << endl;
-		markers[i].draw(outImage, Scalar(0, 0, 255), 2);
+	// append the corners point coordinates
+	for (int i = 0; i < 4; i++) {
+		out.push_back(currentMarker[i].x);
+		out.push_back(currentMarker[i].y);
 	}
-	cv::imshow("aruco", outImage);
-	cv::waitKey(0); //wait for key to be pressed
-	*/
+
+	// append the marker size
+	out.push_back(markerSize);
 
 	return true;
 }
@@ -90,6 +90,10 @@ void ArucoMarkerDetection::drawMarker(cv::Mat& image) {
 
 	// draw contour
 	this->currentMarker.draw(image, Scalar(0, 0, 255), 2, false);
+}
+
+void ArucoMarkerDetection::setMarkerSize(const double& markerSize) {
+	this->markerSize = markerSize;
 }
 
 } /* namespace kinematic_calibration */

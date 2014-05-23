@@ -18,7 +18,13 @@ ArucoContext::~ArucoContext() {
 }
 
 inline MarkerDetection* ArucoContext::getMarkerDetectionInstance() {
-	return new ArucoMarkerDetection();
+	double markerSize = -1.0;
+	nh.param("aruco_markersize", markerSize, markerSize);
+	ROS_INFO("Using an aruco marker with side length %f (-1.0 if not set).",
+			markerSize);
+	ArucoMarkerDetection* instance = new ArucoMarkerDetection();
+	instance->setMarkerSize(markerSize);
+	return instance;
 }
 
 inline g2o::OptimizableGraph::Edge* ArucoContext::getMeasurementEdge(

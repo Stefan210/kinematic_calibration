@@ -32,8 +32,15 @@ public:
 	bool detect(const cv::Mat& inImage, vector<double>& out);
 	void drawMarker(cv::Mat& image);
 
+	void setMarkerSize(const double& markerSize);
+
 private:
 	aruco::Marker currentMarker;
+
+	/**
+	 * The side length of the aruco marker.
+	 */
+	double markerSize;
 };
 
 } /* namespace kinematic_calibration */
