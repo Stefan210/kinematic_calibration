@@ -9,3 +9,4 @@ marker_transform_source: urdf   # 'tf' or 'urdf' (optional; if not set, default 
 # checkerboard specific parameters
 checkerboard_rows: 3            # optional; if not set, default is 4
 checkerboard_columns: 3         # optional; if not set, default is 4
+checkerboard_squarelength: 10   # optional; side length of one square of the checkerboard in [mm]
