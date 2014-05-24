@@ -93,6 +93,15 @@ void G2oJointOffsetOptimization::optimize(
 
 	// build the graph:
 
+	// determine the joint optimization type
+	JointOptimizationType jointOptType;
+	if (options.calibrateJoint6D)
+		jointOptType = JOINT_6D;
+	else if (options.calibrateJointOffsets)
+		jointOptType = JOINT_OFFSETS;
+	else
+		jointOptType = NONE;
+
 	// instantiate the vertex for the joint offsets
 	vector<string> jointNames;
 	for (int i = 0; i < kinematicChains.size(); i++) {
@@ -110,8 +119,7 @@ void G2oJointOffsetOptimization::optimize(
 	JointOffsetVertex* jointOffsetVertex = new JointOffsetVertex(jointNames);
 	//jointOffsetVertex->setEstimate(initialState.jointOffsets);
 	jointOffsetVertex->setId(++id);
-	jointOffsetVertex->setFixed(!options.calibrateJointOffsets);
-	//jointOffsetVertex->setFixed(true);
+	jointOffsetVertex->setFixed(jointOptType != JOINT_OFFSETS);
 	optimizer.addVertex(jointOffsetVertex);
 
 	// instantiate the vertices for the marker transformations
@@ -167,7 +175,7 @@ void G2oJointOffsetOptimization::optimize(
 		eigenIsometry.linear() = eigenAffine.rotation();
 		vertex->setEstimate(eigenIsometry);
 		vertex->setId(++id);
-		vertex->setFixed(true); // TODO: parameterize!
+		vertex->setFixed(jointOptType != JOINT_6D);
 		jointFrameVertices[it->first] = vertex;
 		optimizer.addVertex(vertex);
 	}
@@ -187,7 +195,7 @@ void G2oJointOffsetOptimization::optimize(
 				&frameImageConverter,
 				&kinematicChainsMap.find(current.chain_name)->second);
 		edge->setId(++id);
-		if(optOptions.useRobustKernel) {
+		if (optOptions.useRobustKernel) {
 			edge->setRobustKernel(rk);
 		}
 		edge->vertices()[0] = markerTransformationVertices[current.chain_name];
@@ -200,6 +208,8 @@ void G2oJointOffsetOptimization::optimize(
 			dynamic_cast<EdgeWithJointFrameVertices*>(edge)->setJointFrameVertex(
 					it->first, it->second);
 		}
+		dynamic_cast<EdgeWithJointFrameVertices*>(edge)->setJointOptimizationType(
+				jointOptType);
 		edge->computeError();
 		optimizer.addEdge(edge);
 	}

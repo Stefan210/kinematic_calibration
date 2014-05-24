@@ -107,6 +107,7 @@ public:
 	bool calibrateCameraTransform;
 	bool calibrateCameraIntrinsics;
 	bool calibrateMarkerTransform;
+	bool calibrateJoint6D;
 };
 
 /**

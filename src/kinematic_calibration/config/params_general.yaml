@@ -6,6 +6,11 @@ calibrate_camera_transform: true
 calibrate_camera_intrinsics: true
 calibrate_marker_transform: true
 
+# Note 1: setting the following to 'true' automatically 
+# sets 'calibrate_joint_offsets' to false as both together make no sense!
+# Note 2: 'writing back' the optimized 6D transformations is unsupported
+calibrate_joint_6D: false      
+
 # Filename suffixes for the calibration files:
 # The final filename will be: robot_name + "_" + suffix
 # where robot_name will be taken from the currently loaded urdf robot model
@@ -18,8 +23,8 @@ camera_intrnsics_filename: nao_bottom_640x480.yaml
 
 ### Optimization parameters:
 # Number of iterations for the optimization algorithm:
-max_iterations: 50
+max_iterations: 10
 # use a robust kernel?
-use_robust_kernel: true
+use_robust_kernel: false
 # debug flag:
 debug_optimization: true

@@ -32,7 +32,8 @@ MeasurementEdge<D, Derived>::MeasurementEdge(measurementData measurement,
 		FrameImageConverter* frameImageConverter,
 		KinematicChain* kinematicChain) :
 		measurement(measurement), frameImageConverter(frameImageConverter), kinematicChain(
-				kinematicChain) {
+				kinematicChain), debug(false), jointOptimizationType(
+				JOINT_OFFSETS) {
 	BaseMultiEdge<D, measurementData>::resize(4);
 	for (int i = 0; i < measurement.jointState.name.size(); i++) {
 		jointPositions.insert(
@@ -66,10 +67,16 @@ void MeasurementEdge<D, Derived>::computeError() {
 	// get transformation from end effector to camera
 	tf::Transform headToEndEffector; // root = head, tip = end effector, e.g. wrist
 	map<string, double> jointOffsets = jointOffsetVertex->estimate();
-	map<string, KDL::Frame> jointFrames = getJointFrames();
-	//KinematicChain kc = kinematicChain->withFrames(jointFrames); cout << "getRootToTip" << endl;
-	//jointOffsets[this->kinematicChain->getTip()] = 0; // set offset of the last joint to 0
-	kinematicChain->getRootToTip(jointPositions, jointOffsets, headToEndEffector);
+	if (JOINT_6D == jointOptimizationType) {
+		map<string, KDL::Frame> jointFrames = getJointFrames();
+		KinematicChain kc = kinematicChain->withFrames(jointFrames);
+		kc.getRootToTip(jointPositions, jointOffsets, headToEndEffector);
+	} else if (JOINT_OFFSETS == jointOptimizationType) {
+		kinematicChain->getRootToTip(jointPositions, jointOffsets,
+				headToEndEffector);
+	} else if (NONE == jointOptimizationType) {
+		kinematicChain->getRootToTip(jointPositions, headToEndEffector);
+	}
 
 	// get transformation from marker to end effector
 	Eigen::Isometry3d eigenTransform = markerTransformationVertex->estimate();
@@ -110,8 +117,8 @@ map<string, KDL::Frame> MeasurementEdge<D, Derived>::getJointFrames() {
 	for (map<string, int>::iterator it =
 			this->jointFrameVerticesIndexes.begin();
 			it != this->jointFrameVerticesIndexes.end(); it++) {
-		Eigen::Isometry3d iso = static_cast<VertexSE3*>(BaseMultiEdge<
-				D, measurementData>::vertices()[it->second])->estimate();
+		Eigen::Isometry3d iso = static_cast<VertexSE3*>(BaseMultiEdge<D,
+				measurementData>::vertices()[it->second])->estimate();
 		KDL::Frame frame;
 		tf::transformEigenToKDL(iso, frame);
 		jointFrames[it->first] = frame;
@@ -149,6 +156,12 @@ bool MeasurementEdge<D, Derived>::isDebug() const {
 template<int D, class Derived>
 void MeasurementEdge<D, Derived>::setDebug(bool debug) {
 	this->debug = debug;
+}
+
+template<int D, class Derived>
+void MeasurementEdge<D, Derived>::setJointOptimizationType(
+		JointOptimizationType jointOptimizationType) {
+	this->jointOptimizationType = jointOptimizationType;
 }
 
 } /* namespace kinematic_calibration */

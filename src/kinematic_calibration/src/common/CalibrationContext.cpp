@@ -67,6 +67,7 @@ CalibrationOptions RosCalibContext::getCalibrationOptions() const {
 	nh.getParam("calibrate_camera_intrinsics",
 			options.calibrateCameraIntrinsics);
 	nh.getParam("calibrate_marker_transform", options.calibrateMarkerTransform);
+	nh.param("calibrate_joint_6D", options.calibrateJoint6D, false);
 	return options;
 }
 

@@ -20,13 +20,28 @@ namespace kinematic_calibration {
 using namespace g2o;
 using namespace std;
 
+enum JointOptimizationType {
+	NONE, JOINT_OFFSETS, JOINT_6D
+};
+
 /**
  * Interface for edges having vertices of type JointFrameVertex
  */
 class EdgeWithJointFrameVertices {
 public:
+	EdgeWithJointFrameVertices() {
+	}
+	;
+	~EdgeWithJointFrameVertices() {
+	}
+	;
+
 	virtual void setJointFrameVertex(const string& jointName,
 			g2o::HyperGraph::Vertex* v) = 0;
+
+	virtual void setJointOptimizationType(
+			JointOptimizationType jointOptimizationType) = 0;
+
 };
 
 /**
@@ -47,7 +62,9 @@ public:
 	/**
 	 * Destructor.
 	 */
-	virtual ~MeasurementEdge() {};
+	virtual ~MeasurementEdge() {
+	}
+	;
 
 	/**
 	 * Computes the error of the edge and stores it in an internal structure.
@@ -87,6 +104,12 @@ public:
 	 * @param kinematicChain the kinematic chain
 	 */
 	void setKinematicChain(KinematicChain* kinematicChain);
+
+	/**
+	 * Sets the joint optimization type.
+	 * @param jointOptimizationType The new joint optimization type.
+	 */
+	void setJointOptimizationType(JointOptimizationType jointOptimizationType);
 
 	/**
 	 * Gets the debug flag.
@@ -137,6 +160,11 @@ protected:
 	 * Flag that indicates if the debug mode is on.
 	 */
 	bool debug;
+
+	/**
+	 * Variable that indicates how the joints should be treated.
+	 */
+	JointOptimizationType jointOptimizationType;
 };
 
 } /* namespace kinematic_calibration */
