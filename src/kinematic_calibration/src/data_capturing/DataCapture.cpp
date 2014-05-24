@@ -191,7 +191,7 @@ void DataCapture::playChainPoses() {
 
 	ROS_INFO("Parameter %s ist set to %s:", "move_marker_to_corners",
 			dataCaptureOptions.moveMarkerToCorners ? "true" : "false");
-	if (dataCaptureOptions.moveMarkerToCorners)
+	if (!dataCaptureOptions.moveMarkerToCorners)
 		ROS_INFO(
 				"The measurements will be taken according to the given joint states.");
 	else
