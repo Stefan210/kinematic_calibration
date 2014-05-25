@@ -63,6 +63,7 @@ void ValidationNode::startLoop() {
 	optimize();
 	ROS_INFO("Starting validation...");
 	validate();
+	ROS_INFO("Done! Press ctrl+c for termination.")
 }
 
 void ValidationNode::collectData() {
