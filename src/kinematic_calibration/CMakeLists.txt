@@ -389,7 +389,7 @@ catkin_add_gtest(transformationVertexTest test/TransformationVertexTest.cpp src/
 target_link_libraries(transformationVertexTest ${catkin_LIBRARIES} ${G2O_LIBS})
 	
 ### ValidationNode
-add_library(validationNode 
+add_executable(validationNode 
 	src/optimization/KinematicCalibrationState.cpp
 	src/optimization/ValidationNode.cpp 
 	src/optimization/JointOffsetOptimization.cpp

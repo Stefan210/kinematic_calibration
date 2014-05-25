@@ -332,3 +332,17 @@ void ValidationNode::printError(vector<measurementData>& measurements,
 }
 
 } /* namespace kinematic_calibration */
+
+using namespace kinematic_calibration;
+
+int main(int argc, char** argv) {
+	ros::init(argc, argv, "ValidationNode");
+	CalibrationContext* context = new RosCalibContext();
+	ValidationNode node(context);
+	node.startLoop();
+	while (ros::ok())
+		;
+	delete context;
+	return 0;
+}
+
