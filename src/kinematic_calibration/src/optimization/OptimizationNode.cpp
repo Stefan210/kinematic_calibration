@@ -518,6 +518,7 @@ void OptimizationNode::measurementCb(const measurementDataConstPtr& msg) {
 			}
 		}
 		// save data
+		//data.image = sensor_msgs::Image();
 		measurements.push_back(measurementData(data));
 		ROS_INFO("Measurement data received (#%ld).", measurements.size());
 	}

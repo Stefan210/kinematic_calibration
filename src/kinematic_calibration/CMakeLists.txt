@@ -388,6 +388,30 @@ target_link_libraries(cameraIntrinsicsVertexTest ${catkin_LIBRARIES} ${G2O_LIBS}
 catkin_add_gtest(transformationVertexTest test/TransformationVertexTest.cpp src/optimization/TransformationVertex.cpp)
 target_link_libraries(transformationVertexTest ${catkin_LIBRARIES} ${G2O_LIBS})
 	
+### ValidationNode
+add_library(validationNode 
+	src/optimization/KinematicCalibrationState.cpp
+	src/optimization/ValidationNode.cpp 
+	src/optimization/JointOffsetOptimization.cpp
+	src/optimization/G2oJointOffsetOptimization.cpp
+	src/optimization/CameraIntrinsicsVertex.cpp
+	src/optimization/JointOffsetVertex.cpp
+	src/optimization/TransformationVertex.cpp
+	#src/optimization/MeasurementEdge.cpp
+	#src/optimization/CheckerboardMeasurementEdge.cpp
+	#src/optimization/CircleMeasurementEdge.cpp
+	src/optimization/LocOptKinCalState.cpp
+	src/optimization/LocOptJointOffsetOptimization.cpp
+	src/common/MeasurementPose.cpp
+	)
+target_link_libraries(validationNode 
+	frameImageConverter
+	modelLoader
+	kinematicChain
+	context
+	${catkin_LIBRARIES} 
+	${G2O_LIBS}
+	)
 	
 ### Result publishing
 add_executable(updateNode 
