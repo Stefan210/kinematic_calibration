@@ -132,20 +132,19 @@ void ValidationNode::measurementCb(const measurementDataConstPtr& msg) {
 			this->initialState.addMarker(chainName, chainTip, markerFrame,
 					source);
 		}
+	}
 
-		// save data
-		if (std::find(optimizationDataIds.begin(), optimizationDataIds.end(),
-				data.id) != optimizationDataIds.end()) {
-			optimizationData.push_back(measurementData(data));
-			ROS_INFO("Optimization measurement data received (#%ld).",
-					optimizationData.size());
-		} else {
-			data.image = sensor_msgs::Image();
-			validataionData.push_back(measurementData(data));
-			ROS_INFO("Validation measurement data received (#%ld).",
-					validataionData.size());
-		}
-
+	// save data
+	if (std::find(optimizationDataIds.begin(), optimizationDataIds.end(),
+			data.id) != optimizationDataIds.end()) {
+		optimizationData.push_back(measurementData(data));
+		ROS_INFO("Optimization measurement data received (#%ld).",
+				optimizationData.size());
+	} else {
+		data.image = sensor_msgs::Image();
+		validataionData.push_back(measurementData(data));
+		ROS_INFO("Validation measurement data received (#%ld).",
+				validataionData.size());
 	}
 }
 
