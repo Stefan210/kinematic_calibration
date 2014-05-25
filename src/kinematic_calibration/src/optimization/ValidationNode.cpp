@@ -48,6 +48,8 @@ ValidationNode::ValidationNode(CalibrationContext* context) :
 	modelLoader.initializeFromRos();
 	modelLoader.getKdlTree(kdlTree);
 
+	nh.getParam("optimization_ids", optimizationDataIds);
+
 }
 
 ValidationNode::~ValidationNode() {

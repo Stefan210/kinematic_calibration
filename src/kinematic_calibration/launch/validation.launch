@@ -1,0 +1,7 @@
+<launch>
+  <rosparam file="$(find kinematic_calibration)/config/params_general.yaml" command="load"/>
+  <node pkg="kinematic_calibration" type="validationNode" name="validationNode" output="screen" />
+  <rosparam>
+  optimization_ids: []
+  </rosparam>
+</launch>
