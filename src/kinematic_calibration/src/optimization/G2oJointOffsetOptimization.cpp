@@ -45,13 +45,39 @@ namespace kinematic_calibration {
 typedef TransformationVertex MarkerTransformationVertex;
 typedef TransformationVertex CameraTransformationVertex;
 
+class SaveStateHyperGraphAction: public g2o::HyperGraphAction {
+public:
+	/// Constructor.
+	SaveStateHyperGraphAction(vector<KinematicCalibrationState>& states,
+			JointOffsetVertex* jointOffsetVertex,
+			map<string, TransformationVertex*> markerTransformationVertices,
+			TransformationVertex* cameraToHeadTransformationVertex,
+			CameraIntrinsicsVertex* cameraIntrinsicsVertex,
+			map<string, g2o::HyperGraph::Vertex*> jointFrameVertices);
+
+	/// Desctructor.
+	~SaveStateHyperGraphAction();
+
+	/// Reimplementation of the action.
+	virtual HyperGraphAction* operator()(const HyperGraph* graph,
+			Parameters* parameters = 0);
+
+	vector<KinematicCalibrationState>& states;
+	JointOffsetVertex* jointOffsetVertex;
+	map<string, TransformationVertex*> markerTransformationVertices;
+	TransformationVertex* cameraToHeadTransformationVertex;
+	CameraIntrinsicsVertex* cameraIntrinsicsVertex;
+	map<string, g2o::HyperGraph::Vertex*> jointFrameVertices;
+};
+
 G2oJointOffsetOptimization::G2oJointOffsetOptimization(
 		CalibrationContext& context, vector<measurementData>& measurements,
 		vector<KinematicChain> kinematicChains,
 		FrameImageConverter& frameImageConverter,
 		KinematicCalibrationState initialState) :
 		JointOffsetOptimization(context, measurements, kinematicChains,
-				frameImageConverter, initialState) {
+				frameImageConverter, initialState), saveIntermediateStates(
+				false) {
 }
 
 G2oJointOffsetOptimization::~G2oJointOffsetOptimization() {
@@ -214,6 +240,16 @@ void G2oJointOffsetOptimization::optimize(
 		optimizer.addEdge(edge);
 	}
 
+	// add action to save the intermediate states
+	if (saveIntermediateStates) {
+		intermediateStates.push_back(this->initialState);
+		optimizer.addPostIterationAction(
+				new SaveStateHyperGraphAction(intermediateStates,
+						jointOffsetVertex, markerTransformationVertices,
+						cameraToHeadTransformationVertex,
+						cameraIntrinsicsVertex, jointFrameVertices));
+	}
+
 	// optimize:
 	ROS_INFO("Starting optimization...");
 	optimizer.initializeOptimization();
@@ -254,8 +290,23 @@ void G2oJointOffsetOptimization::optimize(
 
 	// plot the error optimization
 	ROS_INFO("Writing chi2 plot...");
-	BatchStatisticsContainer statistics = optimizer.batchStatistics();
+	this->statistics = optimizer.batchStatistics();
 	this->plotStatistics(statistics);
+}
+
+BatchStatisticsContainer G2oJointOffsetOptimization::getStatistics() const {
+	return this->statistics;
+}
+
+void G2oJointOffsetOptimization::setSaveIntermediateStates(
+		bool saveIntermediateStates) {
+	this->saveIntermediateStates = saveIntermediateStates;
+}
+
+void G2oJointOffsetOptimization::getIntermediateStates(
+		vector<KinematicCalibrationState>& intermediateStates) const
+{
+	intermediateStates = this->intermediateStates;
 }
 
 void G2oJointOffsetOptimization::plotStatistics(
@@ -276,6 +327,59 @@ void G2oJointOffsetOptimization::plotStatistics(
 	fprintf(gnuplotPipe, "e ,\n ");
 	fflush(gnuplotPipe);
 	fclose(gnuplotPipe);
+}
+
+SaveStateHyperGraphAction::SaveStateHyperGraphAction(
+		vector<KinematicCalibrationState>& states,
+		JointOffsetVertex* jointOffsetVertex,
+		map<string, TransformationVertex*> markerTransformationVertices,
+		TransformationVertex* cameraToHeadTransformationVertex,
+		CameraIntrinsicsVertex* cameraIntrinsicsVertex,
+		map<string, g2o::HyperGraph::Vertex*> jointFrameVertices) :
+		states(states), jointOffsetVertex(jointOffsetVertex), markerTransformationVertices(
+				markerTransformationVertices), cameraToHeadTransformationVertex(
+				cameraToHeadTransformationVertex), cameraIntrinsicsVertex(
+				cameraIntrinsicsVertex), jointFrameVertices(jointFrameVertices) {
+}
+
+SaveStateHyperGraphAction::~SaveStateHyperGraphAction() {
+}
+
+HyperGraphAction* SaveStateHyperGraphAction::operator ()(
+		const HyperGraph* graph, Parameters* parameters) {
+	KinematicCalibrationState state;
+
+	// joint offsets
+	state.jointOffsets =
+			static_cast<map<string, double> >(jointOffsetVertex->estimate());
+
+	// marker transformations
+	for (map<string, MarkerTransformationVertex*>::iterator it =
+			markerTransformationVertices.begin();
+			it != markerTransformationVertices.end(); it++) {
+		state.markerTransformations[it->first] =
+				it->second->estimateAsTfTransform();
+	}
+
+	// camera transformation
+	state.cameraToHeadTransformation =
+			cameraToHeadTransformationVertex->estimateAsTfTransform();
+
+	// camera intrinsics
+	state.cameraInfo = cameraIntrinsicsVertex->estimate();
+
+	// joint transformations
+	map<string, tf::Transform> jointTransformations;
+	for (map<string, g2o::HyperGraph::Vertex*>::iterator it =
+			jointFrameVertices.begin(); it != jointFrameVertices.end(); it++) {
+		jointTransformations[it->first] =
+				static_cast<TransformationVertex*>(it->second)->estimateAsTfTransform();
+	}
+	state.jointTransformations = jointTransformations;
+
+	states.push_back(state);
+
+	return this;
 }
 
 } /* namespace kinematic_calibration */

@@ -51,8 +51,28 @@ public:
 	 */
 	void optimize(KinematicCalibrationState& optimizedState);
 
+	/**
+	 * Returns the batch statistics of the optimization.
+	 * return The statistics of the optimization.
+	 */
+	BatchStatisticsContainer getStatistics() const;
+
+	/**
+	 * Sets whether the intermediate calibration states should be saved.
+	 * @param saveIntermediateStates Determines whether the intermediate calibration states should be saved.
+	 */
+	void setSaveIntermediateStates(bool saveIntermediateStates);
+
+	void getIntermediateStates(vector<KinematicCalibrationState>& intermediateStates) const;
+
 protected:
 	void plotStatistics(const BatchStatisticsContainer& statistics) const;
+
+	BatchStatisticsContainer statistics;
+
+	bool saveIntermediateStates;
+
+	vector<KinematicCalibrationState> intermediateStates;
 };
 
 }
