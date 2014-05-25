@@ -63,7 +63,7 @@ void ValidationNode::startLoop() {
 	optimize();
 	ROS_INFO("Starting validation...");
 	validate();
-	ROS_INFO("Done! Press ctrl+c for termination.")
+	ROS_INFO("Done! Press ctrl+c for termination.");
 }
 
 void ValidationNode::collectData() {
@@ -181,7 +181,7 @@ void ValidationNode::printErrorPerIteration() {
 		ROS_WARN("Could not write the CSV file!");
 		return;
 	}
-	csvFile << "ITERATION;OPTIMIZATION_ERROR;VALIDATION_ERROR\n";
+	csvFile << "ITERATION\tOPTIMIZATIONERROR\tVALIDATION\tERROR\n";
 
 	// init poses
 	vector<MeasurementPose> optimizationPoses, validationPoses;
@@ -233,7 +233,7 @@ void ValidationNode::printErrorPerIteration() {
 		}
 
 		// write new line
-		csvFile << iteration << ";" << optimizationError << ";"
+		csvFile << iteration << "\t" << optimizationError << "\t"
 				<< validationError << "\n";
 	}
 
@@ -263,7 +263,7 @@ void ValidationNode::printError(vector<measurementData>& measurements,
 
 	// generate the csv header
 	csvFile
-			<< "ID;XMEASURED;YMEASURED;XOPTIMIZED;YOPTIMIZED;XDIFF;YDIFF;ERROR\n";
+			<< "ID\tXMEASURED\tYMEASURED\tXOPTIMIZED\tYOPTIMIZED\tXDIFF\tYDIFF\tERROR\n";
 
 	// update kinematic chains
 	for (int i = 0; i < this->kinematicChains.size(); i++) {
@@ -321,9 +321,9 @@ void ValidationNode::printError(vector<measurementData>& measurements,
 		double error = (fabs(currentX - x) * fabs(currentX - x)
 				+ fabs(currentY - y) * fabs(currentY - y));
 
-		csvFile << current.id << ";" << currentX << ";" << currentY << ";" << x
-				<< ";" << y << ";" << (currentX - x) << ";" << (currentY - y)
-				<< ";" << error << "\n";
+		csvFile << current.id << "\t" << currentX << "\t" << currentY << "\t" << x
+				<< "\t" << y << "\t" << (currentX - x) << "\t" << (currentY - y)
+				<< "\t" << error << "\n";
 	}
 
 	// write the csv file
