@@ -24,6 +24,8 @@
 #include <iterator>
 #include <map>
 #include <utility>
+#include <gsl/gsl_statistics_double.h>
+#include <gsl/gsl_sort_double.h>
 
 #include "../../include/common/CalibrationContext.h"
 #include "../../include/common/FrameImageConverter.h"
@@ -181,7 +183,11 @@ void ValidationNode::printErrorPerIteration() {
 		ROS_WARN("Could not write the CSV file!");
 		return;
 	}
-	csvFile << "ITERATION\tOPTIMIZATIONERROR\tVALIDATION\tERROR\n";
+	csvFile << "ITERATION\tOPTIMIZATIONERROR\tVALIDATIONERROR\t";
+	csvFile << "OPTMEAN\tOPTVAR\tOPTMIN\tOPTMAX\tOPTLOQTIL\tOPTHIQTIL\t";
+	csvFile << "VALMEAN\tVALVAR\tVALMIN\tVALMAX\tVALLOQTIL\tVALHIQTIL";
+
+	csvFile << "\n";
 
 	// init poses
 	vector<MeasurementPose> optimizationPoses, validationPoses;
@@ -206,35 +212,79 @@ void ValidationNode::printErrorPerIteration() {
 	}
 
 	// iterate through all intermediate states
-	for (int iteration = 0; iteration != this->intermediateStates.size();
+	for (int iteration = 0; iteration < this->intermediateStates.size();
 			iteration++) {
 		double optimizationError = 0.0, validationError = 0.0;
+		vector<double> optErrorVec, valErrorVec;
 
 		// calculate the optimized error
-		for (int poseNum = 0; poseNum < this->optimizationData.size(); poseNum++) {
+		for (int poseNum = 0; poseNum < this->optimizationData.size();
+				poseNum++) {
 			double x, y;
-			optimizationPoses[poseNum].predictImageCoordinates(intermediateStates[iteration], x, y);
+			optimizationPoses[poseNum].predictImageCoordinates(
+					intermediateStates[iteration], x, y);
 			double currentX = optimizationData[poseNum].marker_data[0];
 			double currentY = optimizationData[poseNum].marker_data[1];
 			double error = (fabs(currentX - x) * fabs(currentX - x)
 					+ fabs(currentY - y) * fabs(currentY - y));
 			optimizationError += error;
+			optErrorVec.push_back(error);
 		}
 
 		// calculate the validation error
-		for (int poseNum = 0; poseNum < this->validataionData.size(); poseNum++) {
+		for (int poseNum = 0; poseNum < this->validataionData.size();
+				poseNum++) {
 			double x, y;
-			validationPoses[poseNum].predictImageCoordinates(intermediateStates[iteration], x, y);
+			validationPoses[poseNum].predictImageCoordinates(
+					intermediateStates[iteration], x, y);
 			double currentX = validataionData[poseNum].marker_data[0];
 			double currentY = validataionData[poseNum].marker_data[1];
 			double error = (fabs(currentX - x) * fabs(currentX - x)
 					+ fabs(currentY - y) * fabs(currentY - y));
 			validationError += error;
+			valErrorVec.push_back(error);
 		}
 
-		// write new line
+		gsl_sort(optErrorVec.data(), 1, optErrorVec.size());
+		gsl_sort(valErrorVec.data(), 1, valErrorVec.size());
+
+		// write errors
 		csvFile << iteration << "\t" << optimizationError << "\t"
-				<< validationError << "\n";
+				<< validationError << "\t";
+
+		// write some statistics
+		csvFile << gsl_stats_mean(optErrorVec.data(), 1, optErrorVec.size())
+				<< "\t";
+		csvFile << gsl_stats_variance(optErrorVec.data(), 1, optErrorVec.size())
+				<< "\t";
+		csvFile << gsl_stats_min(optErrorVec.data(), 1, optErrorVec.size())
+				<< "\t";
+		csvFile << gsl_stats_max(optErrorVec.data(), 1, optErrorVec.size())
+				<< "\t";
+		csvFile
+				<< gsl_stats_quantile_from_sorted_data(optErrorVec.data(), 1,
+						optErrorVec.size(), 0.25) << "\t";
+		csvFile
+				<< gsl_stats_quantile_from_sorted_data(optErrorVec.data(), 1,
+						optErrorVec.size(), 0.75) << "\t";
+
+		csvFile << gsl_stats_mean(valErrorVec.data(), 1, valErrorVec.size())
+				<< "\t";
+		csvFile << gsl_stats_variance(valErrorVec.data(), 1, valErrorVec.size())
+				<< "\t";
+		csvFile << gsl_stats_min(valErrorVec.data(), 1, valErrorVec.size())
+				<< "\t";
+		csvFile << gsl_stats_max(valErrorVec.data(), 1, valErrorVec.size())
+				<< "\t";
+		csvFile
+				<< gsl_stats_quantile_from_sorted_data(valErrorVec.data(), 1,
+						valErrorVec.size(), 0.25) << "\t";
+		csvFile
+				<< gsl_stats_quantile_from_sorted_data(valErrorVec.data(), 1,
+						valErrorVec.size(), 0.75);
+
+		// finish the line
+		csvFile << "\n";
 	}
 
 	// close file
@@ -321,9 +371,9 @@ void ValidationNode::printError(vector<measurementData>& measurements,
 		double error = (fabs(currentX - x) * fabs(currentX - x)
 				+ fabs(currentY - y) * fabs(currentY - y));
 
-		csvFile << current.id << "\t" << currentX << "\t" << currentY << "\t" << x
-				<< "\t" << y << "\t" << (currentX - x) << "\t" << (currentY - y)
-				<< "\t" << error << "\n";
+		csvFile << current.id << "\t" << currentX << "\t" << currentY << "\t"
+				<< x << "\t" << y << "\t" << (currentX - x) << "\t"
+				<< (currentY - y) << "\t" << error << "\n";
 	}
 
 	// write the csv file

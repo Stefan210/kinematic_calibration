@@ -38,6 +38,9 @@ set(XMLLIB ${LibXML2_LIBRARIES})
 
 find_package(aruco REQUIRED )
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(gsl OPTIONAL gsl)
+
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
@@ -388,6 +391,7 @@ target_link_libraries(cameraIntrinsicsVertexTest ${catkin_LIBRARIES} ${G2O_LIBS}
 catkin_add_gtest(transformationVertexTest test/TransformationVertexTest.cpp src/optimization/TransformationVertex.cpp)
 target_link_libraries(transformationVertexTest ${catkin_LIBRARIES} ${G2O_LIBS})
 	
+if(gsl_FOUND)
 ### ValidationNode
 add_executable(validationNode 
 	src/optimization/KinematicCalibrationState.cpp
@@ -411,8 +415,10 @@ target_link_libraries(validationNode
 	context
 	${catkin_LIBRARIES} 
 	${G2O_LIBS}
+	${gsl_LIBRARIES}
 	)
-	
+endif()
+
 ### Result publishing
 add_executable(updateNode 
 	src/result_publishing/UpdateNode.cpp 
