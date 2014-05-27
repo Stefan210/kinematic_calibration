@@ -32,7 +32,7 @@ public:
 	EdgeWithJointFrameVertices() {
 	}
 	;
-	~EdgeWithJointFrameVertices() {
+	virtual ~EdgeWithJointFrameVertices() {
 	}
 	;
 
