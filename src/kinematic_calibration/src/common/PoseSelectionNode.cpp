@@ -129,9 +129,16 @@ shared_ptr<PoseSet> PoseSelectionNode::getOptimalPoseSet() {
 
 	shared_ptr<PoseSet> resultSet = poseSet;
 
+	// TODO: remove!
+	// resultSet->initializePoseSet(posePool.size());
+	// return resultSet;
+
 	// initialize with random poses
-	ROS_INFO("Initializing pose set with random poses...");
-	RandomPoseSelectionStrategy intializingStrategy(1);
+	//ROS_INFO("Initializing pose set with random poses...");
+	//RandomPoseSelectionStrategy intializingStrategy(1);
+
+	ROS_INFO("Initializing pose set with one pose...");
+	IncrementalPoseSelectionStrategy intializingStrategy(1);
 	resultSet = intializingStrategy.getOptimalPoseSet(resultSet,
 			observabilityIndex);
 
@@ -145,6 +152,7 @@ shared_ptr<PoseSet> PoseSelectionNode::getOptimalPoseSet() {
 		ROS_INFO("Increment pose set size...");
 		resultSet = incrementStrategy.getOptimalPoseSet(resultSet,
 				observabilityIndex);
+		this->optimalPoses[i] = resultSet;
 	}
 	ROS_INFO("Improve by exchange...");
 	resultSet = exStrategy.getOptimalPoseSet(resultSet, observabilityIndex);
@@ -160,6 +168,10 @@ shared_ptr<PoseSet> PoseSelectionNode::getOptimalPoseSet() {
 //	resultSet = eaeStrategy.getOptimalPoseSet(resultSet, observabilityIndex);
 
 	return resultSet;
+}
+
+map<int, shared_ptr<PoseSet> > PoseSelectionNode::getIntermediatePoseSets() {
+	return this->optimalPoses;
 }
 
 IncrementalPoseSelectionStrategy::IncrementalPoseSelectionStrategy(

@@ -61,6 +61,12 @@ public:
 	 */
 	shared_ptr<PoseSet> getOptimalPoseSet();
 
+	/**
+	 * Returns the optimal pose sets of different sizes, if computed already.
+	 * @return The optimal pose sets of different sizes, if computed already.
+	 */
+	map<int, shared_ptr<PoseSet> > getIntermediatePoseSets();
+
 protected:
 	/**
 	 * Initializes the kinematic chain for which the poses should be selected.
@@ -118,6 +124,11 @@ private:
 	 * Source for loading the robot model.
 	 */
 	ModelLoader modelLoader;
+
+	/**
+	 * Map which stores the optimal poses given the pose set size.
+	 */
+	map<int, shared_ptr<PoseSet> > optimalPoses;
 };
 
 /**
