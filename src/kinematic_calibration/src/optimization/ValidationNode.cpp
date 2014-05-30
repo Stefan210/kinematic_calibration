@@ -26,6 +26,8 @@
 #include <utility>
 #include <gsl/gsl_statistics_double.h>
 #include <gsl/gsl_sort_double.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include "../../include/common/CalibrationContext.h"
 #include "../../include/common/FrameImageConverter.h"
@@ -35,7 +37,7 @@
 namespace kinematic_calibration {
 
 ValidationNode::ValidationNode(CalibrationContext* context) :
-		collectingData(false), context(context) {
+		collectingData(false), context(context), folderName("validation") {
 	measurementSubsriber = nh.subscribe(
 			"/kinematic_calibration/measurement_data", 3000,
 			&ValidationNode::measurementCb, this);
@@ -51,6 +53,8 @@ ValidationNode::ValidationNode(CalibrationContext* context) :
 	modelLoader.getKdlTree(kdlTree);
 
 	nh.getParam("optimization_ids", optimizationDataIds);
+	nh.param("folder_name", folderName, folderName);
+	mkdir(folderName.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 
 }
 
@@ -178,7 +182,9 @@ bool ValidationNode::startValidationCallback(std_srvs::Empty::Request& request,
 
 void ValidationNode::printErrorPerIteration() {
 	// init csv file
-	ofstream csvFile("comparison_error_per_iteration.csv");
+	stringstream ss;
+	ss << folderName << "/" << "comparison_error_per_iteration.csv";
+	ofstream csvFile(ss.str().c_str());
 	if (!csvFile.good()) {
 		ROS_WARN("Could not write the CSV file!");
 		return;
@@ -305,7 +311,10 @@ void ValidationNode::printError(vector<measurementData>& measurements,
 	// instantiate the frame image converter
 	FrameImageConverter frameImageConverter(cameraModel);
 
-	ofstream csvFile(filename.c_str());
+
+	stringstream ss;
+	ss << folderName << "/" << filename;
+	ofstream csvFile(ss.str().c_str());
 	if (!csvFile.good()) {
 		ROS_WARN("Could not write the CSV file!");
 		return;

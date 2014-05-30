@@ -88,6 +88,7 @@ private:
 	CalibrationContext* context;
 	KinematicCalibrationState initialState;
 	vector<KinematicCalibrationState> intermediateStates;
+	string folderName;
 
 	bool collectingData;
 };
