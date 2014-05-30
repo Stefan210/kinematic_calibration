@@ -24,6 +24,7 @@
 #include <urdf_model/joint.h>
 #include <urdf_model/pose.h>
 #include <iostream>
+#include <fstream>
 #include <string>
 
 namespace kinematic_calibration {
@@ -445,6 +446,23 @@ int main(int argc, char** argv) {
 			cout << "\"" << ids[i] << "\", ";
 		}
 		cout << endl;
+
+		// write out the intermediate sets
+		map<int, shared_ptr<PoseSet> >  sets = node.getIntermediatePoseSets();
+		for(map<int, shared_ptr<PoseSet> >::iterator it = sets.begin(); it != sets.end(); it++) {
+			// open the file
+			stringstream ss;
+			ss << chainName << "_" << it->second->getNumberOfPoses();
+			ofstream ofs(ss.str().c_str());
+			if(!ofs.good()) {
+				cout << "Could not write the file  " << ss.str() << endl;
+				continue;
+			}
+			vector<string> ids = poseSource->getPoseIds(it->second->getPoses());
+			for (int i = 0; i < ids.size(); i++) {
+				cout << "\"" << ids[i] << "\", ";
+			}
+		}
 	} else if ("sampling" == poseSource) {
 		PoseSamplingPoseSource* poseSource = new PoseSamplingPoseSource();
 		PoseSelectionNode node(*poseSource);
