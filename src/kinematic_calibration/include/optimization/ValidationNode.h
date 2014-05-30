@@ -64,6 +64,7 @@ protected:
 	void printOptimizationError();
 	void printValidationError();
 	void printError(vector<measurementData>& measurements, string filename);
+	void printResult();
 
 	// callback methods
 	void measurementCb(const measurementDataConstPtr& msg);
