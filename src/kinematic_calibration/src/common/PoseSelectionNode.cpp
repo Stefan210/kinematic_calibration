@@ -460,8 +460,9 @@ int main(int argc, char** argv) {
 			}
 			vector<string> ids = poseSource->getPoseIds(it->second->getPoses());
 			for (int i = 0; i < ids.size(); i++) {
-				cout << "\"" << ids[i] << "\", ";
+				ofs << "\"" << ids[i] << "\", ";
 			}
+			ofs.close();
 		}
 	} else if ("sampling" == poseSource) {
 		PoseSamplingPoseSource* poseSource = new PoseSamplingPoseSource();
