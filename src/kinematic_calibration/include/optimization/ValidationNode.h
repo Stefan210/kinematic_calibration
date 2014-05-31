@@ -65,6 +65,7 @@ protected:
 	void printValidationError();
 	void printError(vector<measurementData>& measurements, string filename);
 	void printResult();
+	void printIntermediateResults();
 
 	// callback methods
 	void measurementCb(const measurementDataConstPtr& msg);
@@ -92,6 +93,22 @@ private:
 	string folderName;
 
 	bool collectingData;
+};
+
+/**
+ * Class for writing the intermediate optimization results into a csv file.
+ */
+class IntermediateResultsCsvWriter {
+public:
+	IntermediateResultsCsvWriter(string delimiter = "\t");
+	virtual ~IntermediateResultsCsvWriter();
+	bool writeToCsv(vector<KinematicCalibrationState>& intermediateStates,
+			string filename) const;
+
+protected:
+	bool writeHeader(KinematicCalibrationState& exampleState, ostream& stream) const;
+	bool writeContent(vector<KinematicCalibrationState>& intermediateStates, ostream& stream) const;
+	string delimiter;
 };
 
 } /* namespace kinematic_calibration */

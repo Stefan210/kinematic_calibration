@@ -161,6 +161,7 @@ void ValidationNode::validate() {
 	printErrorPerIteration();
 	printOptimizationError();
 	printValidationError();
+	printIntermediateResults();
 }
 
 void ValidationNode::camerainfoCallback(
@@ -180,6 +181,13 @@ bool ValidationNode::startValidationCallback(std_srvs::Empty::Request& request,
 		std_srvs::Empty::Response& response) {
 	this->collectingData = false;
 	return true;
+}
+
+void ValidationNode::printIntermediateResults() {
+	IntermediateResultsCsvWriter writer;
+	stringstream filename;
+	filename << this->folderName << "/optimization_intermediate_results.csv";
+	writer.writeToCsv(this->intermediateStates, filename.str());
 }
 
 void ValidationNode::printErrorPerIteration() {
@@ -461,6 +469,154 @@ void ValidationNode::printResult() {
 		ofs << ss;
 		ofs.close();
 	}
+}
+
+IntermediateResultsCsvWriter::IntermediateResultsCsvWriter(string delimiter) :
+		delimiter(delimiter) {
+}
+
+IntermediateResultsCsvWriter::~IntermediateResultsCsvWriter() {
+}
+
+bool IntermediateResultsCsvWriter::writeToCsv(
+		vector<KinematicCalibrationState>& intermediateStates,
+		string filename) const {
+	if (intermediateStates.size() < 2)
+		return false;
+
+	ofstream ofs(filename.c_str());
+	if (!ofs.good())
+		return false;
+
+	if (!writeHeader(intermediateStates[1], ofs))
+		return false;
+
+	if (!writeContent(intermediateStates, ofs))
+		return false;
+
+	return true;
+}
+
+bool IntermediateResultsCsvWriter::writeHeader(
+		KinematicCalibrationState& result, ostream& stream) const {
+	stream << "iteration" << delimiter;
+
+	typedef std::map<string, double>::iterator it_type;
+	for (it_type iterator = result.jointOffsets.begin();
+			iterator != result.jointOffsets.end(); iterator++) {
+		stream << iterator->first << "_offset" << delimiter;
+	}
+
+	for (std::map<string, tf::Transform>::iterator iterator =
+			result.markerTransformations.begin();
+			iterator != result.markerTransformations.end(); iterator++) {
+		tf::Transform transform = iterator->second.inverse(); //TODO
+		string name = iterator->first;
+		double r, p, y;
+		tf::Matrix3x3(transform.getRotation()).getRPY(r, p, y);
+		stream << "marker_transform_" << name << "_tx" << delimiter;
+		stream << "marker_transform_" << name << "_ty" << delimiter;
+		stream << "marker_transform_" << name << "_tz" << delimiter;
+		stream << "marker_transform_" << name << "_rr" << delimiter;
+		stream << "marker_transform_" << name << "_rp" << delimiter;
+		stream << "marker_transform_" << name << "_ry" << delimiter;
+	}
+
+	stream << "camera_transform_" << "tx" << delimiter;
+	stream << "camera_transform_" << "ty" << delimiter;
+	stream << "camera_transform_" << "tz" << delimiter;
+	stream << "camera_transform_" << "rr" << delimiter;
+	stream << "camera_transform_" << "rp" << delimiter;
+	stream << "camera_transform_" << "ry" << delimiter;
+
+	for (map<string, tf::Transform>::iterator it =
+			result.jointTransformations.begin();
+			it != result.jointTransformations.end(); it++) {
+		stream << it->first << "_transform_" << "tx" << delimiter;
+		stream << it->first << "_transform_" << "ty" << delimiter;
+		stream << it->first << "_transform_" << "tz" << delimiter;
+		stream << it->first << "_transform_" << "rr" << delimiter;
+		stream << it->first << "_transform_" << "rp" << delimiter;
+		stream << it->first << "_transform_" << "ry" << delimiter;
+	}
+
+	stream << "camera_fx" << delimiter;
+	stream << "camera_fy" << delimiter;
+	stream << "camera_cx" << delimiter;
+	stream << "camera_cy" << delimiter;
+	stream << "camera_D0" << delimiter;
+	stream << "camera_D1" << delimiter;
+	stream << "camera_D2" << delimiter;
+	stream << "camera_D3" << delimiter;
+	stream << "camera_D4" << delimiter;
+	stream << "\n";
+
+	return true;
+}
+
+bool IntermediateResultsCsvWriter::writeContent(
+		vector<KinematicCalibrationState>& intermediateStates,
+		ostream& stream) const {
+	int iteration = 0;
+	for (vector<KinematicCalibrationState>::iterator statesIt =
+			intermediateStates.begin(); statesIt != intermediateStates.end();
+			statesIt++) {
+		stream << iteration << delimiter;
+
+		typedef std::map<string, double>::iterator it_type;
+		for (it_type iterator = statesIt->jointOffsets.begin();
+				iterator != statesIt->jointOffsets.end(); iterator++) {
+			stream << iterator->second << delimiter;
+		}
+
+		for (std::map<string, tf::Transform>::iterator iterator =
+				statesIt->markerTransformations.begin();
+				iterator != statesIt->markerTransformations.end(); iterator++) {
+			tf::Transform transform = iterator->second.inverse(); //TODO
+			string name = iterator->first;
+			double r, p, y;
+			tf::Matrix3x3(transform.getRotation()).getRPY(r, p, y);
+			stream << transform.getOrigin().x() << delimiter
+					<< transform.getOrigin().y() << delimiter
+					<< transform.getOrigin().z() << delimiter;
+			stream << r << delimiter << p << delimiter << y << delimiter;
+		}
+
+		double r, p, y;
+		tf::Matrix3x3(statesIt->cameraToHeadTransformation.getRotation()).getRPY(
+				r, p, y);
+		stream << statesIt->cameraToHeadTransformation.getOrigin().x()
+				<< delimiter
+				<< statesIt->cameraToHeadTransformation.getOrigin().y()
+				<< delimiter
+				<< statesIt->cameraToHeadTransformation.getOrigin().z()
+				<< delimiter;
+		stream << r << delimiter << p << delimiter << y << delimiter;
+
+		for (map<string, tf::Transform>::iterator it =
+				statesIt->jointTransformations.begin();
+				it != statesIt->jointTransformations.end(); it++) {
+			stream << it->second.getOrigin().x() << delimiter
+					<< it->second.getOrigin().y() << delimiter
+					<< it->second.getOrigin().z() << delimiter;
+			double r, p, y;
+			tf::Matrix3x3(it->second.getRotation()).getRPY(r, p, y);
+			stream << r << delimiter << p << delimiter << y << delimiter;
+		}
+
+		stream << statesIt->cameraInfo.K[K_FX_IDX] << delimiter
+				<< statesIt->cameraInfo.K[K_FY_IDX] << delimiter;
+		stream << statesIt->cameraInfo.K[K_CX_IDX] << delimiter
+				<< statesIt->cameraInfo.K[K_CY_IDX] << delimiter;
+		stream << statesIt->cameraInfo.D[0] << delimiter
+				<< statesIt->cameraInfo.D[1] << delimiter
+				<< statesIt->cameraInfo.D[2] << delimiter
+				<< statesIt->cameraInfo.D[3] << delimiter
+				<< statesIt->cameraInfo.D[4] << "\n";
+
+		iteration++;
+	}
+	return false;
 }
 
 } /* namespace kinematic_calibration */
