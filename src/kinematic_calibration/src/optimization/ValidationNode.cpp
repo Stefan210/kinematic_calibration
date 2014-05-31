@@ -253,6 +253,12 @@ void ValidationNode::printErrorPerIteration() {
 			valErrorVec.push_back(error);
 		}
 
+		// prevent bad things
+		if (optErrorVec.empty())
+			optErrorVec.push_back(0.0);
+		if (valErrorVec.empty())
+			valErrorVec.push_back(0.0);
+
 		gsl_sort(optErrorVec.data(), 1, optErrorVec.size());
 		gsl_sort(valErrorVec.data(), 1, valErrorVec.size());
 
@@ -312,7 +318,6 @@ void ValidationNode::printError(vector<measurementData>& measurements,
 		string filename) {
 	// instantiate the frame image converter
 	FrameImageConverter frameImageConverter(cameraModel);
-
 
 	stringstream ss;
 	ss << folderName << "/" << filename;
