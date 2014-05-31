@@ -398,11 +398,12 @@ void ValidationNode::printError(vector<measurementData>& measurements,
 }
 
 void ValidationNode::printResult() {
-	cout << "Optimized joint offsets:\n";
+	stringstream ss;
+	ss << "Optimized joint offsets:\n";
 	typedef std::map<string, double>::iterator it_type;
 	for (it_type iterator = result.jointOffsets.begin();
 			iterator != result.jointOffsets.end(); iterator++) {
-		cout << iterator->first << " : " << iterator->second << "\n";
+		ss << iterator->first << " : " << iterator->second << "\n";
 	}
 
 	for (std::map<string, tf::Transform>::iterator iterator =
@@ -412,19 +413,19 @@ void ValidationNode::printResult() {
 		string name = iterator->first;
 		double r, p, y;
 		tf::Matrix3x3(transform.getRotation()).getRPY(r, p, y);
-		cout << "Optimized transform form marker to end effector for chain "
+		ss << "Optimized transform form marker to end effector for chain "
 				<< name << ":\n";
-		cout << "(x, y, z) " << transform.getOrigin().x() << " "
+		ss << "(x, y, z) " << transform.getOrigin().x() << " "
 				<< transform.getOrigin().y() << " " << transform.getOrigin().z()
 				<< " ";
-		cout << "(r, p, y) " << r << " " << p << " " << y << "\n";
+		ss << "(r, p, y) " << r << " " << p << " " << y << "\n";
 	}
 
-	cout << "Optimized transform form camera to head:\n";
-	cout << "(x, y, z) " << result.cameraToHeadTransformation.getOrigin().x()
+	ss << "Optimized transform form camera to head:\n";
+	ss << "(x, y, z) " << result.cameraToHeadTransformation.getOrigin().x()
 			<< " " << result.cameraToHeadTransformation.getOrigin().y() << " "
 			<< result.cameraToHeadTransformation.getOrigin().z() << " ";
-	cout << "(q0, q1, q2, q3) "
+	ss << "(q0, q1, q2, q3) "
 			<< result.cameraToHeadTransformation.getRotation().x() << " "
 			<< result.cameraToHeadTransformation.getRotation().y() << " "
 			<< result.cameraToHeadTransformation.getRotation().z() << " "
@@ -433,23 +434,33 @@ void ValidationNode::printResult() {
 	for (map<string, tf::Transform>::iterator it =
 			result.jointTransformations.begin();
 			it != result.jointTransformations.end(); it++) {
-		cout << "Optimized transform for joint " << it->first << ":\n";
-		cout << "(x, y, z) " << it->second.getOrigin().x() << " "
+		ss << "Optimized transform for joint " << it->first << ":\n";
+		ss << "(x, y, z) " << it->second.getOrigin().x() << " "
 				<< it->second.getOrigin().y() << " "
 				<< it->second.getOrigin().z() << " ";
 		double r, p, y;
 		tf::Matrix3x3(it->second.getRotation()).getRPY(r, p, y);
-		cout << "(r, p, y) " << r << " " << p << " " << y << "\n";
+		ss << "(r, p, y) " << r << " " << p << " " << y << "\n";
 	}
 
-	cout << "Optimized camera intrinsics:\n";
-	cout << "(fx,fy) " << result.cameraInfo.K[K_FX_IDX] << " "
+	ss << "Optimized camera intrinsics:\n";
+	ss << "(fx,fy) " << result.cameraInfo.K[K_FX_IDX] << " "
 			<< result.cameraInfo.K[K_FY_IDX] << " ";
-	cout << "(cx,cy) " << result.cameraInfo.K[K_CX_IDX] << " "
+	ss << "(cx,cy) " << result.cameraInfo.K[K_CX_IDX] << " "
 			<< result.cameraInfo.K[K_CY_IDX] << "\n";
-	cout << "D: " << result.cameraInfo.D[0] << ", " << result.cameraInfo.D[1]
+	ss << "D: " << result.cameraInfo.D[0] << ", " << result.cameraInfo.D[1]
 			<< ", " << result.cameraInfo.D[2] << ", " << result.cameraInfo.D[3]
 			<< ", " << result.cameraInfo.D[4] << "\n";
+	cout << ss << endl;
+	stringstream filename;
+	filename << this->folderName << "/optimization_result.txt";
+	ofstream ofs(filename.str().c_str());
+	if (!ofs.good()) {
+		cout << "Could not write results to " << filename.str() << endl;
+	} else {
+		ofs << ss;
+		ofs.close();
+	}
 }
 
 } /* namespace kinematic_calibration */
