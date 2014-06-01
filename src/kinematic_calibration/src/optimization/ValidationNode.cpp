@@ -459,14 +459,14 @@ void ValidationNode::printResult() {
 	ss << "D: " << result.cameraInfo.D[0] << ", " << result.cameraInfo.D[1]
 			<< ", " << result.cameraInfo.D[2] << ", " << result.cameraInfo.D[3]
 			<< ", " << result.cameraInfo.D[4] << "\n";
-	cout << ss << endl;
+	cout << ss.str() << endl;
 	stringstream filename;
 	filename << this->folderName << "/optimization_result.txt";
 	ofstream ofs(filename.str().c_str());
 	if (!ofs.good()) {
 		cout << "Could not write results to " << filename.str() << endl;
 	} else {
-		ofs << ss;
+		ofs << ss.str();
 		ofs.close();
 	}
 }
