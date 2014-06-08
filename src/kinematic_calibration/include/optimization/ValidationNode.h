@@ -29,8 +29,60 @@ class CalibrationContext;
 
 using namespace ros;
 using namespace std;
+using namespace boost;
 
 namespace kinematic_calibration {
+
+/**
+ * Strategy for choosing which data should be used for optimization and validation.
+ */
+class ValidationDataStrategy {
+public:
+	/// Constructor.
+	ValidationDataStrategy();
+	/// Desctructor.
+	virtual ~ValidationDataStrategy();
+	/**
+	 * Adds the measurement to either one or both data sets.
+	 * @param[in/out] optimizationData The optimization data.
+	 * @param[in/out] validataionData The validation data.
+	 * @param[in] data The measurement to add.
+	 */
+	virtual void addMeasurement(vector<measurementData>& optimizationData,
+			vector<measurementData>& validataionData, measurementData data) = 0;
+
+protected:
+	NodeHandle nh;
+	vector<string> optimizationDataIds;
+};
+
+/**
+ * Class that validates on all given data.
+ */
+class ValidateOnAllStrategy : public ValidationDataStrategy {
+public:
+	/// Constructor.
+	ValidateOnAllStrategy();
+	/// Desctructor.
+	virtual ~ValidateOnAllStrategy();
+
+	void addMeasurement(vector<measurementData>& optimizationData,
+			vector<measurementData>& validataionData, measurementData data);
+};
+
+/**
+ * Class that validates on all data that is not thought for optimization.
+ */
+class ValidateOnOthersStrategy : public ValidationDataStrategy {
+public:
+	/// Constructor.
+	ValidateOnOthersStrategy();
+	/// Desctructor.
+	virtual ~ValidateOnOthersStrategy();
+
+	void addMeasurement(vector<measurementData>& optimizationData,
+			vector<measurementData>& validataionData, measurementData data);
+};
 
 /**
  * Node class for validation.
@@ -91,6 +143,7 @@ private:
 	KinematicCalibrationState initialState;
 	vector<KinematicCalibrationState> intermediateStates;
 	string folderName;
+	shared_ptr<ValidationDataStrategy> valDataStrategy;
 
 	bool collectingData;
 };
@@ -106,8 +159,10 @@ public:
 			string filename) const;
 
 protected:
-	bool writeHeader(KinematicCalibrationState& exampleState, ostream& stream) const;
-	bool writeContent(vector<KinematicCalibrationState>& intermediateStates, ostream& stream) const;
+	bool writeHeader(KinematicCalibrationState& exampleState,
+			ostream& stream) const;
+	bool writeContent(vector<KinematicCalibrationState>& intermediateStates,
+			ostream& stream) const;
 	string delimiter;
 };
 

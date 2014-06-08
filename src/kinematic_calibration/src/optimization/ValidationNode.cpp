@@ -57,6 +57,16 @@ ValidationNode::ValidationNode(CalibrationContext* context) :
 	nh.param("folder_name", folderName, folderName);
 	mkdir(folderName.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 
+	string valDataStrategyType = "all";
+	nh.param("validation_data_strategy", valDataStrategyType,
+			valDataStrategyType);
+	if ("all" == valDataStrategyType)
+		this->valDataStrategy = boost::make_shared<ValidateOnAllStrategy>();
+	else if ("others" == valDataStrategyType)
+		this->valDataStrategy = boost::make_shared<ValidateOnOthersStrategy>();
+	else
+		this->valDataStrategy = boost::make_shared<ValidateOnOthersStrategy>();
+
 }
 
 ValidationNode::~ValidationNode() {
@@ -71,7 +81,7 @@ void ValidationNode::startLoop() {
 	printResult();
 	ROS_INFO("Starting validation...");
 	validate();
-	ROS_INFO("Done! Press ctrl+c for termination.");
+	ROS_INFO("Done!");
 }
 
 void ValidationNode::collectData() {
@@ -145,16 +155,8 @@ void ValidationNode::measurementCb(const measurementDataConstPtr& msg) {
 
 	// save data
 	data.image = sensor_msgs::Image();
-	if (std::find(optimizationDataIds.begin(), optimizationDataIds.end(),
-			data.id) != optimizationDataIds.end()) {
-		optimizationData.push_back(measurementData(data));
-		ROS_INFO("Optimization measurement data received (#%ld).",
-				optimizationData.size());
-	} else {
-		validataionData.push_back(measurementData(data));
-		ROS_INFO("Validation measurement data received (#%ld).",
-				validataionData.size());
-	}
+	this->valDataStrategy->addMeasurement(optimizationData, validataionData,
+			data);
 }
 
 void ValidationNode::validate() {
@@ -241,10 +243,10 @@ void ValidationNode::printErrorPerIteration() {
 					intermediateStates[iteration], x, y);
 			double currentX = optimizationData[poseNum].marker_data[0];
 			double currentY = optimizationData[poseNum].marker_data[1];
-			double error = (fabs(currentX - x) * fabs(currentX - x)
+			double optError = (fabs(currentX - x) * fabs(currentX - x)
 					+ fabs(currentY - y) * fabs(currentY - y));
-			optimizationError += error;
-			optErrorVec.push_back(error);
+			optimizationError += optError;
+			optErrorVec.push_back(optError);
 		}
 
 		// calculate the validation error
@@ -255,10 +257,10 @@ void ValidationNode::printErrorPerIteration() {
 					intermediateStates[iteration], x, y);
 			double currentX = validataionData[poseNum].marker_data[0];
 			double currentY = validataionData[poseNum].marker_data[1];
-			double error = (fabs(currentX - x) * fabs(currentX - x)
+			double valError = (fabs(currentX - x) * fabs(currentX - x)
 					+ fabs(currentY - y) * fabs(currentY - y));
-			validationError += error;
-			valErrorVec.push_back(error);
+			validationError += valError;
+			valErrorVec.push_back(valError);
 		}
 
 		// prevent bad things
@@ -267,12 +269,12 @@ void ValidationNode::printErrorPerIteration() {
 		if (valErrorVec.empty())
 			valErrorVec.push_back(0.0);
 
-		gsl_sort(optErrorVec.data(), 1, optErrorVec.size());
-		gsl_sort(valErrorVec.data(), 1, valErrorVec.size());
-
 		// write errors
 		csvFile << iteration << "\t" << optimizationError << "\t"
 				<< validationError << "\t";
+
+		gsl_sort(optErrorVec.data(), 1, optErrorVec.size());
+		gsl_sort(valErrorVec.data(), 1, valErrorVec.size());
 
 		// write some statistics
 		csvFile << gsl_stats_mean(optErrorVec.data(), 1, optErrorVec.size())
@@ -619,6 +621,60 @@ bool IntermediateResultsCsvWriter::writeContent(
 	return false;
 }
 
+ValidationDataStrategy::ValidationDataStrategy() {
+	nh.getParam("optimization_ids", optimizationDataIds);
+}
+
+ValidationDataStrategy::~ValidationDataStrategy() {
+	// nothing to do
+}
+
+ValidateOnAllStrategy::ValidateOnAllStrategy() {
+	// nothing to do
+}
+
+ValidateOnAllStrategy::~ValidateOnAllStrategy() {
+	// nothing to do
+}
+
+void ValidateOnAllStrategy::addMeasurement(
+		vector<measurementData>& optimizationData,
+		vector<measurementData>& validataionData, measurementData data) {
+	if (std::find(optimizationDataIds.begin(), optimizationDataIds.end(),
+			data.id) != optimizationDataIds.end()) {
+		optimizationData.push_back(measurementData(data));
+		ROS_INFO("Optimization measurement data received (#%ld).",
+				optimizationData.size());
+	}
+	validataionData.push_back(measurementData(data));
+	ROS_INFO("Validation measurement data received (#%ld).",
+			validataionData.size());
+
+}
+
+ValidateOnOthersStrategy::ValidateOnOthersStrategy() {
+	// nothing to do
+}
+
+ValidateOnOthersStrategy::~ValidateOnOthersStrategy() {
+	// nothing to do
+}
+
+void ValidateOnOthersStrategy::addMeasurement(
+		vector<measurementData>& optimizationData,
+		vector<measurementData>& validataionData, measurementData data) {
+	if (std::find(optimizationDataIds.begin(), optimizationDataIds.end(),
+			data.id) != optimizationDataIds.end()) {
+		optimizationData.push_back(measurementData(data));
+		ROS_INFO("Optimization measurement data received (#%ld).",
+				optimizationData.size());
+	} else {
+		validataionData.push_back(measurementData(data));
+		ROS_INFO("Validation measurement data received (#%ld).",
+				validataionData.size());
+	}
+}
+
 } /* namespace kinematic_calibration */
 
 using namespace kinematic_calibration;
@@ -628,8 +684,6 @@ int main(int argc, char** argv) {
 	CalibrationContext* context = new RosCalibContext();
 	ValidationNode node(context);
 	node.startLoop();
-	while (ros::ok())
-		;
 	delete context;
 	return 0;
 }
