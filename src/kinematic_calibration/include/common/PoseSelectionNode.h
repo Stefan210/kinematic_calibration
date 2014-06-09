@@ -67,6 +67,12 @@ public:
 	 */
 	map<int, shared_ptr<PoseSet> > getIntermediatePoseSets();
 
+	/**
+	 * Returns the indices of the different pose set sizes.
+	 * @return The indices of the different pose set sizes.
+	 */
+	map<int, double> getIntermediateIndices();
+
 protected:
 	/**
 	 * Initializes the kinematic chain for which the poses should be selected.
@@ -129,6 +135,11 @@ private:
 	 * Map which stores the optimal poses given the pose set size.
 	 */
 	map<int, shared_ptr<PoseSet> > optimalPoses;
+
+	/**
+	 * Map which stores the intermediate pose set indices.
+	 */
+	map<int, double> intermediateIndices;
 };
 
 /**
@@ -281,7 +292,8 @@ public:
 	 */
 	virtual shared_ptr<PoseSet> getOptimalPoseSet(
 			shared_ptr<PoseSet> initialPoseSet,
-			shared_ptr<ObservabilityIndex> observabilityIndex) = 0;
+			shared_ptr<ObservabilityIndex> observabilityIndex,
+			double& index) = 0;
 };
 
 class IncrementalPoseSelectionStrategy: public PoseSelectionStrategy {
@@ -295,7 +307,8 @@ public:
 	 * @return The optimal pose set.
 	 */
 	shared_ptr<PoseSet> getOptimalPoseSet(shared_ptr<PoseSet> initialPoseSet,
-			shared_ptr<ObservabilityIndex> observabilityIndex);
+			shared_ptr<ObservabilityIndex> observabilityIndex,
+			double& index);
 
 private:
 	int numOfPoses;
@@ -313,7 +326,8 @@ public:
 	 * @return The optimal pose set.
 	 */
 	shared_ptr<PoseSet> getOptimalPoseSet(shared_ptr<PoseSet> initialPoseSet,
-			shared_ptr<ObservabilityIndex> observabilityIndex);
+			shared_ptr<ObservabilityIndex> observabilityIndex,
+			double& index);
 };
 
 class RandomPoseSelectionStrategy: public PoseSelectionStrategy {
@@ -327,7 +341,8 @@ public:
 	 * @return The optimal pose set.
 	 */
 	shared_ptr<PoseSet> getOptimalPoseSet(shared_ptr<PoseSet> initialPoseSet,
-			shared_ptr<ObservabilityIndex> observabilityIndex);
+			shared_ptr<ObservabilityIndex> observabilityIndex,
+			double& index);
 
 private:
 	int numOfPoses;
@@ -345,7 +360,8 @@ public:
 	 * @return The optimal pose set.
 	 */
 	shared_ptr<PoseSet> getOptimalPoseSet(shared_ptr<PoseSet> initialPoseSet,
-			shared_ptr<ObservabilityIndex> observabilityIndex);
+			shared_ptr<ObservabilityIndex> observabilityIndex,
+			double& index);
 
 private:
 	int initialSize;

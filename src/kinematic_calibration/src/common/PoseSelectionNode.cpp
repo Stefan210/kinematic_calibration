@@ -129,6 +129,7 @@ shared_ptr<PoseSet> PoseSelectionNode::getOptimalPoseSet() {
 			this->kinematicChainPtr->getName().c_str());
 
 	shared_ptr<PoseSet> resultSet = poseSet;
+	double index;
 
 	// TODO: remove!
 	// resultSet->initializePoseSet(posePool.size());
@@ -141,22 +142,30 @@ shared_ptr<PoseSet> PoseSelectionNode::getOptimalPoseSet() {
 	ROS_INFO("Initializing pose set with one pose...");
 	IncrementalPoseSelectionStrategy intializingStrategy(1);
 	resultSet = intializingStrategy.getOptimalPoseSet(resultSet,
-			observabilityIndex);
+			observabilityIndex, index);
 
 	// increment by 1
 	IncrementalPoseSelectionStrategy incrementStrategy(1);
 	ExchangePoseSelectionStrategy exStrategy;
 
+	this->optimalPoses[1] = resultSet;
+	this->intermediateIndices[1] = index;
+
 	for (int i = resultSet->getNumberOfPoses(); i < maxPoses; i++) {
 		ROS_INFO("Improve by exchange...");
-		resultSet = exStrategy.getOptimalPoseSet(resultSet, observabilityIndex);
+		resultSet = exStrategy.getOptimalPoseSet(resultSet, observabilityIndex,
+				index);
 		ROS_INFO("Increment pose set size...");
 		resultSet = incrementStrategy.getOptimalPoseSet(resultSet,
-				observabilityIndex);
+				observabilityIndex, index);
 		this->optimalPoses[i] = resultSet;
+		this->intermediateIndices[i] = index;
 	}
 	ROS_INFO("Improve by exchange...");
-	resultSet = exStrategy.getOptimalPoseSet(resultSet, observabilityIndex);
+	resultSet = exStrategy.getOptimalPoseSet(resultSet, observabilityIndex, index);
+
+	this->optimalPoses[resultSet->getNumberOfPoses()] = resultSet;
+	this->intermediateIndices[resultSet->getNumberOfPoses()] = index;
 
 	// add 10 more optimal poses
 	//IncrementalPoseSelectionStrategy selectionStrategy(10);
@@ -175,6 +184,10 @@ map<int, shared_ptr<PoseSet> > PoseSelectionNode::getIntermediatePoseSets() {
 	return this->optimalPoses;
 }
 
+map<int, double> PoseSelectionNode::getIntermediateIndices() {
+	return this->intermediateIndices;
+}
+
 IncrementalPoseSelectionStrategy::IncrementalPoseSelectionStrategy(
 		const int& numOfPoses) :
 		numOfPoses(numOfPoses) {
@@ -182,7 +195,7 @@ IncrementalPoseSelectionStrategy::IncrementalPoseSelectionStrategy(
 
 shared_ptr<PoseSet> IncrementalPoseSelectionStrategy::getOptimalPoseSet(
 		shared_ptr<PoseSet> initialPoseSet,
-		shared_ptr<ObservabilityIndex> observabilityIndex) {
+		shared_ptr<ObservabilityIndex> observabilityIndex, double& index) {
 	// best successor
 	shared_ptr<PoseSet> bestSuccessor = initialPoseSet;
 	double bestIndexValue = -1;
@@ -204,6 +217,7 @@ shared_ptr<PoseSet> IncrementalPoseSelectionStrategy::getOptimalPoseSet(
 				bestSuccessor->getNumberOfPoses());
 	}
 
+	index = bestIndexValue;
 	return bestSuccessor;
 }
 
@@ -213,7 +227,7 @@ RandomPoseSelectionStrategy::RandomPoseSelectionStrategy(const int& numOfPoses) 
 
 shared_ptr<PoseSet> RandomPoseSelectionStrategy::getOptimalPoseSet(
 		shared_ptr<PoseSet> initialPoseSet,
-		shared_ptr<ObservabilityIndex> observabilityIndex) {
+		shared_ptr<ObservabilityIndex> observabilityIndex, double& index) {
 	shared_ptr<PoseSet> successor = initialPoseSet;
 	while (successor->getNumberOfPoses() < numOfPoses) {
 		successor = successor->addPose()[0];
@@ -223,7 +237,7 @@ shared_ptr<PoseSet> RandomPoseSelectionStrategy::getOptimalPoseSet(
 
 shared_ptr<PoseSet> ExchangePoseSelectionStrategy::getOptimalPoseSet(
 		shared_ptr<PoseSet> initialPoseSet,
-		shared_ptr<ObservabilityIndex> observabilityIndex) {
+		shared_ptr<ObservabilityIndex> observabilityIndex, double& index) {
 	// best successor
 	shared_ptr<PoseSet> bestSuccessor = initialPoseSet;
 	double bestIndexValue = -1, oldIndexValue = -2;
@@ -273,6 +287,7 @@ shared_ptr<PoseSet> ExchangePoseSelectionStrategy::getOptimalPoseSet(
 
 	}
 
+	index = bestIndexValue;
 	return bestSuccessor;
 }
 
@@ -283,29 +298,29 @@ ExchangeAddExchangePoseSelectionStrategy::ExchangeAddExchangePoseSelectionStrate
 
 shared_ptr<PoseSet> ExchangeAddExchangePoseSelectionStrategy::getOptimalPoseSet(
 		shared_ptr<PoseSet> initialPoseSet,
-		shared_ptr<ObservabilityIndex> observabilityIndex) {
+		shared_ptr<ObservabilityIndex> observabilityIndex, double& index) {
 	shared_ptr<PoseSet> resultSet = initialPoseSet;
 
 	ROS_INFO("Initializing pose set with random poses...");
 	RandomPoseSelectionStrategy intializingStrategy(this->initialSize);
 	resultSet = intializingStrategy.getOptimalPoseSet(resultSet,
-			observabilityIndex);
+			observabilityIndex, index);
 
 	// optimize by adding and exchanging
 	IncrementalPoseSelectionStrategy incrementalStrategy(1);
 	ExchangePoseSelectionStrategy exchangeStrategy;
 	ROS_INFO("Optimize pose set...");
 	resultSet = exchangeStrategy.getOptimalPoseSet(resultSet,
-			observabilityIndex);
+			observabilityIndex, index);
 	for (int i = this->initialSize; i < this->finalSize; i++) {
 		ROS_INFO("Increment pose set size...", i);
 		resultSet = incrementalStrategy.getOptimalPoseSet(resultSet,
-				observabilityIndex);
+				observabilityIndex, index);
 
 	}
 	ROS_INFO("Optimize pose set...");
 	resultSet = exchangeStrategy.getOptimalPoseSet(resultSet,
-			observabilityIndex);
+			observabilityIndex, index);
 
 	return resultSet;
 }
@@ -448,15 +463,16 @@ int main(int argc, char** argv) {
 		cout << endl;
 
 		// write out the intermediate sets
-		map<int, shared_ptr<PoseSet> >  sets = node.getIntermediatePoseSets();
-		for(map<int, shared_ptr<PoseSet> >::iterator it = sets.begin(); it != sets.end(); it++) {
+		map<int, shared_ptr<PoseSet> > sets = node.getIntermediatePoseSets();
+		for (map<int, shared_ptr<PoseSet> >::iterator it = sets.begin();
+				it != sets.end(); it++) {
 			// open the file
 			stringstream ss;
 			ss << chainName << "_" << it->second->getNumberOfPoses();
 			ofstream ofs(ss.str().c_str());
-			if(!ofs.good()) {
+			if (!ofs.good()) {
 				cout << "Could not write the file  " << ss.str() << endl;
-				continue;
+				break;
 			}
 			vector<string> ids = poseSource->getPoseIds(it->second->getPoses());
 			for (int i = 0; i < ids.size(); i++) {
@@ -464,6 +480,25 @@ int main(int argc, char** argv) {
 			}
 			ofs.close();
 		}
+
+		// write intermediate indices
+		stringstream indicesFilenameStream;
+		indicesFilenameStream << chainName << "_" << sets.size()
+				<< "_indices.csv";
+		ofstream indicesOfs(indicesFilenameStream.str().c_str());
+		map<int, double> indices = node.getIntermediateIndices();
+		if (!indicesOfs.good()) {
+			cout << "Could not write the file  " << indicesFilenameStream.str()
+					<< endl;
+		}
+		indicesOfs << "NUMPOSES\tINDEX\n";
+		for (map<int, double>::iterator it = indices.begin();
+				it != indices.end(); it++) {
+			stringstream ss;
+			ss << it->first << "\t" << it->second << "\n";
+			indicesOfs << ss.str();
+		}
+		indicesOfs.close();
 	} else if ("sampling" == poseSource) {
 		PoseSamplingPoseSource* poseSource = new PoseSamplingPoseSource();
 		PoseSelectionNode node(*poseSource);
