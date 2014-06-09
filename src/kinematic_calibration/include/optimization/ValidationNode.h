@@ -22,10 +22,7 @@
 #include "../common/KinematicChain.h"
 #include "../common/ModelLoader.h"
 #include "KinematicCalibrationState.h"
-
-namespace kinematic_calibration {
-class CalibrationContext;
-} /* namespace kinematic_calibration */
+#include "../common/CalibrationContext.h"
 
 using namespace ros;
 using namespace std;
@@ -40,7 +37,7 @@ class ValidationDataStrategy {
 public:
 	/// Constructor.
 	ValidationDataStrategy();
-	/// Desctructor.
+	/// Destructor.
 	virtual ~ValidationDataStrategy();
 	/**
 	 * Adds the measurement to either one or both data sets.
@@ -59,11 +56,11 @@ protected:
 /**
  * Class that validates on all given data.
  */
-class ValidateOnAllStrategy : public ValidationDataStrategy {
+class ValidateOnAllStrategy: public ValidationDataStrategy {
 public:
 	/// Constructor.
 	ValidateOnAllStrategy();
-	/// Desctructor.
+	/// Destructor.
 	virtual ~ValidateOnAllStrategy();
 
 	void addMeasurement(vector<measurementData>& optimizationData,
@@ -73,12 +70,26 @@ public:
 /**
  * Class that validates on all data that is not thought for optimization.
  */
-class ValidateOnOthersStrategy : public ValidationDataStrategy {
+class ValidateOnOthersStrategy: public ValidationDataStrategy {
 public:
 	/// Constructor.
 	ValidateOnOthersStrategy();
-	/// Desctructor.
+	/// Destructor.
 	virtual ~ValidateOnOthersStrategy();
+
+	void addMeasurement(vector<measurementData>& optimizationData,
+			vector<measurementData>& validataionData, measurementData data);
+};
+
+/**
+ * Class that splits the data into optimization and validation data according to ros parameters.
+ */
+class SplitStrategy: public ValidationDataStrategy {
+public:
+	/// Constructor.
+	SplitStrategy() {};
+	/// Destructor.
+	virtual ~SplitStrategy() {};
 
 	void addMeasurement(vector<measurementData>& optimizationData,
 			vector<measurementData>& validataionData, measurementData data);
@@ -102,15 +113,26 @@ public:
 	virtual ~ValidationNode();
 
 	/**
-	 * Starts listening for measurement data
-	 * and executing the optimization and validataion process.
+	 * (Re-)initializes the members.
+	 */
+	void initialize();
+
+	/**
+	 * Starts executing the optimization and validation process.
 	 */
 	void startLoop();
 
+	/**
+	 * Starts spinning.
+	 */
+	void spin();
+
 protected:
 	void collectData();
+	void splitData();
 	void optimize();
 	void validate();
+
 
 	void printErrorPerIteration();
 	void printOptimizationError();
@@ -131,7 +153,7 @@ private:
 	Subscriber cameraInfoSubscriber;
 	ServiceServer validationService;
 
-	vector<measurementData> optimizationData, validataionData;
+	vector<measurementData> optimizationData, validataionData, measurementsPool;
 	vector<string> optimizationDataIds;
 	image_geometry::PinholeCameraModel cameraModel;
 	KinematicCalibrationState result;

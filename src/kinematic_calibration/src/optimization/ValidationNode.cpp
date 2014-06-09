@@ -53,6 +53,18 @@ ValidationNode::ValidationNode(CalibrationContext* context) :
 	modelLoader.initializeFromRos();
 	modelLoader.getKdlTree(kdlTree);
 
+	ROS_INFO("Waiting for data...");
+	collectData();
+
+	ROS_INFO("Spinning...");
+	spin();
+}
+
+ValidationNode::~ValidationNode() {
+	// nothing to do
+}
+
+void ValidationNode::initialize() {
 	nh.getParam("optimization_ids", optimizationDataIds);
 	nh.param("folder_name", folderName, folderName);
 	mkdir(folderName.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
@@ -64,18 +76,22 @@ ValidationNode::ValidationNode(CalibrationContext* context) :
 		this->valDataStrategy = boost::make_shared<ValidateOnAllStrategy>();
 	else if ("others" == valDataStrategyType)
 		this->valDataStrategy = boost::make_shared<ValidateOnOthersStrategy>();
+	else if ("split" == valDataStrategyType)
+		this->valDataStrategy = boost::make_shared<SplitStrategy>();
 	else
 		this->valDataStrategy = boost::make_shared<ValidateOnOthersStrategy>();
-
 }
 
-ValidationNode::~ValidationNode() {
-
+void ValidationNode::spin() {
+	while (ros::ok) {
+		ros::spinOnce();
+	}
 }
 
 void ValidationNode::startLoop() {
-	ROS_INFO("Waiting for data...");
-	collectData();
+	ROS_INFO("(Re-)initialize...");
+	initialize();
+	splitData();
 	ROS_INFO("Starting optimization...");
 	optimize();
 	printResult();
@@ -89,6 +105,17 @@ void ValidationNode::collectData() {
 	while (collectingData && ros::ok()) {
 		ros::spinOnce();
 	}
+}
+
+void ValidationNode::splitData() {
+	this->optimizationData.clear();
+	this->validataionData.clear();
+	for (int i = 0; i < this->measurementsPool.size(); i++) {
+		this->valDataStrategy->addMeasurement(optimizationData, validataionData,
+				measurementsPool[i]);
+	}
+	ROS_INFO("OptimizationData: %ld; ValidationData: %ld",
+			optimizationData.size(), validataionData.size());
 }
 
 void ValidationNode::optimize() {
@@ -111,6 +138,7 @@ void ValidationNode::optimize() {
 	G2oJointOffsetOptimization optimization(*context, optimizationData,
 			kinematicChains, frameImageConverter, initialState);
 	optimization.setSaveIntermediateStates(true);
+	ROS_INFO("Call g2o...");
 	optimization.optimize(result);
 
 	// get intermdiate states
@@ -120,7 +148,7 @@ void ValidationNode::optimize() {
 void ValidationNode::measurementCb(const measurementDataConstPtr& msg) {
 	measurementData data = *msg;
 
-	// check if the measurement contains to a new chain
+// check if the measurement contains to a new chain
 	if (data.chain_name != chainName) {
 		// get the parameters
 		chainName = data.chain_name;
@@ -153,10 +181,10 @@ void ValidationNode::measurementCb(const measurementDataConstPtr& msg) {
 		}
 	}
 
-	// save data
+// save data
 	data.image = sensor_msgs::Image();
-	this->valDataStrategy->addMeasurement(optimizationData, validataionData,
-			data);
+	this->measurementsPool.push_back(data);
+	ROS_INFO("Measurement data received (%ld).", this->measurementsPool.size());
 }
 
 void ValidationNode::validate() {
@@ -182,6 +210,7 @@ void ValidationNode::camerainfoCallback(
 bool ValidationNode::startValidationCallback(std_srvs::Empty::Request& request,
 		std_srvs::Empty::Response& response) {
 	this->collectingData = false;
+	this->startLoop();
 	return true;
 }
 
@@ -193,7 +222,7 @@ void ValidationNode::printIntermediateResults() {
 }
 
 void ValidationNode::printErrorPerIteration() {
-	// init csv file
+// init csv file
 	stringstream ss;
 	ss << folderName << "/" << "comparison_error_per_iteration.csv";
 	ofstream csvFile(ss.str().c_str());
@@ -207,7 +236,7 @@ void ValidationNode::printErrorPerIteration() {
 
 	csvFile << "\n";
 
-	// init poses
+// init poses
 	vector<MeasurementPose> optimizationPoses, validationPoses;
 
 	map<string, KinematicChain> kinematicChainsMap;
@@ -229,7 +258,7 @@ void ValidationNode::printErrorPerIteration() {
 						this->validataionData[i].jointState));
 	}
 
-	// iterate through all intermediate states
+// iterate through all intermediate states
 	for (int iteration = 0; iteration < this->intermediateStates.size();
 			iteration++) {
 		double optimizationError = 0.0, validationError = 0.0;
@@ -311,7 +340,7 @@ void ValidationNode::printErrorPerIteration() {
 		csvFile << "\n";
 	}
 
-	// close file
+// close file
 	csvFile.flush();
 	csvFile.close();
 }
@@ -326,7 +355,7 @@ void ValidationNode::printValidationError() {
 
 void ValidationNode::printError(vector<measurementData>& measurements,
 		string filename) {
-	// instantiate the frame image converter
+// instantiate the frame image converter
 	FrameImageConverter frameImageConverter(cameraModel);
 
 	stringstream ss;
@@ -337,17 +366,17 @@ void ValidationNode::printError(vector<measurementData>& measurements,
 		return;
 	}
 
-	// generate the csv header
+// generate the csv header
 	csvFile
 			<< "ID\tXMEASURED\tYMEASURED\tXOPTIMIZED\tYOPTIMIZED\tXDIFF\tYDIFF\tERROR\n";
 
-	// update kinematic chains
+// update kinematic chains
 	for (int i = 0; i < this->kinematicChains.size(); i++) {
 		this->kinematicChains[i] = this->kinematicChains[i].withTransformations(
 				result.jointTransformations);
 	}
 
-	// print out the measured position and the transformed position
+// print out the measured position and the transformed position
 	for (int i = 0; i < measurements.size(); i++) {
 		measurementData current = measurements[i];
 
@@ -402,7 +431,7 @@ void ValidationNode::printError(vector<measurementData>& measurements,
 				<< (currentY - y) << "\t" << error << "\n";
 	}
 
-	// write the csv file
+// write the csv file
 	csvFile.flush();
 	csvFile.close();
 }
@@ -626,15 +655,15 @@ ValidationDataStrategy::ValidationDataStrategy() {
 }
 
 ValidationDataStrategy::~ValidationDataStrategy() {
-	// nothing to do
+// nothing to do
 }
 
 ValidateOnAllStrategy::ValidateOnAllStrategy() {
-	// nothing to do
+// nothing to do
 }
 
 ValidateOnAllStrategy::~ValidateOnAllStrategy() {
-	// nothing to do
+// nothing to do
 }
 
 void ValidateOnAllStrategy::addMeasurement(
@@ -643,21 +672,17 @@ void ValidateOnAllStrategy::addMeasurement(
 	if (std::find(optimizationDataIds.begin(), optimizationDataIds.end(),
 			data.id) != optimizationDataIds.end()) {
 		optimizationData.push_back(measurementData(data));
-		ROS_INFO("Optimization measurement data received (#%ld).",
-				optimizationData.size());
 	}
 	validataionData.push_back(measurementData(data));
-	ROS_INFO("Validation measurement data received (#%ld).",
-			validataionData.size());
 
 }
 
 ValidateOnOthersStrategy::ValidateOnOthersStrategy() {
-	// nothing to do
+// nothing to do
 }
 
 ValidateOnOthersStrategy::~ValidateOnOthersStrategy() {
-	// nothing to do
+// nothing to do
 }
 
 void ValidateOnOthersStrategy::addMeasurement(
@@ -666,12 +691,24 @@ void ValidateOnOthersStrategy::addMeasurement(
 	if (std::find(optimizationDataIds.begin(), optimizationDataIds.end(),
 			data.id) != optimizationDataIds.end()) {
 		optimizationData.push_back(measurementData(data));
-		ROS_INFO("Optimization measurement data received (#%ld).",
-				optimizationData.size());
 	} else {
 		validataionData.push_back(measurementData(data));
-		ROS_INFO("Validation measurement data received (#%ld).",
-				validataionData.size());
+	}
+}
+
+void SplitStrategy::addMeasurement(vector<measurementData>& optimizationData,
+		vector<measurementData>& validataionData, measurementData data) {
+	vector<string> optimizationDataIds, validationDataIds;
+	nh.getParam("optimization_ids", optimizationDataIds);
+	nh.getParam("validation_ids", validationDataIds);
+	//ROS_INFO("Split measurements: %ld optimization ids, %ld validation ids.",
+	//		optimizationDataIds.size(), validationDataIds.size());
+	if (std::find(optimizationDataIds.begin(), optimizationDataIds.end(),
+			data.id) != optimizationDataIds.end()) {
+		optimizationData.push_back(measurementData(data));
+	} else if (std::find(validationDataIds.begin(), validationDataIds.end(),
+			data.id) != validationDataIds.end()) {
+		validataionData.push_back(measurementData(data));
 	}
 }
 
@@ -683,7 +720,7 @@ int main(int argc, char** argv) {
 	ros::init(argc, argv, "ValidationNode");
 	CalibrationContext* context = new RosCalibContext();
 	ValidationNode node(context);
-	node.startLoop();
+	node.spin();
 	delete context;
 	return 0;
 }
