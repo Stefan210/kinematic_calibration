@@ -39,6 +39,7 @@ public:
 	ValidationDataStrategy();
 	/// Destructor.
 	virtual ~ValidationDataStrategy();
+
 	/**
 	 * Adds the measurement to either one or both data sets.
 	 * @param[in/out] optimizationData The optimization data.
@@ -47,6 +48,15 @@ public:
 	 */
 	virtual void addMeasurement(vector<measurementData>& optimizationData,
 			vector<measurementData>& validataionData, measurementData data) = 0;
+
+	/**
+	 * Adds all measurements to either onr or both data sets.
+	 * @param[in/out] optimizationData The optimization data.
+	 * @param[in/out] validataionData The validation data.
+	 * @param[in] data The measurement to add.
+	 */
+	virtual void addMeasurements(vector<measurementData>& optimizationData,
+			vector<measurementData>& validataionData, vector<measurementData>& data) = 0;
 
 protected:
 	NodeHandle nh;
@@ -65,6 +75,9 @@ public:
 
 	void addMeasurement(vector<measurementData>& optimizationData,
 			vector<measurementData>& validataionData, measurementData data);
+
+	void addMeasurements(vector<measurementData>& optimizationData,
+			vector<measurementData>& validataionData, vector<measurementData>& data);
 };
 
 /**
@@ -79,6 +92,9 @@ public:
 
 	void addMeasurement(vector<measurementData>& optimizationData,
 			vector<measurementData>& validataionData, measurementData data);
+
+	void addMeasurements(vector<measurementData>& optimizationData,
+			vector<measurementData>& validataionData, vector<measurementData>& data);
 };
 
 /**
@@ -93,6 +109,12 @@ public:
 
 	void addMeasurement(vector<measurementData>& optimizationData,
 			vector<measurementData>& validataionData, measurementData data);
+
+	void addMeasurements(vector<measurementData>& optimizationData,
+			vector<measurementData>& validataionData, vector<measurementData>& data);
+
+protected:
+	vector<string> validationDataIds;
 };
 
 /**

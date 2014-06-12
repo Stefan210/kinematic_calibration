@@ -83,7 +83,7 @@ void ValidationNode::initialize() {
 }
 
 void ValidationNode::spin() {
-	while (ros::ok) {
+	while (ros::ok()) {
 		ros::spinOnce();
 	}
 }
@@ -110,10 +110,8 @@ void ValidationNode::collectData() {
 void ValidationNode::splitData() {
 	this->optimizationData.clear();
 	this->validataionData.clear();
-	for (int i = 0; i < this->measurementsPool.size(); i++) {
-		this->valDataStrategy->addMeasurement(optimizationData, validataionData,
-				measurementsPool[i]);
-	}
+	this->valDataStrategy->addMeasurements(optimizationData, validataionData,
+			measurementsPool);
 	ROS_INFO("OptimizationData: %ld; ValidationData: %ld",
 			optimizationData.size(), validataionData.size());
 }
@@ -677,6 +675,16 @@ void ValidateOnAllStrategy::addMeasurement(
 
 }
 
+void ValidateOnAllStrategy::addMeasurements(
+		vector<measurementData>& optimizationData,
+		vector<measurementData>& validataionData,
+		vector<measurementData>& data) {
+	for (vector<measurementData>::iterator it = data.begin(); it != data.end();
+			it++) {
+		this->addMeasurement(optimizationData, validataionData, *it);
+	}
+}
+
 ValidateOnOthersStrategy::ValidateOnOthersStrategy() {
 // nothing to do
 }
@@ -696,19 +704,36 @@ void ValidateOnOthersStrategy::addMeasurement(
 	}
 }
 
+void ValidateOnOthersStrategy::addMeasurements(
+		vector<measurementData>& optimizationData,
+		vector<measurementData>& validataionData,
+		vector<measurementData>& data) {
+	for (vector<measurementData>::iterator it = data.begin(); it != data.end();
+			it++) {
+		this->addMeasurement(optimizationData, validataionData, *it);
+	}
+}
+
 void SplitStrategy::addMeasurement(vector<measurementData>& optimizationData,
 		vector<measurementData>& validataionData, measurementData data) {
-	vector<string> optimizationDataIds, validationDataIds;
-	nh.getParam("optimization_ids", optimizationDataIds);
-	nh.getParam("validation_ids", validationDataIds);
-	//ROS_INFO("Split measurements: %ld optimization ids, %ld validation ids.",
-	//		optimizationDataIds.size(), validationDataIds.size());
 	if (std::find(optimizationDataIds.begin(), optimizationDataIds.end(),
 			data.id) != optimizationDataIds.end()) {
 		optimizationData.push_back(measurementData(data));
 	} else if (std::find(validationDataIds.begin(), validationDataIds.end(),
 			data.id) != validationDataIds.end()) {
 		validataionData.push_back(measurementData(data));
+	}
+}
+
+void kinematic_calibration::SplitStrategy::addMeasurements(
+		vector<measurementData>& optimizationData,
+		vector<measurementData>& validataionData,
+		vector<measurementData>& data) {
+	nh.getParam("optimization_ids", optimizationDataIds);
+	nh.getParam("validation_ids", validationDataIds);
+	for (vector<measurementData>::iterator it = data.begin(); it != data.end();
+			it++) {
+		this->addMeasurement(optimizationData, validataionData, *it);
 	}
 }
 
