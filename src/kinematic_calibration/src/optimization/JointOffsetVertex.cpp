@@ -14,6 +14,12 @@ void JointOffsetVertex::oplusImpl(const double* delta) {
 		string curName = jointNames[i];
 		this->_estimate[curName] += delta[i];
 	}
+	// TODO: replace "hack" by a nice solution!
+	if (this->_estimate.count("RHipYawPitch") > 0
+			&& this->_estimate.count("LHipYawPitch") > 0) {
+		this->_estimate["LHipYawPitch"] = this->_estimate["RHipYawPitch"];
+	}
+
 }
 
 void JointOffsetVertex::setToOriginImpl() {
