@@ -92,6 +92,7 @@ void ValidationNode::startLoop() {
 	ROS_INFO("(Re-)initialize...");
 	initialize();
 	splitData();
+	modifyData();
 	ROS_INFO("Starting optimization...");
 	optimize();
 	printResult();
@@ -114,6 +115,27 @@ void ValidationNode::splitData() {
 			measurementsPool);
 	ROS_INFO("OptimizationData: %ld; ValidationData: %ld",
 			optimizationData.size(), validataionData.size());
+}
+
+void ValidationNode::modifyData() {
+	// should some measurements be randomized?
+	int randomizeMeasurements = 0;
+	nh.param("randomize_measurements_per_chain", randomizeMeasurements,
+			randomizeMeasurements);
+	if (randomizeMeasurements > 0) {
+		MeasurementsRandomizer randomizer;
+		randomizer.randomizeMeasurements(randomizeMeasurements,
+				optimizationData, chainNames, 640, 480);
+	}
+
+	// should (all) measurements be "noisified"?
+	int addNoise = 0;
+	nh.param("add_noise_to_measurements", addNoise, addNoise);
+	if (addNoise > 0) {
+		ROS_INFO("Add noise to measurements (%d pixel).", addNoise);
+		MeasurementsNoiseAdder noisifier;
+		noisifier.noisifyMeasurements(addNoise, optimizationData);
+	}
 }
 
 void ValidationNode::optimize() {
@@ -155,6 +177,7 @@ void ValidationNode::measurementCb(const measurementDataConstPtr& msg) {
 		// instantiate the kinematic chain
 		KinematicChain kinematicChain(kdlTree, chainRoot, chainTip, chainName);
 		this->kinematicChains.push_back(kinematicChain);
+		this->chainNames.push_back(chainName);
 		ROS_INFO("Receive data for chain %s.", chainName.c_str());
 		// try to get the current transformation from chain tip to marker frame
 		string markerFrame = "";
@@ -725,8 +748,7 @@ void SplitStrategy::addMeasurement(vector<measurementData>& optimizationData,
 	}
 }
 
-void kinematic_calibration::SplitStrategy::addMeasurements(
-		vector<measurementData>& optimizationData,
+void SplitStrategy::addMeasurements(vector<measurementData>& optimizationData,
 		vector<measurementData>& validataionData,
 		vector<measurementData>& data) {
 	nh.getParam("optimization_ids", optimizationDataIds);
@@ -734,6 +756,69 @@ void kinematic_calibration::SplitStrategy::addMeasurements(
 	for (vector<measurementData>::iterator it = data.begin(); it != data.end();
 			it++) {
 		this->addMeasurement(optimizationData, validataionData, *it);
+	}
+}
+
+MeasurementsRandomizer::MeasurementsRandomizer() {
+	// nothing to do
+}
+
+MeasurementsRandomizer::~MeasurementsRandomizer() {
+	// nothing to do
+}
+
+void MeasurementsRandomizer::randomizeMeasurements(int n,
+		vector<measurementData>& data, vector<string>& chains, int xMax,
+		int yMax) {
+	// initialize the random function
+	srand(1337);
+
+	// initialize the counter
+	map<string, int> counter;
+	for (vector<string>::iterator it = chains.begin(); it != chains.end();
+			it++) {
+		counter[*it] = 0;
+	}
+	for (int i = 0; i < data.size(); i++) {
+		if (counter[data[i].chain_name] < n) {
+			data[i].marker_data[0] = static_cast<double>(rand())
+					/ (static_cast<double>(RAND_MAX / xMax));
+			data[i].marker_data[1] = static_cast<double>(rand())
+					/ (static_cast<double>(RAND_MAX / yMax));
+			counter[data[i].chain_name]++;
+		}
+	}
+
+}
+
+MeasurementsNoiseAdder::MeasurementsNoiseAdder() {
+	// nothing to do
+}
+
+MeasurementsNoiseAdder::~MeasurementsNoiseAdder() {
+	// nothing to do
+}
+
+void MeasurementsNoiseAdder::noisifyMeasurements(int addNoise,
+		vector<measurementData>& data) {
+	if (addNoise == 0)
+		return;
+
+	// initialize the random function
+	srand(1337);
+
+	// add noise
+	double min = -addNoise;
+	double max = addNoise;
+	for (int i = 0; i < data.size(); i++) {
+		double randValueX = min
+				+ static_cast<double>(rand())
+						/ (static_cast<double>(RAND_MAX / (max - min)));
+		double randValueY = min
+				+ static_cast<double>(rand())
+						/ (static_cast<double>(RAND_MAX / (max - min)));
+		data[i].marker_data[0] += randValueX;
+		data[i].marker_data[1] += randValueY;
 	}
 }
 

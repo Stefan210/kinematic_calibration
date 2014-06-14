@@ -56,7 +56,8 @@ public:
 	 * @param[in] data The measurement to add.
 	 */
 	virtual void addMeasurements(vector<measurementData>& optimizationData,
-			vector<measurementData>& validataionData, vector<measurementData>& data) = 0;
+			vector<measurementData>& validataionData,
+			vector<measurementData>& data) = 0;
 
 protected:
 	NodeHandle nh;
@@ -77,7 +78,8 @@ public:
 			vector<measurementData>& validataionData, measurementData data);
 
 	void addMeasurements(vector<measurementData>& optimizationData,
-			vector<measurementData>& validataionData, vector<measurementData>& data);
+			vector<measurementData>& validataionData,
+			vector<measurementData>& data);
 };
 
 /**
@@ -94,7 +96,8 @@ public:
 			vector<measurementData>& validataionData, measurementData data);
 
 	void addMeasurements(vector<measurementData>& optimizationData,
-			vector<measurementData>& validataionData, vector<measurementData>& data);
+			vector<measurementData>& validataionData,
+			vector<measurementData>& data);
 };
 
 /**
@@ -103,18 +106,63 @@ public:
 class SplitStrategy: public ValidationDataStrategy {
 public:
 	/// Constructor.
-	SplitStrategy() {};
+	SplitStrategy() {
+	}
+	;
 	/// Destructor.
-	virtual ~SplitStrategy() {};
+	virtual ~SplitStrategy() {
+	}
+	;
 
 	void addMeasurement(vector<measurementData>& optimizationData,
 			vector<measurementData>& validataionData, measurementData data);
 
 	void addMeasurements(vector<measurementData>& optimizationData,
-			vector<measurementData>& validataionData, vector<measurementData>& data);
+			vector<measurementData>& validataionData,
+			vector<measurementData>& data);
 
 protected:
 	vector<string> validationDataIds;
+};
+
+/**
+ * Class for randomizing measurement data.
+ * Uses a fixed seed value, thus the results are reproducible.
+ */
+class MeasurementsRandomizer {
+public:
+	/// Constructor.
+	MeasurementsRandomizer();
+
+	/// Destructor.
+	virtual ~MeasurementsRandomizer();
+
+	/**
+	 * Randomizes the first n measurements of each chain.
+	 * @param numOfMeasurements The number of measurements to randomize.
+	 * @param data The list of measurements.
+	 * @param chains The different chains.
+	 * @param xMax The maximum x value.
+	 * @param yMax The maximum y value.
+	 */
+	void randomizeMeasurements(int numOfMeasurements,
+			vector<measurementData>& data, vector<string>& chains, int xMax, int yMax);
+};
+
+class MeasurementsNoiseAdder {
+public:
+	/// Constructor.
+	MeasurementsNoiseAdder();
+
+	/// Destructor.
+	virtual ~MeasurementsNoiseAdder();
+
+	/**
+	 * Adds noise to all measurements using a uniform distribution.
+	 * @param addNoise Noise will be added within the range [-noise, +noise] for x and y respectively.
+	 * @param optimizationData The data to be noisified.
+	 */
+	void noisifyMeasurements(int addNoise, vector<measurementData>& optimizationData);
 };
 
 /**
@@ -152,9 +200,9 @@ public:
 protected:
 	void collectData();
 	void splitData();
+	void modifyData();
 	void optimize();
 	void validate();
-
 
 	void printErrorPerIteration();
 	void printOptimizationError();
@@ -183,6 +231,7 @@ private:
 	KDL::Tree kdlTree;
 	string chainName, chainRoot, chainTip;
 	vector<KinematicChain> kinematicChains;
+	vector<string> chainNames;
 	CalibrationContext* context;
 	KinematicCalibrationState initialState;
 	vector<KinematicCalibrationState> intermediateStates;
