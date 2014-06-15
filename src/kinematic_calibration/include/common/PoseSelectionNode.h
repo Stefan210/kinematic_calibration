@@ -140,6 +140,11 @@ private:
 	 * Map which stores the intermediate pose set indices.
 	 */
 	map<int, double> intermediateIndices;
+
+	/**
+	 * Name of the selection strategy.
+	 */
+	string selectionStrategyName;
 };
 
 /**

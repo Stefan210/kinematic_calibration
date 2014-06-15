@@ -32,11 +32,15 @@ namespace kinematic_calibration {
 using namespace std;
 
 PoseSelectionNode::PoseSelectionNode(PoseSource& poseSource) :
-		poseSource(poseSource), nhPrivate("~") {
+		poseSource(poseSource), nhPrivate("~"), selectionStrategyName("optimal") {
 	initialize();
 
 	// TODO: inject the following instances:
 	this->observabilityIndex = boost::make_shared<NoiseAmplificationIndex>();
+
+	// get the selection strategy name
+	nh.param("selection_strategy", selectionStrategyName,
+			selectionStrategyName);
 }
 
 PoseSelectionNode::~PoseSelectionNode() {
@@ -131,14 +135,30 @@ shared_ptr<PoseSet> PoseSelectionNode::getOptimalPoseSet() {
 	shared_ptr<PoseSet> resultSet = poseSet;
 	double index;
 
-	// TODO: remove!
-	// resultSet->initializePoseSet(posePool.size());
-	// return resultSet;
+	// return all
+	if (selectionStrategyName == "return_all") {
+		ROS_INFO("Returning all poses without optimizing...");
+		resultSet->initializePoseSet(posePool.size());
+		return resultSet;
+	}
 
-	// initialize with random poses
-	//ROS_INFO("Initializing pose set with random poses...");
-	//RandomPoseSelectionStrategy intializingStrategy(1);
+	// select random poses
+	if (selectionStrategyName == "random") {
+		ROS_INFO("Generating random pose set...");
+		for (int i = resultSet->getNumberOfPoses(); i <= maxPoses; i = i + 10) {
+			RandomPoseSelectionStrategy intializingStrategy(i);
+			resultSet = intializingStrategy.getOptimalPoseSet(resultSet,
+					observabilityIndex, index);
+			this->optimalPoses[i] = resultSet;
+			this->intermediateIndices[i] = index;
+		}
+		return resultSet;
+	}
 
+	// select optimal pose set
+	ROS_INFO("Generating optimal pose set...");
+
+	// initialize
 	ROS_INFO("Initializing pose set with one pose...");
 	IncrementalPoseSelectionStrategy intializingStrategy(1);
 	resultSet = intializingStrategy.getOptimalPoseSet(resultSet,
@@ -162,20 +182,11 @@ shared_ptr<PoseSet> PoseSelectionNode::getOptimalPoseSet() {
 		this->intermediateIndices[i] = index;
 	}
 	ROS_INFO("Improve by exchange...");
-	resultSet = exStrategy.getOptimalPoseSet(resultSet, observabilityIndex, index);
+	resultSet = exStrategy.getOptimalPoseSet(resultSet, observabilityIndex,
+			index);
 
 	this->optimalPoses[resultSet->getNumberOfPoses()] = resultSet;
 	this->intermediateIndices[resultSet->getNumberOfPoses()] = index;
-
-	// add 10 more optimal poses
-	//IncrementalPoseSelectionStrategy selectionStrategy(10);
-	//resultSet = selectionStrategy.getOptimalPoseSet(resultSet,
-	//		observabilityIndex);
-
-	// optimize by adding and exchanging
-//	ROS_INFO("Optimizing pose set with add & exchange strategy...");
-//	ExchangeAddExchangePoseSelectionStrategy eaeStrategy(1, 50);
-//	resultSet = eaeStrategy.getOptimalPoseSet(resultSet, observabilityIndex);
 
 	return resultSet;
 }
@@ -228,9 +239,12 @@ RandomPoseSelectionStrategy::RandomPoseSelectionStrategy(const int& numOfPoses) 
 shared_ptr<PoseSet> RandomPoseSelectionStrategy::getOptimalPoseSet(
 		shared_ptr<PoseSet> initialPoseSet,
 		shared_ptr<ObservabilityIndex> observabilityIndex, double& index) {
+	srand(time(NULL));
 	shared_ptr<PoseSet> successor = initialPoseSet;
 	while (successor->getNumberOfPoses() < numOfPoses) {
-		successor = successor->addPose()[0];
+		vector<shared_ptr<PoseSet> > successors = successor->addPose();
+		int randIdx = rand() % successors.size();
+		successor = successor->addPose()[randIdx];
 	}
 	return successor;
 }
