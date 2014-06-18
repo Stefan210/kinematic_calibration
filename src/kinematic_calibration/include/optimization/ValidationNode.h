@@ -23,6 +23,7 @@
 #include "../common/ModelLoader.h"
 #include "KinematicCalibrationState.h"
 #include "../common/CalibrationContext.h"
+#include "../common/CalibrationContext.h"
 
 using namespace ros;
 using namespace std;
@@ -237,6 +238,7 @@ private:
 	vector<KinematicCalibrationState> intermediateStates;
 	string folderName;
 	shared_ptr<ValidationDataStrategy> valDataStrategy;
+	CalibrationOptions calibrationOptions;
 
 	bool collectingData;
 };

@@ -25,14 +25,14 @@
 namespace kinematic_calibration {
 
 MeasurementPose::MeasurementPose(KinematicChain kinematicChain,
-		sensor_msgs::JointState jointState) :
+		sensor_msgs::JointState jointState, CalibrationOptions options) :
 		kinematicChain(kinematicChain), jointState(jointState), derivativesCalculated(
-				false) {
+				false), options(options) {
 }
 
 MeasurementPose::MeasurementPose() :
 		kinematicChain(KinematicChain()), jointState(sensor_msgs::JointState()), derivativesCalculated(
-				false) {
+				false), options(defaultOptions()) {
 }
 
 MeasurementPose& MeasurementPose::operator=(const MeasurementPose& newval) {
@@ -68,8 +68,16 @@ void MeasurementPose::predictEndEffectorPose(
 	jointOffsets = state.jointOffsets;
 
 	// get the transformation from camera to marker
-	kinematicChain.getRootToTip(jointPositions, jointOffsets,
-			headToEndEffector);
+	if (options.calibrateJoint6D) {
+		// optimization of joint 6D offsets
+		KinematicChain kc = this->kinematicChain.withTransformations(
+				state.jointTransformations);
+		kc.getRootToTip(jointPositions, jointOffsets, headToEndEffector);
+	} else {
+		// only joint angle offsets
+		kinematicChain.getRootToTip(jointPositions, jointOffsets,
+				headToEndEffector);
+	}
 	cameraToMarker = endEffectorToMarker * headToEndEffector * cameraToHead;
 }
 
@@ -332,15 +340,15 @@ double MeasurementPose::calculateDerivative(const double& plus,
 	return derivative;
 }
 
-void MeasurementPose::toPoseManagerString(
-		const int& number, stringstream& stream) const {
+void MeasurementPose::toPoseManagerString(const int& number,
+		stringstream& stream) const {
 	vector<string> jointNames;
 	this->kinematicChain.getJointNames(jointNames);
 
 	// print name
 	stringstream ss;
 	ss << this->kinematicChain.getName();
-	ss << std::setfill ('0') << std::setw (3);
+	ss << std::setfill('0') << std::setw(3);
 	ss << number;
 	string poseName = ss.str();
 	stream << poseName << ":\n";
@@ -387,6 +395,15 @@ void MeasurementPose::toPoseManagerString(
 	stream << endl;
 }
 
-} /* namespace kinematic_calibration */
+CalibrationOptions MeasurementPose::defaultOptions() {
+	CalibrationOptions options;
+	options.calibrateJointOffsets = true;
+	options.calibrateCameraTransform = true;
+	options.calibrateCameraIntrinsics = true;
+	options.calibrateMarkerTransform = true;
+	options.calibrateJoint6D = false;
+	return options;
+}
 
+} /* namespace kinematic_calibration */
 

@@ -84,6 +84,12 @@ public:
 			TransformSource source = ROSPARAM_URDF);
 
 	/**
+	 * Returns a map of all joint transformations using KDL frames.
+	 * @return A map of all joint transformations using KDL frames.
+	 */
+	map<string, KDL::Frame> getJointFrames() const ;
+
+	/**
 	 * Current joint offsets.
 	 */
 	map<string, double> jointOffsets;

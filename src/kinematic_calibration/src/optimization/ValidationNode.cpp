@@ -69,6 +69,7 @@ void ValidationNode::initialize() {
 	nh.param("folder_name", folderName, folderName);
 	mkdir(folderName.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 
+	// select the validation strategy
 	string valDataStrategyType = "all";
 	nh.param("validation_data_strategy", valDataStrategyType,
 			valDataStrategyType);
@@ -80,6 +81,9 @@ void ValidationNode::initialize() {
 		this->valDataStrategy = boost::make_shared<SplitStrategy>();
 	else
 		this->valDataStrategy = boost::make_shared<ValidateOnOthersStrategy>();
+
+	// get the calibration options
+	this->calibrationOptions = context->getCalibrationOptions();
 }
 
 void ValidationNode::spin() {
@@ -243,7 +247,7 @@ void ValidationNode::printIntermediateResults() {
 }
 
 void ValidationNode::printErrorPerIteration() {
-// init csv file
+	// init csv file
 	stringstream ss;
 	ss << folderName << "/" << "comparison_error_per_iteration.csv";
 	ofstream csvFile(ss.str().c_str());
@@ -257,7 +261,7 @@ void ValidationNode::printErrorPerIteration() {
 
 	csvFile << "\n";
 
-// init poses
+	// init poses
 	vector<MeasurementPose> optimizationPoses, validationPoses;
 
 	map<string, KinematicChain> kinematicChainsMap;
@@ -269,17 +273,19 @@ void ValidationNode::printErrorPerIteration() {
 		optimizationPoses.push_back(
 				MeasurementPose(
 						kinematicChainsMap[this->optimizationData[i].chain_name],
-						this->optimizationData[i].jointState));
+						this->optimizationData[i].jointState,
+						calibrationOptions));
 	}
 
 	for (int i = 0; i < this->validataionData.size(); i++) {
 		validationPoses.push_back(
 				MeasurementPose(
 						kinematicChainsMap[this->validataionData[i].chain_name],
-						this->validataionData[i].jointState));
+						this->validataionData[i].jointState,
+						calibrationOptions));
 	}
 
-// iterate through all intermediate states
+	// iterate through all intermediate states
 	for (int iteration = 0; iteration < this->intermediateStates.size();
 			iteration++) {
 		double optimizationError = 0.0, validationError = 0.0;
@@ -361,7 +367,7 @@ void ValidationNode::printErrorPerIteration() {
 		csvFile << "\n";
 	}
 
-// close file
+	// close file
 	csvFile.flush();
 	csvFile.close();
 }
@@ -376,7 +382,7 @@ void ValidationNode::printValidationError() {
 
 void ValidationNode::printError(vector<measurementData>& measurements,
 		string filename) {
-// instantiate the frame image converter
+	// instantiate the frame image converter
 	FrameImageConverter frameImageConverter(cameraModel);
 
 	stringstream ss;
@@ -387,17 +393,17 @@ void ValidationNode::printError(vector<measurementData>& measurements,
 		return;
 	}
 
-// generate the csv header
+	// generate the csv header
 	csvFile
 			<< "ID\tXMEASURED\tYMEASURED\tXOPTIMIZED\tYOPTIMIZED\tXDIFF\tYDIFF\tERROR\n";
 
-// update kinematic chains
+	// update kinematic chains
 	for (int i = 0; i < this->kinematicChains.size(); i++) {
 		this->kinematicChains[i] = this->kinematicChains[i].withTransformations(
 				result.jointTransformations);
 	}
 
-// print out the measured position and the transformed position
+	// print out the measured position and the transformed position
 	for (int i = 0; i < measurements.size(); i++) {
 		measurementData current = measurements[i];
 
@@ -414,8 +420,17 @@ void ValidationNode::printError(vector<measurementData>& measurements,
 		for (int j = 0; j < this->kinematicChains.size(); j++) {
 			if (kinematicChains[j].getName() == current.chain_name) {
 				jointOffsets[this->kinematicChains[j].getTip()] = 0;
-				this->kinematicChains[j].getRootToTip(jointPositions,
-						jointOffsets, cameraToEndEffector);
+				if (calibrationOptions.calibrateJoint6D) {
+					// optimization of joint 6D offsets
+					KinematicChain kc = this->kinematicChains[j].withTransformations(
+							result.jointTransformations);
+					kc.getRootToTip(jointPositions, jointOffsets,
+							cameraToEndEffector);
+				} else {
+					// joint angle offsets only
+					this->kinematicChains[j].getRootToTip(jointPositions,
+							jointOffsets, cameraToEndEffector);
+				}
 			}
 		}
 

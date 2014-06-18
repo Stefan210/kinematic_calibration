@@ -12,6 +12,8 @@
 #include <ros/subscriber.h>
 #include <tf/tf.h>
 #include <tf/transform_listener.h>
+
+#include <tf_conversions/tf_kdl.h>
 #include <urdf/model.h>
 #include <urdf_model/joint.h>
 #include <urdf_model/pose.h>
@@ -129,6 +131,17 @@ void KinematicCalibrationState::addMarker(const string name, const string root,
 			markerTransform.getOrigin().getX(),
 			markerTransform.getOrigin().getY(),
 			markerTransform.getOrigin().getZ(), sourceString.c_str());
+}
+
+map<string, KDL::Frame> KinematicCalibrationState::getJointFrames() const {
+	map<string, KDL::Frame> jointFrames;
+	for (map<string, tf::Transform>::const_iterator it = jointTransformations.begin();
+			jointTransformations.end() != it; ++it) {
+		KDL::Frame frame;
+		string name = it->first;
+		tf::transformTFToKDL(it->second, frame);
+		jointFrames[name] = frame;
+	}
 }
 
 } /* namespace kinematic_calibration */

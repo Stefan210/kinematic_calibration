@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "KinematicChain.h"
+#include "../../include/common/CalibrationContext.h"
 
 namespace kinematic_calibration {
 class KinematicCalibrationState;
@@ -34,7 +35,8 @@ public:
 	 * @param jointState The joint states of the kinematic chain.
 	 */
 	MeasurementPose(KinematicChain kinematicChain,
-			sensor_msgs::JointState jointState);
+			sensor_msgs::JointState jointState, CalibrationOptions options =
+					defaultOptions());
 
 	MeasurementPose();
 
@@ -78,27 +80,30 @@ public:
 
 protected:
 	void calcCameraIntrinsicsDerivatives(KinematicCalibrationState state,
-			const double& h,
-			vector<double>& derivativesX, vector<double>& derivativesY);
+			const double& h, vector<double>& derivativesX,
+			vector<double>& derivativesY);
 
 	void calcCameraTransformDerivatives(KinematicCalibrationState state,
-			const double& h,
-			vector<double>& derivativesX, vector<double>& derivativesY);
+			const double& h, vector<double>& derivativesX,
+			vector<double>& derivativesY);
 
 	void calcMarkerTransformDerivatives(KinematicCalibrationState state,
-			const double& h,
-			vector<double>& derivativesX, vector<double>& derivativesY);
+			const double& h, vector<double>& derivativesX,
+			vector<double>& derivativesY);
 
 	void calcJointOffsetsDerivatives(KinematicCalibrationState state,
-			const double& h,
-			vector<double>& derivativesX, vector<double>& derivativesY);
+			const double& h, vector<double>& derivativesX,
+			vector<double>& derivativesY);
 
 	double calculateDerivative(const double& plus, const double& minus,
 			const double& h);
 
+	static CalibrationOptions defaultOptions();
+
 private:
 	KinematicChain kinematicChain;
 	sensor_msgs::JointState jointState;
+	CalibrationOptions options;
 
 	// vectors for the derivatives for x and y respectively
 	Eigen::RowVectorXd derivativesX, derivativesY;

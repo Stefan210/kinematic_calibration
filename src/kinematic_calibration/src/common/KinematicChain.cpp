@@ -147,14 +147,16 @@ void KinematicChain::getRootToTip(const map<string, double>& joint_positions,
 
 KinematicChain KinematicChain::withFrames(
 		const map<string, KDL::Frame> framesToTip) {
-	KinematicChain copy(*this);
+	KinematicChain copy;
+	copy = *this;
+
 	for (unsigned int i = 0; i < chain.getNrOfSegments(); i++) {
 		KDL::Segment segment = chain.getSegment(i);
 		KDL::Joint joint = segment.getJoint();
 		string name = joint.getName();
 
 		// no change for this segment
-		if (!framesToTip.count(name))
+		if (framesToTip.count(name) == 0)
 			continue;
 
 		KDL::Segment newSegment(string(segment.getName()),
