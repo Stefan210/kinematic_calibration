@@ -211,6 +211,8 @@ protected:
 	void printResult();
 	void printIntermediateResults();
 
+	map<string, KDL::Frame> getJointFrames();
+
 	// callback methods
 	void measurementCb(const measurementDataConstPtr& msg);
 	void camerainfoCallback(const sensor_msgs::CameraInfoConstPtr& msg);

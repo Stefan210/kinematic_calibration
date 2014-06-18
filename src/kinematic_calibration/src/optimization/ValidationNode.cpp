@@ -17,6 +17,7 @@
 #include <sensor_msgs/JointState.h>
 #include <tf/LinearMath/Transform.h>
 #include <tf/LinearMath/Vector3.h>
+#include <tf_conversions/tf_kdl.h>
 #include <algorithm>
 #include <cmath>
 #include <fstream>
@@ -376,7 +377,7 @@ void ValidationNode::printValidationError() {
 
 void ValidationNode::printError(vector<measurementData>& measurements,
 		string filename) {
-// instantiate the frame image converter
+	// instantiate the frame image converter
 	FrameImageConverter frameImageConverter(cameraModel);
 
 	stringstream ss;
@@ -387,17 +388,17 @@ void ValidationNode::printError(vector<measurementData>& measurements,
 		return;
 	}
 
-// generate the csv header
+	// generate the csv header
 	csvFile
 			<< "ID\tXMEASURED\tYMEASURED\tXOPTIMIZED\tYOPTIMIZED\tXDIFF\tYDIFF\tERROR\n";
 
-// update kinematic chains
+	// update kinematic chains
 	for (int i = 0; i < this->kinematicChains.size(); i++) {
 		this->kinematicChains[i] = this->kinematicChains[i].withTransformations(
 				result.jointTransformations);
 	}
 
-// print out the measured position and the transformed position
+	// print out the measured position and the transformed position
 	for (int i = 0; i < measurements.size(); i++) {
 		measurementData current = measurements[i];
 
@@ -414,8 +415,17 @@ void ValidationNode::printError(vector<measurementData>& measurements,
 		for (int j = 0; j < this->kinematicChains.size(); j++) {
 			if (kinematicChains[j].getName() == current.chain_name) {
 				jointOffsets[this->kinematicChains[j].getTip()] = 0;
-				this->kinematicChains[j].getRootToTip(jointPositions,
-						jointOffsets, cameraToEndEffector);
+				if (this->result.jointTransformations.size() > 0) {
+					// optimization of joint 6D offsets
+					KinematicChain kc = this->kinematicChains[j].withFrames(
+							getJointFrames());
+					kc.getRootToTip(jointPositions, jointOffsets,
+							cameraToEndEffector);
+				} else {
+					// joint angle offsets only
+					this->kinematicChains[j].getRootToTip(jointPositions,
+							jointOffsets, cameraToEndEffector);
+				}
 			}
 		}
 
@@ -455,6 +465,18 @@ void ValidationNode::printError(vector<measurementData>& measurements,
 // write the csv file
 	csvFile.flush();
 	csvFile.close();
+}
+
+map<string, KDL::Frame> ValidationNode::getJointFrames() {
+	map<string, tf::Transform> jointTransforms =
+			this->result.jointTransformations;
+	map<string, KDL::Frame> jointFrames;
+	for (map<string, tf::Transform>::iterator it = jointTransforms.begin();
+			jointTransforms.end() != it; ++it) {
+		KDL::Frame frame;
+		tf::transformTFToKDL(it->second, frame);
+		jointFrames[it->first] = frame;
+	}
 }
 
 void ValidationNode::printResult() {
