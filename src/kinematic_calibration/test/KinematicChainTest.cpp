@@ -79,6 +79,44 @@ TEST(KinematicChainTest, getJointNamesTest) {
 	ASSERT_TRUE(jointNames[6] == "LWristYaw");
 }
 
+TEST(KinematicChainTest, getJointNamesTest2) {
+	// arrange
+	ifstream file("test.urdf");
+	std::string urdfStr((std::istreambuf_iterator<char>(file)),
+			std::istreambuf_iterator<char>());
+	ModelLoader modelLoader;
+	modelLoader.initializeFromUrdf(urdfStr);
+	KDL::Tree tree;
+	modelLoader.getKdlTree(tree);
+	KinematicChain kinematicChainLLeg(tree, "HeadYaw_link", "LHipRoll_link");
+	KinematicChain kinematicChainRLeg(tree, "HeadYaw_link", "RHipRoll_link");
+	vector<string> jointNamesLLeg, jointNamesRLeg;
+
+	// act
+	kinematicChainLLeg.getJointNames(jointNamesLLeg);
+	kinematicChainRLeg.getJointNames(jointNamesRLeg);
+
+	// assert
+	ASSERT_TRUE(jointNamesLLeg.size() == jointNamesRLeg.size());
+
+	tf::Transform leftTf, rightTf;
+	map<string, double> positions;
+	positions["LHipYawPitch"] = 0.23;
+	positions["RHipYawPitch"] = 0.23;
+	kinematicChainLLeg.getRootToTip(positions, leftTf);
+	kinematicChainRLeg.getRootToTip(positions, rightTf);
+
+	cout << leftTf.getOrigin().x() << " " << leftTf.getOrigin().y() << " "
+			<< leftTf.getOrigin().z() << " ";
+	cout << leftTf.getRotation().x() << " " << leftTf.getRotation().y() << " "
+			<< leftTf.getRotation().z() << " "<< leftTf.getRotation().w() << endl;
+
+	cout << rightTf.getOrigin().x() << " " << rightTf.getOrigin().y() << " "
+			<< rightTf.getOrigin().z() << " ";
+	cout << rightTf.getRotation().x() << " " << rightTf.getRotation().y() << " "
+			<< rightTf.getRotation().z() << " "<< rightTf.getRotation().w() << endl;
+}
+
 } /* namespace kinematic_calibration */
 
 // Run all the tests that were declared with TEST()

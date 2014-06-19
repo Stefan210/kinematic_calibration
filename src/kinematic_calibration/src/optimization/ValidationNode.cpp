@@ -17,6 +17,7 @@
 #include <sensor_msgs/JointState.h>
 #include <tf/LinearMath/Transform.h>
 #include <tf/LinearMath/Vector3.h>
+#include <tf_conversions/tf_kdl.h>
 #include <algorithm>
 #include <cmath>
 #include <fstream>
@@ -470,6 +471,18 @@ void ValidationNode::printError(vector<measurementData>& measurements,
 // write the csv file
 	csvFile.flush();
 	csvFile.close();
+}
+
+map<string, KDL::Frame> ValidationNode::getJointFrames() {
+	map<string, tf::Transform> jointTransforms =
+			this->result.jointTransformations;
+	map<string, KDL::Frame> jointFrames;
+	for (map<string, tf::Transform>::iterator it = jointTransforms.begin();
+			jointTransforms.end() != it; ++it) {
+		KDL::Frame frame;
+		tf::transformTFToKDL(it->second, frame);
+		jointFrames[it->first] = frame;
+	}
 }
 
 void ValidationNode::printResult() {

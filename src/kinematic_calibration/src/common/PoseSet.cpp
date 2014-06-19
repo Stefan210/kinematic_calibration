@@ -187,6 +187,14 @@ bool MeasurementPoseSet::writeToFile(
 	return true;
 }
 
+shared_ptr<map<int, MeasurementPose> > MeasurementPoseSet::getPosePool() const {
+	return this->poseSet;
+}
+
+KinematicCalibrationState MeasurementPoseSet::getKinematicCalibrationState() const {
+	return this->state;
+}
+
 } /* namespace kinematic_calibration */
 
 

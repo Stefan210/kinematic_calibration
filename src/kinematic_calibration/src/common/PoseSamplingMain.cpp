@@ -19,13 +19,13 @@ int testPoseSampling(int argc, char** argv) {
 }
 
 int testRNG() {
-	MarginDiscriminatingUniformRNG rng;
+	MarginDiscriminatingUniformRNG rng(2);
 	//UniformRNG rng;
-	rng.plot(-2, 1, 1000000);
+	rng.plot(-3, 8, 1000000);
 	return 0;
 }
 
 int main(int argc, char** argv) {
-	return testRNG();
-	//return testPoseSampling(argc, argv);
+	//return testRNG();
+	return testPoseSampling(argc, argv);
 }

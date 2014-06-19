@@ -98,7 +98,7 @@ void CheckerboardPoseMeasurementEdge::setError(tf::Transform cameraToMarker) {
 	this->_error[4] = measurement.marker_data[offset + (2 * cols) + 0] - xAxisY;
 	this->_error[5] = measurement.marker_data[offset + (2 * cols) + 1] - yAxisY;
 
-	if (true) {
+	if (false) {
 		cv::Mat outImg;
 		cv_bridge::CvImagePtr input_bridge;
 		input_bridge = cv_bridge::toCvCopy(measurement.image,
@@ -183,7 +183,7 @@ void ArucoPoseMeasurementEdge::setError(tf::Transform cameraToMarker) {
 	this->_error[4] = measurement.marker_data[offset + 6 + 0] - xAxisY;
 	this->_error[5] = measurement.marker_data[offset + 6 + 1] - yAxisY;
 
-	if (true) {
+	if (false) {
 		cv::Mat outImg;
 		cv_bridge::CvImagePtr input_bridge;
 		input_bridge = cv_bridge::toCvCopy(measurement.image,

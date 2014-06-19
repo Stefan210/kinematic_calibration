@@ -122,6 +122,17 @@ public:
 	 */
 	void addMeasurementPoses(vector<MeasurementPose> measurementPoses);
 
+	/**
+	 * Returns all available poses.
+	 * @return All available poses.
+	 */
+	shared_ptr<map<int, MeasurementPose> > getPosePool() const;
+
+	/** Returns the kinematic calibration state.
+	 * @return The kinematic calibration state.
+	 */
+	KinematicCalibrationState getKinematicCalibrationState() const;
+
 	// overridden methods
 	virtual void getJacobian(Eigen::MatrixXd& jacobian) const;
 	virtual void initializePoseSet(const int& n);

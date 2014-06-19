@@ -374,6 +374,23 @@ private:
 
 };
 
+/**
+ * Strategy for selecting poses approximately equal distributed
+ * according to the estimated marker 3D pose.
+ */
+class EqualDist3dPoseSelectionStrategy: public PoseSelectionStrategy {
+public:
+	EqualDist3dPoseSelectionStrategy(int size);
+	virtual ~EqualDist3dPoseSelectionStrategy();
+
+	shared_ptr<PoseSet> getOptimalPoseSet(shared_ptr<PoseSet> initialPoseSet,
+			shared_ptr<ObservabilityIndex> observabilityIndex,
+			double& index);
+
+private:
+	int size;
+};
+
 } /* namespace kinematic_calibration */
 
 #endif /* POSESELECTIONNODE_H_ */

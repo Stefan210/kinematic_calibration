@@ -339,6 +339,30 @@ shared_ptr<PoseSet> ExchangeAddExchangePoseSelectionStrategy::getOptimalPoseSet(
 	return resultSet;
 }
 
+EqualDist3dPoseSelectionStrategy::EqualDist3dPoseSelectionStrategy(int size) :
+		size(size) {
+	// nothing to do
+}
+EqualDist3dPoseSelectionStrategy::~EqualDist3dPoseSelectionStrategy() {
+	// nothing to do
+}
+
+shared_ptr<PoseSet> EqualDist3dPoseSelectionStrategy::getOptimalPoseSet(
+		shared_ptr<PoseSet> initialPoseSet,
+		shared_ptr<ObservabilityIndex> observabilityIndex, double& index) {
+	// TODO: implement
+
+	// initialize resources
+	shared_ptr<MeasurementPoseSet> measurementPoseSet =
+			boost::shared_polymorphic_downcast<MeasurementPoseSet>(
+					initialPoseSet);
+	shared_ptr< map<int, MeasurementPose> > poseMap = measurementPoseSet->getPosePool();
+	KinematicCalibrationState state = measurementPoseSet->getKinematicCalibrationState();
+
+	vector<int> centroids;
+	map<int, int> closestCentroid;
+}
+
 void PoseSelectionNode::camerainfoCallback(
 		const sensor_msgs::CameraInfoConstPtr& msg) {
 	if (cameraModel.fromCameraInfo(msg)) {
