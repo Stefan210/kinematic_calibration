@@ -30,8 +30,16 @@ inline MarkerDetection* ArucoContext::getMarkerDetectionInstance() {
 inline g2o::OptimizableGraph::Edge* ArucoContext::getMeasurementEdge(
 		const measurementData& m, FrameImageConverter* frameImageConverter,
 		KinematicChain* kinematicChain) {
-	return new CheckerboardMeasurementEdge(m, frameImageConverter,
-			kinematicChain);
+	string marker_optimization_type = "single_point";
+	nh.param("marker_optimization_type", marker_optimization_type,
+			marker_optimization_type);
+	if (marker_optimization_type == "full_pose") {
+		return new ArucoPoseMeasurementEdge(m, frameImageConverter,
+				kinematicChain);
+	} else {
+		return new CheckerboardMeasurementEdge(m, frameImageConverter,
+				kinematicChain);
+	}
 }
 
 } /* namespace kinematic_calibration */

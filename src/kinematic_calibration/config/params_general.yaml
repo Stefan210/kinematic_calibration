@@ -23,8 +23,11 @@ camera_intrnsics_filename: nao_bottom_640x480.yaml
 
 ### Optimization parameters:
 # Number of iterations for the optimization algorithm:
-max_iterations: 10
+max_iterations: 30
 # use a robust kernel?
-use_robust_kernel: false
+use_robust_kernel: true
 # debug flag:
 debug_optimization: true
+# use single point optimization or pose? (only if available for the marker type)
+# "single_point" (default) or "full_pose"
+marker_optimization_type: single_point

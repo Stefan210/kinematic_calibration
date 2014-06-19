@@ -86,15 +86,15 @@ G2oJointOffsetOptimization::~G2oJointOffsetOptimization() {
 void G2oJointOffsetOptimization::optimize(
 		KinematicCalibrationState& optimizedState) {
 	typedef BlockSolver<BlockSolverTraits<-1, -1> > MyBlockSolver;
-	//typedef LinearSolverDense<MyBlockSolver::PoseMatrixType> MyLinearSolver;
-	typedef LinearSolverPCG<MyBlockSolver::PoseMatrixType> MyLinearSolver;
+	typedef LinearSolverDense<MyBlockSolver::PoseMatrixType> MyLinearSolver;
+	//typedef LinearSolverPCG<MyBlockSolver::PoseMatrixType> MyLinearSolver;
 
 	// allocating the optimizer
 	SparseOptimizer optimizer;
 
 	// create the linear solver
 	MyLinearSolver* linearSolver = new MyLinearSolver();
-	//linearSolver->setTolerance(0.5);
+	//linearSolver->setTolerance(1e-10);
 	//linearSolver->setAbsoluteTolerance(true);
 
 	// create the block solver on top of the linear solver
@@ -105,6 +105,8 @@ void G2oJointOffsetOptimization::optimize(
 //	OptimizationAlgorithmGaussNewton* algorithm = new OptimizationAlgorithmGaussNewton(blockSolver);
 	OptimizationAlgorithmLevenberg* algorithm =
 			new OptimizationAlgorithmLevenberg(blockSolver);
+	//algorithm->setMaxTrialsAfterFailure(100);
+	algorithm->printVerbose(cout);
 
 	optimizer.setAlgorithm(algorithm);
 

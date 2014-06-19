@@ -25,7 +25,8 @@ MarkerDetection* CheckerboardContext::getMarkerDetectionInstance() {
 	nh.param("checkerboard_rows", rows, rows);
 	nh.param("checkerboard_columns", columns, columns);
 	nh.param("checkerboard_squarelength", squarelength, squarelength);
-	ROS_INFO("Using a %dx%d checkerboard with square length %f (-1.0 if not set).",
+	ROS_INFO(
+			"Using a %dx%d checkerboard with square length %f (-1.0 if not set).",
 			rows, columns, squarelength);
 	CheckerboardDetection* instance = new CheckerboardDetection();
 	instance->setCheckerboardSize(rows, columns);
@@ -37,8 +38,16 @@ MarkerDetection* CheckerboardContext::getMarkerDetectionInstance() {
 inline g2o::OptimizableGraph::Edge* CheckerboardContext::getMeasurementEdge(
 		const measurementData& m, FrameImageConverter* frameImageConverter,
 		KinematicChain* kinematicChain) {
-	return new CheckerboardMeasurementEdge(m, frameImageConverter,
-			kinematicChain);
+	string marker_optimization_type = "single_point";
+	nh.param("marker_optimization_type", marker_optimization_type,
+			marker_optimization_type);
+	if (marker_optimization_type == "full_pose") {
+		return new CheckerboardPoseMeasurementEdge(m, frameImageConverter,
+				kinematicChain);
+	} else {
+		return new CheckerboardMeasurementEdge(m, frameImageConverter,
+				kinematicChain);
+	}
 }
 
 } /* namespace kinematic_calibration */

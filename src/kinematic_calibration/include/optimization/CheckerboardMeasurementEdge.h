@@ -52,6 +52,53 @@ public:
 	 */
 	void setError(tf::Transform cameraToMarker);
 };
+
+class ArucoPoseMeasurementEdge: public MeasurementEdge<6,
+ArucoPoseMeasurementEdge> {
+public:
+	/**
+	 * Constructor.
+	 * @param measurement Measurement represented by the edge.
+	 */
+	ArucoPoseMeasurementEdge(measurementData measurement,
+			FrameImageConverter* frameImageConverter,
+			KinematicChain* kinematicChain);
+
+	/**
+	 * Destructor.
+	 */
+	virtual ~ArucoPoseMeasurementEdge();
+
+	/**
+	 * Sets the single error terms to the error vector.
+	 * @param cameraToMarker Transformation from camera frame to marker frame
+	 */
+	void setError(tf::Transform cameraToMarker);
+};
+
+class CheckerboardPoseMeasurementEdge: public MeasurementEdge<6,
+		CheckerboardPoseMeasurementEdge> {
+public:
+	/**
+	 * Constructor.
+	 * @param measurement Measurement represented by the edge.
+	 */
+	CheckerboardPoseMeasurementEdge(measurementData measurement,
+			FrameImageConverter* frameImageConverter,
+			KinematicChain* kinematicChain);
+
+	/**
+	 * Destructor.
+	 */
+	virtual ~CheckerboardPoseMeasurementEdge();
+
+	/**
+	 * Sets the single error terms to the error vector.
+	 * @param cameraToMarker Transformation from camera frame to marker frame
+	 */
+	void setError(tf::Transform cameraToMarker);
+};
+
 } /* namespace kinematic_calibration */
 
 #endif /* CHECKERBOARDMEASUREMENTEDGE_H_ */
