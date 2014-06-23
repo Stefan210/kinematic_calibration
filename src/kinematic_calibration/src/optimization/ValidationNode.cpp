@@ -173,7 +173,7 @@ void ValidationNode::optimize() {
 void ValidationNode::measurementCb(const measurementDataConstPtr& msg) {
 	measurementData data = *msg;
 
-// check if the measurement contains to a new chain
+	// check if the measurement contains to a new chain
 	if (data.chain_name != chainName) {
 		// get the parameters
 		chainName = data.chain_name;
@@ -207,7 +207,7 @@ void ValidationNode::measurementCb(const measurementDataConstPtr& msg) {
 		}
 	}
 
-// save data
+	// save data
 	data.image = sensor_msgs::Image();
 	this->measurementsPool.push_back(data);
 	ROS_INFO("Measurement data received (%ld).", this->measurementsPool.size());
@@ -218,6 +218,7 @@ void ValidationNode::validate() {
 	printOptimizationError();
 	printValidationError();
 	printIntermediateResults();
+	printPartlyError();
 }
 
 void ValidationNode::camerainfoCallback(
@@ -373,6 +374,157 @@ void ValidationNode::printErrorPerIteration() {
 	csvFile.close();
 }
 
+void ValidationNode::printPartlyError() {
+	// init csv file
+	stringstream ss;
+	ss << folderName << "/" << "partly_error.csv";
+	ofstream csvFile(ss.str().c_str());
+	if (!csvFile.good()) {
+		ROS_WARN("Could not write the CSV file!");
+		return;
+	}
+	csvFile << "INITIAL\t";
+	csvFile << "OPTIMIZATIONERROR\tVALIDATIONERROR\t";
+	csvFile << "OPTMEAN\tOPTVAR\tOPTMIN\tOPTMAX\tOPTLOQTIL\tOPTHIQTIL\t";
+	csvFile << "VALMEAN\tVALVAR\tVALMIN\tVALMAX\tVALLOQTIL\tVALHIQTIL";
+	csvFile << "\n";
+
+	// init part states
+	vector<KinematicCalibrationState> partlyResults;
+	vector<string> resetComponent;
+
+	KinematicCalibrationState resetCameraIntrinsics = result;
+	resetCameraIntrinsics.cameraInfo = this->initialState.cameraInfo;
+	partlyResults.push_back(resetCameraIntrinsics);
+	resetComponent.push_back("CameraIntrinsics");
+
+	KinematicCalibrationState resetCameraExtrinsics = result;
+	resetCameraExtrinsics.cameraToHeadTransformation =
+			this->initialState.cameraToHeadTransformation;
+	partlyResults.push_back(resetCameraExtrinsics);
+	resetComponent.push_back("CameraExtrinsics");
+
+	KinematicCalibrationState resetJointOffsets = result;
+	resetJointOffsets.jointOffsets = this->initialState.jointOffsets;
+	partlyResults.push_back(resetJointOffsets);
+	resetComponent.push_back("JointOffsets");
+
+	KinematicCalibrationState resetMarker = result;
+	resetMarker.markerTransformations =
+			this->initialState.markerTransformations;
+	partlyResults.push_back(resetMarker);
+	resetComponent.push_back("MarkerTransformations");
+
+	// init poses
+	vector<MeasurementPose> optimizationPoses, validationPoses;
+
+	map<string, KinematicChain> kinematicChainsMap;
+	for (int i = 0; i < this->kinematicChains.size(); i++) {
+		kinematicChainsMap[kinematicChains[i].getName()] = kinematicChains[i];
+	}
+
+	for (int i = 0; i < this->optimizationData.size(); i++) {
+		optimizationPoses.push_back(
+				MeasurementPose(
+						kinematicChainsMap[this->optimizationData[i].chain_name],
+						this->optimizationData[i].jointState,
+						calibrationOptions));
+	}
+
+	for (int i = 0; i < this->validataionData.size(); i++) {
+		validationPoses.push_back(
+				MeasurementPose(
+						kinematicChainsMap[this->validataionData[i].chain_name],
+						this->validataionData[i].jointState,
+						calibrationOptions));
+	}
+
+	// iterate through all intermediate states
+	for (int num = 0; num < partlyResults.size(); num++) {
+		double optimizationError = 0.0, validationError = 0.0;
+		vector<double> optErrorVec, valErrorVec;
+
+		// calculate the optimized error
+		for (int poseNum = 0; poseNum < this->optimizationData.size();
+				poseNum++) {
+			double x, y;
+			optimizationPoses[poseNum].predictImageCoordinates(
+					partlyResults[num], x, y);
+			double currentX = optimizationData[poseNum].marker_data[0];
+			double currentY = optimizationData[poseNum].marker_data[1];
+			double optError = (fabs(currentX - x) * fabs(currentX - x)
+					+ fabs(currentY - y) * fabs(currentY - y));
+			optimizationError += optError;
+			optErrorVec.push_back(optError);
+		}
+
+		// calculate the validation error
+		for (int poseNum = 0; poseNum < this->validataionData.size();
+				poseNum++) {
+			double x, y;
+			validationPoses[poseNum].predictImageCoordinates(partlyResults[num],
+					x, y);
+			double currentX = validataionData[poseNum].marker_data[0];
+			double currentY = validataionData[poseNum].marker_data[1];
+			double valError = (fabs(currentX - x) * fabs(currentX - x)
+					+ fabs(currentY - y) * fabs(currentY - y));
+			validationError += valError;
+			valErrorVec.push_back(valError);
+		}
+
+		// prevent bad things
+		if (optErrorVec.empty())
+			optErrorVec.push_back(0.0);
+		if (valErrorVec.empty())
+			valErrorVec.push_back(0.0);
+
+		// write errors
+		csvFile << resetComponent[num] << "\t" << optimizationError << "\t"
+				<< validationError << "\t";
+
+		gsl_sort(optErrorVec.data(), 1, optErrorVec.size());
+		gsl_sort(valErrorVec.data(), 1, valErrorVec.size());
+
+		// write some statistics
+		csvFile << gsl_stats_mean(optErrorVec.data(), 1, optErrorVec.size())
+				<< "\t";
+		csvFile << gsl_stats_variance(optErrorVec.data(), 1, optErrorVec.size())
+				<< "\t";
+		csvFile << gsl_stats_min(optErrorVec.data(), 1, optErrorVec.size())
+				<< "\t";
+		csvFile << gsl_stats_max(optErrorVec.data(), 1, optErrorVec.size())
+				<< "\t";
+		csvFile
+				<< gsl_stats_quantile_from_sorted_data(optErrorVec.data(), 1,
+						optErrorVec.size(), 0.25) << "\t";
+		csvFile
+				<< gsl_stats_quantile_from_sorted_data(optErrorVec.data(), 1,
+						optErrorVec.size(), 0.75) << "\t";
+
+		csvFile << gsl_stats_mean(valErrorVec.data(), 1, valErrorVec.size())
+				<< "\t";
+		csvFile << gsl_stats_variance(valErrorVec.data(), 1, valErrorVec.size())
+				<< "\t";
+		csvFile << gsl_stats_min(valErrorVec.data(), 1, valErrorVec.size())
+				<< "\t";
+		csvFile << gsl_stats_max(valErrorVec.data(), 1, valErrorVec.size())
+				<< "\t";
+		csvFile
+				<< gsl_stats_quantile_from_sorted_data(valErrorVec.data(), 1,
+						valErrorVec.size(), 0.25) << "\t";
+		csvFile
+				<< gsl_stats_quantile_from_sorted_data(valErrorVec.data(), 1,
+						valErrorVec.size(), 0.75);
+
+		// finish the line
+		csvFile << "\n";
+	}
+
+	// close file
+	csvFile.flush();
+	csvFile.close();
+}
+
 void ValidationNode::printOptimizationError() {
 	printError(optimizationData, "optimization_error.csv");
 }
@@ -423,8 +575,9 @@ void ValidationNode::printError(vector<measurementData>& measurements,
 				jointOffsets[this->kinematicChains[j].getTip()] = 0;
 				if (calibrationOptions.calibrateJoint6D) {
 					// optimization of joint 6D offsets
-					KinematicChain kc = this->kinematicChains[j].withTransformations(
-							result.jointTransformations);
+					KinematicChain kc =
+							this->kinematicChains[j].withTransformations(
+									result.jointTransformations);
 					kc.getRootToTip(jointPositions, jointOffsets,
 							cameraToEndEffector);
 				} else {
@@ -468,7 +621,7 @@ void ValidationNode::printError(vector<measurementData>& measurements,
 				<< (currentY - y) << "\t" << error << "\n";
 	}
 
-// write the csv file
+	// write the csv file
 	csvFile.flush();
 	csvFile.close();
 }

@@ -211,6 +211,7 @@ protected:
 	void printError(vector<measurementData>& measurements, string filename);
 	void printResult();
 	void printIntermediateResults();
+	void printPartlyError();
 
 	map<string, KDL::Frame> getJointFrames();
 
