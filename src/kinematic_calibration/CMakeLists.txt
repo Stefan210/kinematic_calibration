@@ -326,6 +326,8 @@ add_executable(poseSelectionNode
 	src/common/PoseSet.cpp
 	src/pose_generation/ObservabilityIndex.cpp
 	src/pose_generation/PoseSelectionNode.cpp
+	src/pose_generation/PoseSelectionStrategy.cpp
+	src/pose_generation/PoseSource.cpp
 	)
 	
 target_link_libraries(poseSelectionNode poseSampling errorModel ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
