@@ -22,9 +22,9 @@
 #include <vector>
 
 #include "../optimization/KinematicCalibrationState.h"
-#include "KinematicChain.h"
-#include "MeasurementPose.h"
-#include "ModelLoader.h"
+#include "../common/KinematicChain.h"
+#include "../common/MeasurementPose.h"
+#include "../common/ModelLoader.h"
 #include "ObservabilityIndex.h"
 
 namespace kinematic_calibration {

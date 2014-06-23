@@ -24,9 +24,9 @@
 #include <hrl_kinematics/TestStability.h>
 
 #include "../optimization/KinematicCalibrationState.h"
-#include "KinematicChain.h"
-#include "MeasurementPose.h"
-#include "ModelLoader.h"
+#include "../common/KinematicChain.h"
+#include "../common/MeasurementPose.h"
+#include "../common/ModelLoader.h"
 
 namespace kinematic_calibration {
 class KinematicChain;

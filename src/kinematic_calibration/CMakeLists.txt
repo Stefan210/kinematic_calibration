@@ -314,18 +314,18 @@ target_link_libraries(errorModelTest errorModel ${catkin_LIBRARIES})
 
 
 ### PoseSampling
-add_library(poseSampling src/common/PoseSampling.cpp)
+add_library(poseSampling src/pose_generation/PoseSampling.cpp)
 target_link_libraries(poseSampling errorModel modelLoader frameImageConverter kinematicChain ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
 
-add_executable(poseSamplingMain src/common/PoseSamplingMain.cpp)
+add_executable(poseSamplingMain src/pose_generation/PoseSamplingMain.cpp)
 target_link_libraries(poseSamplingMain poseSampling)
 
 
 ### PoseSelection
 add_executable(poseSelectionNode
 	src/common/PoseSet.cpp
-	src/common/ObservabilityIndex.cpp
-	src/common/PoseSelectionNode.cpp
+	src/pose_generation/ObservabilityIndex.cpp
+	src/pose_generation/PoseSelectionNode.cpp
 	)
 	
 target_link_libraries(poseSelectionNode poseSampling errorModel ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})

@@ -5,7 +5,7 @@
  *      Author: stefan
  */
 
-#include "../../include/common/ObservabilityIndex.h"
+#include "../../include/pose_generation/ObservabilityIndex.h"
 
 #include <Eigen/SVD>
 #include <Eigen/Core>

@@ -8,7 +8,7 @@
 #ifndef OBSERVABILITYINDEX_H_
 #define OBSERVABILITYINDEX_H_
 
-#include "PoseSet.h"
+#include "../common/PoseSet.h"
 
 namespace kinematic_calibration {
 

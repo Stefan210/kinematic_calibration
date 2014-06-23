@@ -5,7 +5,7 @@
  *      Author: stefan
  */
 
-#include "../../include/common/PoseSampling.h"
+#include "../../include/pose_generation/PoseSampling.h"
 
 using namespace kinematic_calibration;
 

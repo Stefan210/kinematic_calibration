@@ -5,12 +5,10 @@
  *      Author: stefan
  */
 
-#include "../../include/common/PoseSelectionNode.h"
-
-#include "../../include/common/PoseSampling.h"
+#include "../../include/pose_generation/PoseSelectionNode.h"
+#include "../../include/pose_generation/PoseSampling.h"
 
 #include <boost/smart_ptr/make_shared.hpp>
-//#include <kdl/kdl.hpp>
 #include <kdl/tree.hpp>
 #include <opencv/cv.h>
 #include <ros/callback_queue.h>

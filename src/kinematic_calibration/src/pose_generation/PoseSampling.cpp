@@ -5,7 +5,7 @@
  *      Author: stefan
  */
 
-#include "../../include/common/PoseSampling.h"
+#include "../../include/pose_generation/PoseSampling.h"
 
 #include <boost/smart_ptr/make_shared.hpp>
 #include <image_geometry/pinhole_camera_model.h>
