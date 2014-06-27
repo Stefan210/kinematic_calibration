@@ -44,13 +44,23 @@ MeasurementPoseSet::~MeasurementPoseSet() {
 }
 
 void MeasurementPoseSet::addMeasurementPose(MeasurementPose pose) {
-	(*this->poseSet)[numOfPoses++] = pose;
+	(*this->poseSet)[numOfPoses] = pose;
+	numOfPoses++;
 }
 
 void MeasurementPoseSet::addMeasurementPoses(vector<MeasurementPose> poses) {
 	for (vector<MeasurementPose>::const_iterator it = poses.begin();
 			it != poses.end(); it++) {
 		addMeasurementPose(*it);
+	}
+}
+
+void MeasurementPoseSet::addActiveMeasurementPoses(
+		vector<MeasurementPose> poses) {
+	for (vector<MeasurementPose>::const_iterator it = poses.begin();
+			it != poses.end(); it++) {
+		addMeasurementPose(*it);
+		activePoses.push_back(numOfPoses-1);
 	}
 }
 
@@ -196,5 +206,3 @@ KinematicCalibrationState MeasurementPoseSet::getKinematicCalibrationState() con
 }
 
 } /* namespace kinematic_calibration */
-
-

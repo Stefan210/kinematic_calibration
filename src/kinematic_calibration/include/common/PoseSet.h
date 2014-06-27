@@ -123,6 +123,12 @@ public:
 	void addMeasurementPoses(vector<MeasurementPose> measurementPoses);
 
 	/**
+	 * Adds a set of poses to the active pose set.
+	 * @param measurementPosees Poses to be added.
+	 */
+	void addActiveMeasurementPoses(vector<MeasurementPose> measurementPoses);
+
+	/**
 	 * Returns all available poses.
 	 * @return All available poses.
 	 */
