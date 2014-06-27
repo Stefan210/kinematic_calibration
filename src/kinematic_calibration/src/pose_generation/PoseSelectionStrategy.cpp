@@ -55,6 +55,7 @@ shared_ptr<PoseSet> RandomPoseSelectionStrategy::getOptimalPoseSet(
 		vector<shared_ptr<PoseSet> > successors = successor->addPose();
 		int randIdx = rand() % successors.size();
 		successor = successor->addPose()[randIdx];
+		observabilityIndex->calculateIndex(*successor, index);
 	}
 	return successor;
 }
