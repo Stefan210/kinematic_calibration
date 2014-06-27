@@ -32,21 +32,20 @@ void ValidationPoseSelectionNode::run() {
 	nh.getParam("chain_name", chainName);
 
 	// get optimal poses for each split
-	ValidationPoseSource* poseSource = new ValidationPoseSource(numOfPartitionsPerChain);
-	PoseSelectionNode node(*poseSource);
+	PoseSelectionNode node(poseSource);
 	for (int i = 1; i <= numOfPartitionsPerChain; i++) {
-		poseSource->setCurrentValidationPartition(i);
+		poseSource.setCurrentValidationPartition(i);
 		shared_ptr<PoseSet> poses = node.getOptimalPoseSet();
-		vector<string> ids = poseSource->getPoseIds(poses->getPoses());
+		vector<string> ids = poseSource.getPoseIds(poses->getPoses());
 		cout << "Optimized pose ids: " << endl;
-		for (int i = 0; i < ids.size(); i++) {
-			cout << "\"" << ids[i] << "\", ";
+		for (int j = 0; j < ids.size(); j++) {
+			cout << "\"" << ids[j] << "\", ";
 		}
 		cout << endl;
-		ids = poseSource->getPoseIds(poses->getUnusedPoses());
+		ids = poseSource.getPoseIds(poses->getUnusedPoses());
 		cout << "Unused pose ids: " << endl;
-		for (int i = 0; i < ids.size(); i++) {
-			cout << "\"" << ids[i] << "\", ";
+		for (int j = 0; j < ids.size(); j++) {
+			cout << "\"" << ids[j] << "\", ";
 		}
 		cout << endl;
 
@@ -54,24 +53,29 @@ void ValidationPoseSelectionNode::run() {
 		map<int, shared_ptr<PoseSet> > sets = node.getIntermediatePoseSets();
 		for (map<int, shared_ptr<PoseSet> >::iterator it = sets.begin();
 				it != sets.end(); it++) {
-			// open the file
+			// make directory
 			stringstream ss;
-			ss << chainName << "\\" << chainName << "_" << it->second->getNumberOfPoses();
+			ss << chainName << "/" << "all_except_" << i;
+			mkdir(ss.str().c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+			// open the file
+
+			ss << "/" << chainName << "_" << it->second->getNumberOfPoses();
 			ofstream ofs(ss.str().c_str());
 			if (!ofs.good()) {
 				cout << "Could not write the file  " << ss.str() << endl;
 				break;
 			}
-			vector<string> ids = poseSource->getPoseIds(it->second->getPoses());
-			for (int i = 0; i < ids.size(); i++) {
-				ofs << "\"" << ids[i] << "\", ";
+			vector<string> ids = poseSource.getPoseIds(it->second->getPoses());
+			for (int j = 0; j < ids.size(); j++) {
+				ofs << "\"" << ids[j] << "\", ";
 			}
 			ofs.close();
 		}
 
 		// write intermediate indices
 		stringstream indicesFilenameStream;
-		indicesFilenameStream << chainName << "\\" << chainName << "_" << sets.size()
+		indicesFilenameStream << chainName << "/" << "all_except_" << i;
+		indicesFilenameStream << "/" << chainName << "_" << sets.size()
 				<< "_indices.csv";
 		ofstream indicesOfs(indicesFilenameStream.str().c_str());
 		map<int, double> indices = node.getIntermediateIndices();
@@ -87,12 +91,12 @@ void ValidationPoseSelectionNode::run() {
 			indicesOfs << ss.str();
 		}
 		indicesOfs.close();
+
 	}
 }
 
 ValidationPoseSource::ValidationPoseSource(int numOfPartitionsPerChain) :
-		MeasurementMsgPoseSource(), numOfPartitionsPerChain(
-				numOfPartitionsPerChain), validationPartition(1) {
+		numOfPartitionsPerChain(numOfPartitionsPerChain), validationPartition(1) {
 }
 
 ValidationPoseSource::~ValidationPoseSource() {
@@ -110,15 +114,12 @@ void ValidationPoseSource::splitPoseSets(int numOfPartitionsPerChain) {
 		int partitionSize = size / numOfPartitionsPerChain;
 		ROS_INFO("Partition size for chain %s is %d.", it->first.c_str(),
 				partitionSize);
+		vector<sensor_msgs::JointState>::iterator poseIt = it->second.begin();
 		for (int curPartition = 1;
 				curPartition <= this->numOfPartitionsPerChain; curPartition++) {
-			for (vector<sensor_msgs::JointState>::iterator poseIt =
-					it->second.begin(); poseIt != it->second.end(); poseIt++) {
-				if (this->splits[chainName][curPartition].size()
-						>= partitionSize) {
-					break;
-				}
+			while (this->splits[chainName][curPartition].size() < partitionSize) {
 				this->splits[chainName][curPartition].push_back(*poseIt);
+				poseIt++;
 			}
 			// write the ids
 			stringstream ss;
@@ -143,13 +144,13 @@ void ValidationPoseSource::setCurrentValidationPartition(
 
 void ValidationPoseSource::getPoses(const KinematicChain& kinematicChain,
 		vector<MeasurementPose>& poses) {
-// collect measurements if not done so far
+	// collect measurements if not done so far
 	if (this->poses.size() == 0) {
 		this->collectData();
 		this->splitPoseSets(this->numOfPartitionsPerChain);
 	}
 
-// merge all splits except the one to validate
+	// merge all splits except the one to validate
 	for (int i = 1; i <= this->numOfPartitionsPerChain; i++) {
 		if (i == this->validationPartition) {
 			continue;
@@ -165,11 +166,11 @@ void ValidationPoseSource::getPoses(const KinematicChain& kinematicChain,
 int ValidationPoseSource::writeIds(vector<sensor_msgs::JointState> jointStates,
 		string folderName, string fileName) {
 	// create the directory, if not exists
-	mkdir(folderName.c_str(), 777);
+	mkdir(folderName.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 
 	// open the file
 	stringstream ss;
-	ss << folderName << "\\" << fileName;
+	ss << folderName << "/" << fileName;
 	ofstream ofs(ss.str().c_str());
 	if (!ofs.good()) {
 		cout << "Could not write the file  " << ss.str() << endl;
@@ -189,7 +190,7 @@ int ValidationPoseSource::writeIds(vector<sensor_msgs::JointState> jointStates,
 using namespace kinematic_calibration;
 
 int main(int argc, char** argv) {
-	// initialize the node
+// initialize the node
 	stringstream nodeName;
 	ros::Time::init();
 	nodeName << "PoseSelectionNode";

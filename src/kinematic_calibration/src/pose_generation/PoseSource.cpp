@@ -15,9 +15,11 @@ MeasurementMsgPoseSource::MeasurementMsgPoseSource() :
 		collectingData(false) {
 	this->topic = "/kinematic_calibration/measurement_data";
 	this->nh.setCallbackQueue(&callbackQueue);
+	this->measurementSubscriber.shutdown();
 	this->measurementSubscriber = nh.subscribe(topic, 10000,
 			&MeasurementMsgPoseSource::measurementCb, this);
 
+	this->msgService.shutdown();
 	this->msgService = nh.advertiseService(
 			"/kinematic_calibration/stop_collecting",
 			&MeasurementMsgPoseSource::stopCollectingCallback, this);
@@ -51,8 +53,8 @@ void MeasurementMsgPoseSource::measurementCb(
 }
 
 void MeasurementMsgPoseSource::collectData() {
-	collectingData = true;
-	while (collectingData && ros::ok()) {
+	this->collectingData = true;
+	while (this->collectingData && ros::ok()) {
 		this->callbackQueue.callAvailable();
 	}
 }
