@@ -15,7 +15,7 @@ MeasurementMsgPoseSource::MeasurementMsgPoseSource() :
 		collectingData(false) {
 	this->topic = "/kinematic_calibration/measurement_data";
 	this->nh.setCallbackQueue(&callbackQueue);
-	this->measurementSubscriber = nh.subscribe(topic, 1000,
+	this->measurementSubscriber = nh.subscribe(topic, 10000,
 			&MeasurementMsgPoseSource::measurementCb, this);
 
 	this->msgService = nh.advertiseService(
@@ -52,7 +52,7 @@ void MeasurementMsgPoseSource::measurementCb(
 
 void MeasurementMsgPoseSource::collectData() {
 	collectingData = true;
-	while (collectingData) {
+	while (collectingData && ros::ok()) {
 		this->callbackQueue.callAvailable();
 	}
 }

@@ -105,12 +105,19 @@ protected:
 	bool stopCollectingCallback(std_srvs::Empty::Request& request,
 			std_srvs::Empty::Response& response);
 
-private:
+	/**
+	 * Collected poses.
+	 */
+	map<string, vector<sensor_msgs::JointState> > poses;
+
+	map<ros::Time, string> ids;
+
 	/**
 	 * NodeHandle instance.
 	 */
 	NodeHandle nh;
 
+private:
 	/**
 	 * Subscriber for measurement messages.
 	 */
@@ -120,13 +127,6 @@ private:
 	 * Topic of the measurements.
 	 */
 	string topic;
-
-	/**
-	 * Collected poses.
-	 */
-	map<string, vector<sensor_msgs::JointState> > poses;
-
-	map<ros::Time, string> ids;
 
 	/**
 	 * Class private callback queue.
