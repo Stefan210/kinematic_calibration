@@ -327,6 +327,7 @@ add_executable(poseSelectionNode
 	src/pose_generation/ObservabilityIndex.cpp
 	src/pose_generation/PoseSelectionNode.cpp
 	src/pose_generation/PoseSelectionStrategy.cpp
+	src/pose_generation/PoseSelectionNodeMain.cpp
 	src/pose_generation/PoseSource.cpp
 	)
 	
@@ -409,6 +410,8 @@ add_executable(validationNode
 	src/optimization/LocOptKinCalState.cpp
 	src/optimization/LocOptJointOffsetOptimization.cpp
 	src/common/MeasurementPose.cpp
+	src/common/PoseSet.cpp
+	src/pose_generation/ObservabilityIndex.cpp
 	)
 target_link_libraries(validationNode 
 	frameImageConverter
@@ -420,6 +423,19 @@ target_link_libraries(validationNode
 	${gsl_LIBRARIES}
 	)
 endif()
+
+### ValidationPoseSelection
+add_executable(validationPoseSelectionNode
+	src/common/PoseSet.cpp
+	src/pose_generation/ObservabilityIndex.cpp
+	src/pose_generation/PoseSelectionNode.cpp
+	src/pose_generation/ValidationPoseSelectionNode.cpp
+	src/pose_generation/PoseSelectionStrategy.cpp
+	src/pose_generation/PoseSource.cpp
+	)
+	
+target_link_libraries(validationPoseSelectionNode poseSampling errorModel ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
+
 
 ### Result publishing
 add_executable(updateNode 
