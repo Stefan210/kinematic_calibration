@@ -35,6 +35,8 @@
 #include "../../include/common/MeasurementPose.h"
 #include "../../include/optimization/G2oJointOffsetOptimization.h"
 #include "../../include/optimization/CameraIntrinsicsVertex.h"
+#include "../../include/pose_generation/ObservabilityIndex.h"
+#include "../../include/common/PoseSet.h"
 
 namespace kinematic_calibration {
 
@@ -261,7 +263,12 @@ void ValidationNode::printErrorPerIteration() {
 	csvFile << "OPTMEAN\tOPTVAR\tOPTMIN\tOPTMAX\tOPTLOQTIL\tOPTHIQTIL\t";
 	csvFile << "VALMEAN\tVALVAR\tVALMIN\tVALMAX\tVALLOQTIL\tVALHIQTIL";
 
+	if(kinematicChains.size() == 1) {
+		csvFile << "\tOBSERVINDEX";
+	}
 	csvFile << "\n";
+
+	NoiseAmplificationIndex indexCalculator;
 
 	// init poses
 	vector<MeasurementPose> optimizationPoses, validationPoses;
@@ -364,6 +371,15 @@ void ValidationNode::printErrorPerIteration() {
 		csvFile
 				<< gsl_stats_quantile_from_sorted_data(valErrorVec.data(), 1,
 						valErrorVec.size(), 0.75);
+
+		// observability index
+		if(kinematicChains.size() == 1) {
+			double obsIndex;
+			MeasurementPoseSet poseSet(intermediateStates[iteration]);
+			poseSet.addActiveMeasurementPoses(optimizationPoses);
+			indexCalculator.calculateIndex(poseSet,	obsIndex);
+			csvFile << "\t" << obsIndex;
+		}
 
 		// finish the line
 		csvFile << "\n";
@@ -636,6 +652,7 @@ map<string, KDL::Frame> ValidationNode::getJointFrames() {
 		tf::transformTFToKDL(it->second, frame);
 		jointFrames[it->first] = frame;
 	}
+	return jointFrames;
 }
 
 void ValidationNode::printResult() {
