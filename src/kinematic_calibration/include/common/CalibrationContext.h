@@ -127,6 +127,8 @@ public:
 	int maxIterations;
 	bool debug;
 	bool useRobustKernel;
+	bool doEarlyStopping;
+	double gainThreshold;
 };
 } /* namespace kinematic_calibration */
 

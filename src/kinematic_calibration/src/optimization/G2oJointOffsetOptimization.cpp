@@ -32,6 +32,7 @@
 #include <g2o/solvers/pcg/linear_solver_pcg.h>
 #include <g2o/solvers/dense/linear_solver_dense.h>
 #include <g2o/core/robust_kernel_impl.h>
+#include <g2o/core/sparse_optimizer_terminate_action.h>
 
 #include <kdl/kdl.hpp>
 
@@ -100,6 +101,7 @@ void G2oJointOffsetOptimization::optimize(
 	// create the block solver on top of the linear solver
 	MyBlockSolver* blockSolver = new MyBlockSolver(linearSolver);
 	blockSolver->setLevenberg(true);
+	blockSolver->setSchur(false);
 
 	// create the algorithm to carry out the optimization
 //	OptimizationAlgorithmGaussNewton* algorithm = new OptimizationAlgorithmGaussNewton(blockSolver);
@@ -109,6 +111,7 @@ void G2oJointOffsetOptimization::optimize(
 	algorithm->printVerbose(cout);
 
 	optimizer.setAlgorithm(algorithm);
+	//blockSolver->init(&optimizer);
 
 	// get the options
 	CalibrationOptions options = context.getCalibrationOptions();
@@ -252,10 +255,18 @@ void G2oJointOffsetOptimization::optimize(
 						cameraIntrinsicsVertex, jointFrameVertices));
 	}
 
+	// early stopping
+	if (optOptions.doEarlyStopping) {
+		SparseOptimizerTerminateAction* terminateAction =
+				new SparseOptimizerTerminateAction();
+		terminateAction->setGainThreshold(optOptions.gainThreshold);
+		optimizer.addPostIterationAction(terminateAction);
+	}
+
 	// optimize:
 	ROS_INFO("Starting optimization...");
 	optimizer.initializeOptimization();
-	optimizer.computeActiveErrors();
+	//optimizer.computeActiveErrors();
 	optimizer.setVerbose(true);
 	optimizer.optimize(optOptions.maxIterations);
 	ROS_INFO("Done!");
@@ -306,8 +317,7 @@ void G2oJointOffsetOptimization::setSaveIntermediateStates(
 }
 
 void G2oJointOffsetOptimization::getIntermediateStates(
-		vector<KinematicCalibrationState>& intermediateStates) const
-{
+		vector<KinematicCalibrationState>& intermediateStates) const {
 	intermediateStates = this->intermediateStates;
 }
 

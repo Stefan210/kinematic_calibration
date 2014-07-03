@@ -2,7 +2,7 @@
 # - true: initial parameters are loaded, optimized and updated
 # - false: initial parameters are used and written back, but not modified 
 calibrate_joint_offsets: true
-calibrate_camera_transform: true
+calibrate_camera_transform: false
 calibrate_camera_intrinsics: true
 calibrate_marker_transform: true
 
@@ -23,11 +23,14 @@ camera_intrnsics_filename: nao_bottom_640x480.yaml
 
 ### Optimization parameters:
 # Number of iterations for the optimization algorithm:
-max_iterations: 30
+max_iterations: 50
+# do early stopping?
+do_early_stopping: true
+gain_threshold: 0.01 
 # use a robust kernel?
-use_robust_kernel: true
+use_robust_kernel: false
 # debug flag:
 debug_optimization: true
 # use single point optimization or pose? (only if available for the marker type)
 # "single_point" (default) or "full_pose"
-marker_optimization_type: single_point
+marker_optimization_type: full_pose

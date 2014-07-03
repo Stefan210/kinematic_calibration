@@ -83,6 +83,8 @@ OptimizationOptions RosCalibContext::getOptimizationOptions() const {
 	nh.getParam("max_iterations", options.maxIterations);
 	nh.param("debug_optimization", options.debug, false);
 	nh.param("use_robust_kernel", options.useRobustKernel, false);
+	nh.param("do_early_stopping", options.doEarlyStopping, false);
+	nh.param("gain_threshold", options.gainThreshold, 1e-3);
 	return options;
 }
 
