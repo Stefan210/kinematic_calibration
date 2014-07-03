@@ -25,7 +25,7 @@ camera_intrnsics_filename: nao_bottom_640x480.yaml
 # Number of iterations for the optimization algorithm:
 max_iterations: 50
 # do early stopping?
-do_early_stopping: true
+do_early_stopping: false
 gain_threshold: 0.01 
 # use a robust kernel?
 use_robust_kernel: false
@@ -33,4 +33,4 @@ use_robust_kernel: false
 debug_optimization: true
 # use single point optimization or pose? (only if available for the marker type)
 # "single_point" (default) or "full_pose"
-marker_optimization_type: full_pose
+marker_optimization_type: single_point

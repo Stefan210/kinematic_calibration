@@ -18,7 +18,7 @@ using namespace g2o;
 /**
  * Vertex for 6D transformation.
  */
-class TransformationVertex : public VertexSE3 {
+class TransformationVertex: public VertexSE3 {
 public:
 	/**
 	 * Constructor.
@@ -42,6 +42,13 @@ public:
 	 */
 	void setEstimateFromTfTransform(const tf::Transform& tfTransform);
 
+	void setFixed(bool fixed) {
+		VertexSE3::setFixed(fixed);
+	}
+	void setId(int newId) {
+		VertexSE3::setId(newId);
+	}
+
 protected:
 	/**
 	 * Converts from tf::Transform to Eigen::Isometry3d.
@@ -51,6 +58,39 @@ protected:
 	void tfToEigen(const tf::Transform& tfTransformation,
 			Eigen::Isometry3d& eigenIsometry) const;
 };
+
+class TranslationVertex: public TransformationVertex {
+public:
+	TranslationVertex() {
+	}
+	virtual ~TranslationVertex() {
+	}
+	;
+
+	void oplusImpl(const double* delta) {
+		std::vector<double> deltaVec;
+		for (int i = 0; i < 3; i++)
+			deltaVec.push_back(delta[i]);
+
+		for (int i = 0; i < 3; i++)
+			deltaVec.push_back(0.0);
+
+		TransformationVertex::oplusImpl(&deltaVec[0]);
+	}
+
+	int estimateDimension() const {
+		return 3;
+	}
+
+	int minimalEstimateDimension() const {
+		return 3;
+	}
+
+protected:
+	tf::Vector3 translation;
+};
+
+typedef TransformationVertex MarkerTransformationVertex;
 
 } /* namespace kinematic_calibration */
 

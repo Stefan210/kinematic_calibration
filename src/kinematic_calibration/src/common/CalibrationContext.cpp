@@ -68,13 +68,17 @@ CalibrationOptions RosCalibContext::getCalibrationOptions() const {
 			options.calibrateCameraIntrinsics);
 	nh.getParam("calibrate_marker_transform", options.calibrateMarkerTransform);
 	nh.param("calibrate_joint_6D", options.calibrateJoint6D, false);
+	options.markerOptimizationType = "single_point";
+	nh.param("marker_optimization_type", options.markerOptimizationType,
+			options.markerOptimizationType);
 	return options;
 }
 
 DataCaptureOptions RosCalibContext::getDataCaptureOptions() const {
 	DataCaptureOptions options;
 	nh.getParam("/DataCapture/params/find_marker", options.findMarker);
-	nh.getParam("/DataCapture/params/move_marker_to_corners", options.moveMarkerToCorners);
+	nh.getParam("/DataCapture/params/move_marker_to_corners",
+			options.moveMarkerToCorners);
 	return options;
 }
 

@@ -108,6 +108,7 @@ public:
 	bool calibrateCameraIntrinsics;
 	bool calibrateMarkerTransform;
 	bool calibrateJoint6D;
+	string markerOptimizationType;
 };
 
 /**

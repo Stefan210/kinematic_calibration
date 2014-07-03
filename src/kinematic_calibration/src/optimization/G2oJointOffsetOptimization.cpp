@@ -43,7 +43,7 @@ using namespace std;
 
 namespace kinematic_calibration {
 
-typedef TransformationVertex MarkerTransformationVertex;
+//typedef TransformationVertex MarkerTransformationVertex;
 typedef TransformationVertex CameraTransformationVertex;
 
 class SaveStateHyperGraphAction: public g2o::HyperGraphAction {
@@ -157,8 +157,13 @@ void G2oJointOffsetOptimization::optimize(
 	map<string, MarkerTransformationVertex*> markerTransformationVertices;
 	map<string, KinematicChain> kinematicChainsMap;
 	for (int i = 0; i < kinematicChains.size(); i++) {
-		MarkerTransformationVertex* markerTransformationVertex =
-				new MarkerTransformationVertex();
+		MarkerTransformationVertex* markerTransformationVertex;
+		if ("single_point" == options.markerOptimizationType) {
+			markerTransformationVertex = new TranslationVertex();
+		} else {
+			// full pose
+			markerTransformationVertex = new TransformationVertex();
+		}
 		markerTransformationVertex->setId(++id);
 		markerTransformationVertex->setFixed(!options.calibrateMarkerTransform);
 		optimizer.addVertex(markerTransformationVertex);
