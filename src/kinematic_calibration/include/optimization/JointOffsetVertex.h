@@ -28,7 +28,7 @@ public:
 	 */
 	JointOffsetVertex() :
 			jointNames(vector<string>()) {
-		this->_dimension = jointNames.size();
+		//this->_dimension = jointNames.size();
 		this->setToOrigin();
 	}
 
@@ -38,7 +38,7 @@ public:
 	 */
 	JointOffsetVertex(const vector<string>& jointNames) :
 			jointNames(jointNames) {
-		this->_dimension = jointNames.size();
+		//this->_dimension = jointNames.size();
 		this->setToOrigin();
 	}
 
