@@ -30,7 +30,6 @@
 #include <g2o/core/optimization_algorithm_levenberg.h>
 #include <g2o/solvers/dense/linear_solver_dense.h>
 #include <g2o/solvers/pcg/linear_solver_pcg.h>
-#include <g2o/solvers/dense/linear_solver_dense.h>
 #include <g2o/core/robust_kernel_impl.h>
 #include <g2o/core/sparse_optimizer_terminate_action.h>
 
@@ -57,7 +56,7 @@ public:
 			map<string, g2o::HyperGraph::Vertex*> jointFrameVertices);
 
 	/// Desctructor.
-	~SaveStateHyperGraphAction();
+	virtual ~SaveStateHyperGraphAction();
 
 	/// Reimplementation of the action.
 	virtual HyperGraphAction* operator()(const HyperGraph* graph,
@@ -86,9 +85,9 @@ G2oJointOffsetOptimization::~G2oJointOffsetOptimization() {
 
 void G2oJointOffsetOptimization::optimize(
 		KinematicCalibrationState& optimizedState) {
-	typedef BlockSolver<BlockSolverTraits<-1, -1> > MyBlockSolver;
-	typedef LinearSolverDense<MyBlockSolver::PoseMatrixType> MyLinearSolver;
-	//typedef LinearSolverPCG<MyBlockSolver::PoseMatrixType> MyLinearSolver;
+	//typedef BlockSolver<BlockSolverTraits<-1, -1> > MyBlockSolver;
+	typedef BlockSolverX MyBlockSolver;
+	typedef LinearSolverDense<MatrixXd> MyLinearSolver;
 
 	// allocating the optimizer
 	SparseOptimizer optimizer;
@@ -134,23 +133,59 @@ void G2oJointOffsetOptimization::optimize(
 		jointOptType = NONE;
 
 	// instantiate the vertex for the joint offsets
+	// TODO: as parameter / from model!
+	vector<string> mimicJointsFirst, mimicJointsSecond;
+	mimicJointsFirst.push_back("RHipYawPitch");
+	mimicJointsSecond.push_back("LHipYawPitch");
+	map<string, string> currentMimicJoints;
 	vector<string> jointNames;
+	int skipLast = options.calibrateMarkerTransform ? 1 : 0;
+	int skipFirst = options.calibrateCameraTransform ? 1 : 0;
 	for (int i = 0; i < kinematicChains.size(); i++) {
 		vector<string> currentNames;
 		kinematicChains[i].getJointNames(currentNames);
-		// add joint names if not already contained
-		for (int j = 0; j < currentNames.size() - 1; j++) {
+
+		for (int j = skipFirst; j < currentNames.size() - skipLast; j++) {
+			string currentName = currentNames[j];
+			// check if not already contained
 			if (find(jointNames.begin(), jointNames.end(), currentNames[j])
-					== jointNames.end()) {
-				jointNames.push_back(currentNames[j]);
+					!= jointNames.end()) {
+				// joint already contained
+				continue;
 			}
 
+			// check if current is mimic joint
+			for (int k = 0; k < mimicJointsFirst.size(); k++) {
+				if (currentName == mimicJointsFirst[k]
+						&& find(jointNames.begin(), jointNames.end(),
+								mimicJointsSecond[k]) != jointNames.end()) {
+					currentMimicJoints[mimicJointsSecond[k]] = currentName;
+					continue;
+				}
+			}
+			for (int k = 0; k < mimicJointsSecond.size(); k++) {
+				if (currentName == mimicJointsSecond[k]
+						&& find(jointNames.begin(), jointNames.end(),
+								mimicJointsFirst[k]) != jointNames.end()) {
+					currentMimicJoints[mimicJointsFirst[k]] = currentName;
+					continue;
+				}
+			}
+
+			// everything ok -> add the joint
+			jointNames.push_back(currentNames[j]);
 		}
 	}
 	JointOffsetVertex* jointOffsetVertex = new JointOffsetVertex(jointNames);
 	//jointOffsetVertex->setEstimate(initialState.jointOffsets);
 	jointOffsetVertex->setId(++id);
 	jointOffsetVertex->setFixed(jointOptType != JOINT_OFFSETS);
+	for (map<string, string>::iterator it = currentMimicJoints.begin();
+			it != currentMimicJoints.end(); it++) {
+		jointOffsetVertex->setMimicJoint(it->first, it->second);
+		ROS_INFO("Mimic joints: %s <-> %s.", it->first.c_str(),
+				it->second.c_str());
+	}
 	optimizer.addVertex(jointOffsetVertex);
 
 	// instantiate the vertices for the marker transformations
@@ -269,7 +304,7 @@ void G2oJointOffsetOptimization::optimize(
 	}
 
 	// optimize:
-	ROS_INFO("Starting optimization...");
+	ROS_INFO("Starting g2o optimization...");
 	optimizer.initializeOptimization();
 	//optimizer.computeActiveErrors();
 	optimizer.setVerbose(true);

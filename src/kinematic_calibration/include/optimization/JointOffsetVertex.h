@@ -21,7 +21,7 @@ namespace kinematic_calibration {
 /**
  * Class that represents the vertex for the joint offsets.
  */
-class JointOffsetVertex: public g2o::BaseVertex<30, map<string, double> > {
+class JointOffsetVertex: public g2o::BaseVertex<25, map<string, double> > {
 public:
 	/**
 	 * Default constructor.
@@ -60,11 +60,26 @@ public:
 	}
 	virtual void setJointNames(const vector<string>& jointNames) {
 		this->jointNames = jointNames;
-		this->_dimension = jointNames.size();
+		//this->_dimension = jointNames.size();
 	}
 
+	/**
+	 * Sets the joint mimic for one pair of joints.
+	 * @param jointName The name of major joint.
+	 * @param mimicJointName The name of the joint that mimics the "major" joint.
+	 */
+	virtual void setMimicJoint(const string& jointName, const string& mimicJointName);
+
 protected:
+	/**
+	 * Sets the value of the mimic joint to the same value as the "major" joint,
+	 * if the pair is contained within the mimicJoints map.
+	 * @param majorJoint The name of the "major" joint.
+	 */
+	void updateMimicJoint(const string& majorJoint);
+
 	vector<string> jointNames;
+	map<string, string> mimicJoints;
 };
 
 } /* namespace kinematic_calibration */
