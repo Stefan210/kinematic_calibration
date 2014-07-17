@@ -8,12 +8,18 @@
 #ifndef MEASUREMENTEDGE_H_
 #define MEASUREMENTEDGE_H_
 
-#include <kinematic_calibration/measurementData.h>
 #include <g2o/core/base_multi_edge.h>
+#include <g2o/core/hyper_graph.h>
+#include <kdl/frames.hpp>
+#include <kinematic_calibration/measurementData.h>
 #include <tf/tf.h>
+#include <iostream>
+#include <map>
+#include <string>
 
 #include "../../include/common/FrameImageConverter.h"
 #include "../../include/common/KinematicChain.h"
+#include "JointOffsetVertex.h"
 
 namespace kinematic_calibration {
 
@@ -31,10 +37,9 @@ class EdgeWithJointFrameVertices {
 public:
 	EdgeWithJointFrameVertices() {
 	}
-	;
+
 	virtual ~EdgeWithJointFrameVertices() {
 	}
-	;
 
 	virtual void setJointFrameVertex(const string& jointName,
 			g2o::HyperGraph::Vertex* v) = 0;
@@ -44,12 +49,39 @@ public:
 
 };
 
+class EdgeWithJointOffsetVertexContainer {
+public:
+	EdgeWithJointOffsetVertexContainer() : jointOffsetVertexContainer(NULL) {
+	}
+
+
+	virtual ~EdgeWithJointOffsetVertexContainer() {
+	}
+
+
+	virtual void setJointOffsetVertexContainer(
+			JointOffsetVertexContainer* jointOffsetVertexContainer) {
+		if(this->jointOffsetVertexContainer) {
+			delete this->jointOffsetVertexContainer;
+		}
+		this->jointOffsetVertexContainer = jointOffsetVertexContainer;
+	}
+
+	virtual JointOffsetVertexContainer* getJointOffsetVertexContainer(
+			JointOffsetVertexContainer* jointOffsetVertexContainer) {
+		return this->jointOffsetVertexContainer;
+	}
+
+protected:
+	JointOffsetVertexContainer* jointOffsetVertexContainer;
+};
+
 /**
  * Abstract base class for measurement edges for g2o.
  */
 template<int D, class Derived>
 class MeasurementEdge: public BaseMultiEdge<D, measurementData>,
-		public EdgeWithJointFrameVertices {
+		public EdgeWithJointFrameVertices, public EdgeWithJointOffsetVertexContainer {
 public:
 	/**
 	 * Constructor.

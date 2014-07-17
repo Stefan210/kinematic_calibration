@@ -14,7 +14,7 @@
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/JointState.h>
 #include <tf/tf.h>
-#include <tf_conversions/tf_eigen.h>
+#include <tf_conversions/tf_kdl.h>
 #include <eigen_conversions/eigen_kdl.h>
 #include <map>
 #include <string>
@@ -24,6 +24,7 @@
 #include "../../include/optimization/CameraIntrinsicsVertex.h"
 //#include "../../include/optimization/MeasurementEdge.h"
 #include "../../include/optimization/JointOffsetVertex.h"
+#include "../../include/optimization/TransformationVertex.h"
 
 namespace kinematic_calibration {
 
@@ -41,6 +42,9 @@ MeasurementEdge<D, Derived>::MeasurementEdge(measurementData measurement,
 						measurement.jointState.position[i]));
 	}
 
+	Derived& derivedObj = (Derived&) *this;
+	derivedObj.setMeasurement(measurement);
+
 	// set information matrix
 	BaseMultiEdge<D, measurementData>::setInformation(
 			Eigen::Matrix<double, D, D>::Identity());
@@ -55,12 +59,12 @@ void MeasurementEdge<D, Derived>::computeError() {
 	}
 
 	// get the pointers to the vertices
-	VertexSE3* markerTransformationVertex =
-			static_cast<VertexSE3*>(this->_vertices[0]);
+	TransformationVertex* markerTransformationVertex =
+			static_cast<TransformationVertex*>(this->_vertices[0]);
 	JointOffsetVertex* jointOffsetVertex =
 			static_cast<JointOffsetVertex*>(this->_vertices[1]);
-	VertexSE3* cameraToHeadTransformationVertex =
-			static_cast<VertexSE3*>(this->_vertices[2]);
+	TransformationVertex* cameraToHeadTransformationVertex =
+			static_cast<TransformationVertex*>(this->_vertices[2]);
 	CameraIntrinsicsVertex* cameraIntrinsicsVertex =
 			static_cast<CameraIntrinsicsVertex*>(this->_vertices[3]);
 
@@ -79,14 +83,10 @@ void MeasurementEdge<D, Derived>::computeError() {
 	}
 
 	// get transformation from marker to end effector
-	Eigen::Isometry3d eigenTransform = markerTransformationVertex->estimate();
-	tf::Transform endEffectorToMarker;
-	tf::transformEigenToTF(eigenTransform, endEffectorToMarker);
+	tf::Transform endEffectorToMarker = markerTransformationVertex->estimate();
 
 	// get transformation from camera to head
-	eigenTransform = cameraToHeadTransformationVertex->estimate();
-	tf::Transform cameraToHead;
-	tf::transformEigenToTF(eigenTransform, cameraToHead);
+	tf::Transform cameraToHead = cameraToHeadTransformationVertex->estimate();
 
 	// get estimated camera intrinsics
 	sensor_msgs::CameraInfo cameraInfo = cameraIntrinsicsVertex->estimate();
@@ -117,10 +117,10 @@ map<string, KDL::Frame> MeasurementEdge<D, Derived>::getJointFrames() {
 	for (map<string, int>::iterator it =
 			this->jointFrameVerticesIndexes.begin();
 			it != this->jointFrameVerticesIndexes.end(); it++) {
-		Eigen::Isometry3d iso = static_cast<VertexSE3*>(BaseMultiEdge<D,
+		tf::Transform tfTransform = dynamic_cast<TransformationVertex*>(BaseMultiEdge<D,
 				measurementData>::vertices()[it->second])->estimate();
 		KDL::Frame frame;
-		tf::transformEigenToKDL(iso, frame);
+		tf::transformTFToKDL(tfTransform, frame);
 		jointFrames[it->first] = frame;
 	}
 	return jointFrames;
