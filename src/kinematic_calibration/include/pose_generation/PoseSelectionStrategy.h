@@ -105,6 +105,23 @@ private:
 	int finalSize;
 };
 
+class RandomExchangePoseSelectionStrategy: public PoseSelectionStrategy {
+public:
+	RandomExchangePoseSelectionStrategy(const int& numOfPoses);
+	virtual ~RandomExchangePoseSelectionStrategy() {
+	}
+
+	/**
+	 * Draws n poses randomly and improves the random set by exchanging single poses.
+	 * @return The optimal pose set according to the strategy.
+	 */
+	shared_ptr<PoseSet> getOptimalPoseSet(shared_ptr<PoseSet> initialPoseSet,
+			shared_ptr<ObservabilityIndex> observabilityIndex,
+			double& index);
+private:
+	int numOfPoses;
+};
+
 } /* namespace kinematic_calibration */
 
 #endif /* POSESELECTIONSTRATEGY_H_ */

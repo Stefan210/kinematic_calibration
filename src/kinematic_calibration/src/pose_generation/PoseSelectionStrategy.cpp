@@ -44,12 +44,12 @@ shared_ptr<PoseSet> IncrementalPoseSelectionStrategy::getOptimalPoseSet(
 
 RandomPoseSelectionStrategy::RandomPoseSelectionStrategy(const int& numOfPoses) :
 		numOfPoses(numOfPoses) {
+	srand(time(NULL));
 }
 
 shared_ptr<PoseSet> RandomPoseSelectionStrategy::getOptimalPoseSet(
 		shared_ptr<PoseSet> initialPoseSet,
 		shared_ptr<ObservabilityIndex> observabilityIndex, double& index) {
-	srand(time(NULL));
 	shared_ptr<PoseSet> successor = initialPoseSet;
 	while (successor->getNumberOfPoses() < numOfPoses) {
 		vector<shared_ptr<PoseSet> > successors = successor->addPose();
@@ -149,5 +149,33 @@ shared_ptr<PoseSet> ExchangeAddExchangePoseSelectionStrategy::getOptimalPoseSet(
 
 	return resultSet;
 }
+
+RandomExchangePoseSelectionStrategy::RandomExchangePoseSelectionStrategy(
+		const int& numOfPoses) :
+		numOfPoses(numOfPoses) {
+	// nothing to do!
+}
+
+shared_ptr<PoseSet> RandomExchangePoseSelectionStrategy::getOptimalPoseSet(
+		shared_ptr<PoseSet> initialPoseSet,
+		shared_ptr<ObservabilityIndex> observabilityIndex, double& index) {
+	// get n random poses
+	ROS_INFO("Get %d random pose(s)...", numOfPoses);
+	RandomPoseSelectionStrategy randomStrategy(numOfPoses);
+	shared_ptr<PoseSet> randomSet = randomStrategy.getOptimalPoseSet(
+			initialPoseSet, observabilityIndex, index);
+	ROS_INFO("Observability index is %.20f.", index);
+
+	// improve the pose set
+	ROS_INFO("Improve by exchange...");
+	ExchangePoseSelectionStrategy exchangeStrategy;
+	shared_ptr<PoseSet> improvedSet = exchangeStrategy.getOptimalPoseSet(
+			randomSet, observabilityIndex, index);
+	ROS_INFO("Improved observability index is %.20f.", index);
+
+	return improvedSet;
+}
+
+
 
 } /* namespace kinematic_calibration */
