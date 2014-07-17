@@ -9,85 +9,47 @@
 #define TRANSFORMATIONVERTEX_H_
 
 #include <tf/tf.h>
-#include <g2o/types/slam3d/vertex_se3.h>
+#include <g2o/core/base_vertex.h>
 
 namespace kinematic_calibration {
 
 using namespace g2o;
 
-/**
- * Vertex for 6D transformation.
+/*
+ * Vertex that represents a 3D transformation.
  */
-class TransformationVertex: public VertexSE3 {
+class TransformationVertex: public BaseVertex<6, tf::Transform> {
 public:
-	/**
-	 * Constructor.
-	 */
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 	TransformationVertex();
-
-	/**
-	 * Desctructor.
-	 */
 	virtual ~TransformationVertex();
 
-	/**
-	 * Return the current estimate as tf::Transform.
-	 * @return the current estimate as tf::Transform.
-	 */
-	tf::Transform estimateAsTfTransform() const;
-
-	/**
-	 * Set the estimate from tf::Transform.
-	 * @param[in] tfTransform the estimate to be set.
-	 */
-	void setEstimateFromTfTransform(const tf::Transform& tfTransform);
-
-	void setFixed(bool fixed) {
-		VertexSE3::setFixed(fixed);
-	}
-	void setId(int newId) {
-		VertexSE3::setId(newId);
-	}
-
-protected:
-	/**
-	 * Converts from tf::Transform to Eigen::Isometry3d.
-	 * @param[in] tfTransformation Transform to be converted.
-	 * @param[out] eigenIsometry Result.
-	 */
-	void tfToEigen(const tf::Transform& tfTransformation,
-			Eigen::Isometry3d& eigenIsometry) const;
+	virtual bool read(std::istream& in);
+	virtual bool write(std::ostream& out) const;
+	virtual void oplusImpl(const double*);
+	virtual void setToOriginImpl();
 };
 
 class TranslationVertex: public TransformationVertex {
 public:
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 	TranslationVertex() {
 	}
 	virtual ~TranslationVertex() {
 	}
-	;
 
 	void oplusImpl(const double* delta) {
 		std::vector<double> deltaVec;
-		for (int i = 0; i < 3; i++)
-			deltaVec.push_back(delta[i]);
+		double x, y, z;
+		x = this->_estimate.getOrigin().getX();
+		y = this->_estimate.getOrigin().getY();
+		z = this->_estimate.getOrigin().getZ();
+		for (int i = 0; i < 3; i++) {
+			this->_estimate.setOrigin(
+					tf::Vector3(x + delta[0], y + delta[1], z + delta[2]));
+		}
 
-		for (int i = 0; i < 3; i++)
-			deltaVec.push_back(0.0);
-
-		TransformationVertex::oplusImpl(&deltaVec[0]);
 	}
-
-	int estimateDimension() const {
-		return 3;
-	}
-
-	int minimalEstimateDimension() const {
-		return 3;
-	}
-
-protected:
-	tf::Vector3 translation;
 };
 
 typedef TransformationVertex MarkerTransformationVertex;
