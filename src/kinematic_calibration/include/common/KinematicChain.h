@@ -121,7 +121,7 @@ public:
 	 * Returns a list containing the names of all joints.
 	 * @param jointNames Returns a list containing the names of all joints.
 	 */
-	void getJointNames(vector<string>& jointNames) const;
+	virtual void getJointNames(vector<string>& jointNames) const;
 
 	/**
 	 * Returns the chain.
