@@ -34,6 +34,7 @@
 #include <g2o/core/sparse_optimizer_terminate_action.h>
 
 #include <kdl/kdl.hpp>
+#include <tf_conversions/tf_kdl.h>
 
 #include <time.h>
 #include <map>
@@ -85,9 +86,10 @@ G2oJointOffsetOptimization::~G2oJointOffsetOptimization() {
 
 void G2oJointOffsetOptimization::optimize(
 		KinematicCalibrationState& optimizedState) {
-	//typedef BlockSolver<BlockSolverTraits<-1, -1> > MyBlockSolver;
-	typedef BlockSolverX MyBlockSolver;
-	typedef LinearSolverDense<MatrixXd> MyLinearSolver;
+	typedef BlockSolver<BlockSolverTraits<-1, -1> > MyBlockSolver;
+	//typedef BlockSolverX MyBlockSolver;
+	//typedef LinearSolverDense<MatrixXd> MyLinearSolver;
+	typedef LinearSolverDense<MyBlockSolver::PoseMatrixType> MyLinearSolver;
 
 	// allocating the optimizer
 	SparseOptimizer optimizer;
@@ -101,14 +103,14 @@ void G2oJointOffsetOptimization::optimize(
 	MyBlockSolver* blockSolver = new MyBlockSolver(linearSolver);
 	blockSolver->setLevenberg(true);
 	blockSolver->setSchur(false);
+	blockSolver->setWriteDebug(true);
 
 	// create the algorithm to carry out the optimization
 //	OptimizationAlgorithmGaussNewton* algorithm = new OptimizationAlgorithmGaussNewton(blockSolver);
 	OptimizationAlgorithmLevenberg* algorithm =
 			new OptimizationAlgorithmLevenberg(blockSolver);
 	//algorithm->setMaxTrialsAfterFailure(100);
-	algorithm->printVerbose(cout);
-
+	//algorithm->printVerbose(cout);
 	optimizer.setAlgorithm(algorithm);
 	//blockSolver->init(&optimizer);
 
@@ -203,7 +205,7 @@ void G2oJointOffsetOptimization::optimize(
 		markerTransformationVertex->setFixed(!options.calibrateMarkerTransform);
 		optimizer.addVertex(markerTransformationVertex);
 		KinematicChain currentChain = kinematicChains[i];
-		markerTransformationVertex->setEstimateFromTfTransform(
+		markerTransformationVertex->setEstimate(
 				initialState.markerTransformations[currentChain.getName()]);
 		markerTransformationVertices.insert(
 				make_pair(currentChain.getName(), markerTransformationVertex));
@@ -214,12 +216,16 @@ void G2oJointOffsetOptimization::optimize(
 	// instantiate the vertex for the camera transformation
 	CameraTransformationVertex* cameraToHeadTransformationVertex =
 			new CameraTransformationVertex();
+	//cameraToHeadTransformationVertex->setId(++id);
 	cameraToHeadTransformationVertex->setId(++id);
-	cameraToHeadTransformationVertex->setEstimateFromTfTransform(
+	cameraToHeadTransformationVertex->setEstimate(
 			this->initialState.cameraToHeadTransformation);
 	cameraToHeadTransformationVertex->setFixed(
 			!options.calibrateCameraTransform);
-	optimizer.addVertex(cameraToHeadTransformationVertex);
+	if(optimizer.addVertex(cameraToHeadTransformationVertex))
+		cout << "Vertex for CameraTransform added.\n" << endl;
+	else
+		cout << "NOT ADDED.\n" << endl;
 
 	// instantiate the vertex for the camera intrinsics
 	CameraIntrinsicsVertex* cameraIntrinsicsVertex = new CameraIntrinsicsVertex(
@@ -239,12 +245,9 @@ void G2oJointOffsetOptimization::optimize(
 	for (map<string, KDL::Frame>::iterator it = framesToTip.begin();
 			it != framesToTip.end(); it++) {
 		TransformationVertex* vertex = new TransformationVertex();
-		Eigen::Affine3d eigenAffine;
-		tf::transformKDLToEigen(it->second, eigenAffine);
-		Eigen::Isometry3d eigenIsometry;
-		eigenIsometry.translation() = eigenAffine.translation();
-		eigenIsometry.linear() = eigenAffine.rotation();
-		vertex->setEstimate(eigenIsometry);
+		tf::Transform tfTransform;
+		tf::transformKDLToTF(it->second, tfTransform);
+		vertex->setEstimate(tfTransform);
 		vertex->setId(++id);
 		vertex->setFixed(jointOptType != JOINT_6D);
 		jointFrameVertices[it->first] = vertex;
@@ -260,13 +263,13 @@ void G2oJointOffsetOptimization::optimize(
 					current.chain_name.c_str());
 			continue;
 		}
-		RobustKernel* rk = new RobustKernelHuber();
-		//rk->setDelta(5.0);
 		g2o::OptimizableGraph::Edge* edge = context.getMeasurementEdge(current,
 				&frameImageConverter,
 				&kinematicChainsMap.find(current.chain_name)->second);
 		edge->setId(++id);
 		if (optOptions.useRobustKernel) {
+			RobustKernel* rk = new RobustKernelHuber();
+			//rk->setDelta(5.0);
 			edge->setRobustKernel(rk);
 		}
 		edge->vertices()[0] = markerTransformationVertices[current.chain_name];
@@ -305,7 +308,12 @@ void G2oJointOffsetOptimization::optimize(
 
 	// optimize:
 	ROS_INFO("Starting g2o optimization...");
-	optimizer.initializeOptimization();
+	if(!optimizer.initializeOptimization()) {
+		ROS_FATAL("Optimization could not be initialized!");
+		return;
+	}
+
+
 	//optimizer.computeActiveErrors();
 	optimizer.setVerbose(true);
 	optimizer.optimize(optOptions.maxIterations);
@@ -322,12 +330,12 @@ void G2oJointOffsetOptimization::optimize(
 			markerTransformationVertices.begin();
 			it != markerTransformationVertices.end(); it++) {
 		optimizedState.markerTransformations[it->first] =
-				it->second->estimateAsTfTransform();
+				it->second->estimate();
 	}
 
 	// camera transformation
 	optimizedState.cameraToHeadTransformation =
-			cameraToHeadTransformationVertex->estimateAsTfTransform();
+			cameraToHeadTransformationVertex->estimate();
 
 	// camera intrinsics
 	optimizedState.cameraInfo = cameraIntrinsicsVertex->estimate();
@@ -337,7 +345,7 @@ void G2oJointOffsetOptimization::optimize(
 	for (map<string, g2o::HyperGraph::Vertex*>::iterator it =
 			jointFrameVertices.begin(); it != jointFrameVertices.end(); it++) {
 		jointTransformations[it->first] =
-				static_cast<TransformationVertex*>(it->second)->estimateAsTfTransform();
+				static_cast<TransformationVertex*>(it->second)->estimate();
 	}
 	optimizedState.jointTransformations = jointTransformations;
 
@@ -410,12 +418,12 @@ HyperGraphAction* SaveStateHyperGraphAction::operator ()(
 			markerTransformationVertices.begin();
 			it != markerTransformationVertices.end(); it++) {
 		state.markerTransformations[it->first] =
-				it->second->estimateAsTfTransform();
+				it->second->estimate();
 	}
 
 	// camera transformation
 	state.cameraToHeadTransformation =
-			cameraToHeadTransformationVertex->estimateAsTfTransform();
+			cameraToHeadTransformationVertex->estimate();
 
 	// camera intrinsics
 	state.cameraInfo = cameraIntrinsicsVertex->estimate();
@@ -425,7 +433,7 @@ HyperGraphAction* SaveStateHyperGraphAction::operator ()(
 	for (map<string, g2o::HyperGraph::Vertex*>::iterator it =
 			jointFrameVertices.begin(); it != jointFrameVertices.end(); it++) {
 		jointTransformations[it->first] =
-				static_cast<TransformationVertex*>(it->second)->estimateAsTfTransform();
+				static_cast<TransformationVertex*>(it->second)->estimate();
 	}
 	state.jointTransformations = jointTransformations;
 
