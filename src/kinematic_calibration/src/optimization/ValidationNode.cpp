@@ -49,7 +49,7 @@ ValidationNode::ValidationNode(CalibrationContext* context) :
 			&ValidationNode::camerainfoCallback, this);
 
 	validationService = nh.advertiseService(
-			"/kinematic_calibration/start_optimization",
+			"kinematic_calibration/start_optimization",
 			&ValidationNode::startValidationCallback, this);
 
 	// instantiate the model loader
@@ -239,6 +239,7 @@ void ValidationNode::camerainfoCallback(
 bool ValidationNode::startValidationCallback(std_srvs::Empty::Request& request,
 		std_srvs::Empty::Response& response) {
 	this->collectingData = false;
+	measurementSubsriber.shutdown();
 	this->startLoop();
 	return true;
 }
