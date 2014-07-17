@@ -244,7 +244,7 @@ TEST(SinglePointErrorModel, getSquaredErrorTest) {
 	ASSERT_NEAR(x_error * x_error, error[0], eps);
 	ASSERT_NEAR(y_error * y_error, error[1], eps);
 }
-
+/*
 class TestingSinglePointErrorModel: public SinglePointErrorModel {
 public:
 	TestingSinglePointErrorModel(KinematicChain& kinematicChain) :
@@ -254,7 +254,8 @@ public:
 	using SinglePointErrorModel::calcJointOffsetsDerivatives;
 	using SinglePointErrorModel::calculateDerivative;
 };
-
+*/
+/*
 TEST(SinglePointErrorModel, calcCameraIntrinsicsDerivativesTest) {
 	// arrange
 	ifstream file("nao.urdf");
@@ -334,7 +335,7 @@ TEST(SinglePointErrorModel, calcCameraIntrinsicsDerivativesTest) {
 	ASSERT_NEAR(fy_expected, derivatives[1], eps);
 	ASSERT_NEAR(cx_expected, derivatives[2], eps);
 	ASSERT_NEAR(cy_expected, derivatives[3], eps);
-}
+}*/
 
 /*
  TEST(SinglePointErrorModel, calcJointOffsetsDerivativesTest) {
@@ -410,6 +411,7 @@ TEST(SinglePointErrorModel, calcCameraIntrinsicsDerivativesTest) {
  ASSERT_NEAR(expected, derivatives[0], eps);
  }*/
 
+/*
 TEST(SinglePointErrorModel, calcDerivativeTest) {
 	// arrange
 	ifstream file("nao.urdf");
@@ -443,7 +445,7 @@ TEST(SinglePointErrorModel, calcDerivativeTest) {
 	double expected = 1.0;
 	double eps = 1e-6;
 	ASSERT_NEAR(expected, derivative, eps);
-}
+}*/
 
 } /* namespace kinematic_calibration */
 

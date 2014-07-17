@@ -46,31 +46,8 @@ public:
 	virtual void getSquaredError(const KinematicCalibrationState& state,
 			const measurementData& measurement, vector<double>& error) = 0;
 
-	virtual void getPartialDerivativesVector(
-			const KinematicCalibrationState& state,
-			const measurementData& measurement,
-			Eigen::RowVectorXd& partialDerivates);
-
 protected:
 	KinematicChain& kinematicChain;
-
-	vector<double> calcCameraIntrinsicsDerivatives(
-			KinematicCalibrationState state, measurementData measurement,
-			const double& h);
-
-	vector<double> calcCameraTransformDerivatives(
-			KinematicCalibrationState state, measurementData measurement,
-			const double& h);
-
-	vector<double> calcMarkerTransformDerivatives(
-			KinematicCalibrationState state, measurementData measurement,
-			const double& h);
-
-	vector<double> calcJointOffsetsDerivatives(KinematicCalibrationState state,
-			measurementData measurement, const double& h);
-
-	double calculateDerivative(const vector<double>& errorMinusVec,
-			const vector<double>& errorPlusVec, const double& h);
 
 	void appendVector(vector<double>& v1, const vector<double>& v2);
 };
