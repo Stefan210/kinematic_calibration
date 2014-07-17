@@ -106,6 +106,8 @@ void MeasurementPose::getPartialDerivatives(
 		vector<double> partialDerivatesVectorX;
 		vector<double> partialDerivatesVectorY;
 
+		// TODO: parameterize which derivatives should be calculated
+
 		// camera parameters: fx, fy, cx, cy, d[0-4]
 		calcCameraIntrinsicsDerivatives(state, h, partialDerivatesVectorX,
 				partialDerivatesVectorY);
@@ -143,9 +145,8 @@ void MeasurementPose::getPartialDerivatives(
 void MeasurementPose::calcCameraIntrinsicsDerivatives(
 		KinematicCalibrationState state, const double& h,
 		vector<double>& derivativesX, vector<double>& derivativesY) {
-	vector<double> cameraPartialDerivatives;
 
-	// camera parameters: fx, fy, cx, cy, d[0-4]
+ 	// camera parameters: fx, fy, cx, cy, d[0-4]
 	CameraIntrinsicsVertex civ(state.cameraInfo);
 	for (int index = 0; index < civ.dimension(); index++) {
 		// derivations around the current point
@@ -188,7 +189,6 @@ void MeasurementPose::calcCameraIntrinsicsDerivatives(
 void MeasurementPose::calcCameraTransformDerivatives(
 		KinematicCalibrationState state, const double& h,
 		vector<double>& derivativesX, vector<double>& derivativesY) {
-	vector<double> partialDerivatives;
 	tf::Transform cameraTransform = state.cameraToHeadTransformation;
 
 	// camera transform parameters: tx, ty, tz, rr, rp, ry
@@ -203,19 +203,19 @@ void MeasurementPose::calcCameraTransformDerivatives(
 			delta[j] = 0.0;
 
 		// update delta (plus)
-		vertex.setEstimateFromTfTransform(cameraTransform);
+		vertex.setEstimate(cameraTransform);
 		delta[index] = h;
 		vertex.oplus(delta);
-		state.cameraToHeadTransformation = vertex.estimateAsTfTransform();
+		state.cameraToHeadTransformation = vertex.estimate();
 
 		// update error
 		this->predictImageCoordinates(state, xPlus, yPlus);
 
 		// update delta (minus)
-		vertex.setEstimateFromTfTransform(cameraTransform);
+		vertex.setEstimate(cameraTransform);
 		delta[index] = -h;
 		vertex.oplus(delta);
-		state.cameraToHeadTransformation = vertex.estimateAsTfTransform();
+		state.cameraToHeadTransformation = vertex.estimate();
 
 		// update error
 		this->predictImageCoordinates(state, xMinus, yMinus);
@@ -233,13 +233,12 @@ void MeasurementPose::calcCameraTransformDerivatives(
 void MeasurementPose::calcMarkerTransformDerivatives(
 		KinematicCalibrationState state, const double& h,
 		vector<double>& derivativesX, vector<double>& derivativesY) {
-	vector<double> partialDerivatives;
 	tf::Transform markerTransform =
 			state.markerTransformations[kinematicChain.getName()];
 
 	// marker transform parameters: tx, ty, tz, rr, rp, ry
 	TransformationVertex vertex;
-	for (int index = 0; index < vertex.dimension(); index++) {
+	for (int index = 0; index < vertex.dimension()-3; index++) {
 		// derivations around the current point
 		double xMinus, yMinus, xPlus, yPlus;
 
@@ -249,21 +248,21 @@ void MeasurementPose::calcMarkerTransformDerivatives(
 			delta[j] = 0.0;
 
 		// update delta (plus)
-		vertex.setEstimateFromTfTransform(markerTransform);
+		vertex.setEstimate(markerTransform);
 		delta[index] = h;
 		vertex.oplus(delta);
 		state.markerTransformations[kinematicChain.getName()] =
-				vertex.estimateAsTfTransform();
+				vertex.estimate();
 
 		// update error
 		this->predictImageCoordinates(state, xPlus, yPlus);
 
 		// update delta (minus)
-		vertex.setEstimateFromTfTransform(markerTransform);
+		vertex.setEstimate(markerTransform);
 		delta[index] = -h;
 		vertex.oplus(delta);
 		state.markerTransformations[kinematicChain.getName()] =
-				vertex.estimateAsTfTransform();
+				vertex.estimate();
 
 		// update error
 		this->predictImageCoordinates(state, xMinus, yMinus);
@@ -281,20 +280,22 @@ void MeasurementPose::calcMarkerTransformDerivatives(
 void MeasurementPose::calcJointOffsetsDerivatives(
 		KinematicCalibrationState state, const double& h,
 		vector<double>& derivativesX, vector<double>& derivativesY) {
-	vector<double> partialDerivatives;
 	map<string, double> jointOffsets = state.jointOffsets;
 
 	// joint offsets: from root (head) to tip
 	vector<string> jointNames;
 	kinematicChain.getJointNames(jointNames);
 	JointOffsetVertex vertex(jointNames);
-	for (int index = 0; index < vertex.dimension(); index++) {
+
+	int dimension = vertex.estimateDimension();
+	//for (int index = 0; index < dimension; index++) {
+	for (int index = 1; index < dimension - 1; index++) {
 		// derivations around the current point
 		double xMinus, yMinus, xPlus, yPlus;
 
 		// initialize the delta vector
-		double delta[vertex.dimension()];
-		for (int j = 0; j < vertex.dimension(); j++)
+		double delta[dimension];
+		for (int j = 0; j < dimension; j++)
 			delta[j] = 0.0;
 
 		// update delta (plus)
@@ -337,6 +338,12 @@ double MeasurementPose::calculateDerivative(const double& plus,
 //		// TODO: How to handle this correctly?!
 //		derivative = 0;
 //	}
+
+
+	//if(derivative < 1e-3)
+	//	return 0.0;
+
+	//cout << std::setprecision (15) <<  "(+) " << plus << ", (-) " << minus << ", " << "(d) " << derivative << "; ";
 	return derivative;
 }
 
