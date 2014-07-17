@@ -8,15 +8,6 @@ find_package(catkin REQUIRED roscpp cv_bridge image_transport urdf kdl_parser tf
 find_package(orocos_kdl REQUIRED)
 find_package(OpenCV REQUIRED)
 
-SET(G2O_LIBS cholmod cxsparse -lg2o_cli -lg2o_core
--lg2o_csparse_extension -lg2o_ext_freeglut_minimal -lg2o_incremental
--lg2o_interactive -lg2o_interface -lg2o_opengl_helper -lg2o_parser
--lg2o_simulator -lg2o_solver_cholmod -lg2o_solver_csparse
--lg2o_solver_dense -lg2o_solver_pcg -lg2o_solver_slam2d_linear
--lg2o_solver_structure_only -lg2o_stuff -lg2o_types_data -lg2o_types_icp
--lg2o_types_sba -lg2o_types_sclam2d -lg2o_types_sim3 -lg2o_types_slam2d
--lg2o_types_slam3d)
-
 # Tell CMake where to find "FindNAOqi.cmake"
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -26,6 +17,24 @@ find_package(NAOqi QUIET COMPONENTS
     alerror
     alvalue
     )
+    
+find_package(G2O REQUIRED)
+INCLUDE_DIRECTORIES(${G2O_INCLUDE_DIR}) 
+
+SET(G2O_LIBS   	
+	${G2O_CORE_LIBRARY_DEBUG}
+  	${G2O_STUFF_LIBRARY_DEBUG}   	
+  	${G2O_TYPES_SLAM3D_DEBUG} 
+)
+
+#SET(G2O_LIBS cholmod cxsparse -lg2o_cli -lg2o_core
+#-lg2o_csparse_extension -lg2o_ext_freeglut_minimal -lg2o_incremental
+#-lg2o_interactive -lg2o_interface -lg2o_opengl_helper -lg2o_parser
+#-lg2o_simulator -lg2o_solver_cholmod -lg2o_solver_csparse
+#-lg2o_solver_dense -lg2o_solver_pcg -lg2o_solver_slam2d_linear
+#-lg2o_solver_structure_only -lg2o_stuff -lg2o_types_data -lg2o_types_icp
+#-lg2o_types_sba -lg2o_types_sclam2d -lg2o_types_sim3 -lg2o_types_slam2d
+#-lg2o_types_slam3d)
 
 find_package(Boost QUIET COMPONENTS program_options signals)
 
@@ -200,6 +209,7 @@ add_library(context
 	src/common/ColorMarkerContext.cpp
 	src/optimization/CheckerboardMeasurementEdge.cpp
 	src/optimization/CircleMeasurementEdge.cpp
+	src/optimization/TransformationVertex.cpp
 	)
 set_property(TARGET context PROPERTY COMPILE_DEFINITIONS PARAMSPATH="${PROJECT_SOURCE_DIR}/include/data_capturing/color_marker_detection/")
 target_link_libraries(context 
@@ -210,7 +220,7 @@ target_link_libraries(context
 	frameImageConverter
 	kinematicChain
 	${G2O_LIBS}
-        ${orocos_kdl_LIBRARIES}
+    ${orocos_kdl_LIBRARIES}
 	${catkin_LIBRARIES})
 
 
@@ -393,6 +403,9 @@ target_link_libraries(cameraIntrinsicsVertexTest ${catkin_LIBRARIES} ${G2O_LIBS}
 
 catkin_add_gtest(transformationVertexTest test/TransformationVertexTest.cpp src/optimization/TransformationVertex.cpp)
 target_link_libraries(transformationVertexTest ${catkin_LIBRARIES} ${G2O_LIBS})
+
+catkin_add_gtest(jointOffsetVertexTest test/JointOffsetVertexTest.cpp src/optimization/JointOffsetVertex.cpp)
+target_link_libraries(jointOffsetVertexTest kinematicChain modelLoader ${catkin_LIBRARIES} ${G2O_LIBS})
 	
 if(gsl_FOUND)
 ### ValidationNode
