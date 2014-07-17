@@ -129,6 +129,13 @@ public:
 	void addActiveMeasurementPoses(vector<MeasurementPose> measurementPoses);
 
 	/**
+	 * Adds the given pose to the active poses if containted in the pose pool.
+	 * @param[in] pose The pose to set active.
+	 * @return True if success, false othwerwise.
+	 */
+	bool setActive(const MeasurementPose& pose);
+
+	/**
 	 * Returns all available poses.
 	 * @return All available poses.
 	 */

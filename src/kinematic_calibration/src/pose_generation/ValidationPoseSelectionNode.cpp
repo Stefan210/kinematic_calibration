@@ -11,8 +11,13 @@
 #include <sys/stat.h>
 #include <string>
 #include <fstream>
+#include <boost/shared_ptr.hpp>
 
 namespace kinematic_calibration {
+
+using namespace boost;
+using namespace ros;
+using namespace std;
 
 ValidationPoseSelectionNode::ValidationPoseSelectionNode(
 		int numOfPartitionsPerChain) :
@@ -163,6 +168,41 @@ void ValidationPoseSource::getPoses(const KinematicChain& kinematicChain,
 	}
 }
 
+shared_ptr<MeasurementPoseSet> ValidationPoseSource::getInitialPoseSet(
+		const KinematicChain& kinematicChain, KinematicCalibrationState& state,
+		const int& n) {
+	stringstream paramName;
+	paramName << "initial_pose_ids/" << this->validationPartition << "/" << n;
+	if (nh.hasParam(paramName.str())) {
+		ROS_INFO("Initialize the pose set from give ids...");
+
+		// get the ids
+		vector<string> initialIds;
+		nh.getParam(paramName.str(), initialIds);
+
+		// get the pose pool
+		vector<MeasurementPose> posePool;
+		this->getPoses(kinematicChain, posePool);
+
+		// get the respective poses
+		vector<MeasurementPose> poses;
+		this->getPosesByIds(kinematicChain, initialIds, poses);
+
+		// initialize the pose set
+		shared_ptr<MeasurementPoseSet> poseSet = make_shared<MeasurementPoseSet>(
+				state);
+		poseSet->addMeasurementPoses(posePool);
+		for(int i = 0; i < poses.size(); i++) {
+			poseSet->setActive(poses[i]);
+		}
+
+		return poseSet;
+	} else {
+		return MeasurementMsgPoseSource::getInitialPoseSet(kinematicChain,
+				state, n);
+	}
+}
+
 int ValidationPoseSource::writeIds(vector<sensor_msgs::JointState> jointStates,
 		string folderName, string fileName) {
 	// create the directory, if not exists
@@ -190,14 +230,19 @@ int ValidationPoseSource::writeIds(vector<sensor_msgs::JointState> jointStates,
 using namespace kinematic_calibration;
 
 int main(int argc, char** argv) {
-// initialize the node
+	// initialize the node
 	stringstream nodeName;
 	ros::Time::init();
 	nodeName << "PoseSelectionNode";
 	nodeName << ros::Time::now().nsec;
 	ros::init(argc, argv, nodeName.str().c_str());
 
-	ValidationPoseSelectionNode node(10);
+	ros::NodeHandle nh;
+	int numOfSplits = 3;
+	nh.param("num_of_splits", numOfSplits, numOfSplits);
+	ROS_INFO("Generating poses for %i-fold cross-validation.", numOfSplits);
+
+	ValidationPoseSelectionNode node(numOfSplits);
 	node.run();
 	return 0;
 }

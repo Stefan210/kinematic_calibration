@@ -32,7 +32,9 @@ MeasurementMsgPoseSource::~MeasurementMsgPoseSource() {
 void MeasurementMsgPoseSource::getPoses(const KinematicChain& kinematicChain,
 		vector<MeasurementPose>& poses) {
 	// process all pending messages
-	collectData();
+	if (this->poses.size() == 0) {
+		collectData();
+	}
 
 	// add all available poses for the requested chain
 	vector<sensor_msgs::JointState> jointStates =
@@ -40,6 +42,23 @@ void MeasurementMsgPoseSource::getPoses(const KinematicChain& kinematicChain,
 	for (vector<sensor_msgs::JointState>::iterator it = jointStates.begin();
 			it != jointStates.end(); it++) {
 		poses.push_back(MeasurementPose(kinematicChain, *it));
+	}
+}
+
+void MeasurementMsgPoseSource::getPosesByIds(
+		const KinematicChain& kinematicChain, const vector<string>& ids,
+		vector<MeasurementPose>& poses) {
+	// get all poses
+	vector<MeasurementPose> allPoses;
+	this->getPoses(kinematicChain, allPoses);
+
+	// get the one with the requested ids
+	for (vector<MeasurementPose>::iterator it = allPoses.begin();
+			it != allPoses.end(); it++) {
+		if (std::find(ids.begin(), ids.end(),
+				this->ids[it->getJointState().header.stamp]) != ids.end()) {
+			poses.push_back(*it);
+		}
 	}
 }
 
@@ -78,6 +97,22 @@ vector<string> MeasurementMsgPoseSource::getPoseIds(
 	}
 
 	return ids;
+}
+
+shared_ptr<MeasurementPoseSet> PoseSource::getInitialPoseSet(
+		const KinematicChain& kinematicChain, KinematicCalibrationState& state,
+		const int& n) {
+	// get poses for the current chain
+	vector<MeasurementPose> poses;
+	this->getPoses(kinematicChain, poses);
+
+	// initialize the pose set
+	shared_ptr<MeasurementPoseSet> poseSet = make_shared<MeasurementPoseSet>(
+			state);
+	poseSet->addMeasurementPoses(poses);
+	poseSet->initializePoseSet(n);
+
+	return poseSet;
 }
 
 PoseSamplingPoseSource::PoseSamplingPoseSource() :

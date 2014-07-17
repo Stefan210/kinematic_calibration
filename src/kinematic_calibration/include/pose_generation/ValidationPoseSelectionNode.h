@@ -28,6 +28,11 @@ public:
 	virtual void getPoses(const KinematicChain& kinematicChain,
 			vector<MeasurementPose>& poses);
 
+	/// override
+	virtual shared_ptr<MeasurementPoseSet> getInitialPoseSet(
+			const KinematicChain& kinematicChain,
+			KinematicCalibrationState& state, const int& n);
+
 protected:
 	void splitPoseSets(int numOfPartitionsPerChain);
 	int writeIds(vector<sensor_msgs::JointState>, string folderName,
@@ -35,6 +40,7 @@ protected:
 	int numOfPartitionsPerChain;
 	int validationPartition;
 	map<string, map<int, vector<sensor_msgs::JointState> > > splits;
+	NodeHandle nh;
 };
 
 /**

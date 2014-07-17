@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "../common/MeasurementPose.h"
+#include "../common/PoseSet.h"
 
 using namespace std;
 using namespace ros;
@@ -57,6 +58,17 @@ public:
 	 */
 	virtual void getPoses(const KinematicChain& kinematicChain,
 			vector<MeasurementPose>& poses) = 0;
+
+	/**
+	 * Returns an initial pose set for the specified number of poses and chain.
+	 * @param[in] kinematicChain The kinematic chain.
+	 * @param[in] state The calibration state used for initialization of the set.
+	 * @param[in] n Number of poses.
+	 * @return The initial pose set.
+	 */
+	virtual shared_ptr<MeasurementPoseSet> getInitialPoseSet(
+			const KinematicChain& kinematicChain,
+			KinematicCalibrationState& state, const int& n);
 };
 
 /**
@@ -76,6 +88,9 @@ public:
 
 	virtual void getPoses(const KinematicChain& kinematicChain,
 			vector<MeasurementPose>& poses);
+
+	virtual void getPosesByIds(const KinematicChain& kinematicChain,
+			const vector<string>& ids, vector<MeasurementPose>& poses);
 
 	/**
 	 * For the given joint states, returns the corresponding pose ids.
@@ -147,7 +162,7 @@ private:
 /**
  * Source of poses. Creates poses by sampling them.
  */
-class PoseSamplingPoseSource : public PoseSource {
+class PoseSamplingPoseSource: public PoseSource {
 public:
 	PoseSamplingPoseSource();
 	virtual ~PoseSamplingPoseSource();

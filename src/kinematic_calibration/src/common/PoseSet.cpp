@@ -100,6 +100,18 @@ void MeasurementPoseSet::initializePoseSet(const int& n) {
 	}
 }
 
+bool MeasurementPoseSet::setActive(const MeasurementPose& pose) {
+	// iterate through all available poses
+	for (map<int, MeasurementPose>::iterator it = poseSet->begin();
+			it != poseSet->end(); it++) {
+		if(it->second.getJointState().header.stamp == pose.getJointState().header.stamp) {
+			this->activePoses.push_back(it->first);
+			return true;
+		}
+	}
+	return false;
+}
+
 vector<shared_ptr<PoseSet> > MeasurementPoseSet::addPose() const {
 	vector<shared_ptr<PoseSet> > successors;
 

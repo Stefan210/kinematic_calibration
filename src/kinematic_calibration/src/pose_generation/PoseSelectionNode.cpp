@@ -82,6 +82,13 @@ void PoseSelectionNode::initializeState() {
 		this->initialState->jointOffsets[*it] = 0.0;
 	}
 
+	// initialize marker transform
+	string chainTip;
+	string markerFrame;
+	nh.getParam("marker_frame", markerFrame);
+	nh.getParam("chain_tip", chainTip);
+	this->initialState->addMarker("marker", chainTip, markerFrame);
+
 	// initialize transform from camera to head
 	string cameraJointName = "CameraBottom"; // todo: parameterize!
 	urdf::Model model;
@@ -147,11 +154,39 @@ shared_ptr<PoseSet> PoseSelectionNode::getOptimalPoseSet() {
 	// select random poses
 	if (selectionStrategyName == "random") {
 		ROS_INFO("Generating random pose set...");
-		for (int i = resultSet->getNumberOfPoses(); i <= maxPoses; i = i + 10) {
+		for (int i = resultSet->getNumberOfPoses(); i <= maxPoses; i = i + 1) {
 			RandomPoseSelectionStrategy intializingStrategy(i);
 			resultSet = intializingStrategy.getOptimalPoseSet(resultSet,
 					observabilityIndex, index);
 			this->optimalPoses[i] = resultSet;
+			this->intermediateIndices[i] = index;
+		}
+		return resultSet;
+	}
+
+	if (selectionStrategyName == "random_exchange") {
+		ROS_INFO(
+				"Generating random pose set and improving it by exchanging...");
+		for (int i = 5; i <= maxPoses; i++) {
+			RandomExchangePoseSelectionStrategy strategy(i);
+			shared_ptr<PoseSet> initialSet = resultSet;
+			shared_ptr<PoseSet> optimizedSet = strategy.getOptimalPoseSet(
+					initialSet, observabilityIndex, index);
+			this->optimalPoses[i] = initialSet;
+			this->intermediateIndices[i] = index;
+		}
+		return resultSet;
+	}
+
+	if (selectionStrategyName == "improve_given") {
+		ROS_INFO("Improve given pose set by exchanging...");
+		for (int i = 5; i <= maxPoses; i++) {
+			shared_ptr<MeasurementPoseSet> initialSet = this->poseSource.getInitialPoseSet(
+					*this->kinematicChainPtr, *this->initialState, i);
+			ExchangePoseSelectionStrategy strategy;
+			shared_ptr<PoseSet> optimizedSet = strategy.getOptimalPoseSet(
+					initialSet, observabilityIndex, index);
+			this->optimalPoses[i] = initialSet;
 			this->intermediateIndices[i] = index;
 		}
 		return resultSet;
@@ -200,8 +235,6 @@ map<int, shared_ptr<PoseSet> > PoseSelectionNode::getIntermediatePoseSets() {
 map<int, double> PoseSelectionNode::getIntermediateIndices() {
 	return this->intermediateIndices;
 }
-
-
 
 void PoseSelectionNode::camerainfoCallback(
 		const sensor_msgs::CameraInfoConstPtr& msg) {
