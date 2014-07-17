@@ -142,6 +142,7 @@ map<string, KDL::Frame> KinematicCalibrationState::getJointFrames() const {
 		tf::transformTFToKDL(it->second, frame);
 		jointFrames[name] = frame;
 	}
+	return jointFrames;
 }
 
 } /* namespace kinematic_calibration */
