@@ -11,8 +11,7 @@
 
 namespace kinematic_calibration {
 
-// set estimate from tf and get as Eigen
-TEST(TransformationVertexTest, setEstimateFromTfTest) {
+TEST(TransformationVertexTest, setEstimate) {
 	// arrange
 	TransformationVertex vertex;
 	tf::Transform tfTransform;
@@ -24,63 +23,18 @@ TEST(TransformationVertexTest, setEstimateFromTfTest) {
 	tfTransform.setRotation(quat);
 
 	// act
-	vertex.setEstimateFromTfTransform(tfTransform);
-	Eigen::Isometry3d eigenTransform = vertex.estimate();
+	vertex.setEstimate(tfTransform);
+	tf::Transform newTransform = vertex.estimate();
 
 	// assert
 	double eps = 1e-2;
-	ASSERT_NEAR(tx, eigenTransform.translation()[0], eps);
-	ASSERT_NEAR(ty, eigenTransform.translation()[1], eps);
-	ASSERT_NEAR(tz, eigenTransform.translation()[2], eps);
-	Eigen::Quaterniond eigenQuat(eigenTransform.rotation());
-	ASSERT_NEAR(quat.getX(), eigenQuat.x(), eps);
-	ASSERT_NEAR(quat.getY(), eigenQuat.y(), eps);
-	ASSERT_NEAR(quat.getZ(), eigenQuat.z(), eps);
-	ASSERT_NEAR(quat.getW(), eigenQuat.w(), eps);
-}
-
-// set estimate from Eigen and get as tf
-TEST(TransformationVertexTest, estimateAsTfTransformTest) {
-	// arrange
-	TransformationVertex vertex;
-	double tx = 0.2, ty = 0.3, tz = 0.5;
-	Eigen::Isometry3d eigenTransform(Eigen::Translation3d(tx, ty, tz));
-
-	// act
-	vertex.setEstimate(eigenTransform);
-	tf::Transform tfTransform = vertex.estimateAsTfTransform();
-
-	// assert
-	double eps = 1e-2;
-	ASSERT_NEAR(tx, tfTransform.getOrigin()[0], eps);
-	ASSERT_NEAR(ty, tfTransform.getOrigin()[1], eps);
-	ASSERT_NEAR(tz, tfTransform.getOrigin()[2], eps);
-}
-
-TEST(TransformationVertexTest, roundtripTest) {
-	// arrange
-	TransformationVertex vertex;
-	tf::Transform tfTransform;
-	double tx = 0.2, ty = 0.3, tz = 0.5;
-	double rr = 0.7, rp = 0.11, ry = 0.13;
-	tf::Quaternion quat;
-	quat.setRPY(rr, rp, ry);
-	tfTransform.setOrigin(tf::Vector3(tx, ty, tz));
-	tfTransform.setRotation(quat);
-
-	// act
-	vertex.setEstimateFromTfTransform(tfTransform);
-	tf::Transform newTfTransform = vertex.estimateAsTfTransform();
-
-	// assert
-	double eps = 1e-3;
-	tf::Quaternion oldRot = tfTransform.getRotation();
-	tf::Quaternion newRot = newTfTransform.getRotation();
-	ASSERT_EQ(tfTransform.getOrigin(), newTfTransform.getOrigin());
-	ASSERT_NEAR(oldRot.x(), newRot.x(), eps);
-	ASSERT_NEAR(oldRot.y(), newRot.y(), eps);
-	ASSERT_NEAR(oldRot.z(), newRot.z(), eps);
-	ASSERT_NEAR(oldRot.w(), newRot.w(), eps);
+	ASSERT_NEAR(tx, newTransform.getOrigin()[0], eps);
+	ASSERT_NEAR(ty, newTransform.getOrigin()[1], eps);
+	ASSERT_NEAR(tz, newTransform.getOrigin()[2], eps);
+	ASSERT_NEAR(quat.getX(), newTransform.getRotation().getX(), eps);
+	ASSERT_NEAR(quat.getY(), newTransform.getRotation().getY(), eps);
+	ASSERT_NEAR(quat.getZ(), newTransform.getRotation().getZ(), eps);
+	ASSERT_NEAR(quat.getW(), newTransform.getRotation().getW(), eps);
 }
 
 } /* namespace kinematic_calibration */
