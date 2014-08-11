@@ -186,13 +186,14 @@ shared_ptr<PoseSet> PoseSelectionNode::getOptimalPoseSet() {
 			ExchangePoseSelectionStrategy strategy;
 			shared_ptr<PoseSet> optimizedSet = strategy.getOptimalPoseSet(
 					initialSet, observabilityIndex, index);
-			this->optimalPoses[i] = initialSet;
+			this->optimalPoses[i] = optimizedSet;
 			this->intermediateIndices[i] = index;
+			resultSet = optimizedSet;
 		}
 		return resultSet;
 	}
 
-	// select optimal pose set
+	// else: select optimal pose set
 	ROS_INFO("Generating optimal pose set...");
 
 	// initialize
@@ -207,6 +208,10 @@ shared_ptr<PoseSet> PoseSelectionNode::getOptimalPoseSet() {
 
 	this->optimalPoses[1] = resultSet;
 	this->intermediateIndices[1] = index;
+
+	//ROS_INFO("Improve by exchange...");
+	//resultSet = exStrategy.getOptimalPoseSet(resultSet, observabilityIndex,
+	//		index);
 
 	for (int i = resultSet->getNumberOfPoses(); i < maxPoses; i++) {
 		ROS_INFO("Improve by exchange...");
