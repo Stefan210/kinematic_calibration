@@ -1,0 +1,30 @@
+Optimized joint offsets:
+HeadPitch : -0.0300834
+HeadYaw : 0.0274873
+LElbowRoll : 0.0170363
+LElbowYaw : 0.0259483
+LShoulderPitch : -0.0144878
+LShoulderRoll : 0.022602
+Optimized transform form marker to end effector for chain larm:
+(x, y, z) 0.0244566 -0.0297538 0.00118528 (r, p, y) -0.0913249 -0.0344395 -0.124625
+Optimized transform form camera to head:
+(x, y, z) 0.0464123 9.6499e-05 0.0258451 (q0, q1, q2, q3) 0.643747 -0.634817 0.304251 -0.300046
+Optimized transform for joint HeadPitch:
+(x, y, z) 0 0 0 (r, p, y) 0 -0 0
+Optimized transform for joint HeadYaw:
+(x, y, z) 0 0 -0.1265 (r, p, y) 0 -0 0
+Optimized transform for joint LElbowRoll:
+(x, y, z) 0 0 0 (r, p, y) 0 -0 0
+Optimized transform for joint LElbowYaw:
+(x, y, z) 0.105 0.015 0 (r, p, y) 0 -0 0
+Optimized transform for joint LShoulderPitch:
+(x, y, z) 0 0.098 0.1 (r, p, y) 0 -0 0
+Optimized transform for joint LShoulderRoll:
+(x, y, z) 0 0 0 (r, p, y) 0 -0 0
+Optimized transform for joint LWristYaw:
+(x, y, z) 0.05595 0 0 (r, p, y) 0 -0 0
+Optimized transform for joint l_wrist_joint:
+(x, y, z) 0 0 0 (r, p, y) 0 -0 0
+Optimized camera intrinsics:
+(fx,fy) 594.324 577.51 (cx,cy) 323.031 219.24
+D: -0.219318, 4.50294, 0.0241852, 0.000509537, -18.2898

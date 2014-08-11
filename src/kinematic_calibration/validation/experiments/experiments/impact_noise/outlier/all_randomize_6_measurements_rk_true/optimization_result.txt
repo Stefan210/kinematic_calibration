@@ -1,0 +1,94 @@
+Optimized joint offsets:
+HeadPitch : -0.0533455
+HeadYaw : 0.0132769
+LAnklePitch : 0.0762294
+LElbowRoll : 0.0312865
+LElbowYaw : 0.0381958
+LHipPitch : -0.012132
+LHipRoll : -0.01857
+LHipYawPitch : 0.0165442
+LKneePitch : -0.0793747
+LShoulderPitch : 0.00934488
+LShoulderRoll : -0.000830048
+RAnklePitch : 0.0489019
+RElbowRoll : -0.00531395
+RElbowYaw : -0.00325786
+RHipPitch : 0.018065
+RHipRoll : 0.0326901
+RHipYawPitch : 0.0165442
+RKneePitch : 0.0233606
+RShoulderPitch : -0.0126754
+RShoulderRoll : -0.0144015
+Optimized transform form marker to end effector for chain larm:
+(x, y, z) 0.0253401 -0.0301488 0.00275734 (r, p, y) -0.0152426 0.0496803 -0.0327625
+Optimized transform form marker to end effector for chain lleg:
+(x, y, z) 0.0655126 0.000774311 0.0263363 (r, p, y) -0.00234559 -0.00996598 -0.0257874
+Optimized transform form marker to end effector for chain rarm:
+(x, y, z) 0.0214723 0.0285896 -0.000655125 (r, p, y) -0.056112 -0.11692 0.0727737
+Optimized transform form marker to end effector for chain rleg:
+(x, y, z) 0.0917702 -0.00335916 0.0310134 (r, p, y) -0.0389362 -0.00281779 0.0240596
+Optimized transform form camera to head:
+(x, y, z) 0.0507205 -0.00309401 0.0202029 (q0, q1, q2, q3) 0.63765 -0.635069 0.310108 -0.306469
+Optimized transform for joint HeadPitch:
+(x, y, z) 0 0 0 (r, p, y) 0 -0 0
+Optimized transform for joint HeadYaw:
+(x, y, z) 0 0 -0.1265 (r, p, y) 0 -0 0
+Optimized transform for joint LAnklePitch:
+(x, y, z) 0 0 -0.1029 (r, p, y) 0 -0 0
+Optimized transform for joint LAnkleRoll:
+(x, y, z) 0 0 0 (r, p, y) 0 -0 0
+Optimized transform for joint LElbowRoll:
+(x, y, z) 0 0 0 (r, p, y) 0 -0 0
+Optimized transform for joint LElbowYaw:
+(x, y, z) 0.105 0.015 0 (r, p, y) 0 -0 0
+Optimized transform for joint LHipPitch:
+(x, y, z) 0 0 0 (r, p, y) 0 -0 0
+Optimized transform for joint LHipRoll:
+(x, y, z) 0 0 0 (r, p, y) 0 -0 0
+Optimized transform for joint LHipYawPitch:
+(x, y, z) 0 0.05 -0.085 (r, p, y) 0 -0 0
+Optimized transform for joint LKneePitch:
+(x, y, z) 0 0 -0.1 (r, p, y) 0 -0 0
+Optimized transform for joint LShoulderPitch:
+(x, y, z) 0 0.098 0.1 (r, p, y) 0 -0 0
+Optimized transform for joint LShoulderRoll:
+(x, y, z) 0 0 0 (r, p, y) 0 -0 0
+Optimized transform for joint LWristYaw:
+(x, y, z) 0.05595 0 0 (r, p, y) 0 -0 0
+Optimized transform for joint RAnklePitch:
+(x, y, z) 0 0 -0.1029 (r, p, y) 0 -0 0
+Optimized transform for joint RAnkleRoll:
+(x, y, z) 0 0 0 (r, p, y) 0 -0 0
+Optimized transform for joint RElbowRoll:
+(x, y, z) 0 0 0 (r, p, y) 0 -0 0
+Optimized transform for joint RElbowYaw:
+(x, y, z) 0.105 -0.015 0 (r, p, y) 0 -0 0
+Optimized transform for joint RHipPitch:
+(x, y, z) 0 0 0 (r, p, y) 0 -0 0
+Optimized transform for joint RHipRoll:
+(x, y, z) 0 0 0 (r, p, y) 0 -0 0
+Optimized transform for joint RHipYawPitch:
+(x, y, z) 0 -0.05 -0.085 (r, p, y) 0 -0 0
+Optimized transform for joint RKneePitch:
+(x, y, z) 0 0 -0.1 (r, p, y) 0 -0 0
+Optimized transform for joint RShoulderPitch:
+(x, y, z) 0 -0.098 0.1 (r, p, y) 0 -0 0
+Optimized transform for joint RShoulderRoll:
+(x, y, z) 0 0 0 (r, p, y) 0 -0 0
+Optimized transform for joint RWristYaw:
+(x, y, z) 0.05595 0 0 (r, p, y) 0 -0 0
+Optimized transform for joint l_ankle_joint:
+(x, y, z) 0 0 0 (r, p, y) 0 -0 0
+Optimized transform for joint l_sole_joint:
+(x, y, z) 0 0 -0.04519 (r, p, y) 0 -0 0
+Optimized transform for joint l_wrist_joint:
+(x, y, z) 0 0 0 (r, p, y) 0 -0 0
+Optimized transform for joint r_ankle_joint:
+(x, y, z) 0 0 0 (r, p, y) 0 -0 0
+Optimized transform for joint r_sole_joint:
+(x, y, z) 0 0 -0.04519 (r, p, y) 0 -0 0
+Optimized transform for joint r_wrist_joint:
+(x, y, z) 0 0 0 (r, p, y) 0 -0 0
+Optimized camera intrinsics:
+(fx,fy) 564.03 557.798 (cx,cy) 334.356 185.837
+D: 0.538511, -4.01439, -0.00990877, -0.00679911, 8.81391

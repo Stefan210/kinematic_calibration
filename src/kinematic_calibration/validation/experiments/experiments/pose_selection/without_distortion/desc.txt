@@ -1,0 +1,7 @@
+- Camera extrinsisch
+- Camera intrinsisch, aber nur fx/fy, cx/cy, OHNE distortion
+- joint offsets (ohne HeadPitch/LWrist)
+- Marker transform
+
+- Berechnung NAI mit sigma_L
+- mit scaling

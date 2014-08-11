@@ -1,0 +1,14 @@
+\section{Pose Selection Algorithm}
+\label{sec:pose_selection_algorithm}
+
+\subsection{Motivation}
+In \ref{sec:selection_algorithm}, we presented two algorithms for the selection of poses which maximize the observability index. Further, we developed a new algorithm which extended \emph{Exchange-Add-Exchange} algorithm. In this experiment, we compare the \emph{Exchange-Add-Exchange} algorithm to our new algorithm.
+
+\subsection{Setup}
+We used the same setup as in \ref{sec:poses_and_measurements}, i.e. we selected poses out of two thirds of the 750 measurements respectively (which is needed for 3-fold cross-validation). In order to compare both algorithms, we selected 50 measurements for each fold.
+
+\subsection{Results}
+%TODO
+
+\subsection{Conclusions}
+%TODO 
