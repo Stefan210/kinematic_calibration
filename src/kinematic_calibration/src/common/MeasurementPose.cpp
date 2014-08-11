@@ -109,20 +109,24 @@ void MeasurementPose::getPartialDerivatives(
 		// TODO: parameterize which derivatives should be calculated
 
 		// camera parameters: fx, fy, cx, cy, d[0-4]
-		calcCameraIntrinsicsDerivatives(state, h, partialDerivatesVectorX,
-				partialDerivatesVectorY);
+		if (options.calibrateCameraIntrinsics)
+			calcCameraIntrinsicsDerivatives(state, h, partialDerivatesVectorX,
+					partialDerivatesVectorY);
 
 		// camera transform parameters: tx, ty, tz, rr, rp, ry
-		calcCameraTransformDerivatives(state, h, partialDerivatesVectorX,
-				partialDerivatesVectorY);
+		if (options.calibrateCameraTransform)
+			calcCameraTransformDerivatives(state, h, partialDerivatesVectorX,
+					partialDerivatesVectorY);
 
 		// joint offsets: from root (head) to tip
-		calcJointOffsetsDerivatives(state, h, partialDerivatesVectorX,
-				partialDerivatesVectorY);
+		if (options.calibrateJointOffsets)
+			calcJointOffsetsDerivatives(state, h, partialDerivatesVectorX,
+					partialDerivatesVectorY);
 
 		// marker transform parameters: tx, ty, tz, rr, rp, ry
-		calcMarkerTransformDerivatives(state, h, partialDerivatesVectorX,
-				partialDerivatesVectorY);
+		if (options.calibrateMarkerTransform)
+			calcMarkerTransformDerivatives(state, h, partialDerivatesVectorX,
+					partialDerivatesVectorY);
 
 		// convert to Eigen vector
 		derivativesX.resize(1,
@@ -146,7 +150,7 @@ void MeasurementPose::calcCameraIntrinsicsDerivatives(
 		KinematicCalibrationState state, const double& h,
 		vector<double>& derivativesX, vector<double>& derivativesY) {
 
- 	// camera parameters: fx, fy, cx, cy, d[0-4]
+	// camera parameters: fx, fy, cx, cy, d[0-4]
 	CameraIntrinsicsVertex civ(state.cameraInfo);
 	for (int index = 0; index < civ.dimension(); index++) {
 		// derivations around the current point
@@ -238,7 +242,7 @@ void MeasurementPose::calcMarkerTransformDerivatives(
 
 	// marker transform parameters: tx, ty, tz, rr, rp, ry
 	TransformationVertex vertex;
-	for (int index = 0; index < vertex.dimension()-3; index++) {
+	for (int index = 0; index < vertex.dimension() - 3; index++) {
 		// derivations around the current point
 		double xMinus, yMinus, xPlus, yPlus;
 
@@ -338,7 +342,6 @@ double MeasurementPose::calculateDerivative(const double& plus,
 //		// TODO: How to handle this correctly?!
 //		derivative = 0;
 //	}
-
 
 	//if(derivative < 1e-3)
 	//	return 0.0;
