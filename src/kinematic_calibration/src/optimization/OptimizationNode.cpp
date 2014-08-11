@@ -594,11 +594,10 @@ using namespace kinematic_calibration;
 
 int main(int argc, char** argv) {
 	ros::init(argc, argv, "OptimizationNode");
-	CalibrationContext* context = new RosCalibContext();
-	OptimizationNode node(context);
+	RosCalibContext context;
+	OptimizationNode node(&context);
 	node.startLoop();
 	while (ros::ok())
 		;
-	delete context;
 	return 0;
 }
