@@ -189,10 +189,10 @@ shared_ptr<MeasurementPoseSet> ValidationPoseSource::getInitialPoseSet(
 		this->getPosesByIds(kinematicChain, initialIds, poses);
 
 		// initialize the pose set
-		shared_ptr<MeasurementPoseSet> poseSet = make_shared<MeasurementPoseSet>(
-				state);
+		shared_ptr<MeasurementPoseSet> poseSet =
+				make_shared<MeasurementPoseSet>(state);
 		poseSet->addMeasurementPoses(posePool);
-		for(int i = 0; i < poses.size(); i++) {
+		for (int i = 0; i < poses.size(); i++) {
 			poseSet->setActive(poses[i]);
 		}
 
@@ -240,7 +240,9 @@ int main(int argc, char** argv) {
 	ros::NodeHandle nh;
 	int numOfSplits = 3;
 	nh.param("num_of_splits", numOfSplits, numOfSplits);
-	ROS_INFO("Generating poses for %i-fold cross-validation.", numOfSplits);
+	ROS_INFO(
+			"Generating poses for %i-fold cross-validation. (Parameter: num_of_splits)",
+			numOfSplits);
 
 	ValidationPoseSelectionNode node(numOfSplits);
 	node.run();
