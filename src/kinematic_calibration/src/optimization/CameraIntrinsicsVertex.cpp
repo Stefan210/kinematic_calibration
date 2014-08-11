@@ -42,14 +42,21 @@ void CameraIntrinsicsVertex::oplusImpl(const double* delta) {
 
 	// (k1, k2, t1, t2, k3)
 	this->_estimate.D[0] += delta[4];
-	this->_estimate.D[1] += delta[5];
-	this->_estimate.D[2] += delta[6];
-	this->_estimate.D[3] += delta[7];
-	this->_estimate.D[4] += delta[8];
+//	this->_estimate.D[1] += delta[5];
+//	this->_estimate.D[2] += delta[6];
+//	this->_estimate.D[3] += delta[7];
+//	this->_estimate.D[4] += delta[8];
 }
 
 void CameraIntrinsicsVertex::setToOriginImpl() {
 	this->_estimate = initial;
+
+	// set distortion parameters to zero
+//	this->_estimate.D[0] = 0;
+	this->_estimate.D[1] = 0;
+	this->_estimate.D[2] = 0;
+	this->_estimate.D[3] = 0;
+	this->_estimate.D[4] = 0;
 }
 
 } /* namespace kinematic_calibration */

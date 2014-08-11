@@ -26,12 +26,12 @@ using namespace g2o;
 
 namespace kinematic_calibration {
 
-typedef boost::array<double, 9> CameraIntrinsicsType;
+typedef boost::array<double, 5> CameraIntrinsicsType;
 
 /**
  * Vertex representing the camera parameters.
  */
-class CameraIntrinsicsVertex: public BaseVertex<9, sensor_msgs::CameraInfo> {
+class CameraIntrinsicsVertex: public BaseVertex<5, sensor_msgs::CameraInfo> {
 public:
 	CameraIntrinsicsVertex(sensor_msgs::CameraInfo cameraInfo);
 	virtual ~CameraIntrinsicsVertex();
