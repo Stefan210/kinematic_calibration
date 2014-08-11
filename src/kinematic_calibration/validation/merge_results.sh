@@ -68,6 +68,7 @@ do
 	    echo $NEWLINE >> $CSVOUT
       done
       
+      # Column of VALRMS is $18 if >1 chains were used, or $19 if exact 1 chain was used
       AVGRMS=`awk '{mean += $19} END {print mean/(NR-1);}' $CSVOUT`
       VAR=`awk -v CONVFMT=%.28g '{sum+=$19; sumsq+=($19*$19);} END {print (sumsq/(NR-1) - (sum/(NR-1)*sum/(NR-1)));}' $CSVOUT`
       echo $poses$'\t'$AVGRMS$'\t'$VAR >> $CSVRESULT
