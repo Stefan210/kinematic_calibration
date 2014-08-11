@@ -43,6 +43,14 @@ PoseSelectionNode::PoseSelectionNode(PoseSource& poseSource) :
 	// get the selection strategy name
 	nh.param("selection_strategy", selectionStrategyName,
 			selectionStrategyName);
+	ROS_INFO("Selection strategy is %s. (Parameter: selection_strategy)",
+			selectionStrategyName.c_str());
+
+	bool scaleJacobian = true;
+	nh.param("scale_jacobian", scaleJacobian, scaleJacobian);
+	this->observabilityIndex->setScaleJacobian(scaleJacobian);
+	ROS_INFO("Scaling the jacobian matrix is %s. (Parameter: scale_jacobian)",
+			scaleJacobian ? "ENABLED" : "DISABLED");
 }
 
 PoseSelectionNode::~PoseSelectionNode() {
@@ -181,8 +189,9 @@ shared_ptr<PoseSet> PoseSelectionNode::getOptimalPoseSet() {
 	if (selectionStrategyName == "improve_given") {
 		ROS_INFO("Improve given pose set by exchanging...");
 		for (int i = 5; i <= maxPoses; i++) {
-			shared_ptr<MeasurementPoseSet> initialSet = this->poseSource.getInitialPoseSet(
-					*this->kinematicChainPtr, *this->initialState, i);
+			shared_ptr<MeasurementPoseSet> initialSet =
+					this->poseSource.getInitialPoseSet(*this->kinematicChainPtr,
+							*this->initialState, i);
 			ExchangePoseSelectionStrategy strategy;
 			shared_ptr<PoseSet> optimizedSet = strategy.getOptimalPoseSet(
 					initialSet, observabilityIndex, index);

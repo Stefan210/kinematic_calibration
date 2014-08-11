@@ -34,6 +34,22 @@ public:
 	 */
 	virtual void calculateIndex(const PoseSet& poseSet, double& index) = 0;
 
+	/**
+	 * Get whether the jacoabian matrix columns should be scaled.
+	 * @return whether the jacoabian matrix columns should be scaled
+	 */
+	bool isScaleJacobian() const {
+		return scaleJacobian;
+	}
+
+	/**
+	 * Set whether the jacoabian matrix columns should be scaled.
+	 * @param scaleJacobian should the the jacoabian matrix columns be scaled?
+	 */
+	void setScaleJacobian(bool scaleJacobian) {
+		this->scaleJacobian = scaleJacobian;
+	}
+
 protected:
 	/**
 	 * Performs the SVD on the jacobian of the poseSet and returns
@@ -42,6 +58,9 @@ protected:
 	 * @return The singular values of the jacobian.
 	 */
 	Eigen::VectorXd getSingularValues(const PoseSet& poseSet);
+
+	/// boolean which indicates whether the jacoabian matrix columns should be scaled
+	bool scaleJacobian;
 };
 
 /**
